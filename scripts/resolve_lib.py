@@ -399,3 +399,58 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True):
 
 def salvar(r=None):
     (r or conectar(False)).GetProjectManager().SaveProject()
+
+
+# Organização do Media Pool (regra do usuário): pastas fixas na raiz e, com mais de um vídeo no mesmo
+# projeto, uma subpasta por vídeo numerada (01 - Assunto, 02 - Assunto...) dentro de cada uma.
+PASTAS_PROJETO = ("Timelines", "Footages", "BRoll", "SFX", "Musicas", "Motions", "Legendas")
+TIPO_POR_SUBPASTA = {"gravacao": "Footages", "narracoes": "Footages", "brolls": "BRoll", "sfx": "SFX",
+                     "musica": "Musicas", "motions": "Motions", "legendas": "Legendas"}
+
+
+def _sub(mp, pai, nome):
+    for f in pai.GetSubFolderList() or []:
+        if f.GetName() == nome: return f
+    return mp.AddSubFolder(pai, nome)
+
+
+def _tipo_do_arquivo(arq):
+    ext = os.path.splitext(arq)[1].lower()
+    if ext in (".srt", ".vtt"): return "Legendas"
+    if ext in (".wav", ".mp3", ".aif", ".aiff", ".m4a"): return "Musicas"
+    return "Footages"
+
+
+def organizar(p, mp, videos):
+    """Arruma o Media Pool em Timelines / Footages / BRoll / SFX / Musicas / Motions / Legendas.
+    videos = [(pasta_do_video_no_disco, prefixo_das_timelines), ...] na ordem 01, 02, 03...
+    Com 1 vídeo os itens ficam direto na pasta do tipo; com mais de um, em '<NN> - <Assunto>' dentro dela.
+    O tipo vem da subpasta do arquivo no disco (gravacao, brolls, sfx, musica, motions, legendas);
+    timelines pela pasta Timelines pelo prefixo do nome. Arquivo de fora das pastas dos vídeos vai para Footages/Originais."""
+    root = mp.GetRootFolder(); tipos = {n: _sub(mp, root, n) for n in PASTAS_PROJETO}
+    varios = len(videos) > 1
+    rot = [f"{i + 1:02d} - {os.path.basename(os.path.normpath(d)).rsplit(' - ', 1)[0]}" for i, (d, _) in enumerate(videos)]
+    destino = lambda tipo, k: _sub(mp, tipos[tipo], rot[k]) if (varios and k is not None) else tipos[tipo]
+    def todas(f):
+        for c in f.GetClipList() or []: yield c
+        for s in f.GetSubFolderList() or []: yield from todas(s)
+    mover = {}
+    for c in list(todas(root)):
+        if c.GetClipProperty("Type") == "Timeline":
+            k = next((i for i, (_, pre) in enumerate(videos) if c.GetName().startswith(pre)), None)
+            alvo = destino("Timelines", k)
+        else:
+            arq = c.GetClipProperty("File Path") or ""
+            k = next((i for i, (d, _) in enumerate(videos) if arq.startswith(os.path.normpath(d) + os.sep)), None)
+            if k is None:
+                alvo = _sub(mp, tipos["Footages"], "Originais") if _tipo_do_arquivo(arq) == "Footages" else tipos[_tipo_do_arquivo(arq)]
+            else:
+                sub = os.path.relpath(arq, videos[k][0]).split(os.sep)[0]
+                alvo = destino(TIPO_POR_SUBPASTA.get(sub, _tipo_do_arquivo(arq)), k)
+        mover.setdefault(alvo.GetUniqueId(), (alvo, []))[1].append(c)
+    for alvo, clips in mover.values(): mp.MoveClips(clips, alvo)
+    # apaga as pastas antigas que ficaram vazias (NARRACAO, MUSICA, BROLLS, GRAVACOES...)
+    vazias = [f for f in root.GetSubFolderList() if f.GetName() not in PASTAS_PROJETO and not list(todas(f))]
+    if vazias: mp.DeleteFolders(vazias)
+    mp.SetCurrentFolder(root)
+    return {f.GetName(): sum(1 for _ in todas(f)) for f in root.GetSubFolderList()}
