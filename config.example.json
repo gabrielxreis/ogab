@@ -134,6 +134,8 @@
   "cor": {
     "_leia": "PowerGrade (.drx) aplicado em TODOS os takes que entram na timeline. Exporte do DaVinci: Color > Gallery > botão direito no still > Export (gera .dpx + .drx). Coloque os arquivos em assets/grade/ (fica fora do git).",
     "aplicar_power_grade": false,
-    "drx": "assets/grade/<seu PowerGrade>.drx"
+    "drx": "assets/grade/<seu PowerGrade>.drx",
+    "drx_iphone": "assets/grade/<conversor do iPhone + seu LUT>.drx",
+    "_iphone": "Takes de iPhone (detectados pelo metadado Apple ou HEVC HLG/Dolby Vision) recebem drx_iphone: um PowerGrade COMBINADO com o nó conversor do iPhone ANTES dos nós do seu LUT. Crie uma vez no DaVinci: aplique o conversor num clipe de iPhone, adicione depois os nós do seu LUT (ou aplique o LUT e insira o conversor como primeiro nó), grave o still na Gallery e exporte (.drx). Se não existir, o iPhone recebe só o drx normal e a skill avisa."
   }
 }

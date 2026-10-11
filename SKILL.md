@@ -75,7 +75,7 @@ Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoo
 
 ## 7b. Cor (se `config.cor.aplicar_power_grade`)
 
-Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, config.cor.drx)` em todos os takes da V1. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
+Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
 
 ## 8. Lettering (se o usuário quis)
 

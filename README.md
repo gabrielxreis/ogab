@@ -80,6 +80,12 @@ No Claude Code, peça em linguagem normal ou use o comando:
 | `regras.legenda.max_caracteres` | 25 | Tamanho máximo da linha da legenda (uma linha só) |
 | `regras.geracao_so_ilimitada` | `true` | Nunca gera take que gaste crédito |
 
+## Cor e vídeos de iPhone
+
+- `cor.drx`: seu PowerGrade padrão, aplicado em todos os takes.
+- `cor.drx_iphone`: PowerGrade **combinado** para vídeo de iPhone (nó conversor do iPhone **primeiro**, depois os nós do seu LUT). A skill detecta iPhone sozinha (metadado Apple ou HEVC HLG/Dolby Vision) e aplica esse no lugar do padrão.
+- Por que combinado: pela API do DaVinci não dá para empilhar dois PowerGrades no mesmo clipe, e os estágios de grupo (pre/post-clip) não aceitam .drx. Então crie uma vez: num clipe de iPhone, aplique o conversor, adicione depois os nós do seu LUT, grave o still na Gallery e exporte (gera .dpx + .drx) para `assets/grade/`.
+
 ## Conferência automática (`scripts/qc.py`)
 
 Antes de entregar, confere e lista **OK / AVISO / ERRO**:

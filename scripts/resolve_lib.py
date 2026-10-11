@@ -143,13 +143,23 @@ def movimento(item, tipo="zoom_in", intensidade=0.08):
     return z
 
 
-def aplicar_grade(r, t, drx, trilha=1):
-    """Aplica o PowerGrade (.drx) em todos os takes da trilha de vídeo (via node graph de cada item).
-    Timeline.ApplyGradeFromDRX não funciona pela API; usar TimelineItem.GetNodeGraph().ApplyGradeFromDRX(path, 0)."""
-    if not os.path.isabs(drx): drx = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), drx)
+def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1):
+    """Aplica o PowerGrade (.drx) em todos os takes da trilha. Takes de iPhone recebem `drx_iphone`
+    (PowerGrade combinado: conversor do iPhone ANTES + LUT/look depois), se configurado.
+    Notas da API: Timeline.ApplyGradeFromDRX não funciona; usar TimelineItem.GetNodeGraph().ApplyGradeFromDRX(path, 0).
+    Os grafos de grupo (pre/post-clip) NÃO aceitam .drx (só SetLUT), por isso a ordem conversor -> LUT
+    precisa vir pronta num único PowerGrade combinado. Sempre pegar o grafo de novo a cada chamada (grafo velho derruba o Resolve)."""
+    from midia import eh_iphone
+    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    absol = lambda p: p if (not p or os.path.isabs(p)) else os.path.join(base, p)
+    drx, drx_iphone = absol(drx), absol(drx_iphone)
     r.OpenPage("color"); res = []
     for x in t.GetItemListInTrack("video", trilha) or []:
-        g = x.GetNodeGraph(); res.append(bool(g and g.ApplyGradeFromDRX(drx, 0)))
+        arq = x.GetMediaPoolItem().GetClipProperty("File Path")
+        iph = bool(arq and os.path.exists(arq) and eh_iphone(arq))
+        usar = drx_iphone if (iph and drx_iphone and os.path.exists(drx_iphone)) else drx
+        if iph and usar == drx: print(f"AVISO: {x.GetName()} é de iPhone mas não há PowerGrade combinado (cor.drx_iphone); aplicado só o LUT")
+        res.append((x.GetName(), "iphone" if iph else "padrao", bool(x.GetNodeGraph().ApplyGradeFromDRX(usar, 0))))
     r.OpenPage("edit")
     return res
 
