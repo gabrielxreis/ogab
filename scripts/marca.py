@@ -1,6 +1,7 @@
 """Identidade visual da empresa direto do site oficial: logos, cores, fontes, favicon e imagem de compartilhamento.
 
   python3 marca.py https://site-da-empresa.com ~/Desktop/<Empresa>/marca
+  python3 marca.py inverter logo.png [saida.png]   -> versão oposta da logo (branca <-> preta), mantendo a transparência
 
 Salva em <destino>/:
   logos/          todos os candidatos a logo (img/svg com "logo" no nome/classe/alt, favicons, apple-touch-icon, og:image)
@@ -106,6 +107,22 @@ def main(site, destino):
     print(len([s for s in salvos if "arquivo" in s]), "arquivos em", os.path.join(destino, "logos"))
 
 
+def inverter(ent, sai=None):
+    """Branco vira preto e preto vira branco (inverte só o RGB; o canal alfa fica igual, então o fundo transparente
+    continua transparente). Para logo monocromática: gera a versão para fundo claro a partir da branca e vice-versa.
+    Logo colorida: inverter troca as cores da marca; nesse caso pedir a versão oficial ao cliente."""
+    from PIL import Image, ImageOps
+    im = Image.open(ent).convert("RGBA"); r, g, b, a = im.split()
+    rgb = ImageOps.invert(Image.merge("RGB", (r, g, b)))
+    out = Image.merge("RGBA", (*rgb.split(), a))
+    if not sai:
+        base, ext = os.path.splitext(ent)
+        sai = base.replace("branca", "preta") if "branca" in base else base.replace("preta", "branca") if "preta" in base else base + "_invertida"
+        sai += ".png"
+    out.save(sai); print(sai); return sai
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 3: print(__doc__); sys.exit()
-    main(sys.argv[1], os.path.expanduser(sys.argv[2]))
+    if sys.argv[1] == "inverter": inverter(os.path.expanduser(sys.argv[2]), sys.argv[3] if len(sys.argv) > 3 else None)
+    else: main(sys.argv[1], os.path.expanduser(sys.argv[2]))
