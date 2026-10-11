@@ -128,6 +128,8 @@ def equilibrar(srt, min_s=0.7, max_shift=0.35):
         if falta > 0 and k > 0:                  # adianta o início dela, encurtando a anterior
             folga = min(T[k - 1][1] - T[k - 1][0] - min_s, max_shift - (orig[k][0] - T[k][0]), falta)
             if folga > 0: T[k - 1][1] -= folga; T[k][0] -= folga
+    for k in range(1, len(T)):                   # nunca sobrepor (o DaVinci recusa SRT sobreposto)
+        if T[k][0] < T[k - 1][1]: T[k - 1][1] = T[k][0]
     out = [f"{b[0]}\n{tc(T[k][0])} --> {tc(T[k][1])}\n" + '\n'.join(b[2:]) + '\n' for k, b in enumerate(bl)]
     open(srt, 'w').write('\n'.join(out))
 
@@ -200,7 +202,7 @@ def metrica(srt, maxc=25, min_s=0.7):
     e número/data cortado da legenda seguinte."""
     def s(tc): h, m, r = tc.split(':'); sec, ms = r.split(','); return int(h)*3600+int(m)*60+int(sec)+int(ms)/1000
     bl = [b.split('\n') for b in open(srt).read().strip().split('\n\n')]
-    probs = []
+    probs = []; ant_fim = 0
     for k, b in enumerate(bl):
         a, z = [s(x.strip()) for x in b[1].split('-->')]; txt = b[2:]; linha = ' '.join(txt); d = z - a
         tag = f"#{b[0]} [{linha}]"
@@ -211,6 +213,8 @@ def metrica(srt, maxc=25, min_s=0.7):
         if k + 1 < len(bl) and not re.search(r'[.?!]$', linha) and fraca(ult) and not re.fullmatch(r'[\d.,º]+', ult) and not (ult.lower() == 'que' and pen == 'por'):
             probs.append(f"{tag} termina em palavra fraca '{ult}'")
         if d < min_s - 0.02: probs.append(f"{tag} dura {d:.2f}s (mín {min_s})")
+        if k and a < ant_fim - 0.001: probs.append(f"{tag} começa antes do fim da anterior (sobreposta)")
+        ant_fim = z
         if k + 1 < len(bl):
             prox = bl[k + 1][2:]; p1 = prox[0].split()[0].lower() if prox and prox[0].split() else ''
             if re.search(r'\d$', linha) and p1 in ('de', 'anos', 'mil', 'milhões', '%'): probs.append(f"{tag} número separado de '{p1}'")
