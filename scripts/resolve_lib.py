@@ -227,10 +227,15 @@ def _fade_saida(comp, dur_f, fade_f, fim):
         raise RuntimeError("fade de saída não ficou certo")
 
 
-def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0)):
+VEL_ENTRADA = 0.7   # animação do pacote a 70%: na velocidade original a entrada leva ~20 quadros e o texto "pula" na tela
+SEGURA_F = 10       # quadros a mais com o texto inteiro antes do fade (compensa a entrada mais lenta)
+
+
+def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0), velocidade=VEL_ENTRADA):
     """Padrão do usuário para os letterings: Shading Element = SOLID (o template vem com gradiente, Type1=2),
     cor sólida, entrelinha mais junta com quebra de linha, tamanho que cabe na largura, animação na velocidade
-    NORMAL (acelerar com TimeSpeed pede quadros além do fim do título: "frame not available") e, se dur_f for
+    um pouco MAIS LENTA (velocidade 0.7: entrada suave; nunca acima de 1.0, acelerar pede quadros além do fim
+    do título: "frame not available") e, se dur_f for
     menor que o título, FADE OUT médio (fade_f quadros) na imagem inteira do título (_fade_saida)."""
     comp = item.GetFusionCompByIndex(1); txts = _textos(comp)
     if not txts: raise RuntimeError(f"título sem Text+: {item.GetName()}")
@@ -239,8 +244,9 @@ def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8
         tool.SetInput("ShadingElements", 1); tool.SetInput("Type1", 0)          # 0 = Solid
         tool.SetInput("Red1", cor[0]); tool.SetInput("Green1", cor[1]); tool.SetInput("Blue1", cor[2]); tool.SetInput("Alpha1", 1.0)
         if "\n" in texto: tool.SetInput("LineSpacing", entrelinha)
-    for ts in comp.GetToolList(False, "TimeSpeed").values(): ts.SetInput("Speed", 1.0)
+    for ts in comp.GetToolList(False, "TimeSpeed").values(): ts.SetInput("Speed", min(1.0, velocidade))
     fim = int(comp.GetAttrs().get("COMPN_RenderEnd", item.GetDuration() - 1))
+    if dur_f: dur_f = min(dur_f + SEGURA_F, fim - fade_f - 1)
     if dur_f and dur_f + fade_f < fim: _fade_saida(comp, dur_f, fade_f, fim)
 
 
@@ -314,7 +320,7 @@ def camada_letterings(t, mp, lista, template):
         for c in camadas:
             if ini_f >= c[-1][4] + 1: c.append((*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)); break
         else: camadas.append([(*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)])
-    ocup = [(x[1], x[1] + x[2] + 0.6) for x in lista]   # inclui o fade out
+    ocup = [(x[1], x[1] + x[2] + (SEGURA_F + 18) / F) for x in lista]   # inclui a folga e o fade out
     for c in reversed(camadas):           # a primeira camada termina mais perto dos takes
         travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
                  [("video", i) for i in range(2, t.GetTrackCount("video") + 1)]
