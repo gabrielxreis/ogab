@@ -55,7 +55,7 @@ curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main
 ```
 
 O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
-- instala **Homebrew** (se faltar), **ffmpeg**, **Node.js**, **Python 3**, **git** e **Pillow**;
+- instala **Homebrew** (se faltar), **ffmpeg**, **yt-dlp**, **Node.js**, **Python 3**, **git** e **Pillow**;
 - baixa a skill em `~/.claude/skills/ogab` e cria o seu `config.json`;
 - instala o **HyperFrames** e roda o `hyperframes doctor`;
 - instala as fontes livres (Poppins, Playfair Display, Lobster);
@@ -107,6 +107,7 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 | DaVinci Resolve | **Studio 21.1+** | A versão grátis não tem scripting externo. Abaixo da 21.1 a transcrição vai para o Whisper local |
 | Python | 3.10+ | Pillow; `pyobjc-framework-Vision` para o `legenda_ui.py` |
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
+| yt-dlp | qualquer recente (`brew upgrade yt-dlp` se o YouTube mudar) | Baixar trecho de vídeo público do YouTube (reportagem, cena histórica) para b-roll |
 | Node.js | 18+ | HyperFrames |
 
 

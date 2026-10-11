@@ -25,8 +25,8 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 ok "Homebrew $(brew --version | head -1 | awk '{print $2}')"
 
-info "2/7 ffmpeg, Node.js, Python 3 e git"
-for pkg in ffmpeg node python git; do
+info "2/7 ffmpeg, yt-dlp, Node.js, Python 3 e git"
+for pkg in ffmpeg yt-dlp node python git; do
   bin="$pkg"; [ "$pkg" = "python" ] && bin="python3"
   if command -v "$bin" >/dev/null 2>&1; then ok "$pkg já instalado"; else brew install "$pkg"; ok "$pkg instalado"; fi
 done
