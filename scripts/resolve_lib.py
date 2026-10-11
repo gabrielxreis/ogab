@@ -332,8 +332,9 @@ def camada_letterings(t, mp, lista, template):
             for k, i in travar: t.SetTrackLock(k, i, False)
         if _assinatura(t) != antes: raise RuntimeError("áudio/legenda mudaram ao inserir título (ripple): desfazer e refazer")
         t.AddTrack("video", {"index": 1})
+    # endFrame do AppendToTimeline é EXCLUSIVO: com '- 1' cada take voltava 1 quadro menor (quadro preto entre takes).
     for mpi, st, lo, dur, zoom, r_ in takes:
-        x = mp.AppendToTimeline([{"mediaPoolItem": mpi, "startFrame": lo, "endFrame": lo + math.ceil(dur * r_) - 1, "mediaType": 1,
+        x = mp.AppendToTimeline([{"mediaPoolItem": mpi, "startFrame": lo, "endFrame": lo + math.ceil(dur * r_), "mediaType": 1,
                                   "trackIndex": 1, "recordFrame": st}])
         if x and zoom and zoom != 1.0: x[0].SetProperty("ZoomX", zoom); x[0].SetProperty("ZoomY", zoom)
     return ocup
