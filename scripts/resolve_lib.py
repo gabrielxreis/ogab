@@ -517,3 +517,30 @@ def trocar_pela_copia(p, mp, t):
         for x in d.GetItemListInTrack("video", j) or []:
             if x.GetFusionCompCount() and _textos(x.GetFusionCompByIndex(1)): x.SetFades({"FadeOut": FADE_LETTERING})
     return d
+
+
+def inserir_letterings_na_trilha(t, trilha, lista, template, centro_y=None):
+    """Insere letterings [(TEXTO, inicio_s, dur_s[, template[, centro_y]]), ...] direto na trilha `trilha` (acima da V1),
+    SEM tocar na linha principal (regra 1h). PRÉ-REQUISITO: o destino da timeline (patch no cabeçalho) tem que estar
+    nessa trilha (a API não muda o destino; fazer pela interface). Trava todas as outras trilhas durante a inserção
+    (o InsertFusionTitleIntoTimeline faz ripple) e confere que nada mais andou. Ordem cronológica."""
+    F = fps_tl(t); S = t.GetStartFrame()
+    travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
+             [("video", i) for i in range(1, t.GetTrackCount("video") + 1) if i != trilha]
+    for k, i in travar: t.SetTrackLock(k, i, True)
+    t.SetTrackLock("video", trilha, False)
+    antes = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
+    try:
+        for item in sorted(lista, key=lambda x: x[1]):
+            texto, ini, dur = item[:3]; tpl = item[3] if len(item) > 3 else template; cy = item[4] if len(item) > 4 else centro_y
+            f = S + max(3, round(ini * F)); _ir(t, f); time.sleep(0.6); _ir(t, f)
+            n0 = len(t.GetItemListInTrack("video", trilha) or [])
+            if not t.InsertFusionTitleIntoTimeline(tpl): raise RuntimeError(f"título não entrou ({tpl}): o destino está na trilha {trilha}?")
+            novos = [x for x in t.GetItemListInTrack("video", trilha) if x.GetStart() == f]
+            if len(t.GetItemListInTrack("video", trilha)) != n0 + 1 or not novos:
+                raise RuntimeError(f"título não caiu na trilha {trilha} em {f}: conferir o destino da timeline")
+            ajustar_titulo(novos[0], texto, dur_f=round(dur * F), centro_y=cy)
+    finally:
+        for k, i in travar: t.SetTrackLock(k, i, False)
+    depois = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
+    if depois != antes: raise RuntimeError("outra trilha mudou durante a inserção (ripple): conferir")
