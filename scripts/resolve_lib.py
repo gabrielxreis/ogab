@@ -228,9 +228,10 @@ def _fade_saida(comp, dur_f, fade_f, fim):
 
 
 SEGURA_F = 0   # quadros extras com o texto inteiro antes do fade
+FADE_LETTERING = 31   # fade de saída no bloco (o usuário ajustou assim no 'NÃO ABANDONE SUA CARREIRA')
 
 
-def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=15, entrelinha=0.8, cor=(1.0, 1.0, 1.0), centro_y=None):
+def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=31, entrelinha=0.8, cor=(1.0, 1.0, 1.0), centro_y=None):
     """Padrão do usuário para os letterings: troca SÓ o que não é animado no template: texto, tamanho que cabe na
     largura, Shading Element = SOLID (Type1=0), entrelinha 0.8 com quebra de linha e, se pedido, a altura (centro_y,
     0 = base, 1 = topo do quadro). NUNCA sobrescrever entrada que tenha animação (GetConnectedOutput) nem o TimeSpeed:
@@ -250,7 +251,7 @@ def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=15, entrelinha=0.8
         por(tool, "Red1", cor[0]); por(tool, "Green1", cor[1]); por(tool, "Blue1", cor[2])
         if "\n" in texto: por(tool, "LineSpacing", entrelinha)
         if centro_y is not None: por(tool, "Center", {1: 0.5, 2: centro_y})
-    item.SetFades({"FadeOut": fade_f})
+    item.SetFades({"FadeOut": fade_f or FADE_LETTERING})
 
 
 def checar_fades(t):
@@ -511,4 +512,8 @@ def trocar_pela_copia(p, mp, t):
     nome, vi = t.GetName(), t.GetVoiceIsolationState(1)
     d = t.DuplicateTimeline(nome + " (novo)"); p.SetCurrentTimeline(d); mp.DeleteTimelines([t]); d.SetName(nome)
     if vi and vi.get("isEnabled") and not d.GetVoiceIsolationState(1).get("isEnabled"): d.SetVoiceIsolationState(1, vi)
+    # a cópia NÃO leva os fades dos títulos: reaplicar o fade de saída padrão em todo lettering
+    for j in range(2, d.GetTrackCount("video") + 1):
+        for x in d.GetItemListInTrack("video", j) or []:
+            if x.GetFusionCompCount() and _textos(x.GetFusionCompByIndex(1)): x.SetFades({"FadeOut": FADE_LETTERING})
     return d
