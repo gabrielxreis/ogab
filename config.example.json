@@ -51,7 +51,11 @@
     "renderizar_video": false,
     "palavras_chave_lettering": true,
     "capa_e_legenda_post": true,
-    "_renderizar_video": "false = deixa a timeline pronta no DaVinci e NÃO exporta o MP4 (o usuário exporta). A capa (PNG) e a legenda do post são geradas mesmo assim."
+    "_renderizar_video": "false = deixa a timeline pronta no DaVinci e NÃO exporta o MP4 (o usuário exporta). A capa (PNG) e a legenda do post são geradas mesmo assim.",
+    "origem_takes": "perguntar",
+    "_origem_takes": "perguntar | ia (tudo gerado no Magnific ilimitado) | banco (Envato etc.) | misto (banco no real, IA no conceitual)",
+    "legenda_atras_da_pessoa": true,
+    "pacote_entrevista": "perguntar"
   },
   "regras": {
     "duracao_segundos": {

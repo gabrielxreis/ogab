@@ -66,8 +66,9 @@ Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoo
 
 ## 7. Takes
 
+0. **Origem dos takes: perguntar ao usuário** (se `opcoes.origem_takes` = `perguntar`): **tudo com IA** (Magnific ilimitado), **tudo de banco** (Envato etc.) ou **misto** (banco no que existir de verdade, IA no que for conceitual ou não achar). Seguir a escolha nos passos abaixo.
 1. Dividir a narração em blocos de 2-5 s pelos tempos da transcrição.
-2. Primeiro **banco** (`provedores.takes_banco`, ex.: Envato `search_stock_video` com `orientation` certa). Baixar 1080P pelo navegador -> `brolls/take_XX`.
+2. Se for banco ou misto, primeiro **banco** (`provedores.takes_banco`, ex.: Envato `search_stock_video` com `orientation` certa). Baixar 1080P pelo navegador -> `brolls/take_XX`.
 3. Se não achar, **gerar** (`provedores.geracao_takes`), **só ilimitado**: Magnific pelo site (Nano Banana 2 1K + Kling 2.5 720p 5 s). Se só sair pago, avisar e propor alternativa.
 4. `midia.py preparar_take` para 4K/ProRes; `midia.py green` para garantir que não é chroma.
 5. `montar_takes` (sem buracos: encadeia pelo fim real e usa ceil).
@@ -117,6 +118,16 @@ Objetivo: nenhum trecho parado mais de ~2 s sem alguma mudança na tela. Planeja
 - **Barra de progresso / selo da marca** discreto no topo durante o vídeo (opcional, perguntar).
 - **CTA final animado** com a logo e o site do cliente.
 Regras: sem rosto realista de pessoa real; cores, logo e fonte da `marca/`; nada sobre a faixa da legenda; um recurso por vez na tela (motion, palavra-chave e callout não se sobrepõem); conferir quadro a quadro sobre o vídeo antes de colocar; backup da timeline antes de mexer.
+
+## 8e. Mais recursos do HyperFrames (usar quando o vídeo pedir)
+
+- **Pessoa falando para a câmera** (gravação do cliente, depoimento, entrevista):
+  - **Legendas cinematográficas** (`embedded-captions`): a legenda passa **atrás da pessoa**, 35 estilos. Explorar sempre que houver alguém falando; propor o estilo. Só funciona com uma pessoa e sem troca de cena: se tiver cortes, dividir o vídeo antes.
+  - **Pacote de gráficos de entrevista** (`talking-head-recut`): títulos animados, nome e cargo embaixo, cartões com números, citações, vídeo dentro do vídeo, sincronizados com a fala (9:16, 4:5, 16:9). **Perguntar antes** se o usuário quer.
+- **Mapas animados** (`motion-graphics`): quando o assunto envolver lugar (país, estado, cidade, trajeto), criar a animação: destacar região, ligar cidades, zoom no local (ex.: Bora Imigrar, trajeto Brasil > EUA).
+- **Cartão da notícia-fonte** (`motion-graphics`): em vídeo de notícia, recriar a manchete/matéria (veículo, título, data) como cartão animado no começo ou quando a fonte é citada. Dá credibilidade. Recriar o visual, sem copiar o texto inteiro da matéria.
+- **Mixagem de áudio** (`hyperframes-audio`): música abaixando sozinha quando a voz entra (ducking), compressor, limitador, equalizador, fades. Mantém as regras de volume (narração +5, música -10 no DaVinci) como base.
+- **Remover fundo** de foto ou vídeo (`media-use` / `hyperframes remove-background`): pessoa ou produto do cliente por cima de outro cenário, take ou motion.
 
 ## 9. Legenda
 

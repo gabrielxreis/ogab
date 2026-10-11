@@ -18,11 +18,12 @@ Feita para **Claude Code** (app desktop ou terminal).
 | 4 | Projeto no DaVinci (`Assunto - Empresa`), narração na A1 em +5 dB | - | Scripting API do Resolve |
 | 5 | Música emotiva/em alta, clímax no CTA, fade out, -10 dB na A2 | Escolhe entre 3-4 | Artlist ou Envato |
 | 6 | Efeitos sonoros (whoosh nas trocas, impacto no gancho) | Liga/desliga no config | Artlist ou Envato |
-| 7 | Takes: banco primeiro, gera se faltar (só modo **ilimitado**) | Movimentos: a skill pergunta | Envato, Artlist, Storyblocks, Pexels / Magnific |
+| 7 | Takes: **tudo IA, tudo banco ou misto** (você escolhe); geração só no modo **ilimitado** | Origem e movimentos: a skill pergunta | Envato, Artlist, Storyblocks, Pexels / Magnific |
 | 7b | Cor: aplica o **seu PowerGrade** (.drx) em todos os takes (opcional) | Liga/desliga no config | DaVinci (node graph) |
 | 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
 | 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
 | 8d | **Edição dinâmica** (HyperFrames): cortes na batida da música (só quando faz sentido; em vídeo informativo a fala manda), punch-in/zoom nos takes, transições com a cor da marca, tipografia cinética e callouts, CTA animado | Vê a tabela antes | HyperFrames + DaVinci |
+| 8e | Pessoa falando: **legenda atrás da pessoa** e (se pedir) **pacote de gráficos de entrevista**; **mapas animados**; **cartão da notícia-fonte**; **mixagem** (música abaixa quando a voz entra); **remover fundo** | Pergunta o que for opcional | HyperFrames |
 | 8c | **Motions** (HyperFrames) nos momentos certos da fala, no centro da tela, com as cores e a logo da marca, numa trilha MOTIONS | Vê a tabela antes | HyperFrames + DaVinci |
 | 8b | **Palavras-chave** animadas (seu pacote de lettering) no momento em que são faladas; a legenda some enquanto elas aparecem | Vê a lista antes | DaVinci |
 | 10 | Timeline pronta (o MP4 você exporta; render só se pedir), **capa** (`capa.png`) e **legenda do post** com hashtags (`legenda_post.txt`) em `videos/`, e **conferência automática** | - | `resolve_lib.py`, `qc.py` |
@@ -84,6 +85,9 @@ No Claude Code, peça em linguagem normal ou use o comando:
 | `opcoes.movimentos_nos_takes` | `perguntar` | Zoom/movimento leve nos takes (`sempre`, `nunca`, `perguntar`) |
 | `opcoes.lettering_no_gancho` | `perguntar` | Título animado no começo |
 | `opcoes.multi_formatos` | `false` | Renderiza também 4:5, 16:9 e versões 15/30/60 s para Ads |
+| `opcoes.origem_takes` | `perguntar` | Takes `ia` (tudo gerado, só ilimitado), `banco` (Envato etc.) ou `misto` |
+| `opcoes.legenda_atras_da_pessoa` | `true` | Com pessoa falando, legenda cinematográfica atrás dela (HyperFrames) |
+| `opcoes.pacote_entrevista` | `perguntar` | Gráficos de entrevista (nome/cargo, números, citações) |
 | `cor.aplicar_power_grade` | `false` | Aplica o seu PowerGrade (`cor.drx`, em `assets/grade/`) em todos os takes |
 | `opcoes.conferencia_automatica` | `true` | Roda o `qc.py` antes de entregar |
 | `opcoes.pauta_automatica.ativo` | `false` | Sugere pautas sozinha (fonte `gratis`, `newsapi` ou `gnews`) |
