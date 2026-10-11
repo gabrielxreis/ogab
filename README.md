@@ -42,6 +42,25 @@ Tudo fica numa pasta na Mesa com o nome do vídeo:
 
 ## Instalação
 
+### Com um comando (recomendado)
+
+Abra o **Terminal** do Mac e cole:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/install.sh | bash
+```
+
+O instalador ([install.sh](install.sh)) faz tudo sozinho e pode ser rodado de novo para atualizar:
+- instala o **Homebrew** (se faltar), **ffmpeg**, **Node.js**, **Python 3**, **git** e **Pillow**;
+- baixa a skill em `~/.claude/skills/video-redes` e cria o seu `config.json`;
+- instala o **HyperFrames** (motions, gráficos, edição dinâmica) e roda o `hyperframes doctor`;
+- instala as fontes livres (Poppins, Playfair Display, Lobster);
+- confere se o **DaVinci Resolve Studio** e o scripting estão no Mac.
+
+Depois disso falta só o que depende de você (o instalador lembra no final): ligar o scripting no DaVinci (passo 5), conectar as suas contas (passo 8) e o Claude in Chrome (passo 9). Reinicie o Claude Code e peça um vídeo.
+
+### Passo a passo manual
+
 > **Skill complementar recomendada:** `competitor-profiling` (pacote `anthropic-skills`). Quando você manda o site ou material de uma empresa, a skill usa ela para varrer e salvar o máximo de informação (produtos, público, posicionamento, diferenciais, provas, tom, concorrentes) antes de começar. Instale pelo catálogo de skills do Claude (Personalização > Skills, ou peça "instala a skill competitor-profiling"). Sem ela, a skill lê o site direto.
 
 1. **Instalar o HyperFrames junto** (motions e edição dinâmica: cortes na batida, zoom, transições, tipografia cinética):
