@@ -84,7 +84,7 @@ Listar 3-5 vozes no idioma (ElevenLabs `creative_list_voices`; incluir vozes do 
 
 ## 5. Música
 
-Clima padrão: **emotiva, que faz sonhar**, instrumental, priorizando as mais baixadas/em alta (Artlist `sortBy: TOP_DOWNLOADS`, Envato `sortBy: popular`). Mostrar 3-4 opções com prévia; o usuário escolhe. Baixar WAV pelo navegador. `preparar_musica` posiciona o trecho para o **clímax cair no CTA** (usar `hookStartSeconds` do Artlist), com **fade out** e 48 kHz; `colocar_musica(db=-10)` na A2.
+Clima padrão: **emotiva, que faz sonhar**, instrumental, priorizando as mais baixadas/em alta (Artlist `sortBy: TOP_DOWNLOADS`, Envato `sortBy: popular`). Mostrar 3-4 opções com prévia; o usuário escolhe. Baixar WAV pelo navegador. **Música BRUTA na timeline (regra do usuário, 11/10/2026): nunca cortar/renderizar o WAV antes.** `colocar_musica(t, mp, wav_original, inicio_faixa=hookStartSeconds - tempo_do_CTA, db=-10)` põe o arquivo original na A2 com ponto de entrada no trecho (clímax no CTA) e fades no próprio clipe (0,5 s in, 2,5 s out), para o usuário arrastar e reajustar no DaVinci. Cria a A2 se a timeline só tiver A1.
 
 ## 6. Efeitos sonoros (se `opcoes.efeitos_sonoros`)
 

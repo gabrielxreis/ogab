@@ -109,7 +109,7 @@ def colocar_narracao(t, mp, wav, db=5):
 
 
 def preparar_musica(origem, destino, inicio_faixa, dur, fade=2.5, hz=48000):
-    """Corta o trecho usado, já com fade in curto e fade out no fim, em 48 kHz (a API não faz fade)."""
+    """OBSOLETO para a timeline (o usuário quer a música bruta, cortada no DaVinci: use colocar_musica com inicio_faixa). Só para prévia/export fora do DaVinci. Corta o trecho usado, já com fade in curto e fade out no fim, em 48 kHz (a API não faz fade)."""
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", str(inicio_faixa), "-t", str(dur), "-i", origem,
                     "-af", f"afade=t=in:d=0.5,afade=t=out:st={max(0, dur - fade)}:d={fade}", "-ar", str(hz), destino], check=True)
     return destino
@@ -121,14 +121,27 @@ def garantir_trilhas_audio(t, n):
         t.AddTrack("audio", "stereo")
 
 
-def colocar_musica(t, mp, wav_pronto, db=-10):
+def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in=0.5, fade_out=2.5):
+    """Música BRUTA na A2 (regra do usuário, 11/10/2026): o WAV original entra inteiro no Media Pool e o corte
+    é feito no DaVinci (ponto de entrada = inicio_faixa, duração = dur ou a timeline toda), com fade no clipe.
+    Nada de cortar/renderizar o áudio antes: assim o usuário consegue arrastar e reajustar na timeline."""
     garantir_trilhas_audio(t, 2)
-    it = importar(mp, wav_pronto, "MUSICA")
-    res = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": 2, "recordFrame": t.GetStartFrame()}])
+    it = importar(mp, wav_bruto, "MUSICA")
+    fps_c = float(it.GetClipProperty("FPS") or fps_tl(t))
+    if dur is None:
+        dur = (t.GetEndFrame() - t.GetStartFrame()) / fps_tl(t)
+    ini = int(round(inicio_faixa * fps_c))
+    res = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": 2, "recordFrame": t.GetStartFrame(),
+                                "startFrame": ini, "endFrame": ini + int(round(dur * fps_c)) - 1}])
     if not res:
         raise RuntimeError("a música não entrou na A2 (timeline atual é outra?)")
     x = res[0]
     x.SetProperty("AudioVolume", db)
+    F = fps_tl(t)
+    try:
+        x.SetFades({"FadeIn": int(round(fade_in * F)), "FadeOut": int(round(fade_out * F))})
+    except Exception:
+        pass
     return x
 
 
