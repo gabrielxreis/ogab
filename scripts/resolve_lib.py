@@ -382,13 +382,19 @@ def gerar_capa(r, p, mp, take, texto, template, pasta, nome="capa", seg_take=1.0
 def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True):
     for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
-    cfg = {"SelectAllFrames": True, "TargetDir": pasta, "CustomName": nome, "FormatWidth": w, "FormatHeight": h}
+    # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False
+    # gravado no projeto e o MP4 sairia mudo.
+    cfg = {"SelectAllFrames": True, "TargetDir": pasta, "CustomName": nome, "FormatWidth": w, "FormatHeight": h,
+           "ExportVideo": True, "ExportAudio": True, "AudioCodec": "aac", "AudioSampleRate": 48000}
     if legenda_gravada: cfg.update({"ExportSubtitle": True, "SubtitleFormat": "BurnIn"})
     p.SetRenderSettings(cfg)
     jid = p.AddRenderJob(); p.StartRendering(jid)
     while p.IsRenderingInProgress(): time.sleep(2)
-    st = p.GetRenderJobStatus(jid)
-    return os.path.join(pasta, nome + ".mp4"), st.get("JobStatus")
+    st = p.GetRenderJobStatus(jid); arq = os.path.join(pasta, nome + ".mp4")
+    tem_audio = "audio" in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", arq],
+                                          capture_output=True, text=True).stdout
+    if not tem_audio: raise RuntimeError(f"render saiu SEM ÁUDIO: {arq}")
+    return arq, st.get("JobStatus")
 
 
 def salvar(r=None):

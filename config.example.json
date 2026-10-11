@@ -168,5 +168,20 @@
     "drx": "assets/grade/<seu PowerGrade>.drx",
     "drx_iphone": "assets/grade/<conversor do iPhone + seu LUT>.drx",
     "_iphone": "Takes de iPhone (detectados pelo metadado Apple ou HEVC HLG/Dolby Vision) recebem drx_iphone: um PowerGrade COMBINADO com o nó conversor do iPhone ANTES dos nós do seu LUT. Crie uma vez no DaVinci: aplique o conversor num clipe de iPhone, adicione depois os nós do seu LUT (ou aplique o LUT e insira o conversor como primeiro nó), grave o still na Gallery e exporte (.drx). Se não existir, o iPhone recebe só o drx normal e a skill avisa."
+  },
+  "backgrounds": {
+    "_leia": "BGs animados (loops) que ficam atrás de gráficos de dados. Ficam só na sua máquina, nunca no repositório. Sem pasta, a skill cria o BG em código no HyperFrames (sem crédito).",
+    "pasta": "<pasta dos seus BGs animados verticais, ex.: /Volumes/SSD/BACKGROUND/VERTICAL>",
+    "resolucao": "HD",
+    "preferidos_para_dados": [
+      "1 Shadow Grid",
+      "2 Vibrant Flow",
+      "3 Jitter"
+    ],
+    "com_variacao_de_cor": [
+      "4 Flames",
+      "5 Explosion",
+      "6 Vortex"
+    ]
   }
 }
