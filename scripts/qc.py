@@ -29,11 +29,11 @@ def main(pasta, cliente=None, plataforma="instagram"):
     C = cfg(); R = C.get("regras", {}); res = []
     ok = lambda m: res.append(("OK", m)); av = lambda m: res.append(("AVISO", m)); er = lambda m: res.append(("ERRO", m))
 
-    for item in ("roteiro.txt", "links.txt", "narracoes", "musica", "brolls", "videos", "legendas"):
+    for item in ("roteiro.txt", "links.txt", "narracoes", "musica", "brolls", "videos", "legendas", "videos/capa.png", "videos/legenda_post.txt"):
         (ok if os.path.exists(os.path.join(pasta, item)) else er)(f"estrutura: {item}")
 
     vids = sorted(glob.glob(os.path.join(pasta, "videos", "*.mp4")), key=os.path.getmtime)
-    if not vids: er("nenhum vídeo final em videos/")
+    if not vids: av("sem MP4 em videos/ (normal se o render ficou para o usuário); checagens do vídeo puladas")
     else:
         v = vids[-1]; i = info(v)
         ok(f"vídeo final {os.path.basename(v)}: {i['w']}x{i['h']}, {i['dur']:.1f}s")

@@ -22,7 +22,8 @@ Feita para **Claude Code** (app desktop ou terminal).
 | 7b | Cor: aplica o **seu PowerGrade** (.drx) em todos os takes (opcional) | Liga/desliga no config | DaVinci (node graph) |
 | 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
 | 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
-| 10 | Render H.264 (+ formatos extras se habilitado) e **conferência automática** | - | `qc.py` |
+| 8b | **Palavras-chave** animadas (seu pacote de lettering) no momento em que são faladas; a legenda some enquanto elas aparecem | Vê a lista antes | DaVinci |
+| 10 | Timeline pronta (o MP4 você exporta; render só se pedir), **capa** (`capa.png`) e **legenda do post** com hashtags (`legenda_post.txt`) em `videos/`, e **conferência automática** | - | `resolve_lib.py`, `qc.py` |
 
 Tudo fica numa pasta na Mesa com o nome do vídeo:
 
@@ -35,6 +36,8 @@ Tudo fica numa pasta na Mesa com o nome do vídeo:
 ---
 
 ## Instalação
+
+> **Skill complementar recomendada:** `competitor-profiling` (pacote `anthropic-skills`). Quando você manda o site ou material de uma empresa, a skill usa ela para varrer e salvar o máximo de informação (produtos, público, posicionamento, diferenciais, provas, tom, concorrentes) antes de começar. Instale pelo catálogo de skills do Claude (Personalização > Skills, ou peça "instala a skill competitor-profiling"). Sem ela, a skill lê o site direto.
 
 1. **Clonar na pasta de skills do Claude:**
    ```bash

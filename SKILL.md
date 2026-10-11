@@ -33,7 +33,7 @@ Pasta da skill: `~/.claude/skills/video-redes/` (chamada de `SKILL_DIR` abaixo).
 
 ## 1. Cliente (primeira vez por empresa)
 
-Se não existir `SKILL_DIR/clientes/<empresa>/empresa.md`: pedir **site** + **logo** (PNG transparente, claro e escuro) + cores/fontes + redes. Ler o site inteiro e criar, copiando de `clientes/_exemplo/`:
+Se não existir `SKILL_DIR/clientes/<empresa>/empresa.md`: pedir **site** + **logo** (PNG transparente, claro e escuro) + cores/fontes + redes. Assim que o usuário mandar o site (ou qualquer material da empresa), **varrer tudo antes de começar**: usar a skill **`competitor-profiling`** (`anthropic-skills:competitor-profiling`) apontada para a PRÓPRIA empresa (o que faz, produtos, preços, público, posicionamento, diferenciais, provas sociais, tom, redes, concorrentes), complementar lendo as páginas do site, e só então criar, copiando de `clientes/_exemplo/`. Se a skill não estiver instalada, avisar e oferecer instalar (ver README), ou seguir lendo o site direto:
 - `empresa.md`: o que faz, público, dores, diferenciais, tom de voz, CTA, cores, o que **não** dizer (regras do setor).
 - `pronuncia.json`: termos da marca/setor com `grafia` correta, `fala` (como escrever para a voz pronunciar certo) e `erros_transcricao` conhecidos.
 - `logo/`: arquivos do logo.
@@ -81,6 +81,10 @@ Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, co
 
 Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `@gabrielxreis_ Text Presets.drfx` em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`; o Resolve precisa reiniciar após instalar). `lettering(t, "<Template>", "TEXTO", inicio, dur)` na V2: texto do gancho (2-4 palavras) e, se fizer sentido, um destaque no CTA. Ofereça 2-3 templates da lista `config.lettering.templates_disponiveis`.
 
+## 8b. Palavras-chave animadas (se `opcoes.palavras_chave_lettering`)
+
+Escolher 4-6 palavras-chave do roteiro (números, datas, siglas, nome da marca no CTA) e colocar cada uma como lettering do pacote (`config.lettering.template_palavras_chave`) no instante em que é falada, ~2 s: `ocup = palavras_chave(t, p, mp, [(TEXTO, inicio_s, dur_s), ...], template)` (vai aninhado na V2, acima dos takes). **Durante uma palavra-chave a legenda some**: `legendas.py` > `sem_legenda(srt, srt_novo, ocup)` e importar o SRT novo. Mostrar ao usuário a lista (texto + tempo) antes de aplicar.
+
 ## 9. Legenda
 
 Regras: **uma linha só (nunca quebrar)**, pedaço natural da frase, até `config.regras.legenda.max_caracteres` (25 no 9:16), nunca terminar em palavra fraca, número junto da unidade, **sem misturar idiomas**, grafia do cliente corrigida.
@@ -90,7 +94,8 @@ Regras: **uma linha só (nunca quebrar)**, pedaço natural da frase, até `confi
 
 ## 10. Render, formatos e conferência
 
-1. `renderizar(p, <pasta>/videos, "<Assunto> - <Empresa>")` (H.264, legenda gravada).
+1. **Não exportar o vídeo** (`opcoes.renderizar_video` = false, padrão): deixar a timeline pronta no DaVinci para o usuário exportar. Só renderizar se o usuário pedir: `renderizar(p, <pasta>/videos, "<Assunto> - <Empresa>")`.
+1b. **Capa e legenda do post** (se `opcoes.capa_e_legenda_post`), em `<pasta>/videos/`: `gerar_capa(r, p, mp, <melhor take>, "GANCHO\nEM 2-3\nLINHAS", template, <pasta>/videos, seg_quadro=3.3, drx=<grade>)` gera `capa.png` (1080x1920, lettering do gancho sobre um quadro bonito do vídeo, com a cor aplicada). Escrever `legenda_post.txt`: gancho na 1ª linha, 2-4 parágrafos curtos com o conteúdo, CTA do cliente, fonte da notícia com data, 8-15 hashtags (mistura de amplas e de nicho, + a do cliente). Sem travessão.
 2. Se `opcoes.multi_formatos`: criar timelines extras nos formatos de `formatos_extras` (e cortes 15/30/60 s para Ads) e renderizar cada uma com sufixo (`- 4x5`, `- 30s`).
-3. **Conferência automática** (se habilitada): `python3 SKILL_DIR/scripts/qc.py <pasta> --cliente clientes/<empresa> --plataforma <p>`. Corrigir todo **ERRO** e reconferir. Olhar a `qc_folha.jpg`.
+3. **Conferência automática** (se habilitada; sem render, o qc confere legenda, takes e estrutura, e pula as checagens do MP4): `python3 SKILL_DIR/scripts/qc.py <pasta> --cliente clientes/<empresa> --plataforma <p>`. Corrigir todo **ERRO** e reconferir. Olhar a `qc_folha.jpg`.
 4. Salvar o projeto e entregar: link do vídeo, resumo (voz, música, takes banco x gerados, créditos gastos) e o que falta (ex.: logo).

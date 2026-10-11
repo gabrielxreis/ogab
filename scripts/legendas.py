@@ -100,6 +100,17 @@ def sincronizar(transc, frases, saida, fps=30):
     open(saida, 'w').write('\n'.join(out)); print(len(out), 'legendas ->', saida)
 
 
+def sem_legenda(srt_ent, srt_sai, intervalos):
+    """Tira do SRT as legendas que encostam nos intervalos [(ini, fim), ...] em que há palavra-chave na tela."""
+    def s(tc): h, m, r = tc.split(':'); sec, ms = r.split(','); return int(h)*3600+int(m)*60+int(sec)+int(ms)/1000
+    blocos = open(srt_ent).read().strip().split('\n\n'); out = []
+    for b in blocos:
+        l = b.split('\n'); a, z = [s(x.strip()) for x in l[1].split('-->')]
+        if any(a < fim and z > ini for ini, fim in intervalos): continue
+        out.append(f"{len(out)+1}\n{l[1]}\n" + '\n'.join(l[2:]) + '\n')
+    open(srt_sai, 'w').write('\n'.join(out)); print(len(blocos) - len(out), 'legendas tiradas ->', srt_sai)
+
+
 if __name__ == '__main__':
     a = sys.argv[1:]
     if not a: print(__doc__); sys.exit()

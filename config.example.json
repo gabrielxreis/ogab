@@ -47,7 +47,11 @@
       "_fontes_possiveis": "gratis (Google News RSS) | newsapi (precisa NEWSAPI_KEY) | gnews (precisa GNEWS_KEY)",
       "temas_por_cliente": true,
       "quantas_sugestoes": 3
-    }
+    },
+    "renderizar_video": false,
+    "palavras_chave_lettering": true,
+    "capa_e_legenda_post": true,
+    "_renderizar_video": "false = deixa a timeline pronta no DaVinci e NÃO exporta o MP4 (o usuário exporta). A capa (PNG) e a legenda do post são geradas mesmo assim."
   },
   "regras": {
     "duracao_segundos": {
@@ -128,7 +132,8 @@
       "@gabrielxreis_ Sublinhado",
       "@gabrielxreis_ Surgir",
       "@gabrielxreis_ Zoom Out"
-    ]
+    ],
+    "template_palavras_chave": "@gabrielxreis_ Cinematic"
   },
   "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome.",
   "cor": {

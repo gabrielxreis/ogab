@@ -175,19 +175,98 @@ def colocar_legendas(t, mp, srt, trocar=True):
     return len(t.GetItemListInTrack("subtitle", 1) or [])
 
 
-def lettering(t, template, texto, inicio=0.0, dur=None, faixa_video=2):
-    """Insere um título animado do pacote (Fusion Title) no playhead e troca o texto (ferramenta 'Template')."""
-    S, F = t.GetStartFrame(), fps_tl(t)
-    while t.GetTrackCount("video") < faixa_video: t.AddTrack("video")
-    f = S + round(inicio * F)
-    h, rem = divmod(f, int(F) * 3600); m, rem = divmod(rem, int(F) * 60); s, q = divmod(rem, int(F))
-    t.SetCurrentTimecode(f"{h:02d}:{m:02d}:{s:02d}:{q:02d}")
+def _tc(t, f):
+    F = int(round(fps_tl(t))); h, rem = divmod(f, F * 3600); m, rem = divmod(rem, F * 60); s, q = divmod(rem, F)
+    return f"{h:02d}:{m:02d}:{s:02d}:{q:02d}"
+
+
+def _item_timeline(mp, nome):
+    def busca(pasta):
+        for c in pasta.GetClipList() or []:
+            if c.GetClipProperty("Type") == "Timeline" and c.GetName() == nome: return c
+        for sub in pasta.GetSubFolderList():
+            x = busca(sub)
+            if x: return x
+    return busca(mp.GetRootFolder())
+
+
+def tamanho_lettering(texto, base=0.19, largura=0.85):
+    """Tamanho do texto para caber na largura do quadro vertical (medido: largura ~ caracteres x size x 0.39)."""
+    maior = max(len(l) for l in texto.split("\n"))
+    return round(min(base, largura / (0.39 * max(maior, 1))), 4)
+
+
+def clipe_lettering(p, mp, template, texto, size=None, velocidade=1.0, w=1080, h=1920, fps=None):
+    """Cria uma mini-timeline só com o título animado (fundo transparente) e devolve o item de media pool dela.
+    Fusion Titles inseridos pela API sempre caem na V1 e empurram o que estiver lá (inserção com ripple);
+    por isso cada lettering vive na sua timeline e entra na timeline principal ANINHADO na V2+.
+    velocidade > 1 acelera a animação (entrada e saída cabem em menos tempo)."""
+    ant = p.GetCurrentTimeline()
+    nome = f"LT {template.split(' ', 1)[-1]} - {texto.replace(chr(10), ' ')[:40]} {int(time.time()*1000) % 100000}"
+    t = mp.CreateEmptyTimeline(nome)
+    if not t: raise RuntimeError(f"não criou a timeline {nome}")
+    p.SetCurrentTimeline(t)
+    t.SetSetting("useCustomSettings", "1")
+    if fps: t.SetSetting("timelineFrameRate", str(fps))
+    t.SetSetting("timelineResolutionWidth", str(w)); t.SetSetting("timelineResolutionHeight", str(h))
     it = t.InsertFusionTitleIntoTimeline(template)
     if not it: raise RuntimeError(f"template '{template}' não encontrado (pacote instalado? Resolve reiniciado?)")
-    comp = it.GetFusionCompByIndex(1)
-    tool = comp.FindTool("Template") if comp else None
-    if tool: tool.SetInput("StyledText", texto)
-    return it
+    tool = it.GetFusionCompByIndex(1).FindTool("Template")
+    tool.SetInput("StyledText", texto); tool.SetInput("Size", size or tamanho_lettering(texto))
+    if velocidade != 1.0:
+        ts = it.GetFusionCompByIndex(1).FindTool("TimeSpeed1")
+        if ts: ts.SetInput("Speed", velocidade)
+    dur = it.GetDuration()
+    p.SetCurrentTimeline(ant)
+    return _item_timeline(mp, nome), dur
+
+
+def lettering(t, template, texto, inicio=0.0, dur=None, faixa_video=2, p=None, mp=None, velocidade=1.0):
+    """Coloca um lettering animado sobre os takes, na trilha `faixa_video` (V2 por padrão), de `inicio` por `dur` s."""
+    F = fps_tl(t); S = t.GetStartFrame()
+    if p is None or mp is None:
+        raise ValueError("passe p= e mp= (projeto e media pool)")
+    while t.GetTrackCount("video") < faixa_video: t.AddTrack("video")
+    mi, dur_full = clipe_lettering(p, mp, template, texto, velocidade=velocidade, fps=F)
+    n = min(dur_full, round((dur or dur_full / F) * F))
+    x = mp.AppendToTimeline([{"mediaPoolItem": mi, "startFrame": 0, "endFrame": n - 1, "mediaType": 1,
+                              "trackIndex": faixa_video, "recordFrame": S + round(inicio * F)}])
+    return x[0] if x else None
+
+
+def palavras_chave(t, p, mp, lista, template, faixa_video=2, velocidade=2.0):
+    """lista = [(TEXTO, inicio_s, dur_s), ...]. Letterings de palavras-chave na V2. Devolve os intervalos
+    ocupados (para tirar a legenda nesses trechos com legendas.py sem_legenda)."""
+    ocup = []
+    for texto, ini, dur in lista:
+        if lettering(t, template, texto, ini, dur, faixa_video, p, mp, velocidade): ocup.append((ini, ini + dur))
+    return ocup
+
+
+def gerar_capa(r, p, mp, take, texto, template, pasta, nome="capa", seg_take=1.0, seg_quadro=2.5, w=1080, h=1920, drx=None):
+    """Capa (thumbnail) do post: um quadro do take + lettering do gancho por cima (V2), renderizada como PNG
+    no próprio DaVinci. Use 2-3 linhas curtas em `texto` (\\n quebra). seg_quadro = ponto em que o texto já entrou."""
+    ant = p.GetCurrentTimeline()
+    t = mp.CreateEmptyTimeline(f"CAPA {nome} {int(time.time()) % 100000}"); p.SetCurrentTimeline(t)
+    t.SetSetting("useCustomSettings", "1"); t.SetSetting("timelineResolutionWidth", str(w)); t.SetSetting("timelineResolutionHeight", str(h))
+    F = fps_tl(t); S = t.GetStartFrame(); t.AddTrack("video")
+    it = importar(mp, take, "BROLLS"); sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
+    ini = min(int(seg_take * sf), max(0, mx - int(6 * sf)))
+    x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": ini, "endFrame": min(mx - 1, ini + int(6 * sf)), "mediaType": 1, "trackIndex": 1, "recordFrame": S}])[0]
+    if drx: x.GetNodeGraph().ApplyGradeFromDRX(drx, 0)
+    lettering(t, template, texto, 0.0, None, 2, p, mp)
+    q = S + round(seg_quadro * F)
+    for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
+    p.SetCurrentRenderFormatAndCodec("png", "RGB8")
+    p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": q, "MarkOut": q, "TargetDir": pasta, "CustomName": nome,
+                         "FormatWidth": w, "FormatHeight": h, "ExportVideo": True, "ExportAudio": False})
+    jid = p.AddRenderJob(); p.StartRendering(jid)
+    while p.IsRenderingInProgress(): time.sleep(1)
+    p.SetCurrentTimeline(ant)
+    import glob
+    gerados = sorted(glob.glob(os.path.join(pasta, nome + "*.png")), key=os.path.getmtime)
+    if gerados and gerados[-1] != os.path.join(pasta, nome + ".png"): os.replace(gerados[-1], os.path.join(pasta, nome + ".png"))
+    return os.path.join(pasta, nome + ".png")
 
 
 def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True):
