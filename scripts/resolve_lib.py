@@ -193,6 +193,8 @@ def colocar_legendas(t, mp, srt, trocar=True, p=None):
     it = importar(mp, unico, "LEGENDAS")
     # AppendToTimeline usa a timeline ABERTA: abrir `t` antes (senão a legenda cai em outro vídeo) e conferir
     if p: p.SetCurrentTimeline(t)
+    # trilha de legenda DESABILITADA recusa o SRT em silêncio (render sem legenda pode deixá-la desligada)
+    t.SetTrackEnable("subtitle", 1, True)
     n0 = len(t.GetItemListInTrack("subtitle", 1) or [])
     mp.AppendToTimeline([it])
     if len(t.GetItemListInTrack("subtitle", 1) or []) == n0:
