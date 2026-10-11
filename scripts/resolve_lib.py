@@ -230,36 +230,39 @@ def _fade_saida(comp, dur_f, fade_f, fim):
 SEGURA_F = 0   # quadros extras com o texto inteiro antes do fade
 
 
-def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0)):
-    """Padrão do usuário para os letterings: Shading Element = SOLID (o template vem com gradiente, Type1=2),
-    cor sólida, entrelinha mais junta com quebra de linha, tamanho que cabe na largura, animação na velocidade
-    na velocidade ORIGINAL do template (NUNCA mexer no TimeSpeed: mudar a velocidade quebra as animações do pacote) e, se dur_f for
-    menor que o título, FADE OUT médio (fade_f quadros) na imagem inteira do título (_fade_saida)."""
+def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=15, entrelinha=0.8, cor=(1.0, 1.0, 1.0), centro_y=None):
+    """Padrão do usuário para os letterings: troca SÓ o que não é animado no template: texto, tamanho que cabe na
+    largura, Shading Element = SOLID (Type1=0), entrelinha 0.8 com quebra de linha e, se pedido, a altura (centro_y,
+    0 = base, 1 = topo do quadro). NUNCA sobrescrever entrada que tenha animação (GetConnectedOutput) nem o TimeSpeed:
+    o pacote já tem animação de ENTRADA e ela tem que aparecer. A saída é um FADE NO BLOCO da timeline
+    (TimelineItem.SetFades FadeOut), não um nó dentro da composição. dur_f fica só por compatibilidade (o bloco
+    tem a duração padrão do template, 5 s; a API não apara título)."""
     comp = item.GetFusionCompByIndex(1); txts = _textos(comp)
     if not txts: raise RuntimeError(f"título sem Text+: {item.GetName()}")
+    def por(tool, nome, valor):
+        inp = tool.GetInputList(); ent = next((i for i in inp.values() if i.GetAttrs()["INPS_ID"] == nome), None)
+        if ent is not None and ent.GetConnectedOutput(): return       # animado pelo template: não mexer
+        tool.SetInput(nome, valor)
     for tool in txts:
-        tool.SetInput("StyledText", texto); tool.SetInput("Size", size or tamanho_lettering(texto))
-        tool.SetInput("ShadingElements", 1); tool.SetInput("Type1", 0)          # 0 = Solid
-        tool.SetInput("Red1", cor[0]); tool.SetInput("Green1", cor[1]); tool.SetInput("Blue1", cor[2]); tool.SetInput("Alpha1", 1.0)
-        if "\n" in texto: tool.SetInput("LineSpacing", entrelinha)
-    fim = int(comp.GetAttrs().get("COMPN_RenderEnd", item.GetDuration() - 1))
-    if dur_f: dur_f = min(dur_f + SEGURA_F, fim - fade_f - 1)
-    if dur_f and dur_f + fade_f < fim: _fade_saida(comp, dur_f, fade_f, fim)
+        tool.SetInput("StyledText", texto)
+        por(tool, "Size", size or tamanho_lettering(texto))
+        por(tool, "ShadingElements", 1); por(tool, "Type1", 0)            # 0 = Solid
+        por(tool, "Red1", cor[0]); por(tool, "Green1", cor[1]); por(tool, "Blue1", cor[2])
+        if "\n" in texto: por(tool, "LineSpacing", entrelinha)
+        if centro_y is not None: por(tool, "Center", {1: 0.5, 2: centro_y})
+    item.SetFades({"FadeOut": fade_f})
 
 
 def checar_fades(t):
-    """Confere se TODO lettering (título Fusion acima da V1) termina com fade (nó FadeSaida): cai para 0 e não volta."""
+    """Confere se TODO lettering (título Fusion acima da V1) tem fade out no bloco (SetFades) e nenhum nó FadeSaida antigo."""
     ruins = []
     for v in range(2, t.GetTrackCount("video") + 1):
         for it in t.GetItemListInTrack("video", v) or []:
             if not it.GetFusionCompCount(): continue
-            c = it.GetFusionCompByIndex(1); g = c.FindTool("FadeSaida"); txt = (_textos(c) or [None])[0]
+            c = it.GetFusionCompByIndex(1); txt = (_textos(c) or [None])[0]
             nome = txt.GetInput("StyledText") if txt else it.GetName()
-            if not g: ruins.append(nome); continue
-            vals = [g.GetInput("GainAlpha", f) or 0 for f in range(0, it.GetDuration(), 3)]
-            caiu = next((i for i, x in enumerate(vals) if x < 0.01), None)
-            if caiu is None or any(x > 0.01 for x in vals[caiu:]): ruins.append(nome)
-    print("fades OK" if not ruins else f"SEM FADE LIMPO: {ruins}")
+            if c.FindTool("FadeSaida") or not (it.GetFades() or {}).get("FadeOut"): ruins.append(nome)
+    print("fades OK" if not ruins else f"SEM FADE NO BLOCO: {ruins}")
     return ruins
 
 
@@ -272,17 +275,17 @@ def _ir(t, f, tentativas=20):
     raise RuntimeError(f"playhead não foi para {alvo} (está em {t.GetCurrentTimecode()})")
 
 
-def _inserir_titulo_v1(t, template, texto, ini_f, dur_f):
+def _inserir_titulo_v1(t, template, texto, ini_f, dur_f, centro_y=None):
     """Insere o Fusion Title na V1 em ini_f (a API sempre usa a V1, com ripple). NÃO corta o título:
     cortar um Fusion Title no meio derruba o Resolve. A duração visível vem de um fade out na opacidade
     do texto: o título fica com o tamanho padrão, mas o texto some (com fade médio) depois de dur_f quadros."""
-    _ir(t, ini_f)
+    _ir(t, ini_f); time.sleep(0.6); _ir(t, ini_f)          # a interface demora a assentar o playhead
     it = t.InsertFusionTitleIntoTimeline(template)
     if not it: raise RuntimeError(f"template '{template}' não encontrado (pacote instalado? Resolve reiniciado?)")
     achados = [x for x in (t.GetItemListInTrack("video", 1) or []) if x.GetStart() == ini_f]
     if not achados: raise RuntimeError(f"título não caiu em {ini_f}")
     alvo = achados[0]
-    ajustar_titulo(alvo, texto, dur_f=dur_f)
+    ajustar_titulo(alvo, texto, dur_f=dur_f, centro_y=centro_y)
     return alvo
 
 
@@ -292,7 +295,7 @@ def _assinatura(t):
             for i in range(1, t.GetTrackCount(k) + 1) for x in (t.GetItemListInTrack(k, i) or [])]
 
 
-def camada_letterings(t, mp, lista, template):
+def camada_letterings(t, mp, lista, template, centro_y=None):
     """Coloca letterings [(TEXTO, inicio_s, dur_s[, template]), ...] em camadas logo ACIMA dos takes (sem compound).
     A API só insere título na V1 e com ripple, então: guarda os takes da V1 e tira; distribui os letterings em
     camadas sem sobreposição (cada título ocupa o tamanho padrão do template); para cada camada, insere na V1
@@ -307,7 +310,8 @@ def camada_letterings(t, mp, lista, template):
         m = x.GetMediaPoolItem()
         if not m: continue
         r_ = float(m.GetClipProperty("FPS")) / F
-        takes.append((m, x.GetStart(), round(x.GetLeftOffset() * r_), x.GetDuration(), x.GetProperty("ZoomX"), r_))
+        props = {k: x.GetProperty(k) for k in ("ZoomX", "ZoomY", "Pan", "Tilt")}   # reenquadramento do rosto
+        takes.append((m, x.GetStart(), round(x.GetLeftOffset() * r_), x.GetDuration(), props, r_))
     velhos = t.GetItemListInTrack("video", 1) or []
     if velhos: t.DeleteClips(velhos, False)
     padrao = 150  # duração padrão dos Fusion Titles do pacote (5 s a 30 fps); conferido ao inserir
@@ -317,7 +321,7 @@ def camada_letterings(t, mp, lista, template):
         for c in camadas:
             if ini_f >= c[-1][4] + 1: c.append((*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)); break
         else: camadas.append([(*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)])
-    ocup = [(x[1], x[1] + x[2] + (SEGURA_F + 18) / F) for x in lista]   # inclui a folga e o fade out
+    ocup = [(x[1], x[1] + padrao / F) for x in lista]   # o bloco inteiro do título (fade no fim do bloco)
     for c in reversed(camadas):           # a primeira camada termina mais perto dos takes
         travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
                  [("video", i) for i in range(2, t.GetTrackCount("video") + 1)]
@@ -327,16 +331,18 @@ def camada_letterings(t, mp, lista, template):
         antes = _assinatura(t)
         try:
             for texto, ini, dur, tpl, _ in c:
-                _inserir_titulo_v1(t, tpl, texto, S + round(ini * F), round(dur * F))
+                _inserir_titulo_v1(t, tpl, texto, S + max(3, round(ini * F)), round(dur * F), centro_y)   # quadro 0 falha no fade
         finally:
             for k, i in travar: t.SetTrackLock(k, i, False)
         if _assinatura(t) != antes: raise RuntimeError("áudio/legenda mudaram ao inserir título (ripple): desfazer e refazer")
         t.AddTrack("video", {"index": 1})
     # endFrame do AppendToTimeline é EXCLUSIVO: com '- 1' cada take voltava 1 quadro menor (quadro preto entre takes).
-    for mpi, st, lo, dur, zoom, r_ in takes:
+    for mpi, st, lo, dur, props, r_ in takes:
         x = mp.AppendToTimeline([{"mediaPoolItem": mpi, "startFrame": lo, "endFrame": lo + math.ceil(dur * r_), "mediaType": 1,
                                   "trackIndex": 1, "recordFrame": st}])
-        if x and zoom and zoom != 1.0: x[0].SetProperty("ZoomX", zoom); x[0].SetProperty("ZoomY", zoom)
+        if x:
+            for k, v in props.items():
+                if v is not None: x[0].SetProperty(k, v)
     return ocup
 
 
@@ -455,3 +461,54 @@ def organizar(p, mp, videos):
     if vazias: mp.DeleteFolders(vazias)
     mp.SetCurrentFolder(root)
     return {f.GetName(): sum(1 for _ in todas(f)) for f in root.GetSubFolderList()}
+
+
+# Rosto (regras 1e e 1f do SKILL.md): medir onde está e reenquadrar com zoom + Pan/Tilt, sem nada por cima.
+QUEIXO_MAX, OLHOS_Y = 1140, 760     # em 1080x1920: queixo acima da faixa da legenda; centro do rosto ~terço de cima
+
+
+def medir_rosto(arquivo, passo_s=1.0, w=1080, h=1920):
+    """Mediana do rosto (cx, cy, lado do quadrado do detector) em pixels do quadro w x h, sem zoom."""
+    import cv2, statistics as st
+    cas = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    cap = cv2.VideoCapture(arquivo); fps = cap.get(cv2.CAP_PROP_FPS) or 30; n = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)); bx = []
+    for fr in range(0, n, max(1, int(fps * passo_s))):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, fr); ok, img = cap.read()
+        if not ok: continue
+        g = cv2.cvtColor(cv2.resize(img, (w, h)), cv2.COLOR_BGR2GRAY)
+        fs = cas.detectMultiScale(g, 1.1, 8, minSize=(int(w * 0.2),) * 2)
+        if len(fs): bx.append(max(fs, key=lambda b: b[2] * b[3]))
+    if not bx: return None
+    return {"cx": st.median(b[0] + b[2] / 2 for b in bx), "cy": st.median(b[1] + b[3] / 2 for b in bx), "lado": st.median(b[2] for b in bx)}
+
+
+def enquadrar(face, punch=1.15, zoom_max=1.45, w=1080, h=1920):
+    """[(zoom, pan, tilt) base, (zoom, pan, tilt) punch-in] para o rosto ficar centralizado, olhos no terço de cima
+    e queixo acima de QUEIXO_MAX, sem borda preta (o zoom sobe até o Pan/Tilt caber). Tilt positivo sobe a imagem."""
+    out = []
+    for mult in (1.0, punch):
+        z = max(1.0, out[0][0] * mult if out else 1.0)
+        while True:
+            alvo_y = min(OLHOS_Y, QUEIXO_MAX - 0.6 * face["lado"] * z)
+            fx = w / 2 + (face["cx"] - w / 2) * z; fy = h / 2 + (face["cy"] - h / 2) * z
+            pan, dy = w / 2 - fx, alvo_y - fy
+            if abs(pan) <= w / 2 * (z - 1) + 0.5 and abs(dy) <= h / 2 * (z - 1) + 0.5: break
+            z += 0.005
+        out.append((round(min(z, zoom_max) if out else z, 3), round(pan), round(-dy)))
+    return out
+
+
+def aplicar_enquadramento(t, base, punch, trilha=1):
+    """Base nos pedaços pares e punch-in nos ímpares (alterna a cada corte)."""
+    for i, x in enumerate(t.GetItemListInTrack("video", trilha) or []):
+        z, pan, tilt = punch if i % 2 else base
+        for k, v in (("ZoomX", z), ("ZoomY", z), ("Pan", pan), ("Tilt", tilt)): x.SetProperty(k, v)
+
+
+def trocar_pela_copia(p, mp, t):
+    """Títulos mexidos pela API travam (entram secos no render). Duplica a timeline, apaga a original e devolve a cópia
+    com o mesmo nome; mantém o Voice Isolation da A1."""
+    nome, vi = t.GetName(), t.GetVoiceIsolationState(1)
+    d = t.DuplicateTimeline(nome + " (novo)"); p.SetCurrentTimeline(d); mp.DeleteTimelines([t]); d.SetName(nome)
+    if vi and vi.get("isEnabled") and not d.GetVoiceIsolationState(1).get("isEnabled"): d.SetVoiceIsolationState(1, vi)
+    return d
