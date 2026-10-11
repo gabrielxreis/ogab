@@ -61,3 +61,5 @@ const pick=s=>{const e=document.querySelector(s); if(!e) return null; const c=ge
 ({h1:pick('h1'), h2:pick('h2'), texto:pick('p'), botao:pick('button, a[class*=rounded]'), fontes:[...document.fonts].filter(f=>f.status=='loaded').map(f=>f.family+' '+f.weight)})
 ```
 Anotar no `marca/identidade.md`. A imagem de compartilhamento (og:image) pode ser de uma versão antiga do site: valer o que a página mostra hoje.
+
+**Artlist (11/10/2026):** em algumas faixas (Artlist Original) o menu MP3/WAV só aparece depois de clicar no ícone de download pela COORDENADA (o clique por ref não abre); depois do clique os botões MP3 e WAV aparecem na linha do Play. Esperar a página sair do esqueleto cinza (7 a 10 s) antes.

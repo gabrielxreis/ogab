@@ -115,9 +115,19 @@ def preparar_musica(origem, destino, inicio_faixa, dur, fade=2.5, hz=48000):
     return destino
 
 
+def garantir_trilhas_audio(t, n):
+    """Cria trilhas de áudio estéreo até ter n (timeline de gravação vem só com A1; sem isso o append some calado)."""
+    while t.GetTrackCount("audio") < n:
+        t.AddTrack("audio", "stereo")
+
+
 def colocar_musica(t, mp, wav_pronto, db=-10):
+    garantir_trilhas_audio(t, 2)
     it = importar(mp, wav_pronto, "MUSICA")
-    x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": 2, "recordFrame": t.GetStartFrame()}])[0]
+    res = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": 2, "recordFrame": t.GetStartFrame()}])
+    if not res:
+        raise RuntimeError("a música não entrou na A2 (timeline atual é outra?)")
+    x = res[0]
     x.SetProperty("AudioVolume", db)
     return x
 
