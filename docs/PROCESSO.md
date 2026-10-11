@@ -130,7 +130,7 @@ mp.AppendToTimeline([{"mediaPoolItem": narr, "mediaType": 2, "trackIndex": 1, "r
 - **Regra: ajustar já na criação da timeline.** Assim que `criar_timeline` roda (antes de importar narração, takes ou títulos), conferir playback = timeline. **Não ligar Render Cache (o usuário não quer; fica em None).** Não esperar o áudio picotar.
 - **Se o áudio picotar mesmo assim (resolução validada):** conferir `p.GetSetting('timelinePlaybackFrameRate')` contra `timelineFrameRate` (`resolve_lib.checar_playback(p)`). Se diferente (ex.: playback 24 numa timeline 30, que acontece em projeto criado antes dessa regra ou aberto de outro modelo), a API devolve False no `SetSetting`; corrigir pela interface: **File > Project Settings > Master Settings > Playback frame rate = mesmo fps da timeline > Save** (por automação: `app_menu ["File","Project Settings…"]`, digitar no campo, clicar Save). Não ligar Render Cache (regra do usuário). Salvar o projeto.
 - Gotcha: ligar `useCustomSettings` reseta a resolução para 1920x1080; por isso regravar largura/altura **depois**.
-- Transcrever a narração para ter o tempo de cada palavra: `narr.TranscribeAudio()` e `narr.GetTranscription()` (ou `creative_transcribe_audio` do ElevenLabs). Esses tempos guiam música, takes e legenda.
+- Transcrever a narração para ter o tempo de cada palavra: `scripts/transcrever.py` (DaVinci 21.1+: `TranscribeAudio()` + `GetTranscription()`; abaixo da 21.1: Whisper local, escolhido sozinho pela versão). Esses tempos guiam música, takes e legenda.
 
 ---
 
@@ -217,6 +217,6 @@ Antes de entregar:
 
 ## Estrutura de pastas
 
-Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`, `links.txt`, `narracoes/`, `musica/`, `brolls/`, `videos/`, `legendas/`. Perfis das empresas ficam em `~/.claude/skills/video-redes/clientes/<empresa>/`.
+Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`, `links.txt`, `narracoes/`, `musica/`, `brolls/`, `videos/`, `legendas/`. Perfis das empresas ficam em `~/.claude/skills/ogab/clientes/<empresa>/`.
 
 - **Fade dos letterings:** a curva de opacidade é gravada com `SetKeyFrames(kf, True)` (substitui tudo). `SetInput(valor, quadro)` soma com keyframes antigos e o texto reaparecia depois do fade em alguns. Antes de entregar, rodar `checar_fades(t)`: todo lettering tem que cair para 0 e não voltar.

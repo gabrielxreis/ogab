@@ -15,7 +15,7 @@ A skill funciona com o que você tiver. Em `config.json`, cada etapa tem uma **l
 
 ## Trocar um provedor
 
-- Pelo chat: `/video-redes config provedores.musica ["envato","artlist"]`
+- Pelo chat: `/ogab config provedores.musica ["envato","artlist"]`
 - Ou edite `config.json` à mão.
 - Para usar um provedor novo (ex.: outra plataforma de geração), conecte o MCP dele no Claude, coloque o nome na lista da etapa e descreva em uma linha em `docs/PROVEDORES.md` como ele baixa/gera. A IA lê isso na hora.
 

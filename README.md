@@ -1,4 +1,4 @@
-# video-redes: skill do Claude para vídeos de redes sociais no DaVinci Resolve
+# Gab (/ogab): o editor de vídeo com IA para redes sociais no DaVinci Resolve
 
 Do **roteiro** à **timeline pronta e renderizada** no DaVinci Resolve, com IA: você aprova o roteiro, escolhe a voz, e a skill cuida de narração, música, efeitos sonoros, takes (de banco ou gerados), lettering animado, legenda com métrica certa, conferência automática e exportação.
 
@@ -52,10 +52,10 @@ curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main
 
 O instalador ([install.sh](install.sh)) faz tudo sozinho e pode ser rodado de novo para atualizar:
 - instala o **Homebrew** (se faltar), **ffmpeg**, **Node.js**, **Python 3**, **git** e **Pillow**;
-- baixa a skill em `~/.claude/skills/video-redes` e cria o seu `config.json`;
+- baixa a skill em `~/.claude/skills/ogab` e cria o seu `config.json`;
 - instala o **HyperFrames** (motions, gráficos, edição dinâmica) e roda o `hyperframes doctor`;
 - instala as fontes livres (Poppins, Playfair Display, Lobster);
-- confere se o **DaVinci Resolve Studio** e o scripting estão no Mac.
+- confere se o **DaVinci Resolve Studio** e o scripting estão no Mac, **detecta a versão** e, se for anterior à 21.1, instala o **Whisper local** para a transcrição.
 
 Depois disso falta só o que depende de você (o instalador lembra no final): ligar o scripting no DaVinci (passo 5), conectar as suas contas (passo 8) e o Claude in Chrome (passo 9). Reinicie o Claude Code e peça um vídeo.
 
@@ -69,13 +69,14 @@ Depois disso falta só o que depende de você (o instalador lembra no final): li
    ```
 2. **Clonar na pasta de skills do Claude:**
    ```bash
-   git clone https://github.com/gabrielxreis/video-redes-skill ~/.claude/skills/video-redes
+   git clone https://github.com/gabrielxreis/video-redes-skill ~/.claude/skills/ogab
    ```
 3. **Criar sua configuração** (fica só na sua máquina, não vai para o GitHub):
    ```bash
-   cp ~/.claude/skills/video-redes/config.example.json ~/.claude/skills/video-redes/config.json
+   cp ~/.claude/skills/ogab/config.example.json ~/.claude/skills/ogab/config.json
    ```
-4. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
+4. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio 21.1 ou mais novo** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
+   - **Versão mais antiga do DaVinci também funciona:** abaixo da 21.1 a API não devolve a transcrição, então a skill transcreve com o **Whisper local** (grátis, no próprio Mac): `pip3 install --user mlx-whisper` (Apple Silicon) ou `faster-whisper` (Intel). O instalador detecta a versão e instala sozinho só quando precisa. Abaixo da 20.2.2 a API pode errar a trilha da narração e da música (a skill confere).
 5. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
 6. **Fontes:** instale as de `assets/fontes/` (duplo clique em cada .ttf, ou copie para `~/Library/Fonts/`). São fontes livres (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
 7. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (29 animações: Cinematic, Palavra Por Palavra, Gold Design, Blur Up...). Ele **não** vem neste repositório. Use o seu próprio pacote de títulos do Fusion (`.drfx`): copie para
@@ -85,16 +86,17 @@ Depois disso falta só o que depende de você (o instalador lembra no final): li
 
 ## Como usar
 
-No Claude Code, peça em linguagem normal ou use o comando:
+No Claude Code, chame o **Gab** com `/ogab` seguido do pedido (ou só peça em linguagem normal que ele entra sozinho):
 
 | Comando | O que faz |
 |---|---|
-| `faz um vídeo para a <empresa> sobre <tema>` | Fluxo completo |
-| `/video-redes ajuda` | Mostra o que está habilitado, os provedores escolhidos e como mudar (o `/help` puro é do próprio Claude Code) |
-| `/video-redes config <chave> <valor>` | Liga/desliga opções. Ex.: `config opcoes.multi_formatos true` |
-| `/video-redes cliente <nome>` | Cria/atualiza o perfil do cliente (site, logo, pronúncias) |
-| `/video-redes pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
-| `/video-redes update` | Atualiza a skill (`git pull`), sem mexer no seu config nem nos clientes |
+| `/ogab faz um vídeo para a <empresa> sobre <tema>` | Fluxo completo |
+| `/ogab <qualquer edição no DaVinci>` | Edita a timeline aberta (cortes, legenda, música, motions...) |
+| `/ogab ajuda` | Mostra o que está habilitado, os provedores escolhidos e como mudar (o `/help` puro é do próprio Claude Code) |
+| `/ogab config <chave> <valor>` | Liga/desliga opções. Ex.: `config opcoes.multi_formatos true` |
+| `/ogab cliente <nome>` | Cria/atualiza o perfil do cliente (site, logo, pronúncias) |
+| `/ogab pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
+| `/ogab update` | Atualiza a skill (`git pull`), sem mexer no seu config nem nos clientes |
 
 ## Opções que você liga e desliga (`config.json`)
 
@@ -140,6 +142,7 @@ scripts/midia.py         converte takes pesados, áudio 48 kHz, detecta green sc
 scripts/qc.py            conferência automática
 scripts/marca.py         logos, cores e fontes do site oficial da empresa
 scripts/pauta.py         pauta automática (Google News grátis, NewsAPI, GNews)
+scripts/transcrever.py   transcrição com tempo por palavra: DaVinci 21.1+ ou Whisper local, pela versão detectada
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa

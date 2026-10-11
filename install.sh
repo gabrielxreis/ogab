@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Instalador da skill video-redes (macOS).
+# Instalador do Gab (/ogab), o editor de vídeo com IA (macOS).
 # Uso:  curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/install.sh | bash
 # Pode rodar de novo quando quiser: só instala o que faltar e atualiza a skill.
 set -euo pipefail
 
 REPO="https://github.com/gabrielxreis/video-redes-skill"
-DEST="$HOME/.claude/skills/video-redes"
+DEST="$HOME/.claude/skills/ogab"
 
 ok()   { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 info() { printf "\n\033[1m%s\033[0m\n" "$1"; }
@@ -38,7 +38,10 @@ else
   ok "Pillow instalado"
 fi
 
-info "4/7 Skill video-redes"
+info "4/7 Gab (/ogab)"
+if [ ! -e "$DEST" ] && [ -d "$HOME/.claude/skills/video-redes/.git" ]; then
+  mv "$HOME/.claude/skills/video-redes" "$DEST" && ok "pasta antiga video-redes renomeada para ogab"
+fi
 if [ -d "$DEST/.git" ]; then
   git -C "$DEST" pull --ff-only --quiet && ok "atualizada em $DEST"
 else
@@ -67,16 +70,43 @@ while IFS= read -r -d '' f; do
 done < <(find "$DEST/assets/fontes" -type f \( -name '*.ttf' -o -name '*.otf' \) -print0)
 ok "$n fonte(s) nova(s) instalada(s)"
 
-info "7/7 DaVinci Resolve"
-if [ -d "/Applications/DaVinci Resolve/DaVinci Resolve.app" ]; then
-  ok "DaVinci Resolve encontrado"
-  if [ -f "/Applications/DaVinci Resolve/DaVinci Resolve.app/Contents/Libraries/Fusion/fusionscript.so" ]; then
+info "7/7 DaVinci Resolve e transcrição"
+APP="/Applications/DaVinci Resolve/DaVinci Resolve.app"
+precisa_whisper=1
+if [ -d "$APP" ]; then
+  VER="$(defaults read "$APP/Contents/Info" CFBundleShortVersionString 2>/dev/null || echo 0)"
+  MAJ="$(echo "$VER" | cut -d. -f1)"; MIN="$(echo "$VER" | cut -d. -f2)"; PAT="$(echo "$VER" | cut -d. -f3)"
+  MAJ=${MAJ:-0}; MIN=${MIN:-0}; PAT=${PAT:-0}
+  ok "DaVinci Resolve $VER encontrado"
+  if [ -f "$APP/Contents/Libraries/Fusion/fusionscript.so" ]; then
     ok "biblioteca de scripting encontrada"
   else
     warn "scripting não encontrado: a skill precisa do DaVinci Resolve STUDIO (a versão grátis não tem scripting externo)"
   fi
+  # A leitura da transcrição pela API (GetTranscription) só existe a partir da 21.1.
+  if [ "$MAJ" -gt 21 ] || { [ "$MAJ" -eq 21 ] && [ "$MIN" -ge 1 ]; }; then
+    precisa_whisper=0
+    ok "o DaVinci $VER transcreve sozinho: Whisper não é necessário"
+  else
+    warn "DaVinci $VER: abaixo da 21.1 a API não devolve a transcrição; vou instalar o Whisper local (grátis)"
+  fi
+  # AppendToTimeline só com áudio numa trilha específica foi corrigido na 20.2.2.
+  if [ "$MAJ" -lt 20 ] || { [ "$MAJ" -eq 20 ] && { [ "$MIN" -lt 2 ] || { [ "$MIN" -eq 2 ] && [ "$PAT" -lt 2 ]; }; }; }; then
+    warn "abaixo da 20.2.2 o DaVinci pode errar a trilha ao colocar narração e música; a skill confere A1/A2, mas o ideal é atualizar para a 21.1+"
+  fi
 else
-  warn "DaVinci Resolve não encontrado em /Applications. Instale o DaVinci Resolve Studio: https://www.blackmagicdesign.com/products/davinciresolve"
+  warn "DaVinci Resolve não encontrado em /Applications. Instale o DaVinci Resolve Studio 21.1+: https://www.blackmagicdesign.com/products/davinciresolve"
+fi
+
+if [ "$precisa_whisper" -eq 1 ]; then
+  if [ "$(uname -m)" = "arm64" ]; then WPKG="mlx-whisper"; WMOD="mlx_whisper"; else WPKG="faster-whisper"; WMOD="faster_whisper"; fi
+  if python3 -c "import $WMOD" 2>/dev/null; then
+    ok "Whisper local ($WPKG) já instalado"
+  else
+    python3 -m pip install --user --quiet "$WPKG" 2>/dev/null || python3 -m pip install --user --quiet --break-system-packages "$WPKG"
+    python3 -c "import $WMOD" 2>/dev/null && ok "Whisper local ($WPKG) instalado; o modelo (~1,6 GB) baixa na primeira transcrição" \
+      || warn "não consegui instalar o $WPKG; rode: python3 -m pip install --user $WPKG"
+  fi
 fi
 
 cat <<'EOF'
@@ -89,5 +119,5 @@ Pronto. Falta só o que precisa de você (uma vez):
      ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/
   5. Opcional: skill competitor-profiling (Personalização > Skills no Claude).
 
-Reinicie o Claude Code e peça: "faz um vídeo para <empresa> sobre <tema>" ou digite /video-redes ajuda
+Reinicie o Claude Code e peça: "faz um vídeo para <empresa> sobre <tema>" ou digite /ogab ajuda (o Gab é o seu editor)
 EOF

@@ -1,5 +1,5 @@
 {
-  "_leia": "Copie para config.json (fica só na sua máquina). Edite à mão ou peça: '/video-redes config' para ver e mudar.",
+  "_leia": "Copie para config.json (fica só na sua máquina). Edite à mão ou peça: '/ogab config' para ver e mudar.",
   "pasta_saida": "~/Desktop",
   "provedores": {
     "voz": [
