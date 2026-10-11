@@ -143,6 +143,17 @@ def movimento(item, tipo="zoom_in", intensidade=0.08):
     return z
 
 
+def aplicar_grade(r, t, drx, trilha=1):
+    """Aplica o PowerGrade (.drx) em todos os takes da trilha de vídeo (via node graph de cada item).
+    Timeline.ApplyGradeFromDRX não funciona pela API; usar TimelineItem.GetNodeGraph().ApplyGradeFromDRX(path, 0)."""
+    if not os.path.isabs(drx): drx = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), drx)
+    r.OpenPage("color"); res = []
+    for x in t.GetItemListInTrack("video", trilha) or []:
+        g = x.GetNodeGraph(); res.append(bool(g and g.ApplyGradeFromDRX(drx, 0)))
+    r.OpenPage("edit")
+    return res
+
+
 def colocar_legendas(t, mp, srt, trocar=True):
     """Importa o SRT na trilha de legenda. Se a trilha já existe, troca só os itens (mantém o preset de estilo)."""
     if t.GetTrackCount("subtitle") == 0: t.AddTrack("subtitle")

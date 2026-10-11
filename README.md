@@ -19,6 +19,7 @@ Feita para **Claude Code** (app desktop ou terminal).
 | 5 | Música emotiva/em alta, clímax no CTA, fade out, -10 dB na A2 | Escolhe entre 3-4 | Artlist ou Envato |
 | 6 | Efeitos sonoros (whoosh nas trocas, impacto no gancho) | Liga/desliga no config | Artlist ou Envato |
 | 7 | Takes: banco primeiro, gera se faltar (só modo **ilimitado**) | Movimentos: a skill pergunta | Envato, Artlist, Storyblocks, Pexels / Magnific |
+| 7b | Cor: aplica o **seu PowerGrade** (.drx) em todos os takes (opcional) | Liga/desliga no config | DaVinci (node graph) |
 | 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
 | 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
 | 10 | Render H.264 (+ formatos extras se habilitado) e **conferência automática** | - | `qc.py` |
@@ -72,6 +73,7 @@ No Claude Code, peça em linguagem normal ou use o comando:
 | `opcoes.movimentos_nos_takes` | `perguntar` | Zoom/movimento leve nos takes (`sempre`, `nunca`, `perguntar`) |
 | `opcoes.lettering_no_gancho` | `perguntar` | Título animado no começo |
 | `opcoes.multi_formatos` | `false` | Renderiza também 4:5, 16:9 e versões 15/30/60 s para Ads |
+| `cor.aplicar_power_grade` | `false` | Aplica o seu PowerGrade (`cor.drx`, em `assets/grade/`) em todos os takes |
 | `opcoes.conferencia_automatica` | `true` | Roda o `qc.py` antes de entregar |
 | `opcoes.pauta_automatica.ativo` | `false` | Sugere pautas sozinha (fonte `gratis`, `newsapi` ou `gnews`) |
 | `regras.volume_db` | narração +5, música -10 | Volumes na timeline |

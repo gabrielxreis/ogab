@@ -130,5 +130,10 @@
       "@gabrielxreis_ Zoom Out"
     ]
   },
-  "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome."
+  "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome.",
+  "cor": {
+    "_leia": "PowerGrade (.drx) aplicado em TODOS os takes que entram na timeline. Exporte do DaVinci: Color > Gallery > botão direito no still > Export (gera .dpx + .drx). Coloque os arquivos em assets/grade/ (fica fora do git).",
+    "aplicar_power_grade": false,
+    "drx": "assets/grade/<seu PowerGrade>.drx"
+  }
 }

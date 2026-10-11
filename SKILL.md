@@ -73,6 +73,10 @@ Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoo
 5. `montar_takes` (sem buracos: encadeia pelo fim real e usa ceil).
 6. Se o usuário quis **movimentos**: `movimento()` (zoom leve) ou indicar onde animar.
 
+## 7b. Cor (se `config.cor.aplicar_power_grade`)
+
+Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, config.cor.drx)` em todos os takes da V1. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
+
 ## 8. Lettering (se o usuário quis)
 
 Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `@gabrielxreis_ Text Presets.drfx` em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`; o Resolve precisa reiniciar após instalar). `lettering(t, "<Template>", "TEXTO", inicio, dur)` na V2: texto do gancho (2-4 palavras) e, se fizer sentido, um destaque no CTA. Ofereça 2-3 templates da lista `config.lettering.templates_disponiveis`.
