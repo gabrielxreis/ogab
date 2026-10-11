@@ -58,6 +58,15 @@ def criar_projeto(nome, w=1080, h=1920, fps=30):
     return p, mp
 
 
+
+def checar_playback(p):
+    """True se o playback fps == timeline fps. Se False o áudio picota; a API não corrige depois que há timeline:
+    Project Settings > Master Settings > Playback frame rate (interface) + Playback > Render Cache > Smart."""
+    pb, tl = p.GetSetting("timelinePlaybackFrameRate"), p.GetSetting("timelineFrameRate")
+    ok = float(pb or 0) == float(tl or 0)
+    if not ok: print(f"AVISO: playback {pb} fps != timeline {tl} fps (áudio vai picotar)")
+    return ok
+
 def _bin(mp, nome):
     for f in mp.GetRootFolder().GetSubFolderList():
         if f.GetName() == nome:
@@ -186,17 +195,23 @@ def tamanho_lettering(texto, base=0.19, largura=0.85):
     return round(min(base, largura / (0.39 * max(maior, 1))), 4)
 
 
-def ajustar_titulo(item, texto, size=None, velocidade=1.0, entrelinha=0.8, cor=(1.0, 1.0, 1.0)):
+def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0)):
     """Padrão do usuário para os letterings: Shading Element = SOLID (o template vem com gradiente, Type1=2),
-    cor sólida, entrelinha mais junta quando há quebra de linha, tamanho que cabe na largura."""
+    cor sólida, entrelinha mais junta com quebra de linha, tamanho que cabe na largura, animação na velocidade
+    NORMAL (acelerar com TimeSpeed pede quadros além do fim do título: "frame not available") e, se dur_f for
+    menor que o título, FADE OUT médio (fade_f quadros) animando a opacidade do texto (a sombra some junto)."""
     comp = item.GetFusionCompByIndex(1); tool = comp.FindTool("Template")
     tool.SetInput("StyledText", texto); tool.SetInput("Size", size or tamanho_lettering(texto))
     tool.SetInput("ShadingElements", 1); tool.SetInput("Type1", 0)          # 0 = Solid
     tool.SetInput("Red1", cor[0]); tool.SetInput("Green1", cor[1]); tool.SetInput("Blue1", cor[2]); tool.SetInput("Alpha1", 1.0)
     if "\n" in texto: tool.SetInput("LineSpacing", entrelinha)
-    if velocidade != 1.0:
-        ts = comp.FindTool("TimeSpeed1")
-        if ts: ts.SetInput("Speed", velocidade)
+    ts = comp.FindTool("TimeSpeed1")
+    if ts: ts.SetInput("Speed", 1.0)
+    fim = int(comp.GetAttrs().get("COMPN_RenderEnd", item.GetDuration() - 1))
+    if dur_f and dur_f + fade_f < fim:
+        comp.Lock(); tool.Opacity1 = comp.BezierSpline({}); comp.Unlock()
+        for tt, v in ((0, 1.0), (dur_f, 1.0), (dur_f + fade_f, 0.0), (fim, 0.0)):
+            tool.SetInput("Opacity1", v, tt)
 
 
 def _ir(t, f, tentativas=20):
@@ -210,15 +225,15 @@ def _ir(t, f, tentativas=20):
 
 def _inserir_titulo_v1(t, template, texto, ini_f, dur_f):
     """Insere o Fusion Title na V1 em ini_f (a API sempre usa a V1, com ripple). NÃO corta o título:
-    cortar um Fusion Title no meio derruba o Resolve. A duração visível vem da velocidade da animação
-    (TimeSpeed): o título fica com o tamanho padrão, mas o texto entra e sai em dur_f quadros."""
+    cortar um Fusion Title no meio derruba o Resolve. A duração visível vem de um fade out na opacidade
+    do texto: o título fica com o tamanho padrão, mas o texto some (com fade médio) depois de dur_f quadros."""
     _ir(t, ini_f)
     it = t.InsertFusionTitleIntoTimeline(template)
     if not it: raise RuntimeError(f"template '{template}' não encontrado (pacote instalado? Resolve reiniciado?)")
     achados = [x for x in (t.GetItemListInTrack("video", 1) or []) if x.GetStart() == ini_f]
     if not achados: raise RuntimeError(f"título não caiu em {ini_f}")
     alvo = achados[0]
-    ajustar_titulo(alvo, texto, velocidade=max(1.0, alvo.GetDuration() / max(dur_f, 1)))
+    ajustar_titulo(alvo, texto, dur_f=dur_f)
     return alvo
 
 
@@ -241,7 +256,7 @@ def camada_letterings(t, mp, lista, template):
         for c in camadas:
             if ini_f >= c[-1][3] + 1: c.append((*item, ini_f + padrao)); break
         else: camadas.append([(*item, ini_f + padrao)])
-    ocup = [(x[1], x[1] + x[2]) for x in lista]
+    ocup = [(x[1], x[1] + x[2] + 0.6) for x in lista]   # inclui o fade out
     for c in reversed(camadas):           # a primeira camada termina mais perto dos takes
         travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
                  [("video", i) for i in range(2, t.GetTrackCount("video") + 1)]

@@ -54,7 +54,7 @@ Listar 3-5 vozes no idioma (ElevenLabs `creative_list_voices`; incluir vozes do 
 
 ## 4. DaVinci: projeto e narração
 
-`scripts/resolve_lib.py`: `criar_projeto(nome, w, h, fps)` (grava fps de timeline **e playback** antes de qualquer timeline), `criar_timeline`, `colocar_narracao(db=+5)`. Formato pela plataforma (9:16 1080x1920; 4:5 1080x1350; 16:9 1920x1080).
+`scripts/resolve_lib.py`: `criar_projeto(nome, w, h, fps)` (grava fps de timeline **e playback** antes de qualquer timeline; se o áudio picotar, `checar_playback(p)` e, se divergir, corrigir em Project Settings > Master Settings pela interface + Render Cache Smart, ver docs/PROCESSO.md), `criar_timeline`, `colocar_narracao(db=+5)`. Formato pela plataforma (9:16 1080x1920; 4:5 1080x1350; 16:9 1920x1080).
 
 ## 5. Música
 
