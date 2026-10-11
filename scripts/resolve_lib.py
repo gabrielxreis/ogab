@@ -297,7 +297,8 @@ def _assinatura(t):
 
 
 def camada_letterings(t, mp, lista, template, centro_y=None):
-    """Coloca letterings [(TEXTO, inicio_s, dur_s[, template]), ...] em camadas logo ACIMA dos takes (sem compound).
+    """Coloca letterings [(TEXTO, inicio_s, dur_s[, template[, centro_y]]), ...] em camadas logo ACIMA dos takes (sem compound).
+    centro_y por item: 0.5 = centro (lettering sobre b-roll, sem rosto); 1-1290/1920 = abaixo do queixo (sobre a pessoa).
     A API só insere título na V1 e com ripple, então: guarda os takes da V1 e tira; distribui os letterings em
     camadas sem sobreposição (cada título ocupa o tamanho padrão do template); para cada camada, insere na V1
     vazia em ordem cronológica (com áudio, legenda e outras trilhas TRAVADAS para o ripple não mexer) e cria
@@ -320,8 +321,8 @@ def camada_letterings(t, mp, lista, template, centro_y=None):
     for item in sorted(lista, key=lambda x: x[1]):
         ini_f = S + round(item[1] * F)
         for c in camadas:
-            if ini_f >= c[-1][4] + 1: c.append((*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)); break
-        else: camadas.append([(*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)])
+            if ini_f >= c[-1][4] + 1: c.append((*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao, item[4] if len(item) > 4 else centro_y)); break
+        else: camadas.append([(*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao, item[4] if len(item) > 4 else centro_y)])
     ocup = [(x[1], x[1] + padrao / F) for x in lista]   # o bloco inteiro do título (fade no fim do bloco)
     for c in reversed(camadas):           # a primeira camada termina mais perto dos takes
         travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
@@ -331,8 +332,8 @@ def camada_letterings(t, mp, lista, template, centro_y=None):
         if soltas: raise RuntimeError(f"trilhas não travaram {soltas}: o ripple do título ia empurrar áudio/legenda")
         antes = _assinatura(t)
         try:
-            for texto, ini, dur, tpl, _ in c:
-                _inserir_titulo_v1(t, tpl, texto, S + max(3, round(ini * F)), round(dur * F), centro_y)   # quadro 0 falha no fade
+            for texto, ini, dur, tpl, _, cy in c:
+                _inserir_titulo_v1(t, tpl, texto, S + max(3, round(ini * F)), round(dur * F), cy)   # quadro 0 falha no fade
         finally:
             for k, i in travar: t.SetTrackLock(k, i, False)
         if _assinatura(t) != antes: raise RuntimeError("áudio/legenda mudaram ao inserir título (ripple): desfazer e refazer")
