@@ -61,7 +61,7 @@ def criar_projeto(nome, w=1080, h=1920, fps=30):
 
 def checar_playback(p):
     """True se o playback fps == timeline fps. Se False o áudio picota; a API não corrige depois que há timeline:
-    Project Settings > Master Settings > Playback frame rate (interface) + Playback > Render Cache > Smart."""
+    Project Settings > Master Settings > Playback frame rate (interface). Não ligar Render Cache (fica em None)."""
     pb, tl = p.GetSetting("timelinePlaybackFrameRate"), p.GetSetting("timelineFrameRate")
     ok = float(pb or 0) == float(tl or 0)
     if not ok: print(f"AVISO: playback {pb} fps != timeline {tl} fps (áudio vai picotar)")
@@ -86,7 +86,7 @@ def criar_timeline(p, mp, nome, w=None, h=None, fps=None):
         p.SetSetting("timelinePlaybackFrameRate", str(fps or p.GetSetting("timelineFrameRate")))
         if not checar_playback(p):
             print("AJUSTAR AGORA PELA INTERFACE: File > Project Settings > Master Settings > Playback frame rate "
-                  "= fps da timeline > Save; e Playback > Render Cache > Smart")
+                  "= fps da timeline > Save (Render Cache fica em None)")
     return t
 
 

@@ -149,7 +149,7 @@ assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
 
 ## Armadilhas conhecidas (já tratadas pela skill)
 
-- O DaVinci não muda o **frame rate de playback** por script depois que o projeto tem timeline: a skill grava ao criar o projeto (senão o áudio engasga). Se um projeto já existente estiver com playback diferente da timeline, corrige em Project Settings > Master Settings > Playback frame rate e liga Playback > Render Cache > Smart.
+- O DaVinci não muda o **frame rate de playback** por script depois que o projeto tem timeline: a skill grava ao criar o projeto (senão o áudio engasga). Se um projeto já existente estiver com playback diferente da timeline, corrige em Project Settings > Master Settings > Playback frame rate. Render Cache fica desligado (None).
 - Takes **4K/ProRes** travam a reprodução: convertidos para 1080 H.264 antes de importar.
 - A API só insere títulos animados na **V1** (empurrando o que estiver lá): a skill monta os letterings numa camada acima dos takes criando trilha na posição 1, sem compound. Cortar um título animado no meio derruba o Resolve, então a duração visível vem de um fade out. Nunca mudar a velocidade das animações (quebra o template).
 - A API não faz **fade** de áudio nem aplica **estilo de legenda**: o fade é feito no arquivo (ffmpeg) e o estilo fica na trilha de legenda (preset).
