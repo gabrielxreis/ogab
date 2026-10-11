@@ -110,7 +110,7 @@ Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hype
 ## 8d. Edição dinâmica com HyperFrames (ritmo de Reels)
 
 Objetivo: nenhum trecho parado mais de ~2 s sem alguma mudança na tela. Planejar junto com os motions, numa tabela única (tempo, recurso, o que faz) para o usuário ver antes. Recursos, todos renderizados como MOV com alfa (ou take reprocessado) e postos no DaVinci no tempo exato:
-- **Cortes no ritmo da música:** `hyperframes beats` na música escolhida; ajustar os pontos de troca dos takes (`montar_takes`) para cair nas batidas mais próximas da fala, sem cortar no meio de uma ideia.
+- **Cortes no ritmo da música: só se fizer sentido.** Em vídeo mais emocional/hype (música marcada, pouca informação por frase), `hyperframes beats` na música e ajustar as trocas de take para as batidas mais próximas da fala. Em vídeo **informativo** (notícia, explicação, dados), a fala manda: cortar no fim de cada ideia, sem forçar batida.
 - **Punch-in / zoom / Ken Burns nos takes** (skill `hyperframes-keyframes`): reprocessar o take com zoom suave ou punch-in na palavra forte (a API do DaVinci não faz keyframe de zoom). Salvar como `brolls/take_XX_dyn.mov` e trocar na timeline. Perguntar antes (regra: movimentos nos takes = perguntar).
 - **Transições** entre blocos (whip, flash, wipe com a cor da marca): overlay curto (6-12 quadros) com alfa na trilha MOTIONS, alinhado ao corte, com o whoosh do SFX no mesmo quadro.
 - **Tipografia cinética / callouts:** números, datas e comparações que não viraram motion (setas, círculos, sublinhado, contador subindo, barra de progresso), sempre no centro e acima da legenda.
