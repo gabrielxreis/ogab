@@ -20,6 +20,8 @@ Pasta da skill: `~/.claude/skills/video-redes/` (chamada de `SKILL_DIR` abaixo).
 
 ## Regras fixas (sempre)
 
+0. **Contas são de quem usa a skill.** Usar SÓ os conectores e logins da pessoa que está rodando o Claude. Nunca pedir, guardar nem usar senha, token ou chave de outra pessoa; nunca colocar credenciais no `config.json` nem no repositório. Se um provedor não estiver conectado, pedir para a própria pessoa conectar a conta dela.
+
 1. **Pasta do vídeo**: `<pasta_saida>/<Assunto> - <Empresa>/` (padrão `~/Desktop`), com `roteiro.txt`, `links.txt` (origem de tudo: notícia, voz, música, cada take, cada efeito), `narracoes/`, `musica/`, `sfx/`, `brolls/`, `videos/`, `legendas/`. **Projeto do DaVinci com o mesmo nome** `<Assunto> - <Empresa>`.
 2. **Tudo via MCP/API, só download pelo navegador** (Claude in Chrome logado nas contas do usuário). Ver `navegador/downloads.md`.
 3. **Economizar créditos e tokens**: 1 geração por vez, sem variações extras; estimar custo antes (ElevenLabs `estimate_only`); gerar takes **só em modo ilimitado** (Magnific pelo site); buscas com `perPage` pequeno; no navegador, JS enxuto e zoom pequeno em vez de screenshot grande; não reler arquivos grandes.
@@ -73,7 +75,7 @@ Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoo
 
 ## 8. Lettering (se o usuário quis)
 
-Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `TEXT PRESETS.drfx` em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`; o Resolve precisa reiniciar após instalar). `lettering(t, "<Template>", "TEXTO", inicio, dur)` na V2: texto do gancho (2-4 palavras) e, se fizer sentido, um destaque no CTA. Ofereça 2-3 templates da lista `config.lettering.templates_disponiveis`.
+Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `@gabrielxreis_ Text Presets.drfx` em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`; o Resolve precisa reiniciar após instalar). `lettering(t, "<Template>", "TEXTO", inicio, dur)` na V2: texto do gancho (2-4 palavras) e, se fizer sentido, um destaque no CTA. Ofereça 2-3 templates da lista `config.lettering.templates_disponiveis`.
 
 ## 9. Legenda
 

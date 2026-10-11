@@ -2,7 +2,9 @@
 
 Do **roteiro** à **timeline pronta e renderizada** no DaVinci Resolve, com IA: você aprova o roteiro, escolhe a voz, e a skill cuida de narração, música, efeitos sonoros, takes (de banco ou gerados), lettering animado, legenda com métrica certa, conferência automática e exportação.
 
-Feita para **Claude Code** (app desktop ou terminal). Cada pessoa conecta **as próprias contas** e escolhe quais plataformas usar em cada etapa: a skill segue o processo com o que estiver disponível.
+Feita para **Claude Code** (app desktop ou terminal).
+
+> **Cada pessoa usa as PRÓPRIAS contas.** A skill não vem com nenhuma conta, chave ou login. Quem instala conecta os seus serviços (ElevenLabs, Artlist, Envato, Magnific...) no próprio Claude e faz login nos sites no próprio navegador. Nada disso fica salvo no repositório nem no `config.json`. Você escolhe quais plataformas usar em cada etapa, e a skill segue com o que estiver disponível na sua conta.
 
 ---
 
@@ -44,9 +46,9 @@ Tudo fica numa pasta na Mesa com o nome do vídeo:
 3. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
 4. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
 5. **Fontes:** instale as de `assets/fontes/` (duplo clique em cada .ttf, ou copie para `~/Library/Fonts/`). São fontes livres (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
-6. **Lettering animado (opcional):** se você tem um pacote de títulos do Fusion (`.drfx`), copie para
-   `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/` e **reinicie o Resolve**. Coloque o nome do pacote e dos templates em `config.json > lettering`. Pacotes comprados **não** vêm neste repositório.
-7. **Conectar suas contas** (veja [docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific, etc. Conecte só o que você usa.
+6. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (29 animações: Cinematic, Palavra Por Palavra, Gold Design, Blur Up...). Ele **não** vem neste repositório. Use o seu próprio pacote de títulos do Fusion (`.drfx`): copie para
+   `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/` e **reinicie o Resolve**. Coloque o nome do pacote e dos templates em `config.json > lettering` (o nome do template é o nome do arquivo `.setting` dentro do pacote).
+7. **Conectar as SUAS contas** (veja [docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific, etc. Conecte só o que você usa.
 8. **Claude in Chrome:** instale a extensão e faça login nos sites (Envato, Artlist, Magnific). Downloads são sempre pelo navegador; a IA nunca digita senha.
 
 ## Como usar
@@ -83,7 +85,7 @@ estrutura da pasta, resolução e duração pela regra da plataforma, **quadros 
 
 ## Pronúncia por cliente (aprende sozinha)
 
-`clientes/<empresa>/pronuncia.json` guarda, para cada termo, a **grafia** da legenda, como **escrever para a voz** pronunciar certo e os **erros de transcrição** já vistos. Quando a transcrição mostra um erro novo (ex.: a voz falou "Bora em Nigrar"), a skill adiciona no arquivo, corrige a legenda e, se for erro da voz, regera só o trecho (com sua aprovação).
+`clientes/<empresa>/pronuncia.json` guarda, para cada termo, a **grafia** da legenda, como **escrever para a voz** pronunciar certo e os **erros de transcrição** já vistos. Quando a transcrição mostra um erro novo (ex.: a transcrição ouviu o nome da marca errado), a skill adiciona no arquivo, corrige a legenda e, se for erro da voz, regera só o trecho (com sua aprovação).
 
 ## Estrutura do repositório
 

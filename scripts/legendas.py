@@ -8,7 +8,7 @@ Comandos:
       -> casa cada legenda com o tempo das palavras faladas e grava o SRT.
 
 Formato do frases.txt: uma legenda por linha. '#n' no fim força o nº de palavras faladas quando a grafia
-corrigida tem nº de palavras diferente da transcrição (ex.: "na Bora Imigrar. #4" porque falou "na Bora em Nigrar").
+corrigida tem nº de palavras diferente da transcrição (ex.: "na Marca X. #4" quando a transcrição ouviu "na Mar ca X", 4 palavras).
 
 transcricao.json = saída de MediaPoolItem.GetTranscription() do Resolve (segments[].words[] com start/end em
 timecode HH:MM:SS:FF) ou do ElevenLabs/Whisper convertida para {"segments":[{"words":[{"text","start","end"}]}]} em segundos.
@@ -32,7 +32,7 @@ def palavras(transc, fps=30):
 
 
 def correcoes(pasta_cliente):
-    """pronuncia.json do cliente: {"termos": [{"grafia": "Bora Imigrar", "erros_transcricao": ["Bora em Nigrar"], "fala": "Bóra Imigrár"}]}"""
+    """pronuncia.json do cliente: {"termos": [{"grafia": "Marca X", "erros_transcricao": ["Mar ca X"], "fala": "Marca X"}]}"""
     fix = []
     p = os.path.join(pasta_cliente, 'pronuncia.json') if pasta_cliente else None
     if p and os.path.exists(p):

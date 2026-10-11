@@ -1,25 +1,45 @@
 {
   "_leia": "Copie para config.json (fica só na sua máquina). Edite à mão ou peça: '/video-redes config' para ver e mudar.",
-
   "pasta_saida": "~/Desktop",
-
   "provedores": {
-    "voz": ["elevenlabs", "artlist"],
-    "musica": ["artlist", "envato"],
-    "efeitos_sonoros": ["artlist", "envato"],
-    "takes_banco": ["envato", "artlist", "storyblocks", "pexels"],
-    "geracao_takes": ["magnific_site_ilimitado"],
+    "voz": [
+      "elevenlabs",
+      "artlist"
+    ],
+    "musica": [
+      "artlist",
+      "envato"
+    ],
+    "efeitos_sonoros": [
+      "artlist",
+      "envato"
+    ],
+    "takes_banco": [
+      "envato",
+      "artlist",
+      "storyblocks",
+      "pexels"
+    ],
+    "geracao_takes": [
+      "magnific_site_ilimitado"
+    ],
     "download": "navegador",
     "editor": "davinci_resolve"
   },
-
   "opcoes": {
     "efeitos_sonoros": true,
     "movimentos_nos_takes": "perguntar",
     "lettering_no_gancho": "perguntar",
     "multi_formatos": false,
-    "formatos_extras": ["4:5", "16:9"],
-    "versoes_ads": [15, 30, 60],
+    "formatos_extras": [
+      "4:5",
+      "16:9"
+    ],
+    "versoes_ads": [
+      15,
+      30,
+      60
+    ],
     "conferencia_automatica": true,
     "pauta_automatica": {
       "ativo": false,
@@ -29,33 +49,86 @@
       "quantas_sugestoes": 3
     }
   },
-
   "regras": {
     "duracao_segundos": {
-      "instagram": [30, 90],
-      "youtube_shorts": [15, 60],
-      "youtube_longo": [180, 900],
-      "meta_ads": [15, 30, 60]
+      "instagram": [
+        30,
+        90
+      ],
+      "youtube_shorts": [
+        15,
+        60
+      ],
+      "youtube_longo": [
+        180,
+        900
+      ],
+      "meta_ads": [
+        15,
+        30,
+        60
+      ]
     },
     "palavras_por_minuto": 150,
     "fps": 30,
-    "volume_db": { "narracao": 5, "musica": -10 },
+    "volume_db": {
+      "narracao": 5,
+      "musica": -10
+    },
     "fade_out_musica_s": 2.5,
     "audio_hz": 48000,
     "loudness_alvo_lufs": -14,
     "legenda": {
       "uma_linha": true,
       "max_caracteres": 25,
-      "preset_trilha": { "fonte": "Poppins", "estilo": "Bold", "tamanho": 40, "caixa_alta": true, "cor": "branco", "posicao": "baixo centro" }
+      "preset_trilha": {
+        "fonte": "Poppins",
+        "estilo": "Bold",
+        "tamanho": 40,
+        "caixa_alta": true,
+        "cor": "branco",
+        "posicao": "baixo centro"
+      }
     },
     "evitar_green_screen": true,
     "converter_takes_pesados_para_1080": true,
     "geracao_so_ilimitada": true
   },
-
   "lettering": {
-    "pacote": "TEXT PRESETS.drfx",
-    "template_gancho": "OUTCinematic",
-    "templates_disponiveis": ["OUTCinematic", "OUTModerno", "OUTReveal", "OUTPalavraPorPalavra", "OUTPalavraPorPalavra2", "OUTGoldDesign", "OUTSilverDesign", "OUTBlurUp", "OUTBlur", "OUTZoomOut", "OUTSurgir", "OUTDestacado", "OUTSublinhado", "OUTSlide", "OUTCorte", "OUTCorteLinha", "OUTBrilho", "OUTBrilho2", "OUTFlicker", "OUTFlicking", "OUTGirando", "OUTAcima", "OUTAbaixo", "OUTEsquerda", "OUTDireita"]
-  }
+    "_leia": "Pacote de títulos animados do Fusion (.drfx) instalado em ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/. O nome do template é o nome do arquivo .setting dentro do pacote. Use o seu próprio pacote e liste os nomes aqui.",
+    "pacote": "@gabrielxreis_ Text Presets.drfx",
+    "template_gancho": "@gabrielxreis_ Cinematic",
+    "templates_disponiveis": [
+      "@gabrielxreis_ Abaixo (Rápido)",
+      "@gabrielxreis_ Abaixo",
+      "@gabrielxreis_ Acima (Rápido)",
+      "@gabrielxreis_ Acima",
+      "@gabrielxreis_ Blur",
+      "@gabrielxreis_ Blur Up",
+      "@gabrielxreis_ Brilho",
+      "@gabrielxreis_ Brilho 2",
+      "@gabrielxreis_ Cinematic",
+      "@gabrielxreis_ Corte",
+      "@gabrielxreis_ Corte Linha",
+      "@gabrielxreis_ Destacado",
+      "@gabrielxreis_ Direita (Rápido)",
+      "@gabrielxreis_ Direita",
+      "@gabrielxreis_ Esquerda (Rápido)",
+      "@gabrielxreis_ Esquerda",
+      "@gabrielxreis_ Flicker",
+      "@gabrielxreis_ Flicking",
+      "@gabrielxreis_ Girando",
+      "@gabrielxreis_ Gold Design",
+      "@gabrielxreis_ Moderno",
+      "@gabrielxreis_ Palavra Por Palavra",
+      "@gabrielxreis_ Palavra Por Palavra 2",
+      "@gabrielxreis_ Reveal",
+      "@gabrielxreis_ Silver Design",
+      "@gabrielxreis_ Slide",
+      "@gabrielxreis_ Sublinhado",
+      "@gabrielxreis_ Surgir",
+      "@gabrielxreis_ Zoom Out"
+    ]
+  },
+  "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome."
 }

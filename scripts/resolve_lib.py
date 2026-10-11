@@ -8,7 +8,7 @@ Uso típico (python3 com as variáveis de ambiente do Resolve, ver ambiente()):
     colocar_musica(t, mp, ".../musica/faixa.wav", inicio_faixa=64.0, dur=48.4, db=-10, fade=2.5)
     montar_takes(t, mp, [(".../brolls/take_01.mp4", 0.0), (".../brolls/take_02.mp4", 5.1), ...], fim=48.4)
     colocar_legendas(t, mp, ".../legendas/legendas_v1.srt")
-    lettering(t, "OUTCinematic", "A FILA VOLTOU", inicio=0.0, dur=2.5)
+    lettering(t, "@gabrielxreis_ Cinematic", "TEXTO DO GANCHO", inicio=0.0, dur=2.5)
     renderizar(p, ".../videos", "Assunto - Empresa", 1080, 1920)
 """
 import math, os, subprocess, sys, time
