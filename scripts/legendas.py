@@ -101,7 +101,7 @@ def sincronizar(transc, frases, saida, fps=30):
         if k + 1 < len(cont): en = max(en, min(st + 0.8, ws[i][1]))
         out.append(f"{k + 1}\n{tc(st)} --> {tc(en)}\n{f.replace(' / ', chr(10))}\n")
     open(saida, 'w').write('\n'.join(out)); print(len(out), 'legendas ->', saida)
-    equilibrar(saida)
+    equilibrar(saida); equilibrar(saida)   # 2ª passada pega o que a cadeia deixou
 
 
 def equilibrar(srt, min_s=0.7, max_shift=0.35):
