@@ -119,6 +119,7 @@ assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
 
 - O DaVinci não muda o **frame rate de playback** por script depois que o projeto tem timeline: a skill grava ao criar o projeto (senão o áudio engasga).
 - Takes **4K/ProRes** travam a reprodução: convertidos para 1080 H.264 antes de importar.
+- A API só insere títulos animados na **V1** (empurrando o que estiver lá): a skill monta os letterings numa camada acima dos takes criando trilha na posição 1, sem compound. Cortar um título animado no meio derruba o Resolve, então a duração vem da velocidade da animação.
 - A API não faz **fade** de áudio nem aplica **estilo de legenda**: o fade é feito no arquivo (ffmpeg) e o estilo fica na trilha de legenda (preset).
 - Fontes 24/25 fps numa timeline 30 fps deixam **1-2 quadros pretos**: os takes são encadeados pelo fim real.
 - Os conectores de Envato/Artlist/Magnific **não baixam** arquivos: download pelo navegador.
