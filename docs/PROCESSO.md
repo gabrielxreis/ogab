@@ -218,3 +218,5 @@ Antes de entregar:
 ## Estrutura de pastas
 
 Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`, `links.txt`, `narracoes/`, `musica/`, `brolls/`, `videos/`, `legendas/`. Perfis das empresas ficam em `~/.claude/skills/video-redes/clientes/<empresa>/`.
+
+- **Fade dos letterings:** a curva de opacidade é gravada com `SetKeyFrames(kf, True)` (substitui tudo). `SetInput(valor, quadro)` soma com keyframes antigos e o texto reaparecia depois do fade em alguns. Antes de entregar, rodar `checar_fades(t)`: todo lettering tem que cair para 0 e não voltar.

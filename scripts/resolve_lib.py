@@ -215,9 +215,30 @@ def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8
     if ts: ts.SetInput("Speed", 1.0)
     fim = int(comp.GetAttrs().get("COMPN_RenderEnd", item.GetDuration() - 1))
     if dur_f and dur_f + fade_f < fim:
-        comp.Lock(); tool.Opacity1 = comp.BezierSpline({}); comp.Unlock()
-        for tt, v in ((0, 1.0), (dur_f, 1.0), (dur_f + fade_f, 0.0), (fim, 0.0)):
-            tool.SetInput("Opacity1", v, tt)
+        # SetKeyFrames(..., True) SUBSTITUI a curva inteira: SetInput por quadro soma com keyframes antigos
+        # (do preset ou de tentativa anterior) e o texto volta a aparecer depois do fade.
+        out = tool.Opacity1.GetConnectedOutput()
+        if not out:
+            comp.Lock(); tool.Opacity1 = comp.BezierSpline({}); comp.Unlock(); out = tool.Opacity1.GetConnectedOutput()
+        kf = {0.0: {1: 1.0}, float(dur_f): {1: 1.0}, float(dur_f + fade_f): {1: 0.0}, float(fim + 1): {1: 0.0}}
+        out.GetTool().SetKeyFrames(kf, True)
+        if sorted(out.GetTool().GetKeyFrames()) != sorted(kf):
+            raise RuntimeError(f"fade do lettering '{texto}' não ficou limpo")
+
+
+def checar_fades(t, fade_f=18):
+    """Confere se TODO lettering (título Fusion acima da V1) termina com fade: opacidade 1 -> 0 e nunca volta a subir."""
+    ruins = []
+    for v in range(2, t.GetTrackCount("video") + 1):
+        for it in t.GetItemListInTrack("video", v) or []:
+            if not it.GetFusionCompCount(): continue
+            tool = it.GetFusionCompByIndex(1).FindTool("Template")
+            if not tool: continue
+            vals = [tool.GetInput("Opacity1", f) or 0 for f in range(0, it.GetDuration(), 3)]
+            caiu = next((i for i, x in enumerate(vals) if x < 0.01), None)
+            if caiu is None or any(x > 0.01 for x in vals[caiu:]): ruins.append(tool.GetInput("StyledText"))
+    print("fades OK" if not ruins else f"SEM FADE LIMPO: {ruins}")
+    return ruins
 
 
 def _ir(t, f, tentativas=20):
