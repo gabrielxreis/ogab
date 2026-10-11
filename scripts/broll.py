@@ -82,6 +82,13 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
     eh_foto = lambda b: os.path.splitext(b["arquivo"])[1].lower() in (".heic", ".jpg", ".jpeg", ".png")
     plano = [x for x in plano if not eh_foto(x[1])] + [x for x in plano if eh_foto(x[1])]
     for seg_t, b in plano:
+        # não cabe por cima de um clipe que já está na trilha: limita ao vão livre (senão o append falha calado)
+        ini_f = S + int(round(seg_t * F))
+        depois_dele = [x.GetStart() for x in (t.GetItemListInTrack("video", trilha) or []) if x.GetStart() > ini_f]
+        if depois_dele:
+            b["dur"] = min(b["dur"], (min(depois_dele) - ini_f) / F - 0.04)
+        if b["dur"] < 0.5:
+            print("  sem espaço:", b["frase"]); continue
         it = R.importar(mp, b["arquivo"], bin_nome)
         pr = it.GetClipProperty()
         fps_c = float(pr.get("FPS") or F)
@@ -96,6 +103,8 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
         if not res:
             print("  falhou:", b["frase"], os.path.basename(b["arquivo"])); continue
         x = res[0]
+        if not any(abs(y.GetStart() - ini_f) <= 1 for y in (t.GetItemListInTrack("video", trilha) or [])):
+            print("  NÃO ENTROU (sobreposição?):", b["frase"]); continue
         try:
             w, h = [int(v) for v in (pr.get("Resolution") or "0x0").split("x")]
         except ValueError:
