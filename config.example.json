@@ -133,7 +133,29 @@
       "@gabrielxreis_ Surgir",
       "@gabrielxreis_ Zoom Out"
     ],
-    "template_palavras_chave": "@gabrielxreis_ Cinematic"
+    "template_palavras_chave": "@gabrielxreis_ Cinematic",
+    "favoritos": [
+      "@gabrielxreis_ Palavra Por Palavra",
+      "@gabrielxreis_ Palavra Por Palavra 2"
+    ],
+    "rodizio": [
+      "@gabrielxreis_ Zoom Out",
+      "@gabrielxreis_ Destacado",
+      "@gabrielxreis_ Blur Up",
+      "@gabrielxreis_ Surgir",
+      "@gabrielxreis_ Reveal",
+      "@gabrielxreis_ Slide",
+      "@gabrielxreis_ Acima",
+      "@gabrielxreis_ Abaixo",
+      "@gabrielxreis_ Brilho",
+      "@gabrielxreis_ Cinematic"
+    ],
+    "evitar_2_linhas": [
+      "@gabrielxreis_ Sublinhado",
+      "@gabrielxreis_ Moderno",
+      "@gabrielxreis_ Corte"
+    ],
+    "_variar": "Favoritos em ~metade dos letterings, o resto alternando o rodízio; nunca a mesma animação duas vezes seguidas."
   },
   "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome.",
   "cor": {

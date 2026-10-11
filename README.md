@@ -12,7 +12,7 @@ Feita para **Claude Code** (app desktop ou terminal).
 
 | # | Etapa | Você decide? | Ferramenta |
 |---|---|---|---|
-| 1 | Perfil do cliente (site, logo, tom, pronúncias) | Só na 1ª vez | Lê o site e monta `clientes/<empresa>/` |
+| 1 | Perfil do cliente (site, tom, pronúncias) + **logos e identidade visual baixadas do site** | Só na 1ª vez | `competitor-profiling` + `marca.py`, monta `clientes/<empresa>/` e `<Empresa>/marca/` |
 | 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa a notícia/tema com fonte |
 | 3 | **Voz** (narração por IA) | **Escolhe a voz** | ElevenLabs ou Artlist |
 | 4 | Projeto no DaVinci (`Assunto - Empresa`), narração na A1 em +5 dB | - | Scripting API do Resolve |
@@ -28,9 +28,11 @@ Feita para **Claude Code** (app desktop ou terminal).
 Tudo fica numa pasta na Mesa com o nome do vídeo:
 
 ```
-~/Desktop/<Assunto> - <Empresa>/
-  roteiro.txt      links.txt  (de onde veio cada coisa)
-  narracoes/  musica/  sfx/  brolls/  videos/  legendas/
+~/Desktop/<Empresa>/
+  marca/           logos/ identidade.json identidade.md  (baixados do site oficial)
+  <Assunto> - <Empresa>/
+    roteiro.txt      links.txt  (de onde veio cada coisa)
+    narracoes/  musica/  sfx/  brolls/  videos/  legendas/
 ```
 
 ---
@@ -107,6 +109,7 @@ scripts/resolve_lib.py   monta projeto, timeline, narração, música, sfx, take
 scripts/legendas.py      rascunho de legenda por frase + sincronização com a narração
 scripts/midia.py         converte takes pesados, áudio 48 kHz, detecta green screen
 scripts/qc.py            conferência automática
+scripts/marca.py         logos, cores e fontes do site oficial da empresa
 scripts/pauta.py         pauta automática (Google News grátis, NewsAPI, GNews)
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões

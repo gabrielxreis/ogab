@@ -35,3 +35,13 @@ if(c){c.click();await new Promise(r=>setTimeout(r,900));const o=[...document.que
 - Vídeo: abrir `magnific.com/app/creation/<id>` da imagem > **Create video** (só funciona depois de um zoom/screenshot da aba; clicar 2x se precisar) > **Kling 2.5 / 720p / 5 s / Unlimited**.
 - O botão Generate muda de lugar com prompt longo: clicar por JS pelo texto `Generate`.
 - Baixar o resultado pelo MCP (só leitura: `creations_wait` devolve a URL) e `curl`. Conferir `credits: 0` em `creations_get`.
+
+## Identidade visual quando o site carrega o estilo por JavaScript
+
+Se `marca.py` não achar as fontes (site feito em React/Vite, estilo injetado por JS), abrir o site no navegador e rodar:
+
+```js
+const pick=s=>{const e=document.querySelector(s); if(!e) return null; const c=getComputedStyle(e); return {font:c.fontFamily, peso:c.fontWeight, cor:c.color, fundo:c.backgroundColor}};
+({h1:pick('h1'), h2:pick('h2'), texto:pick('p'), botao:pick('button, a[class*=rounded]'), fontes:[...document.fonts].filter(f=>f.status=='loaded').map(f=>f.family+' '+f.weight)})
+```
+Anotar no `marca/identidade.md`. A imagem de compartilhamento (og:image) pode ser de uma versão antiga do site: valer o que a página mostra hoje.

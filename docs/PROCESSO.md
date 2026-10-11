@@ -97,7 +97,7 @@ A voz é a única etapa que usa crédito fora do Magnific (créditos do ElevenLa
 
 ## Etapa 3. Abrir o DaVinci e importar o áudio
 
-**Nome do projeto no DaVinci: sempre `<Assunto> - <Empresa>`** (ex.: `Visa Bulletin Outubro 2026 - Empresa X`), para o usuário achar fácil. A pasta no disco tem o mesmo nome, dentro de `pasta_saida` (padrão `~/Desktop`).
+**Nome do projeto no DaVinci: sempre `<Assunto> - <Empresa>`** (ex.: `Visa Bulletin Outubro 2026 - Empresa X`), para o usuário achar fácil. A pasta no disco tem o mesmo nome, dentro da pasta da empresa: `pasta_saida/<Empresa>/<Assunto> - <Empresa>/` (padrão `~/Desktop`). A pasta da empresa também guarda `marca/` (logos e identidade do site, via `scripts/marca.py`).
 
 ```bash
 export RESOLVE_SCRIPT_API="/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting"

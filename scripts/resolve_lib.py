@@ -201,42 +201,61 @@ def tamanho_lettering(texto, base=0.19, largura=0.85):
     return round(min(base, largura / (0.39 * max(maior, 1))), 4)
 
 
+def _textos(comp):
+    """Todas as ferramentas de texto (Text+) do título. O nome muda por animação (Template, Template_1, Text1...)
+    e algumas têm duas (Corte: o texto é duplicado e cortado por máscara), então o texto vai em todas."""
+    return [x for x in comp.GetToolList(False).values() if x.ID == "TextPlus"]
+
+
+def _fade_saida(comp, dur_f, fade_f, fim):
+    """Fade out na IMAGEM FINAL do título (nó ColorGain 'FadeSaida' logo antes do MediaOut, ganho em R, G, B e alfa):
+    some tudo junto (texto, sombra, barras, linhas, brilho), em qualquer animação. SetKeyFrames(..., True)
+    substitui a curva inteira (somar keyframes por SetInput deixava o texto voltar depois do fade)."""
+    mo = comp.FindTool("MediaOut1")
+    g = comp.FindTool("FadeSaida")
+    if not g:
+        src = mo.Input.GetConnectedOutput()
+        comp.Lock(); g = comp.AddTool("ColorGain", -32768, -32768); g.SetAttrs({"TOOLS_Name": "FadeSaida"})
+        g.Input = src; mo.Input = g.Output; comp.Unlock()
+    kf = {0.0: {1: 1.0}, float(dur_f): {1: 1.0}, float(dur_f + fade_f): {1: 0.0}, float(fim + 1): {1: 0.0}}
+    for ent in ("GainRed", "GainGreen", "GainBlue", "GainAlpha"):
+        inp = getattr(g, ent); out = inp.GetConnectedOutput()
+        if not out:
+            comp.Lock(); setattr(g, ent, comp.BezierSpline({})); comp.Unlock(); out = getattr(g, ent).GetConnectedOutput()
+        out.GetTool().SetKeyFrames(kf, True)
+    if round(g.GetInput("GainAlpha", dur_f + fade_f), 2) != 0.0 or round(g.GetInput("GainAlpha", 0), 2) != 1.0:
+        raise RuntimeError("fade de saída não ficou certo")
+
+
 def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0)):
     """Padrão do usuário para os letterings: Shading Element = SOLID (o template vem com gradiente, Type1=2),
     cor sólida, entrelinha mais junta com quebra de linha, tamanho que cabe na largura, animação na velocidade
     NORMAL (acelerar com TimeSpeed pede quadros além do fim do título: "frame not available") e, se dur_f for
-    menor que o título, FADE OUT médio (fade_f quadros) animando a opacidade do texto (a sombra some junto)."""
-    comp = item.GetFusionCompByIndex(1); tool = comp.FindTool("Template")
-    tool.SetInput("StyledText", texto); tool.SetInput("Size", size or tamanho_lettering(texto))
-    tool.SetInput("ShadingElements", 1); tool.SetInput("Type1", 0)          # 0 = Solid
-    tool.SetInput("Red1", cor[0]); tool.SetInput("Green1", cor[1]); tool.SetInput("Blue1", cor[2]); tool.SetInput("Alpha1", 1.0)
-    if "\n" in texto: tool.SetInput("LineSpacing", entrelinha)
-    ts = comp.FindTool("TimeSpeed1")
-    if ts: ts.SetInput("Speed", 1.0)
+    menor que o título, FADE OUT médio (fade_f quadros) na imagem inteira do título (_fade_saida)."""
+    comp = item.GetFusionCompByIndex(1); txts = _textos(comp)
+    if not txts: raise RuntimeError(f"título sem Text+: {item.GetName()}")
+    for tool in txts:
+        tool.SetInput("StyledText", texto); tool.SetInput("Size", size or tamanho_lettering(texto))
+        tool.SetInput("ShadingElements", 1); tool.SetInput("Type1", 0)          # 0 = Solid
+        tool.SetInput("Red1", cor[0]); tool.SetInput("Green1", cor[1]); tool.SetInput("Blue1", cor[2]); tool.SetInput("Alpha1", 1.0)
+        if "\n" in texto: tool.SetInput("LineSpacing", entrelinha)
+    for ts in comp.GetToolList(False, "TimeSpeed").values(): ts.SetInput("Speed", 1.0)
     fim = int(comp.GetAttrs().get("COMPN_RenderEnd", item.GetDuration() - 1))
-    if dur_f and dur_f + fade_f < fim:
-        # SetKeyFrames(..., True) SUBSTITUI a curva inteira: SetInput por quadro soma com keyframes antigos
-        # (do preset ou de tentativa anterior) e o texto volta a aparecer depois do fade.
-        out = tool.Opacity1.GetConnectedOutput()
-        if not out:
-            comp.Lock(); tool.Opacity1 = comp.BezierSpline({}); comp.Unlock(); out = tool.Opacity1.GetConnectedOutput()
-        kf = {0.0: {1: 1.0}, float(dur_f): {1: 1.0}, float(dur_f + fade_f): {1: 0.0}, float(fim + 1): {1: 0.0}}
-        out.GetTool().SetKeyFrames(kf, True)
-        if sorted(out.GetTool().GetKeyFrames()) != sorted(kf):
-            raise RuntimeError(f"fade do lettering '{texto}' não ficou limpo")
+    if dur_f and dur_f + fade_f < fim: _fade_saida(comp, dur_f, fade_f, fim)
 
 
-def checar_fades(t, fade_f=18):
-    """Confere se TODO lettering (título Fusion acima da V1) termina com fade: opacidade 1 -> 0 e nunca volta a subir."""
+def checar_fades(t):
+    """Confere se TODO lettering (título Fusion acima da V1) termina com fade (nó FadeSaida): cai para 0 e não volta."""
     ruins = []
     for v in range(2, t.GetTrackCount("video") + 1):
         for it in t.GetItemListInTrack("video", v) or []:
             if not it.GetFusionCompCount(): continue
-            tool = it.GetFusionCompByIndex(1).FindTool("Template")
-            if not tool: continue
-            vals = [tool.GetInput("Opacity1", f) or 0 for f in range(0, it.GetDuration(), 3)]
+            c = it.GetFusionCompByIndex(1); g = c.FindTool("FadeSaida"); txt = (_textos(c) or [None])[0]
+            nome = txt.GetInput("StyledText") if txt else it.GetName()
+            if not g: ruins.append(nome); continue
+            vals = [g.GetInput("GainAlpha", f) or 0 for f in range(0, it.GetDuration(), 3)]
             caiu = next((i for i, x in enumerate(vals) if x < 0.01), None)
-            if caiu is None or any(x > 0.01 for x in vals[caiu:]): ruins.append(tool.GetInput("StyledText"))
+            if caiu is None or any(x > 0.01 for x in vals[caiu:]): ruins.append(nome)
     print("fades OK" if not ruins else f"SEM FADE LIMPO: {ruins}")
     return ruins
 
@@ -264,16 +283,28 @@ def _inserir_titulo_v1(t, template, texto, ini_f, dur_f):
     return alvo
 
 
+def _assinatura(t):
+    """Posição de todos os itens de áudio e legenda (para provar que o ripple dos títulos não mexeu neles)."""
+    return [(k, i, x.GetStart(), x.GetDuration()) for k in ("audio", "subtitle")
+            for i in range(1, t.GetTrackCount(k) + 1) for x in (t.GetItemListInTrack(k, i) or [])]
+
+
 def camada_letterings(t, mp, lista, template):
-    """Coloca letterings [(TEXTO, inicio_s, dur_s), ...] em camadas logo ACIMA dos takes (sem compound).
+    """Coloca letterings [(TEXTO, inicio_s, dur_s[, template]), ...] em camadas logo ACIMA dos takes (sem compound).
     A API só insere título na V1 e com ripple, então: guarda os takes da V1 e tira; distribui os letterings em
     camadas sem sobreposição (cada título ocupa o tamanho padrão do template); para cada camada, insere na V1
     vazia em ordem cronológica (com áudio, legenda e outras trilhas TRAVADAS para o ripple não mexer) e cria
     uma trilha nova na posição 1 (a camada sobe). No fim recoloca os takes na V1. Reaplicar a cor depois.
     Devolve os intervalos ocupados (para sem_legenda)."""
     F = fps_tl(t); S = t.GetStartFrame()
-    takes = [(x.GetMediaPoolItem(), x.GetStart(), x.GetLeftOffset(), x.GetDuration(), x.GetProperty("ZoomX"))
-             for x in (t.GetItemListInTrack("video", 1) or []) if x.GetMediaPoolItem()]
+    # GetLeftOffset/GetDuration vêm em quadros da TIMELINE, mas AppendToTimeline (startFrame/endFrame) pede quadros
+    # da FONTE: em take 24/25 fps numa timeline 30, usar direto desloca o início e estica o take a cada refação.
+    takes = []
+    for x in (t.GetItemListInTrack("video", 1) or []):
+        m = x.GetMediaPoolItem()
+        if not m: continue
+        r_ = float(m.GetClipProperty("FPS")) / F
+        takes.append((m, x.GetStart(), round(x.GetLeftOffset() * r_), x.GetDuration(), x.GetProperty("ZoomX"), r_))
     velhos = t.GetItemListInTrack("video", 1) or []
     if velhos: t.DeleteClips(velhos, False)
     padrao = 150  # duração padrão dos Fusion Titles do pacote (5 s a 30 fps); conferido ao inserir
@@ -281,21 +312,25 @@ def camada_letterings(t, mp, lista, template):
     for item in sorted(lista, key=lambda x: x[1]):
         ini_f = S + round(item[1] * F)
         for c in camadas:
-            if ini_f >= c[-1][3] + 1: c.append((*item, ini_f + padrao)); break
-        else: camadas.append([(*item, ini_f + padrao)])
+            if ini_f >= c[-1][4] + 1: c.append((*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)); break
+        else: camadas.append([(*item[:3], item[3] if len(item) > 3 else template, ini_f + padrao)])
     ocup = [(x[1], x[1] + x[2] + 0.6) for x in lista]   # inclui o fade out
     for c in reversed(camadas):           # a primeira camada termina mais perto dos takes
         travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
                  [("video", i) for i in range(2, t.GetTrackCount("video") + 1)]
         for k, i in travar: t.SetTrackLock(k, i, True)
+        soltas = [(k, i) for k, i in travar if not t.GetIsTrackLocked(k, i)]
+        if soltas: raise RuntimeError(f"trilhas não travaram {soltas}: o ripple do título ia empurrar áudio/legenda")
+        antes = _assinatura(t)
         try:
-            for texto, ini, dur, _ in c:
-                _inserir_titulo_v1(t, template, texto, S + round(ini * F), round(dur * F))
+            for texto, ini, dur, tpl, _ in c:
+                _inserir_titulo_v1(t, tpl, texto, S + round(ini * F), round(dur * F))
         finally:
             for k, i in travar: t.SetTrackLock(k, i, False)
+        if _assinatura(t) != antes: raise RuntimeError("áudio/legenda mudaram ao inserir título (ripple): desfazer e refazer")
         t.AddTrack("video", {"index": 1})
-    for mpi, st, lo, dur, zoom in takes:
-        x = mp.AppendToTimeline([{"mediaPoolItem": mpi, "startFrame": lo, "endFrame": lo + dur - 1, "mediaType": 1,
+    for mpi, st, lo, dur, zoom, r_ in takes:
+        x = mp.AppendToTimeline([{"mediaPoolItem": mpi, "startFrame": lo, "endFrame": lo + math.ceil(dur * r_) - 1, "mediaType": 1,
                                   "trackIndex": 1, "recordFrame": st}])
         if x and zoom and zoom != 1.0: x[0].SetProperty("ZoomX", zoom); x[0].SetProperty("ZoomY", zoom)
     return ocup
