@@ -185,7 +185,12 @@ def colocar_legendas(t, mp, srt, trocar=True):
     elif trocar:
         antigos = t.GetItemListInTrack("subtitle", 1) or []
         if antigos: t.DeleteClips(antigos, False)
-    it = importar(mp, srt, "LEGENDAS")   # nome de arquivo único por versão (v1, v2...)
+    # O Media Pool reaproveita item pelo NOME do arquivo: SRT com mesmo nome em vídeos diferentes faz um vídeo
+    # receber a legenda do outro. Sempre importar com nome único (pasta do vídeo + nome).
+    pasta_video = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(srt))))
+    unico = os.path.join(os.path.dirname(srt), f"{pasta_video.split(' - ')[0].replace(' ', '_')}__{os.path.basename(srt)}")
+    if not os.path.exists(unico): import shutil; shutil.copy(srt, unico)
+    it = importar(mp, unico, "LEGENDAS")
     mp.AppendToTimeline([it])
     return len(t.GetItemListInTrack("subtitle", 1) or [])
 
