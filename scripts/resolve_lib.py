@@ -179,7 +179,7 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1):
     return res
 
 
-def colocar_legendas(t, mp, srt, trocar=True):
+def colocar_legendas(t, mp, srt, trocar=True, p=None):
     """Importa o SRT na trilha de legenda. Se a trilha já existe, troca só os itens (mantém o preset de estilo)."""
     if t.GetTrackCount("subtitle") == 0: t.AddTrack("subtitle")
     elif trocar:
@@ -191,7 +191,12 @@ def colocar_legendas(t, mp, srt, trocar=True):
     unico = os.path.join(os.path.dirname(srt), f"{pasta_video.split(' - ')[0].replace(' ', '_')}__{os.path.basename(srt)}")
     if not os.path.exists(unico): import shutil; shutil.copy(srt, unico)
     it = importar(mp, unico, "LEGENDAS")
+    # AppendToTimeline usa a timeline ABERTA: abrir `t` antes (senão a legenda cai em outro vídeo) e conferir
+    if p: p.SetCurrentTimeline(t)
+    n0 = len(t.GetItemListInTrack("subtitle", 1) or [])
     mp.AppendToTimeline([it])
+    if len(t.GetItemListInTrack("subtitle", 1) or []) == n0:
+        raise RuntimeError(f"a legenda não entrou em '{t.GetName()}': passe p= para abrir a timeline certa")
     return len(t.GetItemListInTrack("subtitle", 1) or [])
 
 

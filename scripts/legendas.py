@@ -114,9 +114,14 @@ def equilibrar(srt, min_s=0.7, max_shift=0.35):
     for k in range(len(T)):
         falta = min_s - (T[k][1] - T[k][0])
         if falta <= 0: continue
-        if k + 1 < len(T):                       # empurra o início da próxima
-            folga = min(T[k + 1][1] - T[k + 1][0] - min_s, max_shift - (T[k + 1][0] - orig[k + 1][0]), falta)
-            if folga > 0: T[k][1] += folga; T[k + 1][0] += folga; falta -= folga
+        if k + 1 < len(T):                       # empurra o início da próxima, em cadeia (até 3 vizinhas)
+            for _ in range(2):
+                folga = min(T[k + 1][1] - T[k + 1][0] - min_s, max_shift - (T[k + 1][0] - orig[k + 1][0]), falta)
+                if folga > 0: T[k][1] += folga; T[k + 1][0] += folga; falta -= folga
+                if falta <= 0: break
+                for m in range(k + 1, min(k + 3, len(T) - 1)):   # a vizinha repõe empurrando a seguinte
+                    sobra = min(T[m + 1][1] - T[m + 1][0] - min_s, max_shift - (T[m + 1][0] - orig[m + 1][0]), falta)
+                    if sobra > 0: T[m][1] += sobra; T[m + 1][0] += sobra
         elif falta > 0: T[k][1] += falta; falta = 0   # última: estende o fim
         if falta > 0 and k == 0:                 # primeira: começa um pouco antes da fala
             ant = min(falta, max_shift, T[0][0]); T[0][0] -= ant; falta -= ant
