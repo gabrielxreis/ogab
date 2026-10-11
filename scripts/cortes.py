@@ -56,9 +56,23 @@ def silencios(audio, limiar=-35, minimo=0.35):
     return list(zip(ini, fim))
 
 
-def tirar_silencios(trechos, audio, minimo=0.35, deixa=0.12, limiar=-35):
-    """Dentro de cada trecho, encolhe cada silêncio > minimo para 2*deixa (respiro)."""
-    sil = silencios(audio, limiar=limiar, minimo=minimo)
+def tirar_silencios(trechos, audio, minimo=0.35, deixa=0.12, limiar=-35, protegidas=()):
+    """Dentro de cada trecho, encolhe cada silêncio > minimo para 2*deixa (respiro).
+    Nunca corta dentro de uma palavra da transcrição (palavra falada baixo parece silêncio)."""
+    sil = []
+    for s0, s1 in silencios(audio, limiar=limiar, minimo=minimo):
+        partes = [(s0, s1)]
+        for w0, w1 in protegidas:
+            w0, w1 = w0 - 0.06, w1 + 0.06
+            novo = []
+            for a, b in partes:
+                if w1 <= a or w0 >= b:
+                    novo.append((a, b))
+                else:
+                    if w0 > a: novo.append((a, w0))
+                    if w1 < b: novo.append((w1, b))
+            partes = novo
+        sil += [x for x in partes if x[1] - x[0] >= minimo]
     out = []
     for a, b in trechos:
         cur = a
@@ -94,7 +108,7 @@ def plano(trans, saida, tirar=(), entre=(), ate=None, pausa=0.35, pre=0.10, pos=
         fora.update(idx)
         print(f"  tira {a:6.2f}-{b:6.2f}  ({len(idx)} palavras) {' '.join(ws[i]['t'] for i in idx)[:90]}")
     manter = [w for i, w in enumerate(ws) if i not in fora and (ate is None or w["s"] < ate)]
-    trechos, ini, fim, prev_i = [], None, None, None
+    trechos, ini, fim, prev_i, i0 = [], None, None, None, None
     idx_de = {id(w): i for i, w in enumerate(ws)}
     for w in manter:
         i = idx_de[id(w)]
@@ -103,21 +117,30 @@ def plano(trans, saida, tirar=(), entre=(), ate=None, pausa=0.35, pre=0.10, pos=
             fim = w["e"]
         else:
             if ini is not None:
-                trechos.append([ini, fim])
-            ini, fim = w["s"], w["e"]
+                trechos.append([ini, fim, i0, prev_i])
+            ini, fim, i0 = w["s"], w["e"], i
         prev_i = i
     if ini is not None:
-        trechos.append([ini, fim])
-    # margem sem sobrepor trechos vizinhos
+        trechos.append([ini, fim, i0, prev_i])
+    # margem sem sobrepor trechos vizinhos e sem entrar numa palavra removida
     out = []
-    for k, (a, b) in enumerate(trechos):
+    for a, b, ia, ib in trechos:
         a2 = max(0.0, a - pre); b2 = b + pos
+        if ia > 0 and (ia - 1) in fora:
+            a2 = max(a2, ws[ia - 1]["e"] + 0.02)
+        if ib + 1 < len(ws) and (ib + 1) in fora:
+            b2 = min(b2, ws[ib + 1]["s"] - 0.02)
+        a2 = min(a2, a); b2 = max(b2, b)
         if out and a2 < out[-1][1]:
             meio = (out[-1][1] - pos + a) / 2 if out[-1][1] > a else a2
             out[-1][1] = min(out[-1][1], max(meio, out[-1][0] + 0.05)); a2 = out[-1][1]
         out.append([round(a2, 3), round(b2, 3)])
     if audio:
-        out = tirar_silencios(out, audio, silencio, deixa, limiar)
+        out = tirar_silencios(out, audio, silencio, deixa, limiar, [(w['s'], w['e']) for w in manter])
+    perdidas = [w["t"] + f"@{w['s']:.1f}" for w in manter
+                if not any(a - 0.01 <= (w["s"] + w["e"]) / 2 <= b + 0.01 for a, b in out)]
+    if perdidas:
+        print("AVISO palavras fora dos cortes:", " ".join(perdidas))
     total = sum(b - a for a, b in out)
     json.dump({"trechos": out, "total": round(total, 2), "transcricao": trans}, open(saida, "w"), indent=1)
     print(f"{len(out)} trechos, {total:.1f} s ({int(total//60)}:{total%60:04.1f})")
