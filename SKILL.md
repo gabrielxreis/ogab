@@ -1,11 +1,11 @@
 ---
 name: video-redes
-description: Produz vídeos para redes sociais (Instagram Reels, YouTube Shorts/longo, Meta Ads) do roteiro até a timeline pronta e renderizada no DaVinci Resolve - roteiro para aprovação, voz por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, legenda com métrica e conferência automática. Use quando o usuário pedir para criar/fazer um vídeo, reels, anúncio, pauta ou roteiro para uma empresa/cliente, ou digitar /video-redes (subcomandos ajuda, config, update, pauta, cliente).
+description: Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve (cortar, montar, legendar, colocar música, takes, lettering, motions, cor, áudio, exportar). Leva do roteiro até a timeline pronta no DaVinci: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions e gráficos com HyperFrames, legenda com métrica e conferência automática. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill; as outras skills de vídeo (hyperframes, motion-graphics etc.) entram como ferramentas DENTRO deste fluxo. Também /video-redes (subcomandos ajuda, config, update, pauta, cliente).
 ---
 
 # video-redes
 
-Pipeline de vídeo para redes sociais com IA + DaVinci Resolve. Duas paradas obrigatórias para o usuário decidir: **aprovar o roteiro** e **escolher a voz**. Nada que gaste crédito roda antes delas.
+Pipeline de vídeo para redes sociais com IA + DaVinci Resolve. **Esta é a skill principal de vídeo:** todo pedido para criar um vídeo ou editar algo no DaVinci começa aqui, mesmo quando é só um ajuste numa timeline existente (nesse caso, pular direto para a etapa que o pedido toca, sem refazer roteiro e voz). Skills de vídeo de terceiros (HyperFrames e suas workflows, legendas, edição) são chamadas a partir daqui, seguindo as regras desta skill (centralização, marca, volumes, legenda, pastas). Duas paradas obrigatórias para o usuário decidir: **aprovar o roteiro** e **escolher a voz**. Nada que gaste crédito roda antes delas.
 
 Pasta da skill: `~/.claude/skills/video-redes/` (chamada de `SKILL_DIR` abaixo). Scripts em `SKILL_DIR/scripts/`. Detalhes técnicos em `SKILL_DIR/docs/PROCESSO.md` (ler a seção da etapa só quando chegar nela, para economizar tokens).
 
