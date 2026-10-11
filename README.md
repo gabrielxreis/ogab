@@ -22,6 +22,7 @@ Feita para **Claude Code** (app desktop ou terminal).
 | 7b | Cor: aplica o **seu PowerGrade** (.drx) em todos os takes (opcional) | Liga/desliga no config | DaVinci (node graph) |
 | 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
 | 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
+| 8c | **Motions** (HyperFrames) nos momentos certos da fala, no centro da tela, com as cores e a logo da marca, numa trilha MOTIONS | Vê a tabela antes | HyperFrames + DaVinci |
 | 8b | **Palavras-chave** animadas (seu pacote de lettering) no momento em que são faladas; a legenda some enquanto elas aparecem | Vê a lista antes | DaVinci |
 | 10 | Timeline pronta (o MP4 você exporta; render só se pedir), **capa** (`capa.png`) e **legenda do post** com hashtags (`legenda_post.txt`) em `videos/`, e **conferência automática** | - | `resolve_lib.py`, `qc.py` |
 
@@ -41,21 +42,25 @@ Tudo fica numa pasta na Mesa com o nome do vídeo:
 
 > **Skill complementar recomendada:** `competitor-profiling` (pacote `anthropic-skills`). Quando você manda o site ou material de uma empresa, a skill usa ela para varrer e salvar o máximo de informação (produtos, público, posicionamento, diferenciais, provas, tom, concorrentes) antes de começar. Instale pelo catálogo de skills do Claude (Personalização > Skills, ou peça "instala a skill competitor-profiling"). Sem ela, a skill lê o site direto.
 
-1. **Clonar na pasta de skills do Claude:**
+1. **Instalar o HyperFrames junto** (motions/animações explicativas sobre o vídeo):
+   ```bash
+   npx skills add heygen-com/hyperframes
+   ```
+2. **Clonar na pasta de skills do Claude:**
    ```bash
    git clone https://github.com/gabrielxreis/video-redes-skill ~/.claude/skills/video-redes
    ```
-2. **Criar sua configuração** (fica só na sua máquina, não vai para o GitHub):
+3. **Criar sua configuração** (fica só na sua máquina, não vai para o GitHub):
    ```bash
    cp ~/.claude/skills/video-redes/config.example.json ~/.claude/skills/video-redes/config.json
    ```
-3. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
-4. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
-5. **Fontes:** instale as de `assets/fontes/` (duplo clique em cada .ttf, ou copie para `~/Library/Fonts/`). São fontes livres (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
-6. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (29 animações: Cinematic, Palavra Por Palavra, Gold Design, Blur Up...). Ele **não** vem neste repositório. Use o seu próprio pacote de títulos do Fusion (`.drfx`): copie para
+4. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
+5. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
+6. **Fontes:** instale as de `assets/fontes/` (duplo clique em cada .ttf, ou copie para `~/Library/Fonts/`). São fontes livres (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
+7. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (29 animações: Cinematic, Palavra Por Palavra, Gold Design, Blur Up...). Ele **não** vem neste repositório. Use o seu próprio pacote de títulos do Fusion (`.drfx`): copie para
    `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/` e **reinicie o Resolve**. Coloque o nome do pacote e dos templates em `config.json > lettering` (o nome do template é o nome do arquivo `.setting` dentro do pacote).
-7. **Conectar as SUAS contas** (veja [docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific, etc. Conecte só o que você usa.
-8. **Claude in Chrome:** instale a extensão e faça login nos sites (Envato, Artlist, Magnific). Downloads são sempre pelo navegador; a IA nunca digita senha.
+8. **Conectar as SUAS contas** (veja [docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific, etc. Conecte só o que você usa.
+9. **Claude in Chrome:** instale a extensão e faça login nos sites (Envato, Artlist, Magnific). Downloads são sempre pelo navegador; a IA nunca digita senha.
 
 ## Como usar
 
@@ -122,7 +127,7 @@ assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
 
 - O DaVinci não muda o **frame rate de playback** por script depois que o projeto tem timeline: a skill grava ao criar o projeto (senão o áudio engasga). Se um projeto já existente estiver com playback diferente da timeline, corrige em Project Settings > Master Settings > Playback frame rate e liga Playback > Render Cache > Smart.
 - Takes **4K/ProRes** travam a reprodução: convertidos para 1080 H.264 antes de importar.
-- A API só insere títulos animados na **V1** (empurrando o que estiver lá): a skill monta os letterings numa camada acima dos takes criando trilha na posição 1, sem compound. Cortar um título animado no meio derruba o Resolve, então a duração vem da velocidade da animação.
+- A API só insere títulos animados na **V1** (empurrando o que estiver lá): a skill monta os letterings numa camada acima dos takes criando trilha na posição 1, sem compound. Cortar um título animado no meio derruba o Resolve, então a duração visível vem de um fade out. Nunca mudar a velocidade das animações (quebra o template).
 - A API não faz **fade** de áudio nem aplica **estilo de legenda**: o fade é feito no arquivo (ffmpeg) e o estilo fica na trilha de legenda (preset).
 - Fontes 24/25 fps numa timeline 30 fps deixam **1-2 quadros pretos**: os takes são encadeados pelo fim real.
 - Os conectores de Envato/Artlist/Magnific **não baixam** arquivos: download pelo navegador.

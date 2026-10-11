@@ -88,10 +88,22 @@ Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `@gabrielx
 - Tamanho que cabe na largura do vertical (`tamanho_lettering`).
 - **Durante uma palavra-chave a legenda some** (`legendas.py` > `sem_legenda`).
 - **Variar as animações** para não ficar tudo igual: a favorita é **Palavra Por Palavra** (e Palavra Por Palavra 2), usar em cerca de metade dos letterings e alternar com outras do pacote (`config.lettering.favoritos` / `rodizio`); não repetir a mesma em seguida. Com 2 linhas, evitar `config.lettering.evitar_2_linhas` (Sublinhado cobre a 2ª linha; Moderno e Corte embaralham). Passar o template por item: `(TEXTO, inicio_s, dur_s, template)`.
-- **Entrada suave**: as animações rodam a **70% da velocidade** (`VEL_ENTRADA`); na original a entrada leva ~0,7 s e o texto parece pular na tela. O texto fica 10 quadros a mais (`SEGURA_F`) antes do fade. Nunca acelerar acima de 1.0.
+- **NUNCA mudar a velocidade das animações** (TimeSpeed do template): mudar quebra as animações do pacote. Nem acelerar nem desacelerar. A duração visível vem só do fade out.
+- Depois de aplicar, **conferir a entrada** renderizando 4-5 quadros parados dos primeiros 25 quadros de cada lettering: se o texto já aparece inteiro no quadro 0 (entrou seco), limpar o cache (Playback > Delete Render Cache > All) e conferir de novo; se continuar, trocar o título por um novo do template.
 - **Fade out em tudo**: `ajustar_titulo` põe um nó `FadeSaida` (ColorGain em R, G, B e alfa) antes do MediaOut, então some texto, sombra, caixa e linha juntos em qualquer animação.
 
 Como fazer: escolher 4-6 palavras-chave do roteiro (números, datas, siglas, a marca no CTA), mostrar a lista (texto + tempo) ao usuário e aplicar com `ocup = camada_letterings(t, mp, [(TEXTO, inicio_s, dur_s), ...], template)` **antes** de `montar_takes` (ou depois: a função guarda e recoloca os takes), depois `aplicar_grade` de novo. Por trás: a API só insere Fusion Title na V1 e com ripple; a função trava áudio/legenda/outras trilhas, insere na V1 vazia, cria trilha na posição 1 (`AddTrack("video", {"index": 1})`) para a camada subir, e reparte em mais camadas quando dois títulos ficariam sobrepostos. **Nunca cortar um Fusion Title no meio (derruba o Resolve)**: a duração visível vem do fade out (`FadeSaida`). A função confere que as trilhas travaram e que áudio/legenda não andaram (senão para com erro); ao recolocar os takes converte quadros da timeline para quadros da fonte (take 24/25 fps). Se o último lettering passar do fim do vídeo, estender o último take e a música (com fade) até ele, para não sobrar preto.
+
+## 8c. Motions (HyperFrames): animações explicativas nos lugares certos
+
+Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hyperframes`, ver README). Usar as skills `hyperframes` / `motion-graphics` para criar e renderizar.
+
+1. **Onde entra cada motion:** pela transcrição, um motion por ideia-chave do roteiro (número, data, comparação, processo, CTA), começando no instante em que a frase é falada e terminando antes da próxima ideia. Montar a tabela (arquivo, entra em, fala, o que mostra) e mostrar ao usuário antes de renderizar.
+2. **Visual da marca:** cores, logo e fonte de `<Empresa>/marca/` (identidade.md). Ícones simples, sem rosto de pessoa real.
+3. **Posição: no CENTRO da tela** (o usuário achou "muito em cima" no terço superior), terminando acima da faixa da legenda (medir a posição da legenda na timeline; no preset padrão ela fica por volta de y=1180 em 1920). Nada encostando nas bordas.
+4. **Render:** MOV ProRes 4444 com alfa, 1080x1920 (ou o formato da plataforma), mesmo fps da timeline, em `<pasta do vídeo>/motions/mNN-nome.mov`. O projeto HyperFrames fica fora da pasta do vídeo (ex.: `~/Documents/videos/<assunto>-motions/`). Conferir quadro a quadro sobre um quadro do vídeo antes de entregar.
+5. **Timeline:** `colocar_motions(p, t, mp, [(arquivo, segundo), ...])` duplica a timeline como backup e põe tudo numa trilha própria **MOTIONS**, acima de takes e letterings.
+6. **Conflito com palavra-chave:** motion e lettering de palavra-chave no mesmo momento brigam no centro. Preferir o motion e tirar o lettering daquele trecho (e devolver a legenda nesse intervalo); avisar o usuário quais saíram.
 
 ## 9. Legenda
 

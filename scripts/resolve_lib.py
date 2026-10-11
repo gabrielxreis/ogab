@@ -227,15 +227,13 @@ def _fade_saida(comp, dur_f, fade_f, fim):
         raise RuntimeError("fade de saída não ficou certo")
 
 
-VEL_ENTRADA = 0.7   # animação do pacote a 70%: na velocidade original a entrada leva ~20 quadros e o texto "pula" na tela
-SEGURA_F = 10       # quadros a mais com o texto inteiro antes do fade (compensa a entrada mais lenta)
+SEGURA_F = 0   # quadros extras com o texto inteiro antes do fade
 
 
-def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0), velocidade=VEL_ENTRADA):
+def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8, cor=(1.0, 1.0, 1.0)):
     """Padrão do usuário para os letterings: Shading Element = SOLID (o template vem com gradiente, Type1=2),
     cor sólida, entrelinha mais junta com quebra de linha, tamanho que cabe na largura, animação na velocidade
-    um pouco MAIS LENTA (velocidade 0.7: entrada suave; nunca acima de 1.0, acelerar pede quadros além do fim
-    do título: "frame not available") e, se dur_f for
+    na velocidade ORIGINAL do template (NUNCA mexer no TimeSpeed: mudar a velocidade quebra as animações do pacote) e, se dur_f for
     menor que o título, FADE OUT médio (fade_f quadros) na imagem inteira do título (_fade_saida)."""
     comp = item.GetFusionCompByIndex(1); txts = _textos(comp)
     if not txts: raise RuntimeError(f"título sem Text+: {item.GetName()}")
@@ -244,7 +242,6 @@ def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=18, entrelinha=0.8
         tool.SetInput("ShadingElements", 1); tool.SetInput("Type1", 0)          # 0 = Solid
         tool.SetInput("Red1", cor[0]); tool.SetInput("Green1", cor[1]); tool.SetInput("Blue1", cor[2]); tool.SetInput("Alpha1", 1.0)
         if "\n" in texto: tool.SetInput("LineSpacing", entrelinha)
-    for ts in comp.GetToolList(False, "TimeSpeed").values(): ts.SetInput("Speed", min(1.0, velocidade))
     fim = int(comp.GetAttrs().get("COMPN_RenderEnd", item.GetDuration() - 1))
     if dur_f: dur_f = min(dur_f + SEGURA_F, fim - fade_f - 1)
     if dur_f and dur_f + fade_f < fim: _fade_saida(comp, dur_f, fade_f, fim)
@@ -340,6 +337,20 @@ def camada_letterings(t, mp, lista, template):
                                   "trackIndex": 1, "recordFrame": st}])
         if x and zoom and zoom != 1.0: x[0].SetProperty("ZoomX", zoom); x[0].SetProperty("ZoomY", zoom)
     return ocup
+
+
+def colocar_motions(p, t, mp, lista, nome_trilha="MOTIONS"):
+    """Motions do HyperFrames (MOV ProRes 4444 com alfa, 1080x1920, fps da timeline) numa trilha PRÓPRIA acima de tudo.
+    lista = [(arquivo, segundo_na_timeline), ...]. Antes duplica a timeline como backup."""
+    t.DuplicateTimeline(f"{t.GetName()} (backup antes motions)"); p.SetCurrentTimeline(t)
+    t.AddTrack("video"); v = t.GetTrackCount("video"); t.SetTrackName("video", v, nome_trilha)
+    S, F = t.GetStartFrame(), fps_tl(t); out = []
+    for arq, seg in lista:
+        it = importar(mp, arq, "MOTIONS")
+        x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 1, "trackIndex": v, "recordFrame": S + round(seg * F)}])
+        if not x: raise RuntimeError(f"motion não entrou: {arq}")
+        out.append(x[0])
+    return out
 
 
 def gerar_capa(r, p, mp, take, texto, template, pasta, nome="capa", seg_take=1.0, seg_quadro=3.3, w=1080, h=1920, drx=None):
