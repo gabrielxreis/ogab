@@ -32,6 +32,15 @@ Pasta da skill: `~/.claude/skills/ogab/` (chamada de `SKILL_DIR` abaixo). Script
 6. **Pessoas reais**: nunca gerar rosto realista de pessoa real em cena inventada; usar símbolo, pessoa de costas, foto real fornecida pelo usuário ou ilustração. Voz clonada só se for do próprio usuário/cliente ou autorizada.
 7. **Movimentos nos takes e lettering no gancho: perguntar** antes (a não ser que `config` diga `sempre`/`nunca`).
 8. Sem travessão (em dash) nos textos para o usuário e nas legendas.
+9. **Diário do projeto: `PROJETO.md` na pasta de cada vídeo** (`<pasta_saida>/<Empresa>/<Assunto> - <Empresa>/PROJETO.md`). Criar logo que a pasta nasce e **atualizar ao fim de cada etapa** (curto, em tópicos, sem copiar roteiro nem transcrição inteiros, que já estão nos seus arquivos):
+   - **Status:** etapa atual e o que falta (checklist das etapas 1 a 10).
+   - **Decisões do usuário:** roteiro aprovado (versão), voz escolhida (nome e id), música, origem dos takes, lettering, motions, o que ele pediu para mudar e por quê.
+   - **DaVinci:** nome do projeto e da timeline, fps/resolução, o que está em cada trilha (V1 takes, V2 lettering, MOTIONS, A1 narração, A2 música, A3 sfx, legenda), backups criados.
+   - **Arquivos:** caminhos dos arquivos-chave (narração, transcrição, SRT da versão atual, motions, projeto HyperFrames) e o que cada versão mudou.
+   - **Custos:** créditos gastos (ElevenLabs etc.).
+   - **Pendências e problemas** encontrados (com a solução que funcionou).
+   **Ao retomar um vídeo** (sessão nova, "continua o vídeo X", ajuste numa timeline existente): ler o `PROJETO.md` **primeiro** e seguir dali, sem reler o histórico nem os arquivos grandes. É o que deixa uma sessão nova barata.
+10. **Modelo e esforço por tipo de tarefa** (economia de tokens). Pensamento pesado com **Opus em esforço alto**: roteiro, escolhas de edição (takes, música, ritmo, onde entra cada motion), problemas difíceis e conferência final. Tarefas mecânicas com **Sonnet ou esforço baixo**: renomear e mover arquivos, baixar e converter mídia, importar, encaixar clipes já decididos, trocar uma versão na timeline, ajustes pequenos. A sessão **não pode trocar o próprio modelo** (o app bloqueia, para ninguém ter a cobrança alterada sem ver). Então, na mudança de fase, **avisar numa linha** o usuário para trocar no seletor do app: "Agora é parte mecânica (importar e encaixar os takes): pode passar para Sonnet / esforço baixo." e, antes de decisão criativa: "Próximo passo é escolher a música: volta para Opus alto." Lote grande de trabalho mecânico já decidido (baixar e converter vários takes, renomear e organizar a pasta) pode ir para um subagente com `model: "sonnet"` e instruções fechadas (caminhos, nomes, o que conferir), e o resultado volta para o `PROJETO.md`.
 
 ## 1. Cliente (primeira vez por empresa)
 
