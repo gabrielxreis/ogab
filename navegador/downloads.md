@@ -6,6 +6,22 @@ Antes de baixar: o usuário precisa estar logado no site. A IA **nunca** digita 
 
 ## Envato Elements (vídeo, música, efeitos)
 
+**Receita que funcionou em lote (11/10/2026, 21 b-rolls sem erro):** usar `browser_batch` com, por clipe: `navigate` (link elements.envato.com) -> `computer screenshot` com `scale 0.2` (**sem screenshot a página não redireciona** para app.envato.com) -> `wait 8` -> `javascript_tool` com o script abaixo. 3 a 4 clipes por lote. Se o script responder "ainda na pagina antiga", repetir screenshot + espera.
+```js
+const W=ms=>new Promise(r=>setTimeout(r,ms));
+if(!location.host.startsWith('app.')) 'ainda na pagina antiga'; else {
+ for(let i=0;i<30&&![...document.querySelectorAll('button')].some(b=>/^Baixar/.test(b.innerText.trim()));i++) await W(500);
+ const main=[...document.querySelectorAll('button')].find(b=>/^Baixar/.test(b.innerText.trim())); let res='sem botão';
+ if(main){ const y=main.getBoundingClientRect().y;
+  const seta=[...document.querySelectorAll('button[aria-haspopup]')].find(b=>Math.abs(b.getBoundingClientRect().y-y)<5&&b.getBoundingClientRect().x>main.getBoundingClientRect().x);
+  if(seta){ seta.click(); await W(900);
+   const op=[...document.querySelectorAll('[role=menuitem],[role=option],li,button,div')].filter(e=>/^1080P/.test(e.innerText.trim())&&e.children.length<4).pop();
+   if(op){op.click(); res='1080P';} else {document.body.click(); main.click(); res='principal';} }
+  else { main.click(); res='principal '+main.innerText; } }   // clipe só com uma versão (já 1080x1920)
+ res }
+```
+O nome do arquivo baixado não é o do link (o Envato usa outro título + data + `utc`): conferir pelo tamanho/horário em `~/Downloads` e renomear para `brolls/take_XX_<assunto>`. Clipes só em ProRes vêm grandes (centenas de MB): o DaVinci lê direto; o ffmpeg deste Mac não converte alguns ProRes sem `trc`.
+
 1. `navigate` para o link `elements.envato.com/...` que veio da busca do MCP.
 2. **Tirar um zoom/screenshot pequeno da aba logo em seguida**: a página só redireciona para `app.envato.com/stock-video/<id>` depois de renderizar (se a navegação acontecer durante o zoom, dá erro "navigated to a different domain"; é normal, siga para o passo 3).
 3. Esperar ~8 s e rodar este JS (escolhe 1080P quando há opções; se só existe um arquivo, baixa ele):
