@@ -465,7 +465,7 @@ def organizar(p, mp, videos):
 
 
 # Rosto (regras 1e e 1f do SKILL.md): medir onde está e reenquadrar com zoom + Pan/Tilt, sem nada por cima.
-QUEIXO_MAX, OLHOS_Y = 1140, 760     # em 1080x1920: queixo acima da faixa da legenda; centro do rosto ~terço de cima
+QUEIXO_MAX = 1140     # em 1080x1920: queixo acima da faixa da legenda
 
 
 def medir_rosto(arquivo, passo_s=1.0, w=1080, h=1920):
@@ -483,26 +483,25 @@ def medir_rosto(arquivo, passo_s=1.0, w=1080, h=1920):
     return {"cx": st.median(b[0] + b[2] / 2 for b in bx), "cy": st.median(b[1] + b[3] / 2 for b in bx), "lado": st.median(b[2] for b in bx)}
 
 
-def enquadrar(face, punch=1.15, zoom_max=1.45, w=1080, h=1920):
-    """[(zoom, pan, tilt) base, (zoom, pan, tilt) punch-in] para o rosto ficar centralizado, olhos no terço de cima
-    e queixo acima de QUEIXO_MAX, sem borda preta (o zoom sobe até o Pan/Tilt caber). Tilt positivo sobe a imagem."""
-    out = []
-    for mult in (1.0, punch):
-        z = max(1.0, out[0][0] * mult if out else 1.0)
-        while True:
-            alvo_y = min(OLHOS_Y, QUEIXO_MAX - 0.6 * face["lado"] * z)
-            fx = w / 2 + (face["cx"] - w / 2) * z; fy = h / 2 + (face["cy"] - h / 2) * z
-            pan, dy = w / 2 - fx, alvo_y - fy
-            if abs(pan) <= w / 2 * (z - 1) + 0.5 and abs(dy) <= h / 2 * (z - 1) + 0.5: break
-            z += 0.005
-        out.append((round(min(z, zoom_max) if out else z, 3), round(pan), round(-dy)))
-    return out
+def enquadrar(face, w=1080, h=1920, tol_x=40):
+    """(zoom, pan, tilt) com o MÍNIMO de zoom (regra do usuário): só sobe a imagem até o queixo ficar acima de
+    QUEIXO_MAX e só centraliza na horizontal se o rosto estiver a mais de tol_x px do centro. Sem borda preta.
+    Sem punch-in: o mesmo valor no vídeo todo. Tilt positivo sobe a imagem."""
+    z = 1.0
+    while True:
+        fx = w / 2 + (face["cx"] - w / 2) * z; fy = h / 2 + (face["cy"] - h / 2) * z
+        queixo = fy + 0.6 * face["lado"] * z
+        dy = min(0.0, QUEIXO_MAX - queixo)                       # só sobe, e só o necessário
+        pan = 0.0 if abs(w / 2 - fx) <= tol_x else (w / 2 - fx)
+        if abs(pan) <= w / 2 * (z - 1) + 0.5 and abs(dy) <= h / 2 * (z - 1) + 0.5: break
+        z += 0.005
+    return round(z, 3), round(pan), round(-dy)
 
 
-def aplicar_enquadramento(t, base, punch, trilha=1):
-    """Base nos pedaços pares e punch-in nos ímpares (alterna a cada corte)."""
-    for i, x in enumerate(t.GetItemListInTrack("video", trilha) or []):
-        z, pan, tilt = punch if i % 2 else base
+def aplicar_enquadramento(t, enq, trilha=1):
+    """Mesmo enquadramento (zoom, pan, tilt) em todos os pedaços da trilha (sem punch-in)."""
+    z, pan, tilt = enq
+    for x in t.GetItemListInTrack("video", trilha) or []:
         for k, v in (("ZoomX", z), ("ZoomY", z), ("Pan", pan), ("Tilt", tilt)): x.SetProperty(k, v)
 
 
