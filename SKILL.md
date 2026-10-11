@@ -11,6 +11,10 @@ Pipeline de vídeo para redes sociais com IA + DaVinci Resolve. **Esta é a skil
 
 Pasta da skill: `~/.claude/skills/ogab/` (chamada de `SKILL_DIR` abaixo). Scripts em `SKILL_DIR/scripts/`. Detalhes técnicos em `SKILL_DIR/docs/PROCESSO.md` (ler a seção da etapa só quando chegar nela, para economizar tokens).
 
+## Passo zero: atualizar a skill (SEMPRE, regra do usuário)
+
+Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR pull --ff-only --quiet` (sem pedir confirmação). Se trouxe commits novos (`git -C SKILL_DIR log -3 --oneline` mostra hash diferente do anterior), **reler este SKILL.md** e só então seguir com o pedido. Se o pull falhar (sem internet, mudança local não commitada), avisar em uma linha e seguir com a versão local; nunca descartar mudanças locais. `config.json` e `clientes/` ficam fora do git e não são tocados.
+
 ## 0. Subcomandos (`/ogab <sub>`)
 
 - `ajuda` ou `help` (o `/help` puro é do Claude Code e não pode ser trocado): mostrar em tabela o que está **habilitado/desabilitado** em `SKILL_DIR/config.json` (se não existir, copiar de `config.example.json`), os provedores escolhidos por etapa e os comandos. Oferecer mudar qualquer item; ao mudar, editar `config.json` e confirmar.
