@@ -29,8 +29,9 @@ def main(pasta, cliente=None, plataforma="instagram"):
     C = cfg(); R = C.get("regras", {}); res = []
     ok = lambda m: res.append(("OK", m)); av = lambda m: res.append(("AVISO", m)); er = lambda m: res.append(("ERRO", m))
 
-    for item in ("roteiro.txt", "links.txt", "narracoes", "musica", "brolls", "videos", "legendas", "videos/capa.png", "videos/legenda_post.txt"):
-        (ok if os.path.exists(os.path.join(pasta, item)) else er)(f"estrutura: {item}")
+    for item in ("roteiro.txt", "links.txt", "narracoes|gravacao", "musica", "brolls", "videos", "legendas", "videos/capa.png", "videos/legenda_post.txt"):
+        # vídeo gravado pela pessoa (talking head) tem gravacao/ no lugar de narracoes/
+        (ok if any(os.path.exists(os.path.join(pasta, x)) for x in item.split("|")) else er)(f"estrutura: {item}")
 
     vids = sorted(glob.glob(os.path.join(pasta, "videos", "*.mp4")), key=os.path.getmtime)
     if not vids: av("sem MP4 em videos/ (normal se o render ficou para o usuário); checagens do vídeo puladas")
@@ -76,14 +77,17 @@ def main(pasta, cliente=None, plataforma="instagram"):
             (er if multi else ok)(f"legenda em uma linha ({len(multi)} com quebra)")
         longas = [l for b in linhas for l in b if len(l) > mx]
         (er if longas else ok)(f"legendas até {mx} caracteres" + (f": {longas[:3]}" if longas else ""))
-        fim_fraco = [b[-1] for b in linhas[:-1] if b and not re.search(r'[.?!]$', b[-1]) and fraca(b[-1].split()[-1])]
-        (av if fim_fraco else ok)("legenda terminando em palavra fraca" + (f": {fim_fraco[:3]}" if fim_fraco else ""))
+        from legendas import metrica
+        import io, contextlib
+        with contextlib.redirect_stdout(io.StringIO()): probs = metrica(srts[-1], mx)
+        (er if probs else ok)("métrica da legenda" + (f": {probs[:3]}" if probs else " (0 problema)"))
         if cliente and os.path.exists(os.path.join(cliente, "pronuncia.json")):
             bruto = " ".join(l for b in linhas for l in b)
             for t in json.load(open(os.path.join(cliente, "pronuncia.json"))).get("termos", []):
                 for e in t.get("erros_transcricao", []):
                     so_caixa = e.lower() == t["grafia"].lower()
-                    achou = (e in bruto) if so_caixa else (e.lower() in bruto.lower())
+                    pad = r"(?<!\w)" + re.escape(e) + r"(?!\w)"   # palavra inteira ('Visa Bullet' não casa com 'Visa Bulletin')
+                    achou = bool(re.search(pad, bruto)) if so_caixa else bool(re.search(pad, bruto, re.I))
                     if so_caixa and L.get("preset_trilha", {}).get("caixa_alta"): achou = False  # legenda vai em caixa alta
                     (er if achou else ok)(f"grafia: '{e}' -> '{t['grafia']}'")
     else: er("nenhum SRT em legendas/")
