@@ -94,7 +94,9 @@ Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `@gabrielx
 
 Como fazer: escolher 4-6 palavras-chave do roteiro (números, datas, siglas, a marca no CTA), mostrar a lista (texto + tempo) ao usuário e aplicar com `ocup = camada_letterings(t, mp, [(TEXTO, inicio_s, dur_s), ...], template)` **antes** de `montar_takes` (ou depois: a função guarda e recoloca os takes), depois `aplicar_grade` de novo. Por trás: a API só insere Fusion Title na V1 e com ripple; a função trava áudio/legenda/outras trilhas, insere na V1 vazia, cria trilha na posição 1 (`AddTrack("video", {"index": 1})`) para a camada subir, e reparte em mais camadas quando dois títulos ficariam sobrepostos. **Nunca cortar um Fusion Title no meio (derruba o Resolve)**: a duração visível vem do fade out (`FadeSaida`). A função confere que as trilhas travaram e que áudio/legenda não andaram (senão para com erro); ao recolocar os takes converte quadros da timeline para quadros da fonte (take 24/25 fps). Se o último lettering passar do fim do vídeo, estender o último take e a música (com fade) até ele, para não sobrar preto.
 
-## 8c. Motions (HyperFrames): animações explicativas nos lugares certos
+## 8c. HyperFrames: motions e edição dinâmica
+
+O HyperFrames não é só para motion: usar para deixar a **edição inteira dinâmica** (ver 8d). Primeiro os motions:
 
 Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hyperframes`, ver README). Usar as skills `hyperframes` / `motion-graphics` para criar e renderizar.
 
@@ -104,6 +106,17 @@ Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hype
 4. **Render:** MOV ProRes 4444 com alfa, 1080x1920 (ou o formato da plataforma), mesmo fps da timeline, em `<pasta do vídeo>/motions/mNN-nome.mov`. O projeto HyperFrames fica fora da pasta do vídeo (ex.: `~/Documents/videos/<assunto>-motions/`). Conferir quadro a quadro sobre um quadro do vídeo antes de entregar.
 5. **Timeline:** `colocar_motions(p, t, mp, [(arquivo, segundo), ...])` duplica a timeline como backup e põe tudo numa trilha própria **MOTIONS**, acima de takes e letterings.
 6. **Conflito com palavra-chave:** motion e lettering de palavra-chave no mesmo momento brigam no centro. Preferir o motion e tirar o lettering daquele trecho (e devolver a legenda nesse intervalo); avisar o usuário quais saíram.
+
+## 8d. Edição dinâmica com HyperFrames (ritmo de Reels)
+
+Objetivo: nenhum trecho parado mais de ~2 s sem alguma mudança na tela. Planejar junto com os motions, numa tabela única (tempo, recurso, o que faz) para o usuário ver antes. Recursos, todos renderizados como MOV com alfa (ou take reprocessado) e postos no DaVinci no tempo exato:
+- **Cortes no ritmo da música:** `hyperframes beats` na música escolhida; ajustar os pontos de troca dos takes (`montar_takes`) para cair nas batidas mais próximas da fala, sem cortar no meio de uma ideia.
+- **Punch-in / zoom / Ken Burns nos takes** (skill `hyperframes-keyframes`): reprocessar o take com zoom suave ou punch-in na palavra forte (a API do DaVinci não faz keyframe de zoom). Salvar como `brolls/take_XX_dyn.mov` e trocar na timeline. Perguntar antes (regra: movimentos nos takes = perguntar).
+- **Transições** entre blocos (whip, flash, wipe com a cor da marca): overlay curto (6-12 quadros) com alfa na trilha MOTIONS, alinhado ao corte, com o whoosh do SFX no mesmo quadro.
+- **Tipografia cinética / callouts:** números, datas e comparações que não viraram motion (setas, círculos, sublinhado, contador subindo, barra de progresso), sempre no centro e acima da legenda.
+- **Barra de progresso / selo da marca** discreto no topo durante o vídeo (opcional, perguntar).
+- **CTA final animado** com a logo e o site do cliente.
+Regras: sem rosto realista de pessoa real; cores, logo e fonte da `marca/`; nada sobre a faixa da legenda; um recurso por vez na tela (motion, palavra-chave e callout não se sobrepõem); conferir quadro a quadro sobre o vídeo antes de colocar; backup da timeline antes de mexer.
 
 ## 9. Legenda
 

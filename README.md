@@ -22,6 +22,7 @@ Feita para **Claude Code** (app desktop ou terminal).
 | 7b | Cor: aplica o **seu PowerGrade** (.drx) em todos os takes (opcional) | Liga/desliga no config | DaVinci (node graph) |
 | 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
 | 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
+| 8d | **Edição dinâmica** (HyperFrames): cortes na batida da música, punch-in/zoom nos takes, transições com a cor da marca, tipografia cinética e callouts, CTA animado | Vê a tabela antes | HyperFrames + DaVinci |
 | 8c | **Motions** (HyperFrames) nos momentos certos da fala, no centro da tela, com as cores e a logo da marca, numa trilha MOTIONS | Vê a tabela antes | HyperFrames + DaVinci |
 | 8b | **Palavras-chave** animadas (seu pacote de lettering) no momento em que são faladas; a legenda some enquanto elas aparecem | Vê a lista antes | DaVinci |
 | 10 | Timeline pronta (o MP4 você exporta; render só se pedir), **capa** (`capa.png`) e **legenda do post** com hashtags (`legenda_post.txt`) em `videos/`, e **conferência automática** | - | `resolve_lib.py`, `qc.py` |
@@ -42,7 +43,7 @@ Tudo fica numa pasta na Mesa com o nome do vídeo:
 
 > **Skill complementar recomendada:** `competitor-profiling` (pacote `anthropic-skills`). Quando você manda o site ou material de uma empresa, a skill usa ela para varrer e salvar o máximo de informação (produtos, público, posicionamento, diferenciais, provas, tom, concorrentes) antes de começar. Instale pelo catálogo de skills do Claude (Personalização > Skills, ou peça "instala a skill competitor-profiling"). Sem ela, a skill lê o site direto.
 
-1. **Instalar o HyperFrames junto** (motions/animações explicativas sobre o vídeo):
+1. **Instalar o HyperFrames junto** (motions e edição dinâmica: cortes na batida, zoom, transições, tipografia cinética):
    ```bash
    npx skills add heygen-com/hyperframes
    ```
