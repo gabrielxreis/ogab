@@ -81,6 +81,12 @@ def criar_timeline(p, mp, nome, w=None, h=None, fps=None):
         if fps: t.SetSetting("timelineFrameRate", str(fps))
         t.SetSetting("timelineResolutionWidth", str(w)); t.SetSetting("timelineResolutionHeight", str(h))
     while t.GetTrackCount("audio") < 3: t.AddTrack("audio")   # A1 narração, A2 música, A3 efeitos
+    # Já na criação: playback fps tem que ser igual ao da timeline (senão o áudio picota).
+    if not checar_playback(p):
+        p.SetSetting("timelinePlaybackFrameRate", str(fps or p.GetSetting("timelineFrameRate")))
+        if not checar_playback(p):
+            print("AJUSTAR AGORA PELA INTERFACE: File > Project Settings > Master Settings > Playback frame rate "
+                  "= fps da timeline > Save; e Playback > Render Cache > Smart")
     return t
 
 
