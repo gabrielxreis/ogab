@@ -11,7 +11,7 @@ Uso típico (python3 com as variáveis de ambiente do Resolve, ver ambiente()):
     lettering(t, "@gabrielxreis_ Cinematic", "TEXTO DO GANCHO", inicio=0.0, dur=2.5)
     renderizar(p, ".../videos", "Assunto - Empresa", 1080, 1920)
 """
-import math, os, subprocess, sys, time
+import math, os, re, subprocess, sys, time
 
 RESOLVE_API = "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting"
 RESOLVE_LIB = "/Applications/DaVinci Resolve/DaVinci Resolve.app/Contents/Libraries/Fusion/fusionscript.so"
@@ -400,13 +400,41 @@ def gerar_capa(r, p, mp, take, texto, template, pasta, nome="capa", seg_take=1.0
     return os.path.join(pasta, nome + ".png")
 
 
-def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True):
+def masterizar(arq, lufs=-14, tp=-1.5, fade_s=0.4):
+    """Áudio final do MP4: loudnorm em 2 passagens (-14 LUFS, pico -1.5 dBTP) + fade curto no fim; vídeo copiado.
+    Talking head saiu do DaVinci com pico de +4,7 dBFS e loudness de -12,5 a -17,8: masterizar SEMPRE."""
+    import json
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", arq],
+                               capture_output=True, text=True).stdout)
+    fade = f"afade=t=out:st={max(0, dur - fade_s):.3f}:d={fade_s}"
+    med = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", arq, "-af", f"{fade},loudnorm=I={lufs}:TP={tp}:LRA=11:print_format=json",
+                          "-f", "null", "-"], capture_output=True, text=True).stderr
+    m = json.loads(med[med.rindex("{"):med.rindex("}") + 1])
+    ln = (f"loudnorm=I={lufs}:TP={tp}:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:measured_LRA={m['input_lra']}"
+          f":measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true")
+    tmp = arq[:-4] + "_tmp.mp4"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", arq, "-c:v", "copy", "-af", f"{fade},{ln},aresample=48000", "-c:a", "aac", "-b:a", "320k",
+                    "-movflags", "+faststart", tmp], check=True)
+    os.replace(tmp, arq)
+    a = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", arq, "-af", "ebur128=peak=true", "-f", "null", "-"], capture_output=True, text=True).stderr
+    i = float(re.findall(r"I:\s+(-?[\d.]+) LUFS", a)[-1]); pk = float(re.findall(r"Peak:\s+(-?[\d.]+) dBFS", a)[-1])
+    return i, pk
+
+
+def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True):
+    """ate_fim_do_video: corta no último quadro de vídeo (música que passa do fim dava quadros pretos no final).
+    master: masteriza o áudio do MP4 (masterizar)."""
     for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
     # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False
     # gravado no projeto e o MP4 sairia mudo.
     cfg = {"SelectAllFrames": True, "TargetDir": pasta, "CustomName": nome, "FormatWidth": w, "FormatHeight": h,
            "ExportVideo": True, "ExportAudio": True, "AudioCodec": "aac", "AudioSampleRate": 48000}
+    if ate_fim_do_video:
+        t = p.GetCurrentTimeline()
+        fim = max((x.GetEnd() for k in range(1, t.GetTrackCount("video") + 1) for x in (t.GetItemListInTrack("video", k) or [])), default=None)
+        if fim and fim < t.GetEndFrame():
+            cfg.update({"SelectAllFrames": False, "MarkIn": t.GetStartFrame(), "MarkOut": fim - 1})
     if legenda_gravada: cfg.update({"ExportSubtitle": True, "SubtitleFormat": "BurnIn"})
     p.SetRenderSettings(cfg)
     jid = p.AddRenderJob(); p.StartRendering(jid)
@@ -415,6 +443,9 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True):
     tem_audio = "audio" in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", arq],
                                           capture_output=True, text=True).stdout
     if not tem_audio: raise RuntimeError(f"render saiu SEM ÁUDIO: {arq}")
+    if master:
+        i, pk = masterizar(arq)
+        if abs(i + 14) > 0.5 or pk > -1.0: raise RuntimeError(f"master fora do alvo: {i} LUFS, pico {pk}")
     return arq, st.get("JobStatus")
 
 
