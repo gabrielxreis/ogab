@@ -1,69 +1,71 @@
-# Gab (/ogab): o editor de vídeo com IA para redes sociais no DaVinci Resolve
+<div align="center">
 
-Do **roteiro** à **timeline pronta e renderizada** no DaVinci Resolve, com IA: você aprova o roteiro, escolhe a voz, e a skill cuida de narração, música, efeitos sonoros, takes (de banco ou gerados), lettering animado, legenda com métrica certa, conferência automática e exportação.
+[![/ogab](.github/banner.svg)](#readme)
 
-Feita para **Claude Code** (app desktop ou terminal).
+[![Último commit](https://img.shields.io/github/last-commit/gabrielxreis/video-redes-skill?color=brightgreen&label=atualizado&style=for-the-badge)](https://github.com/gabrielxreis/video-redes-skill/commits/main "Histórico")
+[![Claude Code](https://img.shields.io/badge/Claude_Code-skill-D97757.svg?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.com/claude-code "Claude Code")
+[![DaVinci Resolve Studio](https://img.shields.io/badge/DaVinci_Resolve-Studio_21.1+-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)](#requisitos "Requisitos")
+[![macOS](https://img.shields.io/badge/-macOS-lightblue.svg?style=for-the-badge&logo=apple&logoColor=black)](#instalacao "Instalação")
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](#requisitos "Requisitos")
+[![Licença: MIT](https://img.shields.io/badge/-MIT-red.svg?style=for-the-badge)](LICENSE "Licença")
 
-> **Cada pessoa usa as PRÓPRIAS contas.** A skill não vem com nenhuma conta, chave ou login. Quem instala conecta os seus serviços (ElevenLabs, Artlist, Envato, Magnific...) no próprio Claude e faz login nos sites no próprio navegador. Nada disso fica salvo no repositório nem no `config.json`. Você escolhe quais plataformas usar em cada etapa, e a skill segue com o que estiver disponível na sua conta.
+</div>
 
----
+**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **dentro do DaVinci Resolve**: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci.
 
-## O que ela faz (o fluxo)
+> **Cada pessoa usa as PRÓPRIAS contas.** A skill não traz conta, chave nem login. Você conecta os seus serviços (ElevenLabs, Artlist, Envato, Magnific...) no seu Claude e faz login nos sites no seu navegador. Nada disso vai para o repositório nem para o `config.json`.
 
-| # | Etapa | Você decide? | Ferramenta |
-|---|---|---|---|
-| 1 | Perfil do cliente (site, tom, pronúncias) + **logos e identidade visual baixadas do site** | Só na 1ª vez | `competitor-profiling` + `marca.py`, monta `clientes/<empresa>/` e `<Empresa>/marca/` |
-| 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa a notícia/tema com fonte |
-| 3 | **Voz** (narração por IA) | **Escolhe a voz** | ElevenLabs ou Artlist |
-| 4 | Projeto no DaVinci (`Assunto - Empresa`), narração na A1 em +5 dB | - | Scripting API do Resolve |
-| 5 | Música emotiva/em alta, clímax no CTA, fade out, -10 dB na A2 | Escolhe entre 3-4 | Artlist ou Envato |
-| 6 | Efeitos sonoros (whoosh nas trocas, impacto no gancho) | Liga/desliga no config | Artlist ou Envato |
-| 7 | Takes: **tudo IA, tudo banco ou misto** (você escolhe); geração só no modo **ilimitado** | Origem e movimentos: a skill pergunta | Envato, Artlist, Storyblocks, Pexels / Magnific |
-| 7b | Cor: aplica o **seu PowerGrade** (.drx) em todos os takes (opcional) | Liga/desliga no config | DaVinci (node graph) |
-| 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
-| 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
-| 8d | **Edição dinâmica** (HyperFrames): cortes na batida da música (só quando faz sentido; em vídeo informativo a fala manda), punch-in/zoom nos takes, transições com a cor da marca, tipografia cinética e callouts, CTA animado | Vê a tabela antes | HyperFrames + DaVinci |
-| 8e | Pessoa falando: **legenda atrás da pessoa** e (se pedir) **pacote de gráficos de entrevista**; **mapas animados**; **cartão da notícia-fonte**; **mixagem** (música abaixa quando a voz entra); **remover fundo** | Pergunta o que for opcional | HyperFrames |
-| 8c | **Motions** (HyperFrames) nos momentos certos da fala, no centro da tela, com as cores e a logo da marca, numa trilha MOTIONS | Vê a tabela antes | HyperFrames + DaVinci |
-| 8b | **Palavras-chave** animadas (seu pacote de lettering) no momento em que são faladas; a legenda some enquanto elas aparecem | Vê a lista antes | DaVinci |
-| 10 | Timeline pronta (o MP4 você exporta; render só se pedir), **capa** (`capa.png`) e **legenda do post** com hashtags (`legenda_post.txt`) em `videos/`, e **conferência automática** | - | `resolve_lib.py`, `qc.py` |
+* [INSTALAÇÃO](#instalacao)
+    * [Um comando](#um-comando)
+    * [Passo a passo manual](#passo-a-passo-manual)
+    * [Atualizar](#atualizar)
+    * [Requisitos](#requisitos)
+* [USO E COMANDOS](#uso-e-comandos)
+    * [Comandos](#comandos)
+    * [O fluxo](#o-fluxo)
+    * [Editar um vídeo que já está no DaVinci](#editar-um-video-que-ja-esta-no-davinci)
+* [CONFIGURAÇÃO](#configuracao)
+    * [Opções](#opcoes)
+    * [Cor e vídeos de iPhone](#cor-e-videos-de-iphone)
+* [CLIENTES](#clientes)
+    * [Perfil, pronúncia e estilo de edição](#perfil-pronuncia-e-estilo-de-edicao)
+* [PASTA DO VÍDEO](#pasta-do-video)
+* [LEGENDA](#legenda)
+* [MOTIONS](#motions)
+* [ÁUDIO E EXPORT](#audio-e-export)
+* [SCRIPTS](#scripts)
+* [ARMADILHAS CONHECIDAS](#armadilhas-conhecidas)
+* [ESTRUTURA DO REPOSITÓRIO](#estrutura-do-repositorio)
+* [LICENÇA](#licenca)
 
-Tudo fica numa pasta na Mesa com o nome do vídeo:
 
-```
-~/Desktop/<Empresa>/
-  marca/           logos/ identidade.json identidade.md  (baixados do site oficial)
-  <Assunto> - <Empresa>/
-    roteiro.txt      links.txt  (de onde veio cada coisa)
-    narracoes/  musica/  sfx/  brolls/  videos/  legendas/
-```
+# INSTALAÇÃO
 
----
+[![Instalar no macOS](https://img.shields.io/badge/-Instalar_no_macOS-lightblue.svg?style=for-the-badge&logo=apple&logoColor=black)](#um-comando)
+[![install.sh](https://img.shields.io/badge/-install.sh-grey.svg?style=for-the-badge&logo=gnubash&logoColor=white)](install.sh)
+[![HyperFrames](https://img.shields.io/badge/-HyperFrames-6E40C9.svg?style=for-the-badge)](https://github.com/heygen-com/hyperframes)
+[![Provedores](https://img.shields.io/badge/-Provedores-orange.svg?style=for-the-badge)](docs/PROVEDORES.md)
 
-## Instalação
+## Um comando
 
-### Com um comando (recomendado)
-
-Abra o **Terminal** do Mac e cole:
+Cole no **Terminal** do Mac:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/install.sh | bash
 ```
 
-O instalador ([install.sh](install.sh)) faz tudo sozinho e pode ser rodado de novo para atualizar:
-- instala o **Homebrew** (se faltar), **ffmpeg**, **Node.js**, **Python 3**, **git** e **Pillow**;
+O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
+- instala **Homebrew** (se faltar), **ffmpeg**, **Node.js**, **Python 3**, **git** e **Pillow**;
 - baixa a skill em `~/.claude/skills/ogab` e cria o seu `config.json`;
-- instala o **HyperFrames** (motions, gráficos, edição dinâmica) e roda o `hyperframes doctor`;
+- instala o **HyperFrames** e roda o `hyperframes doctor`;
 - instala as fontes livres (Poppins, Playfair Display, Lobster);
-- confere se o **DaVinci Resolve Studio** e o scripting estão no Mac, **detecta a versão** e, se for anterior à 21.1, instala o **Whisper local** para a transcrição.
+- confere o **DaVinci Resolve Studio** e o scripting, **detecta a versão** e, abaixo da 21.1, instala o **Whisper local** para a transcrição.
 
-Depois disso falta só o que depende de você (o instalador lembra no final): ligar o scripting no DaVinci (passo 5), conectar as suas contas (passo 8) e o Claude in Chrome (passo 9). Reinicie o Claude Code e peça um vídeo.
+Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar as suas contas e o Claude in Chrome (passos 5, 8 e 9 abaixo). Reinicie o Claude Code e peça um vídeo.
 
-### Passo a passo manual
+## Passo a passo manual
 
-> **Skill complementar recomendada:** `competitor-profiling` (pacote `anthropic-skills`). Quando você manda o site ou material de uma empresa, a skill usa ela para varrer e salvar o máximo de informação (produtos, público, posicionamento, diferenciais, provas, tom, concorrentes) antes de começar. Instale pelo catálogo de skills do Claude (Personalização > Skills, ou peça "instala a skill competitor-profiling"). Sem ela, a skill lê o site direto.
-
-1. **Instalar o HyperFrames junto** (motions e edição dinâmica: cortes na batida, zoom, transições, tipografia cinética):
+1. **HyperFrames** (motions e edição dinâmica):
    ```bash
    npx skills add heygen-com/hyperframes
    ```
@@ -71,95 +73,247 @@ Depois disso falta só o que depende de você (o instalador lembra no final): li
    ```bash
    git clone https://github.com/gabrielxreis/video-redes-skill ~/.claude/skills/ogab
    ```
-3. **Criar sua configuração** (fica só na sua máquina, não vai para o GitHub):
+3. **Criar a sua configuração** (fica só na sua máquina):
    ```bash
    cp ~/.claude/skills/ogab/config.example.json ~/.claude/skills/ogab/config.json
    ```
-4. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio 21.1 ou mais novo** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
-   - **Versão mais antiga do DaVinci também funciona:** abaixo da 21.1 a API não devolve a transcrição, então a skill transcreve com o **Whisper local** (grátis, no próprio Mac): `pip3 install --user mlx-whisper` (Apple Silicon) ou `faster-whisper` (Intel). O instalador detecta a versão e instala sozinho só quando precisa. Abaixo da 20.2.2 a API pode errar a trilha da narração e da música (a skill confere).
+4. **Dependências Python:**
+   ```bash
+   pip3 install pillow pyobjc-framework-Vision
+   ```
+   O `pyobjc-framework-Vision` é o OCR da Apple usado pelo `legenda_ui.py`.
 5. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
-6. **Fontes:** instale as de `assets/fontes/` (duplo clique em cada .ttf, ou copie para `~/Library/Fonts/`). São fontes livres (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
-7. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (29 animações: Cinematic, Palavra Por Palavra, Gold Design, Blur Up...). Ele **não** vem neste repositório. Use o seu próprio pacote de títulos do Fusion (`.drfx`): copie para
-   `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/` e **reinicie o Resolve**. Coloque o nome do pacote e dos templates em `config.json > lettering` (o nome do template é o nome do arquivo `.setting` dentro do pacote).
-8. **Conectar as SUAS contas** (veja [docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific, etc. Conecte só o que você usa.
-9. **Claude in Chrome:** instale a extensão e faça login nos sites (Envato, Artlist, Magnific). Downloads são sempre pelo navegador; a IA nunca digita senha.
+6. **Fontes:** instale as de `assets/fontes/` (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
+7. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (Cinematic, Palavra Por Palavra, Blur Up, Destacado, Zoom Out...), que **não** vem no repositório. Use o seu pacote de títulos do Fusion (`.drfx`) em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`, reinicie o Resolve e coloque os nomes em `config.json > lettering`.
+8. **Conectar as SUAS contas** ([docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific etc. Só o que você usa.
+9. **Claude in Chrome:** instale a extensão e faça login nos sites. Downloads são sempre pelo navegador; a IA nunca digita senha.
+10. **Acessibilidade:** dê permissão de Acessibilidade ao app que roda o Claude Code (Ajustes do Sistema > Privacidade e Segurança > Acessibilidade). Só é necessário para os ajustes de legenda feitos pela interface.
 
-## Como usar
+> **Skill complementar recomendada:** `competitor-profiling` (pacote `anthropic-skills`). Quando você manda o site de uma empresa, a skill usa ela para montar o perfil completo antes de começar.
 
-No Claude Code, chame o **Gab** com `/ogab` seguido do pedido (ou só peça em linguagem normal que ele entra sozinho):
+## Atualizar
+
+A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.json` nem em `clientes/`). Para forçar:
+
+```
+/ogab update
+```
+
+## Requisitos
+
+| | Mínimo | Observação |
+|---|---|---|
+| Sistema | macOS | Testado em Apple Silicon |
+| DaVinci Resolve | **Studio 21.1+** | A versão grátis não tem scripting externo. Abaixo da 21.1 a transcrição vai para o Whisper local |
+| Python | 3.10+ | Pillow; `pyobjc-framework-Vision` para o `legenda_ui.py` |
+| ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
+| Node.js | 18+ | HyperFrames |
+
+
+# USO E COMANDOS
+
+## Comandos
+
+No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem normal:
 
 | Comando | O que faz |
 |---|---|
-| `/ogab faz um vídeo para a <empresa> sobre <tema>` | Fluxo completo |
-| `/ogab <qualquer edição no DaVinci>` | Edita a timeline aberta (cortes, legenda, música, motions...) |
-| `/ogab ajuda` | Mostra o que está habilitado, os provedores escolhidos e como mudar (o `/help` puro é do próprio Claude Code) |
-| `/ogab config <chave> <valor>` | Liga/desliga opções. Ex.: `config opcoes.multi_formatos true` |
-| `/ogab cliente <nome>` | Cria/atualiza o perfil do cliente (site, logo, pronúncias) |
+| `/ogab faz um vídeo para a <empresa> sobre <tema>` | Fluxo completo, do roteiro ao export |
+| `/ogab <edição no DaVinci>` | Edita a timeline aberta (cortes, legenda, música, motions, b-roll...) |
+| `/ogab cliente <nome>` | Cria ou atualiza o perfil do cliente (site, logo, pronúncias, estilo) |
 | `/ogab pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
-| `/ogab update` | Atualiza a skill (`git pull`), sem mexer no seu config nem nos clientes |
+| `/ogab config <chave> <valor>` | Liga ou desliga opções. Ex.: `config opcoes.multi_formatos true` |
+| `/ogab ajuda` | Mostra o que está habilitado e os provedores escolhidos |
+| `/ogab update` | Atualiza a skill |
 
-## Opções que você liga e desliga (`config.json`)
+## O fluxo
+
+| # | Etapa | Você decide? | Ferramenta |
+|---|---|---|---|
+| 1 | Perfil do cliente + logos e identidade visual baixadas do site | Só na 1ª vez | `competitor-profiling`, `marca.py` |
+| 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa com fonte e data |
+| 3 | **Voz** (narração por IA) | **Escolhe** | ElevenLabs ou Artlist |
+| 4 | Projeto no DaVinci (`Assunto - Empresa`), Media Pool organizado, Stacked Timelines | - | Scripting API |
+| 5 | Música (pop/remix leve por padrão), -10 dB, fade | Escolhe entre 3-4 | Artlist ou Envato |
+| 6 | Efeitos sonoros (whoosh, pop, impacto) | Liga/desliga | Artlist ou Envato |
+| 7 | Takes: IA, banco ou misto; geração só no modo ilimitado | Origem | Envato, Artlist, Pexels / Magnific |
+| 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista | Seu pacote `.drfx` |
+| 9 | **Motions** centralizados e medidos, com as cores da marca, CTA animado | Vê a tabela | HyperFrames + `guias.py` |
+| 10 | **Legenda** de uma linha, métrica obrigatória, do início ao fim | - | `legendas.py`, `legenda_ui.py` |
+| 11 | Timeline pronta, **conferência**, **master** e export (se pedir), capa e texto do post | - | `resolve_lib.py`, `qc.py` |
+
+## Editar um vídeo que já está no DaVinci
+
+Para gravação de apresentador (talking head), a skill:
+- mantém a trilha principal **V1 intocada**: b-roll, lettering, BG e motions entram em camadas acima;
+- liga **Voice Isolation** no áudio de iPhone ou câmera;
+- enquadra o rosto com o **mínimo de zoom**, sem punch-in alternado; nada sobre o rosto;
+- em vídeo emocional, põe **b-roll em toda imagem concreta** e lettering + b-roll nas frases de efeito;
+- corta retakes e pausas pela transcrição (`cortes.py`), com a timeline original como backup.
+
+
+# CONFIGURAÇÃO
+
+Tudo em `config.json` (copiado de `config.example.json`, fora do git).
+
+## Opções
 
 | Opção | Padrão | O que faz |
 |---|---|---|
 | `opcoes.efeitos_sonoros` | `true` | Whoosh nas trocas, impacto no gancho, pop no CTA |
 | `opcoes.movimentos_nos_takes` | `perguntar` | Zoom/movimento leve nos takes (`sempre`, `nunca`, `perguntar`) |
 | `opcoes.lettering_no_gancho` | `perguntar` | Título animado no começo |
-| `opcoes.multi_formatos` | `false` | Renderiza também 4:5, 16:9 e versões 15/30/60 s para Ads |
-| `opcoes.origem_takes` | `perguntar` | Takes `ia` (tudo gerado, só ilimitado), `banco` (Envato etc.) ou `misto` |
-| `opcoes.legenda_atras_da_pessoa` | `true` | Com pessoa falando, legenda cinematográfica atrás dela (HyperFrames) |
+| `opcoes.multi_formatos` | `false` | Renderiza também 4:5, 16:9 e cortes de 15/30/60 s para Ads |
+| `opcoes.origem_takes` | `perguntar` | `ia`, `banco` ou `misto` |
 | `opcoes.pacote_entrevista` | `perguntar` | Gráficos de entrevista (nome/cargo, números, citações) |
-| `cor.aplicar_power_grade` | `false` | Aplica o seu PowerGrade (`cor.drx`, em `assets/grade/`) em todos os takes |
+| `opcoes.renderizar_video` | `false` | Exporta o MP4 sozinho (senão entrega a timeline pronta) |
+| `opcoes.capa_e_legenda_post` | `true` | `capa.png` e `legenda_post.txt` em `videos/` |
 | `opcoes.conferencia_automatica` | `true` | Roda o `qc.py` antes de entregar |
-| `opcoes.pauta_automatica.ativo` | `false` | Sugere pautas sozinha (fonte `gratis`, `newsapi` ou `gnews`) |
+| `opcoes.pauta_automatica.ativo` | `false` | Sugere pautas sozinha (`gratis`, `newsapi` ou `gnews`) |
+| `cor.aplicar_power_grade` | `false` | Aplica o seu PowerGrade em todos os takes |
 | `regras.volume_db` | narração +5, música -10 | Volumes na timeline |
-| `regras.legenda.max_caracteres` | 25 | Tamanho máximo da linha da legenda (uma linha só) |
+| `regras.legenda.max_caracteres` | `25` | Tamanho máximo da linha da legenda |
 | `regras.geracao_so_ilimitada` | `true` | Nunca gera take que gaste crédito |
 
 ## Cor e vídeos de iPhone
 
-- `cor.drx`: seu PowerGrade padrão, aplicado em todos os takes.
-- `cor.drx_iphone`: PowerGrade **combinado** para vídeo de iPhone (nó conversor do iPhone **primeiro**, depois os nós do seu LUT). A skill detecta iPhone sozinha (metadado Apple ou HEVC HLG/Dolby Vision) e aplica esse no lugar do padrão.
-- Por que combinado: pela API do DaVinci não dá para empilhar dois PowerGrades no mesmo clipe, e os estágios de grupo (pre/post-clip) não aceitam .drx. Então crie uma vez: num clipe de iPhone, aplique o conversor, adicione depois os nós do seu LUT, grave o still na Gallery e exporte (gera .dpx + .drx) para `assets/grade/`.
+- `cor.drx`: PowerGrade padrão, aplicado em todos os takes.
+- `cor.drx_iphone`: PowerGrade **combinado** para iPhone (conversor do iPhone primeiro, depois os nós do seu LUT). A skill detecta iPhone sozinha (metadado Apple ou HEVC HLG/Dolby Vision).
+- A API não empilha dois PowerGrades no mesmo clipe, por isso o combinado: grave o still na Gallery e exporte (.dpx + .drx) para `assets/grade/`.
 
-## Conferência automática (`scripts/qc.py`)
 
-Antes de entregar, confere e lista **OK / AVISO / ERRO**:
-estrutura da pasta, resolução e duração pela regra da plataforma, **quadros pretos** entre takes, **loudness** (alvo -14 LUFS), legenda em uma linha e no tamanho certo, **grafias erradas** do cliente (ex.: nome da marca transcrito errado), takes com **green screen** e arquivos pesados que travam o playback. Gera uma folha de contato com 6 quadros.
+# CLIENTES
 
-## Pronúncia por cliente (aprende sozinha)
+## Perfil, pronúncia e estilo de edição
 
-`clientes/<empresa>/pronuncia.json` guarda, para cada termo, a **grafia** da legenda, como **escrever para a voz** pronunciar certo e os **erros de transcrição** já vistos. Quando a transcrição mostra um erro novo (ex.: a transcrição ouviu o nome da marca errado), a skill adiciona no arquivo, corrige a legenda e, se for erro da voz, regera só o trecho (com sua aprovação).
+Cada empresa tem uma pasta em `clientes/<empresa>/` (local, fora do git), criada na primeira vez a partir de `clientes/_exemplo/`:
 
-## Estrutura do repositório
+| Arquivo | Para quê |
+|---|---|
+| `empresa.md` | O que faz, público, dores, tom, CTA, cores, fontes e o que **não** dizer |
+| `pronuncia.json` | Grafia certa de cada termo, como escrever para a voz e erros de transcrição já vistos. A skill aprende sozinha |
+| `estilo.md` | **O estilo de edição da marca**: formato, camadas, presets de lettering, legenda, motions e CTA, b-roll, música aprovada e rejeitada, export e tom. Lido **antes** de editar qualquer vídeo da empresa |
+
+Cada empresa tem o seu estilo. Regra que você dá para uma marca vai para o `estilo.md` dela; regra geral vai para o `SKILL.md`. O estilo também fica espelhado no perfil da empresa no Desktop (`~/Desktop/<empresa>.md`).
+
+
+# PASTA DO VÍDEO
+
+```
+~/Desktop/<Empresa>/
+  marca/                       logos/ identidade.json identidade.md (do site oficial)
+  <Assunto> - <Empresa>/
+    roteiro.txt  links.txt     (de onde veio cada coisa)
+    narracoes/ ou gravacao/    musica/  sfx/  brolls/  motions/  legendas/
+    videos/                    <Assunto> - <Empresa>.mp4  capa.png  legenda_post.txt
+```
+
+No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / Motions / Legendas`, com subpastas `01`, `02`... quando há mais de um vídeo no projeto.
+
+
+# LEGENDA
+
+- **Uma linha**, até 25 caracteres, cortada em ponto natural da frase. **Métrica obrigatória** logo depois de gerar: `legendas.py metrica` com 0 problema antes de seguir.
+- Preset de trilha **GAB USA** (Poppins Bold, caixa alta).
+- Vai do **início ao fim** do vídeo, inclusive no CTA e nos motions. Nunca some.
+- Posição padrão **Y 724**; só as legendas que cruzam um lettering, ou um motion na faixa de baixo, descem para **Y 390**. A API do Resolve não mexe em estilo de legenda, então o `legenda_ui.py` faz isso pela interface com OCR, numa chamada só.
+- Legendas que faltam se **acrescentam sem apagar** as que já existem: SRT só com as novas, com o tempo contado a partir do fim da última legenda.
+
+
+# MOTIONS
+
+- Feitos no **HyperFrames**, com as cores, a fonte e a logo da marca, numa trilha `MOTIONS`.
+- **Sempre centralizados**, medidos com `guias.py` (cutaway no centro da tela, imersivo abaixo do queixo). Nada sobre o rosto: se cobriria o rosto, vira tela cheia sobre um BG animado, que fica contínuo entre motions próximos.
+- Acabamento caprichado e variado, sem repetir o mesmo layout.
+
+
+# ÁUDIO E EXPORT
+
+- Voz com Voice Isolation, música a -10 dB, SFX discretos.
+- `renderizar()` exporta com a legenda gravada, **corta no último quadro de vídeo** (nada de quadro preto no fim) e **masteriza** o áudio: loudnorm em duas passagens para **-14 LUFS** com pico de **-1,5 dBTP**, vídeo copiado sem recomprimir. Para com erro se ficar fora do alvo.
+- Render Cache fica desligado.
+
+
+# SCRIPTS
+
+Todos em `scripts/`, rodando com `python3`.
+
+### legendas.py
+    rascunho     transcricao.json frases.txt [--cliente pasta] [--max 25]   Uma legenda por linha, cortada em ponto natural
+    sincronizar  transcricao.json frases.txt saida.srt                      Casa cada legenda com o tempo das palavras
+    metrica      legenda.srt                                                Uma linha, tamanho, fim fraco, duração, sobreposição
+
+### legenda_ui.py
+    "<timeline>"                       Trilha em Y 724 e desce para 390 as legendas que cruzam a trilha LETTERING
+    "<timeline>" --indices 4,5,6       Escolhe à mão quais descem (1 = primeira legenda)
+    "<timeline>" --so-listar           Só mostra a lista
+    "<timeline>" --conferir            Render e mede a altura do texto de cada legenda
+
+### guias.py
+    guia      [saida.png]                                   Guia 1080x1920: centros, áreas, faixa da legenda, interface do Instagram
+    medir     <arquivo.mov|.png> --alvo cutaway|imersivo    Área visível do motion e distância do centro (passa com até 6 px)
+    sobrepor  <arquivo> <fundo.png> <saida.png> [--t 2.0]   Prova visual: fundo + motion + guia
+
+### cortes.py
+    plano  <transcricao.json> <saida.json> [--tirar "frase"] [--pausa 0.35]   Tira retakes e encurta pausas pela transcrição
+
+### qc.py
+    <pasta_do_video> [--cliente pasta] [--plataforma instagram|meta_ads|youtube_shorts]
+    Estrutura, resolução, duração, quadros pretos, loudness, legenda, grafias erradas, green screen, arquivos pesados
+
+### transcrever.py
+    <audio.wav> <saida.json> [--motor auto|davinci|whisper] [--idioma pt]   Tempo por palavra (DaVinci 21.1+ ou Whisper local)
+    --versao                                                                 Versão do DaVinci e motor escolhido
+
+### marca.py
+    <site> <pasta>/marca     Logos, cores, fontes, favicon e imagem de compartilhamento do site oficial
+    inverter <logo.png>      Versão oposta da logo (branca <-> preta), mantendo a transparência
+
+### midia.py
+    preparar_take  entrada saida.mp4 [1080x1920]   4K/ProRes pesado para 1080 H.264
+    audio48k       entrada saida.wav               Converte para 48 kHz
+    green / iphone / info  arquivo                 Green screen, detecção de iPhone, metadados
+
+### pauta.py
+    "<tema1>; <tema2>" [--fonte gratis|newsapi|gnews] [--dias 7] [--n 8]   Notícias recentes para virar roteiro
+
+### resolve_lib.py
+Biblioteca usada pela skill: projeto, timeline, narração, música, SFX, takes, legenda, lettering, enquadramento, organização do Media Pool, `renderizar()` e `masterizar()`.
+
+
+# ARMADILHAS CONHECIDAS
+
+Já tratadas pela skill:
+
+- **Frame rate de playback** não muda por script depois que o projeto tem timeline: a skill grava ao criar.
+- **Takes 4K/ProRes** travam a reprodução: convertidos para 1080 H.264 antes de importar.
+- **Títulos animados** só entram pela API na trilha de destino e empurram o resto: a skill trava as outras trilhas e insere numa camada acima. Cortar título no meio derruba o Resolve; a saída é um fade no bloco. Nunca mexer na animação de entrada do template.
+- **Estilo de legenda** não existe na API e o Resolve só grava **uma** trilha de legenda no burn-in: a posição por legenda é feita pela interface (`legenda_ui.py`).
+- No `legenda_ui.py`, o Resolve (Qt) **ignora teclado enviado pelo Quartz**: as teclas vão pelo System Events. **Tab** no campo de posição joga o foco no botão "Add New" e o próximo Return cria uma legenda "Subtitle": nunca usar.
+- `AppendToTimeline` usa a timeline **aberta** e, para SRT, cola **depois da última legenda** da trilha.
+- **Trilha de legenda desligada** rejeita o SRT em silêncio.
+- **Música passando do fim** gera quadro preto: o render corta no último quadro de vídeo.
+- Conectores de Envato/Artlist/Magnific **não baixam** arquivos: download pelo navegador.
+- Gerar no Magnific **pelo MCP cobra crédito**; o ilimitado só vale pelo site.
+
+
+# ESTRUTURA DO REPOSITÓRIO
 
 ```
 SKILL.md                 instruções que o Claude segue (o "cérebro" da skill)
+README.md                este arquivo
+install.sh               instalador de um comando
 config.example.json      modelo de configuração (copie para config.json)
-scripts/resolve_lib.py   monta projeto, timeline, narração, música, sfx, takes, legenda, lettering, render
-scripts/legendas.py      rascunho de legenda por frase + sincronização com a narração
-scripts/midia.py         converte takes pesados, áudio 48 kHz, detecta green screen
-scripts/qc.py            conferência automática
-scripts/marca.py         logos, cores e fontes do site oficial da empresa
-scripts/pauta.py         pauta automática (Google News grátis, NewsAPI, GNews)
-scripts/transcrever.py   transcrição com tempo por palavra: DaVinci 21.1+ ou Whisper local, pela versão detectada
+scripts/                 resolve_lib, legendas, legenda_ui, guias, cortes, qc, transcrever, marca, midia, pauta
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
-clientes/_exemplo/       modelo de perfil de cliente e pronúncias
+docs/BACKGROUNDS.md      fundos animados para os motions
+clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
 assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
 ```
 
-## Armadilhas conhecidas (já tratadas pela skill)
 
-- O DaVinci não muda o **frame rate de playback** por script depois que o projeto tem timeline: a skill grava ao criar o projeto (senão o áudio engasga). Se um projeto já existente estiver com playback diferente da timeline, corrige em Project Settings > Master Settings > Playback frame rate. Render Cache fica desligado (None).
-- Takes **4K/ProRes** travam a reprodução: convertidos para 1080 H.264 antes de importar.
-- A API só insere títulos animados na **V1** (empurrando o que estiver lá): a skill monta os letterings numa camada acima dos takes criando trilha na posição 1, sem compound. Cortar um título animado no meio derruba o Resolve, então a duração visível vem de um fade out. Nunca mudar a velocidade das animações (quebra o template).
-- A API não faz **fade** de áudio nem aplica **estilo de legenda**: o fade é feito no arquivo (ffmpeg) e o estilo fica na trilha de legenda (preset).
-- Fontes 24/25 fps numa timeline 30 fps deixam **1-2 quadros pretos**: os takes são encadeados pelo fim real.
-- Os conectores de Envato/Artlist/Magnific **não baixam** arquivos: download pelo navegador.
-- Gerar no Magnific **pelo MCP cobra crédito**; o ilimitado só vale pelo site.
+# LICENÇA
 
-## Licença
-
-Código: MIT. Fontes em `assets/fontes/`: SIL Open Font License (ver os OFL.txt). Pacotes de lettering, músicas, takes e vozes pertencem às plataformas/autores e seguem as licenças das suas assinaturas.
+Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. Pacotes de lettering, músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas.

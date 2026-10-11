@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="220" viewBox="0 0 900 220">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1b2433"/>
+    </linearGradient>
+    <linearGradient id="tx" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7a3d"/>
+      <stop offset="1" stop-color="#ffb36b"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="220" rx="18" fill="url(#bg)"/>
+  <g fill="none" stroke="#2a3446" stroke-width="2">
+    <rect x="40" y="60" width="64" height="100" rx="10"/>
+    <rect x="56" y="76" width="32" height="68" rx="4"/>
+  </g>
+  <circle cx="72" cy="110" r="10" fill="#ff7a3d"/>
+  <text x="140" y="128" font-family="Poppins, Inter, Helvetica, Arial, sans-serif" font-size="92" font-weight="800" fill="url(#tx)">/ogab</text>
+  <text x="142" y="168" font-family="Poppins, Inter, Helvetica, Arial, sans-serif" font-size="22" font-weight="500" fill="#c9d1d9">o editor de vídeo com IA no DaVinci Resolve</text>
+  <g font-family="Menlo, monospace" font-size="15" fill="#6e7681">
+    <text x="560" y="62">roteiro › voz › música › takes</text>
+    <text x="560" y="86">lettering › motions › legenda</text>
+    <text x="560" y="110">qc › master › export</text>
+  </g>
+</svg>
