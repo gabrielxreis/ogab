@@ -1,0 +1,7 @@
+{
+  "_leia": "grafia = como aparece na legenda; fala = como escrever no texto da voz para pronunciar certo; erros_transcricao = como a transcrição costuma errar (vira correção automática na legenda e alerta na conferência). A skill atualiza este arquivo sozinha quando acha um erro novo.",
+  "termos": [
+    { "grafia": "EB-2", "fala": "ê-bê dois", "erros_transcricao": ["EB2", "é bê dois"] },
+    { "grafia": "Nome da Marca", "fala": "Nome da Marca", "erros_transcricao": [] }
+  ]
+}

@@ -1,0 +1,116 @@
+# video-redes: skill do Claude para vídeos de redes sociais no DaVinci Resolve
+
+Do **roteiro** à **timeline pronta e renderizada** no DaVinci Resolve, com IA: você aprova o roteiro, escolhe a voz, e a skill cuida de narração, música, efeitos sonoros, takes (de banco ou gerados), lettering animado, legenda com métrica certa, conferência automática e exportação.
+
+Feita para **Claude Code** (app desktop ou terminal). Cada pessoa conecta **as próprias contas** e escolhe quais plataformas usar em cada etapa: a skill segue o processo com o que estiver disponível.
+
+---
+
+## O que ela faz (o fluxo)
+
+| # | Etapa | Você decide? | Ferramenta |
+|---|---|---|---|
+| 1 | Perfil do cliente (site, logo, tom, pronúncias) | Só na 1ª vez | Lê o site e monta `clientes/<empresa>/` |
+| 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa a notícia/tema com fonte |
+| 3 | **Voz** (narração por IA) | **Escolhe a voz** | ElevenLabs ou Artlist |
+| 4 | Projeto no DaVinci (`Assunto - Empresa`), narração na A1 em +5 dB | - | Scripting API do Resolve |
+| 5 | Música emotiva/em alta, clímax no CTA, fade out, -10 dB na A2 | Escolhe entre 3-4 | Artlist ou Envato |
+| 6 | Efeitos sonoros (whoosh nas trocas, impacto no gancho) | Liga/desliga no config | Artlist ou Envato |
+| 7 | Takes: banco primeiro, gera se faltar (só modo **ilimitado**) | Movimentos: a skill pergunta | Envato, Artlist, Storyblocks, Pexels / Magnific |
+| 8 | Lettering animado no gancho (pacote de títulos do Fusion) | A skill pergunta | DaVinci + seu pacote .drfx |
+| 9 | Legenda: **uma linha**, pedaço natural da frase, grafia corrigida | - | Transcrição do Resolve + `legendas.py` |
+| 10 | Render H.264 (+ formatos extras se habilitado) e **conferência automática** | - | `qc.py` |
+
+Tudo fica numa pasta na Mesa com o nome do vídeo:
+
+```
+~/Desktop/<Assunto> - <Empresa>/
+  roteiro.txt      links.txt  (de onde veio cada coisa)
+  narracoes/  musica/  sfx/  brolls/  videos/  legendas/
+```
+
+---
+
+## Instalação
+
+1. **Clonar na pasta de skills do Claude:**
+   ```bash
+   git clone https://github.com/gabrielxreis/video-redes-skill ~/.claude/skills/video-redes
+   ```
+2. **Criar sua configuração** (fica só na sua máquina, não vai para o GitHub):
+   ```bash
+   cp ~/.claude/skills/video-redes/config.example.json ~/.claude/skills/video-redes/config.json
+   ```
+3. **Requisitos da máquina:** macOS, **DaVinci Resolve Studio** (a versão grátis não tem scripting externo), Python 3 com Pillow (`pip3 install pillow`), ffmpeg (`brew install ffmpeg`).
+4. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
+5. **Fontes:** instale as de `assets/fontes/` (duplo clique em cada .ttf, ou copie para `~/Library/Fonts/`). São fontes livres (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
+6. **Lettering animado (opcional):** se você tem um pacote de títulos do Fusion (`.drfx`), copie para
+   `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/` e **reinicie o Resolve**. Coloque o nome do pacote e dos templates em `config.json > lettering`. Pacotes comprados **não** vêm neste repositório.
+7. **Conectar suas contas** (veja [docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific, etc. Conecte só o que você usa.
+8. **Claude in Chrome:** instale a extensão e faça login nos sites (Envato, Artlist, Magnific). Downloads são sempre pelo navegador; a IA nunca digita senha.
+
+## Como usar
+
+No Claude Code, peça em linguagem normal ou use o comando:
+
+| Comando | O que faz |
+|---|---|
+| `faz um vídeo para a <empresa> sobre <tema>` | Fluxo completo |
+| `/video-redes ajuda` | Mostra o que está habilitado, os provedores escolhidos e como mudar (o `/help` puro é do próprio Claude Code) |
+| `/video-redes config <chave> <valor>` | Liga/desliga opções. Ex.: `config opcoes.multi_formatos true` |
+| `/video-redes cliente <nome>` | Cria/atualiza o perfil do cliente (site, logo, pronúncias) |
+| `/video-redes pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
+| `/video-redes update` | Atualiza a skill (`git pull`), sem mexer no seu config nem nos clientes |
+
+## Opções que você liga e desliga (`config.json`)
+
+| Opção | Padrão | O que faz |
+|---|---|---|
+| `opcoes.efeitos_sonoros` | `true` | Whoosh nas trocas, impacto no gancho, pop no CTA |
+| `opcoes.movimentos_nos_takes` | `perguntar` | Zoom/movimento leve nos takes (`sempre`, `nunca`, `perguntar`) |
+| `opcoes.lettering_no_gancho` | `perguntar` | Título animado no começo |
+| `opcoes.multi_formatos` | `false` | Renderiza também 4:5, 16:9 e versões 15/30/60 s para Ads |
+| `opcoes.conferencia_automatica` | `true` | Roda o `qc.py` antes de entregar |
+| `opcoes.pauta_automatica.ativo` | `false` | Sugere pautas sozinha (fonte `gratis`, `newsapi` ou `gnews`) |
+| `regras.volume_db` | narração +5, música -10 | Volumes na timeline |
+| `regras.legenda.max_caracteres` | 25 | Tamanho máximo da linha da legenda (uma linha só) |
+| `regras.geracao_so_ilimitada` | `true` | Nunca gera take que gaste crédito |
+
+## Conferência automática (`scripts/qc.py`)
+
+Antes de entregar, confere e lista **OK / AVISO / ERRO**:
+estrutura da pasta, resolução e duração pela regra da plataforma, **quadros pretos** entre takes, **loudness** (alvo -14 LUFS), legenda em uma linha e no tamanho certo, **grafias erradas** do cliente (ex.: nome da marca transcrito errado), takes com **green screen** e arquivos pesados que travam o playback. Gera uma folha de contato com 6 quadros.
+
+## Pronúncia por cliente (aprende sozinha)
+
+`clientes/<empresa>/pronuncia.json` guarda, para cada termo, a **grafia** da legenda, como **escrever para a voz** pronunciar certo e os **erros de transcrição** já vistos. Quando a transcrição mostra um erro novo (ex.: a voz falou "Bora em Nigrar"), a skill adiciona no arquivo, corrige a legenda e, se for erro da voz, regera só o trecho (com sua aprovação).
+
+## Estrutura do repositório
+
+```
+SKILL.md                 instruções que o Claude segue (o "cérebro" da skill)
+config.example.json      modelo de configuração (copie para config.json)
+scripts/resolve_lib.py   monta projeto, timeline, narração, música, sfx, takes, legenda, lettering, render
+scripts/legendas.py      rascunho de legenda por frase + sincronização com a narração
+scripts/midia.py         converte takes pesados, áudio 48 kHz, detecta green screen
+scripts/qc.py            conferência automática
+scripts/pauta.py         pauta automática (Google News grátis, NewsAPI, GNews)
+navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
+docs/PROCESSO.md         referência detalhada, armadilhas e decisões
+docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
+clientes/_exemplo/       modelo de perfil de cliente e pronúncias
+assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
+```
+
+## Armadilhas conhecidas (já tratadas pela skill)
+
+- O DaVinci não muda o **frame rate de playback** por script depois que o projeto tem timeline: a skill grava ao criar o projeto (senão o áudio engasga).
+- Takes **4K/ProRes** travam a reprodução: convertidos para 1080 H.264 antes de importar.
+- A API não faz **fade** de áudio nem aplica **estilo de legenda**: o fade é feito no arquivo (ffmpeg) e o estilo fica na trilha de legenda (preset).
+- Fontes 24/25 fps numa timeline 30 fps deixam **1-2 quadros pretos**: os takes são encadeados pelo fim real.
+- Os conectores de Envato/Artlist/Magnific **não baixam** arquivos: download pelo navegador.
+- Gerar no Magnific **pelo MCP cobra crédito**; o ilimitado só vale pelo site.
+
+## Licença
+
+Código: MIT. Fontes em `assets/fontes/`: SIL Open Font License (ver os OFL.txt). Pacotes de lettering, músicas, takes e vozes pertencem às plataformas/autores e seguem as licenças das suas assinaturas.
