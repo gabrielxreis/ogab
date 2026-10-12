@@ -43,11 +43,13 @@ n=0; for f in "$AQUI"/assets/mogrt/*.mogrt; do [ -f "$f" ] && cp "$f" "$MG/" && 
 
 # Quem roda este instalador escolheu o Premiere: grava no config.json (o Gab trabalha só nele).
 CFG="$AQUI/../config.json"; [ -f "$CFG" ] || cp "$AQUI/../config.example.json" "$CFG"
+if [ "${OGAB_SEM_CONFIG:-0}" != "1" ]; then   # o install.sh principal já gravou a escolha
 python3 - "$CFG" <<'PY' && ok "config.json: editor = premiere"
 import json, sys
 c = json.load(open(sys.argv[1])); c["editor"] = "premiere"
 json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
+fi
 
 # Aviso para o Gab ler o guia do Premiere (no CLAUDE.md do usuário, fora do repositório).
 CM="$HOME/.claude/CLAUDE.md"; MARCA="ogab/premiere/README.md"

@@ -19,14 +19,14 @@ function Py { & py -3 @args }
 
 if ($env:OS -ne "Windows_NT") { Write-Host "Este instalador e para Windows. No Mac use o install.sh."; exit 1 }
 
-Info "1/8 winget"
+Info "1/10 winget"
 if (-not (Tem winget)) {
   Warn "winget nao encontrado. Instale o 'App Installer' pela Microsoft Store e rode de novo."
   exit 1
 }
 Ok "winget disponivel"
 
-Info "2/8 ffmpeg, yt-dlp, Node.js, Python 3 e git"
+Info "2/10 ffmpeg, yt-dlp, Node.js, Python 3 e git"
 $pacotes = @(
   @{ bin = "ffmpeg"; id = "Gyan.FFmpeg" },
   @{ bin = "yt-dlp"; id = "yt-dlp.yt-dlp" },
@@ -41,7 +41,7 @@ foreach ($p in $pacotes) {
   AtualizaPath
   if (Tem $p.bin) { Ok "$($p.bin) instalado" } else { Warn "nao consegui instalar $($p.id); rode: winget install --id $($p.id) -e" }
 }
-Info "2b/8 Docker Desktop (obrigatorio: o hyperframes doctor exige para o render dos motions)"
+Info "2b/10 Docker Desktop (obrigatorio: o hyperframes doctor exige para o render dos motions)"
 $dockerExe = Join-Path $env:ProgramFiles "Docker\Docker\Docker Desktop.exe"
 if (-not (Tem docker) -and -not (Test-Path $dockerExe)) {
   Write-Host "  Instalando o Docker Desktop (o Windows vai pedir permissao de administrador; pode pedir para ativar o WSL 2)..."
@@ -62,11 +62,11 @@ if (Test-Path $dockerExe) {
 
 if (-not (Tem py)) { Warn "sem Python ('py'): instale o Python 3.12 e rode de novo."; exit 1 }
 
-Info "3/8 Pillow (Python)"
+Info "3/10 Pillow (Python)"
 Py -c "import PIL" 2>$null
 if ($LASTEXITCODE -eq 0) { Ok "Pillow ja instalado" } else { Py -m pip install --user --quiet pillow; Ok "Pillow instalado" }
 
-Info "4/8 Gab (/ogab)"
+Info "4/10 Gab (/ogab)"
 if (Test-Path (Join-Path $DEST ".git")) {
   git -C $DEST pull --ff-only --quiet
   if ($LASTEXITCODE -eq 0) { Ok "atualizada em $DEST" } else { Warn "nao consegui atualizar (mudanca local?); segue com a versao local" }
@@ -90,10 +90,10 @@ if (-not $editor) {
 Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['editor']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $editor
 Ok "editor: $editor (para trocar: /ogab config editor davinci|premiere)"
 
-# Motions: automatico (HyperFrames) ou no After Effects (camadas editaveis). So pergunta se houver AE instalado.
+# Motions: automatico (HyperFrames) ou no After Effects (camadas editaveis). Tudo e instalado; a escolha so diz qual o Gab usa.
 $motion = if ($env:OGAB_MOTION) { $env:OGAB_MOTION } elseif ($cfgJ.motion) { $cfgJ.motion } else { "" }
 $temAE = Get-ChildItem (Join-Path $env:ProgramFiles "Adobe") -Directory -Filter "Adobe After Effects 20*" -ErrorAction SilentlyContinue
-if (-not $motion -and $temAE) {
+if (-not $motion) {
   Write-Host "`n  Como o Gab faz os motions?`n    1) Automatico (HyperFrames, rapido)`n    2) No After Effects (camadas editaveis: texto, numeros, checks, cores)"
   $escm = Read-Host "  Escolha [1/2]"
   $motion = if ($escm -eq "2") { "aftereffects" } else { "hyperframes" }
@@ -102,7 +102,7 @@ if (-not $motion) { $motion = "hyperframes" }
 Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['motion']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $motion
 Ok "motions: $motion (para trocar: /ogab config motion hyperframes|aftereffects)"
 
-Info "5/8 Ambiente do Windows (Resolve, Python, atalho python3)"
+Info "5/10 Ambiente do Windows (Resolve, Python, atalho python3)"
 $api  = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting"
 $appd = Join-Path $env:ProgramFiles "Blackmagic Design\DaVinci Resolve"
 $lib  = Join-Path $appd "fusionscript.dll"
@@ -132,7 +132,7 @@ if (-not (Test-Path $claudeMd) -or -not (Select-String -Path $claudeMd -SimpleMa
   Ok "aviso do Windows adicionado em ~/.claude/CLAUDE.md"
 } else { Ok "aviso do Windows ja esta no ~/.claude/CLAUDE.md" }
 
-Info "6/8 HyperFrames e skills de design"
+Info "6/10 HyperFrames e skills de design"
 function Npx($desc, $cmd) {
   cmd /c "$cmd >nul 2>&1"
   if ($LASTEXITCODE -eq 0) { Ok $desc } else { Warn "rode depois: $cmd" }
@@ -161,7 +161,7 @@ else {
   if ($LASTEXITCODE -eq 0) { Ok "awesome-opus5-5-videos (inspiracao de motions) em ~/.claude/referencias" } else { Warn "nao consegui clonar o awesome-opus5-5-videos" }
 }
 
-Info "7/8 Fontes (Poppins, Playfair Display, Lobster, licenca OFL)"
+Info "7/10 Fontes (Poppins, Playfair Display, Lobster, licenca OFL)"
 $fontesUser = Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts"
 New-Item -ItemType Directory -Force -Path $fontesUser | Out-Null
 $reg = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
@@ -191,18 +191,7 @@ Get-ChildItem -Path (Join-Path $DEST "assets\lettering") -Filter *.drfx -ErrorAc
   Ok "lettering $($_.Name) instalado (reinicie o DaVinci)"
 }
 
-if ($motion -eq "aftereffects") {
-  Info "After Effects (extensao Gab Ponte AE)"
-  $env:OGAB_SEM_CONFIG = "1"
-  & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "aftereffects\instalar.ps1")
-  $env:OGAB_SEM_CONFIG = ""
-}
-
-if ($editor -eq "premiere") {
-  Info "8/8 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
-  & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "premiere\instalar.ps1")
-} else {
-Info "8/8 DaVinci Resolve e transcricao"
+Info "8/10 DaVinci Resolve e transcricao"
 $exe = Join-Path $appd "Resolve.exe"
 $precisaWhisper = $true
 if (Test-Path $exe) {
@@ -236,17 +225,26 @@ if ($precisaWhisper) {
 Py -c "import os, DaVinciResolveScript; print('  [ok] API do Resolve importada (', os.environ['RESOLVE_SCRIPT_LIB'], ')')" 2>$null
 if ($LASTEXITCODE -ne 0) { Warn "a API do Resolve ainda nao importa; confira o Resolve Studio instalado e abra um terminal novo" }
 
-}
+# Tudo e instalado em toda maquina; config.json (editor e motion) so diz qual app o Gab usa.
+$env:OGAB_SEM_CONFIG = "1"
+Info "9/10 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
+& powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "premiere\instalar.ps1")
+Info "10/10 After Effects (extensao Gab Ponte AE, motions editaveis)"
+& powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "aftereffects\instalar.ps1")
+$env:OGAB_SEM_CONFIG = ""
 
 Write-Host @"
 
-Pronto. Falta so o que precisa de voce (uma vez):
-  1. No DaVinci: Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
-  2. Conectar as SUAS contas no Claude (Configuracoes > Conectores): ElevenLabs, Artlist, Envato, Magnific... so o que usar.
-  3. Instalar a extensao Claude in Chrome e fazer login nos sites (downloads sao pelo navegador).
-  4. Reiniciar o DaVinci para ele carregar o lettering (@gabrielxreis_ Text Presets, ja instalado em
-     %APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\).
-  5. Opcional: Higgsfield e Magnific logados no Chrome (imagem e video de IA no ilimitado, pelo site).
+Pronto. Seu Gab vai editar no: $editor   |   motions: $motion
+(trocar a qualquer hora: /ogab config editor davinci|premiere  e  /ogab config motion hyperframes|aftereffects)
+
+Falta so o que precisa de voce (uma vez), no app que voce usa:
+  DaVinci:        Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
+                  Reinicie o DaVinci para carregar o lettering (@gabrielxreis_ Text Presets, ja instalado em %APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\).
+  Premiere:       Window > UXP Plugins > Gab Ponte (deixe o painel encaixado).
+  After Effects:  nada: a ponte sobe sozinha (se o AE estava aberto durante a instalacao, feche e rode o instalador de novo).
+  Todos:          conecte as SUAS contas no Claude (Configuracoes > Conectores): ElevenLabs, Artlist, Envato, Magnific...
+                  e a extensao Claude in Chrome logada nos sites (downloads sao pelo navegador).
 
 FECHE e abra de novo o Claude Code (para pegar as variaveis novas) e digite:  /ogab comecar
 Diferencas do Windows: ~/.claude/skills/ogab/windows/README.md

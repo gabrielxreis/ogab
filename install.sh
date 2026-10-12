@@ -16,7 +16,7 @@ if [ "$(uname)" != "Darwin" ]; then
   exit 1
 fi
 
-info "1/7 Homebrew"
+info "1/9 Homebrew"
 if ! command -v brew >/dev/null 2>&1; then
   echo "  Instalando o Homebrew (vai pedir a senha do Mac)..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -25,13 +25,13 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 ok "Homebrew $(brew --version | head -1 | awk '{print $2}')"
 
-info "2/7 ffmpeg, yt-dlp, Node.js, Python 3 e git"
+info "2/9 ffmpeg, yt-dlp, Node.js, Python 3 e git"
 for pkg in ffmpeg yt-dlp node python git; do
   bin="$pkg"; [ "$pkg" = "python" ] && bin="python3"
   if command -v "$bin" >/dev/null 2>&1; then ok "$pkg já instalado"; else brew install "$pkg"; ok "$pkg instalado"; fi
 done
 
-info "2b/7 Docker Desktop (obrigatório: o hyperframes doctor exige para o render dos motions)"
+info "2b/9 Docker Desktop (obrigatório: o hyperframes doctor exige para o render dos motions)"
 if ! command -v docker >/dev/null 2>&1 && [ ! -d "/Applications/Docker.app" ]; then
   brew install --cask docker-desktop 2>/dev/null || brew install --cask docker
 fi
@@ -47,14 +47,14 @@ else
   warn "não consegui instalar o Docker Desktop; instale em https://www.docker.com/products/docker-desktop/ e rode o instalador de novo"
 fi
 
-info "3/7 Pillow (Python)"
+info "3/9 Pillow (Python)"
 if python3 -c "import PIL" 2>/dev/null; then ok "Pillow já instalado"
 else
   python3 -m pip install --user --quiet pillow 2>/dev/null || python3 -m pip install --user --quiet --break-system-packages pillow
   ok "Pillow instalado"
 fi
 
-info "4/7 Gab (/ogab)"
+info "4/9 Gab (/ogab)"
 if [ ! -e "$DEST" ] && [ -d "$HOME/.claude/skills/video-redes/.git" ]; then
   mv "$HOME/.claude/skills/video-redes" "$DEST" && ok "pasta antiga video-redes renomeada para ogab"
 fi
@@ -87,10 +87,10 @@ json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
 ok "editor: $OGAB_EDITOR (para trocar: /ogab config editor davinci|premiere)"
 
-# Motions: automático (HyperFrames) ou no After Effects (camadas editáveis). Só pergunta se houver AE instalado.
+# Motions: automático (HyperFrames) ou no After Effects (camadas editáveis). Tudo é instalado; a escolha só diz qual o Gab usa.
 MOTION_ATUAL="$(python3 -c "import json;print(json.load(open('$DEST/config.json')).get('motion',''))" 2>/dev/null || true)"
 OGAB_MOTION="${OGAB_MOTION:-$MOTION_ATUAL}"
-if [ -z "$OGAB_MOTION" ] && ls -d /Applications/Adobe\ After\ Effects\ 20* >/dev/null 2>&1 && [ -r /dev/tty ]; then
+if [ -z "$OGAB_MOTION" ] && [ -r /dev/tty ]; then
   printf "\n  Como o Gab faz os motions?\n    1) Automático (HyperFrames, rápido)\n    2) No After Effects (camadas editáveis: texto, números, checks, cores)\n  Escolha [1/2]: "
   read -r escm < /dev/tty || true
   [ "${escm:-1}" = "2" ] && OGAB_MOTION="aftereffects" || OGAB_MOTION="hyperframes"
@@ -103,13 +103,13 @@ json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
 ok "motions: $OGAB_MOTION (para trocar: /ogab config motion hyperframes|aftereffects)"
 
-info "5/7 HyperFrames (motions, gráficos, edição dinâmica)"
+info "5/9 HyperFrames (motions, gráficos, edição dinâmica)"
 npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/null 2>&1 \
   && ok "skills do HyperFrames instaladas" \
   || warn "não consegui instalar o HyperFrames agora; rode depois: npx skills add heygen-com/hyperframes -g -a claude-code -s '*' -y"
 npx --yes hyperframes doctor >/dev/null 2>&1 && ok "hyperframes doctor ok" || warn "rode 'npx hyperframes doctor' para ver o que falta no HyperFrames"
 
-info "5b/7 Skills de design, navegador e engenharia reversa (taste, web-design-guidelines, image-to-code, playwright-cli, REA, awesome-design-md)"
+info "5b/9 Skills de design, navegador e engenharia reversa (taste, web-design-guidelines, image-to-code, playwright-cli, REA, awesome-design-md)"
 npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y >/dev/null 2>&1 \
   && ok "taste-skill (design-taste-frontend, image-to-code) instaladas" \
   || warn "rode depois: npx skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y"
@@ -140,7 +140,7 @@ else
     && ok "awesome-opus5-5-videos (inspiração de motions, 850+ prompts) em ~/.claude/referencias" || warn "não consegui clonar o awesome-opus5-5-videos"
 fi
 
-info "6/7 Fontes (Poppins, Playfair Display, Lobster, licença OFL)"
+info "6/9 Fontes (Poppins, Playfair Display, Lobster, licença OFL)"
 mkdir -p "$HOME/Library/Fonts"
 n=0
 while IFS= read -r -d '' f; do
@@ -156,11 +156,7 @@ for f in "$DEST"/assets/lettering/*.drfx; do
   [ -f "$f" ] && cp -f "$f" "$TPL/" && ok "lettering $(basename "$f") instalado (reinicie o DaVinci)"
 done
 
-if [ "$OGAB_EDITOR" = "premiere" ]; then
-info "7/7 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
-bash "$DEST/premiere/instalar.sh" | sed -n '/^ /p'
-else
-info "7/7 DaVinci Resolve e transcrição"
+info "7/9 DaVinci Resolve e transcrição"
 APP="/Applications/DaVinci Resolve/DaVinci Resolve.app"
 precisa_whisper=1
 if [ -d "$APP" ]; then
@@ -198,41 +194,27 @@ if [ "$precisa_whisper" -eq 1 ]; then
       || warn "não consegui instalar o $WPKG; rode: python3 -m pip install --user $WPKG"
   fi
 fi
-fi
 
-if [ "$OGAB_MOTION" = "aftereffects" ]; then
-info "7b/7 After Effects (extensão Gab Ponte AE)"
-OGAB_SEM_CONFIG=1 bash "$DEST/aftereffects/instalar.sh" | sed -n '/^ /p'
-fi
+# Tudo é instalado em toda máquina; config.json (editor e motion) só diz qual app o Gab usa.
+info "8/9 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
+OGAB_SEM_CONFIG=1 bash "$DEST/premiere/instalar.sh" | sed -n '/^ /p' || true
 
-if [ "$OGAB_EDITOR" = "premiere" ]; then
-cat <<'EOF'
+info "9/9 After Effects (extensão Gab Ponte AE, motions editáveis)"
+OGAB_SEM_CONFIG=1 bash "$DEST/aftereffects/instalar.sh" | sed -n '/^ /p' || true   # sem AE (ou AE aberto) só avisa
 
-Pronto. Falta só o que precisa de você (uma vez):
-  1. No Premiere: Window > UXP Plugins > Gab Ponte (deixe o painel encaixado; ele mostra "conectado").
-  2. Conectar as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific... só o que usar.
-  3. Instalar a extensão Claude in Chrome e fazer login nos sites (downloads são pelo navegador).
-  4. Opcional: seus letterings (.mogrt) em ~/.claude/skills/ogab/premiere/assets/mogrt e rode o instalador de novo.
-  5. Opcional: Higgsfield e Magnific logados no Chrome (imagem e vídeo de IA no ilimitado, pelo site).
+
+cat <<EOF
+
+Pronto. Seu Gab vai editar no: $OGAB_EDITOR   |   motions: $OGAB_MOTION
+(trocar a qualquer hora: /ogab config editor davinci|premiere  e  /ogab config motion hyperframes|aftereffects)
+
+Falta só o que precisa de você (uma vez), no app que você usa:
+  DaVinci:        Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
+                  Reinicie o DaVinci para carregar o lettering (@gabrielxreis_ Text Presets, já instalado em Fusion/Templates).
+  Premiere:       Window > UXP Plugins > Gab Ponte (deixe o painel encaixado).
+  After Effects:  nada: a ponte sobe sozinha (se o AE estava aberto durante a instalação, feche e rode o instalador de novo).
+  Todos:          conecte as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific...
+                  e a extensão Claude in Chrome logada nos sites (downloads são pelo navegador).
 
 Reinicie o Claude Code e digite:  /ogab comecar
 EOF
-else
-cat <<'EOF'
-
-Pronto. Falta só o que precisa de você (uma vez):
-  1. No DaVinci: Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
-  2. Conectar as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific... só o que usar.
-  3. Instalar a extensão Claude in Chrome e fazer login nos sites (downloads são pelo navegador).
-  4. Reiniciar o DaVinci para ele carregar o lettering (@gabrielxreis_ Text Presets, já instalado em
-     ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/).
-  5. Opcional: skill competitor-profiling (Personalização > Skills no Claude).
-
-  6. Opcional: Higgsfield e Magnific logados no Chrome (imagem e vídeo de IA no ilimitado, pelo site).
-
-Reinicie o Claude Code e digite:  /ogab comecar
-O Gab mostra em 1 minuto como pedir, onde ele para para você aprovar, e como gastar menos tokens:
-  - uma conversa por vídeo; para retomar: /ogab continua o vídeo X (ele lê o PROJETO.md do vídeo)
-  - no fim de cada ação você recebe só uma barrinha: feito / falta / próximo
-EOF
-fi
