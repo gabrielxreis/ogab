@@ -610,3 +610,33 @@ def inserir_letterings_na_trilha(t, trilha, lista, template, centro_y=None):
         for k, i in travar: t.SetTrackLock(k, i, False)
     depois = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
     if depois != antes: raise RuntimeError("outra trilha mudou durante a inserção (ripple): conferir")
+
+MODELO_LEGENDA = "MODELO GAB USA"
+DRT_MODELO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "davinci", "modelo_gab_usa.drt")
+
+
+def timeline_do_modelo(p, mp, nome, w=None, h=None, fps=None, modelo=MODELO_LEGENDA, drt=DRT_MODELO):
+    """Timeline nova JÁ com o estilo de legenda (preset GAB USA) sem clicar em nada: a API não aplica estilo de
+    legenda, mas ele fica gravado na trilha e vai junto quando a timeline é duplicada ou importada (.drt).
+    Usa a timeline-modelo do projeto; se não existir, importa assets/davinci/modelo_gab_usa.drt."""
+    tls = {p.GetTimelineByIndex(i).GetName(): p.GetTimelineByIndex(i) for i in range(1, p.GetTimelineCount() + 1)}
+    m = tls.get(modelo)
+    if not m and os.path.exists(drt):
+        m = mp.ImportTimelineFromFile(drt, {"timelineName": modelo})
+        if m: m.SetName(modelo)
+    if not m:
+        return None
+    p.SetCurrentTimeline(m)
+    t = m.DuplicateTimeline(nome)
+    if not t:
+        return None
+    p.SetCurrentTimeline(t)
+    for k in ("video", "audio", "subtitle"):
+        for n in range(1, t.GetTrackCount(k) + 1):
+            its = t.GetItemListInTrack(k, n) or []
+            if its: t.DeleteClips(its)
+    t.SetSetting("useCustomSettings", "1")
+    for k, v in (("timelineResolutionWidth", w), ("timelineResolutionHeight", h), ("timelineFrameRate", fps)):
+        if v: t.SetSetting(k, str(v))
+    return t
+

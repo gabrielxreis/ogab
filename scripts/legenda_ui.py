@@ -6,6 +6,7 @@ pela interface sozinho: clica, digita e CONFERE por OCR (Vision da Apple), numa 
   python3 legenda_ui.py "<nome da timeline>"            # trilha em 724 e desce as legendas do lettering p/ 390
   python3 legenda_ui.py "<timeline>" --indices 4,5,6     # índices (1 = primeira legenda) escolhidos à mão
   python3 legenda_ui.py "<timeline>" --so-listar         # só mostra quais legendas cruzam a trilha LETTERING
+  python3 legenda_ui.py "<timeline>" --preset "GAB USA" [--arquivo x.preset]  # carrega o preset de estilo na trilha e segue
   python3 legenda_ui.py "<timeline>" --conferir          # render + checa a altura do texto de cada legenda
 
 Requisitos: DaVinci aberto e maximizado na página Edit com o Inspector visível; pyobjc-framework-Vision
@@ -23,7 +24,7 @@ import resolve_lib as L
 BUNDLE = "com.blackmagic-design.DaVinciResolve"
 Y_PADRAO, Y_LETTERING = 724, 390
 INSPECTOR = (1305, 70, 423, 470)   # x, y, w, h em pontos da tela (Inspector à direita)
-TIMELINE = (160, 620, 1568, 370)  # faixa das trilhas (sem os cabeçalhos)
+TIMELINE = (160, 540, 1568, 450)  # faixa das trilhas (sem os cabeçalhos)
 
 
 # ---------- tela: captura + OCR ----------
@@ -102,6 +103,24 @@ def frente():
     for a in NSRunningApplication.runningApplicationsWithBundleIdentifier_(BUNDLE):
         a.activateWithOptions_(NSApplicationActivateIgnoringOtherApps)
     time.sleep(0.8)
+    coberta()
+
+
+def coberta():
+    """Bug 12/10/2026: a janela do Claude (ou outra) por cima do Inspector fazia o OCR ler o chat e o clique cair
+    nela. Para com erro claro se a primeira janela visível sobre o Inspector/timeline não for do DaVinci."""
+    info = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID)
+    for reg in (INSPECTOR, TIMELINE):
+        cx, cy = reg[0] + reg[2] / 2, reg[1] + reg[3] / 2
+        for w in info:   # ordem: de cima para baixo
+            if w.get("kCGWindowLayer", 0) != 0: continue
+            b = w.get("kCGWindowBounds", {})
+            if b and b["X"] <= cx <= b["X"] + b["Width"] and b["Y"] <= cy <= b["Y"] + b["Height"]:
+                dono = w.get("kCGWindowOwnerName", "")
+                if "DaVinci" not in dono:
+                    raise RuntimeError(f"a janela de {dono!r} está por cima do DaVinci (Inspector/timeline): "
+                                       "minimize ou mova essa janela e rode de novo")
+                break
 
 
 # ---------- helpers de OCR ----------
@@ -228,6 +247,37 @@ def selecionar_alguma(caps):
     return True
 
 
+# ---------- preset de estilo da trilha (a API não aplica estilo de legenda) ----------
+def _menu_ocr():
+    return ocr((900, 40, 828, 900))
+
+
+def carregar_preset(nome_preset="GAB USA", arquivo=None):
+    """Inspector > Track > menu ⋯ > <preset> > Load Preset. Se o preset não existir, Import Preset... do arquivo.
+    Confere pela fonte mostrada no Inspector (Poppins) no fim."""
+    aba("Track")
+    cab = [o for o in ocr(INSPECTOR) if "subtitle" in _norm(o[0])]
+    if not cab: raise RuntimeError("cabeçalho do Inspector (Subtitle) não encontrado")
+    y = cab[0][2]; x = INSPECTOR[0] + INSPECTOR[2] - 18
+    clicar(x, y); time.sleep(0.6)
+    m = _menu_ocr(); item = achar(m, nome_preset, exato=False)
+    if not item:
+        imp = achar(m, "Import Preset", exato=False)
+        if not imp or not arquivo: raise RuntimeError(f"preset {nome_preset!r} não está no menu e não há arquivo p/ importar")
+        clicar(imp[0][1], imp[0][2]); time.sleep(1.2)
+        _se("keystroke \"g\" using {command down, shift down}"); time.sleep(0.6)
+        digitar(arquivo); tecla(RETURN); time.sleep(0.6); tecla(RETURN); time.sleep(1.5)
+        clicar(x, y); time.sleep(0.6); m = _menu_ocr(); item = achar(m, nome_preset, exato=False)
+        if not item: raise RuntimeError("importei o preset mas ele não apareceu no menu")
+    clicar(item[0][1], item[0][2]); time.sleep(0.6)
+    load = achar(_menu_ocr(), "Load Preset", exato=False)
+    if not load: raise RuntimeError("opção Load Preset não apareceu")
+    clicar(load[0][1], load[0][2]); time.sleep(1.0)
+    ok = achar(ocr(INSPECTOR), "Poppins", exato=False)
+    print("preset", nome_preset, "carregado" if ok else "carregado? (fonte Poppins não lida no Inspector; conferir)")
+    return bool(ok)
+
+
 # ---------- dados pela API ----------
 def dados(nome):
     r = L.conectar(); p = r.GetProjectManager().GetCurrentProject(); r.OpenPage("edit")
@@ -278,6 +328,9 @@ def main():
     if "--so-listar" in a: return
     frente()
     selecionar_alguma(caps)
+    if "--preset" in a:
+        arq = a[a.index("--arquivo") + 1] if "--arquivo" in a else os.path.expanduser("~/Desktop/GAB USA Subtitle.preset")
+        carregar_preset(a[a.index("--preset") + 1], arq)
     aba("Track")
     if not setar_y(Y_PADRAO, rolagem=False): raise RuntimeError("trilha não ficou em 724")
     aba("Caption")

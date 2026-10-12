@@ -169,7 +169,11 @@ def montar(plano_json, nome_tl, clipe, fps_fonte=30.0):
             raise SystemExit(f"já existe {nome_tl!r} com conteúdo e o backup '- bruto': apague/renomeie um antes")
         velha.SetName(nome_tl + " - bruto")
     base = velha if (velha and not vazia) else tls.get(nome_tl + " - bruto")
-    t = velha if vazia else mp.CreateEmptyTimeline(nome_tl)
+    t = velha if vazia else None
+    if t is None:   # nasce do modelo: legenda já com o preset GAB USA (sem interface)
+        t = R.timeline_do_modelo(p, mp, nome_tl, base.GetSetting("timelineResolutionWidth") if base else None,
+                                 base.GetSetting("timelineResolutionHeight") if base else None,
+                                 base.GetSetting("timelineFrameRate") if base else None) or mp.CreateEmptyTimeline(nome_tl)
     p.SetCurrentTimeline(t)
     # mesma resolução/fps da gravação original (o padrão do projeto pode ser horizontal)
     if base:

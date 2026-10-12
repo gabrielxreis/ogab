@@ -238,3 +238,7 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 | 11/10/2026 | legenda/b-roll em tempo errado depois do usuário editar | tempos da fonte != tempos da timeline | `broll.transcricao_na_timeline(t, ...)` converte pela `GetSourceStartTime` de cada corte da V1 |
 | 11/10/2026 | Magnific Kling cobrou/recusou ilimitado | o gerador abre com 1080p e ∞ OFF | 720p + ∞ ON e só gerar se aparecer "Unlimited videos for this resolution" (ver navegador/downloads.md) |
 | 11/10/2026 | SKILL.md não carregava no `npx skills` | YAML: ":" sem aspas na description | description entre aspas |
+| 12/10/2026 | preset de legenda (GAB USA) só entrava pela interface | a API não aplica estilo de legenda; o `.preset` é protobuf+zstd e só o DaVinci lê | o estilo vai junto quando a timeline é duplicada/importada: `resolve_lib.timeline_do_modelo()` cria a timeline a partir de "MODELO GAB USA" (ou importa `assets/davinci/modelo_gab_usa.drt`); `cortes.py montar` já usa |
+| 12/10/2026 | `legenda_ui.py` leu o chat do Claude e clicou fora | a janela do Claude fica por cima do Inspector | `coberta()` para com erro claro; `--preset "GAB USA"` carrega o preset pela interface quando precisar |
+| 12/10/2026 | régua da timeline não achada pelo OCR | painéis com outra altura | área de busca da régua ampliada (`TIMELINE`) |
+| 12/10/2026 | download em lote do Magnific não chegou (zip e avulso) | Chrome segurando downloads seguidos do site | liberar "downloads automáticos" para magnific.com no Chrome (ícone de download da barra) |
