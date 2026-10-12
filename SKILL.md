@@ -70,7 +70,7 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 7. Movimentos nos takes e lettering no gancho: perguntar (salvo `config`).
 8. Sem travessão (em dash) nos textos e legendas.
 9. **`PROJETO.md` em cada vídeo** (status, decisões, DaVinci, arquivos, custos, pendências): atualizar a cada etapa; ao retomar ("continua o vídeo X"), ler ele primeiro em vez de reconstruir pela conversa.
-10. Modelo/esforço por tarefa: decisão criativa e conferência com esforço alto; tarefas mecânicas com Sonnet/Haiku ou esforço baixo.
+10. Modelo/esforço por tarefa: decisão criativa e conferência com esforço alto; tarefas mecânicas com Sonnet/Haiku ou esforço baixo. **Lote mecânico vai para subagente barato** (ferramenta Agent com `model: "haiku"`, ou `"sonnet"` se precisar de navegador): baixar vários takes/músicas/SFX, converter e organizar mídia, conferir arquivos. O subagente recebe a lista pronta e devolve só o resultado (caminhos e o que falhou); a decisão criativa fica aqui.
 
 ## Padrão: Reels de apresentador falando (`docs/etapas/padrao_reels.md`)
 Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): vertical, 60-90 s, V1 intocada, legenda GAB USA do início ao fim, recurso escolhido trecho a trecho (motion, IA com apresentador, personagem criado, banco, material real), motions no centro com o visual do site e a duração da fala, CTA com o site pequeno, música bruta terminando com o vídeo. O `estilo.md` do cliente só muda o que for diferente.
@@ -115,6 +115,7 @@ Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usu�
 **OBRIGATÓRIO e logo em seguida a `montar_takes` (na mesma chamada; esquecida no lote Calverstone, 12/10/2026)** e sempre que trocar um take: `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. O `projeto.py` só marca "cor" quando todo take da V1 tem o PowerGrade. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
 
 ## 8. Lettering e motions (HyperFrames) (`docs/etapas/lettering_motions.md`)
+**Biblioteca primeiro (economiza tokens):** antes de criar um motion do zero, `python3 SKILL_DIR/scripts/biblioteca_motions.py listar`; se um modelo serve, preencher os campos (`aplicar`) em vez de escrever o motion inteiro. Motion novo aprovado vira modelo (ver `aftereffects/README.md`).
 Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; motions em sequência COLADOS (`colar_motions`, sem fade de fundo quando um emenda no outro); edição dinâmica e recursos extras do HyperFrames. Legenda atrás da pessoa e pacote de entrevista: `docs/etapas/extras.md` (quando usar e como).
 
 ## 9. Render, formatos e conferência (`docs/etapas/render.md`)

@@ -4,6 +4,7 @@ O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiz
 Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos itens.
 
 ## 2026.10.12-6 (12/10/2026)
+- **Gasta menos tokens:** tarefas repetitivas (baixar vários takes, converter, organizar) vão para um ajudante mais barato, e os motions começam pela biblioteca de modelos antes de serem feitos do zero.
 - **Docker não é mais instalado:** o Gab não usa. Se o `hyperframes doctor` avisar "Docker: not found", pode ignorar. Quem já instalou pode manter ou desinstalar, tanto faz.
 
 ## 2026.10.12-5 (12/10/2026)
