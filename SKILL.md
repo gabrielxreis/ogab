@@ -202,6 +202,13 @@ Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoo
 5. `montar_takes` (sem buracos: encadeia pelo fim real e usa ceil).
 6. Se o usuário quis **movimentos**: `movimento()` (zoom leve) ou indicar onde animar.
 
+7a. **Ficha de personagem (regra do usuário, 12/10/2026): toda vez que o usuário quiser usar a foto de uma pessoa** (apresentador, cliente, personagem), ANTES de qualquer take com ela:
+   1. Pedir só as fotos (sem mostrar prompt): 1 frontal séria (a principal) + 2 a 5 de outros ângulos e de corpo inteiro, com a roupa que vai aparecer. Confirmar que a pessoa autorizou o uso da imagem.
+   2. Gerar a ficha na IA escolhida pelo usuário (`provedores.geracao_takes`: MCP, site ou o que ele usar) com o prompt `assets/prompts/ficha_personagem.md` (adaptar só o que não se aplica: barba, óculos, ele/ela) + a imagem de layout `config.ficha_layout_exemplo` (só layout, nunca o rosto). Modelo de imagem que aceita várias referências (ex.: Nano Banana 2), horizontal.
+   3. Mostrar a ficha ao usuário e esperar o ok (rosto tem que ser a MESMA pessoa; se não, refazer).
+   4. Salvar em `clientes/<empresa>/personagens/<nome>/` (fora do git): `ficha.png`, recortes `ref_rosto.jpg` (frontal) e `ref_corpo.jpg` (corpo inteiro), e `descricao.md` escrita a partir da ficha (rosto, cabelo, barba, óculos, pele, corpo, roupa, calçado, acessórios, estampa) para colar nos prompts.
+   5. Em todo take com a pessoa: refs @img1 = ref_corpo, @img2 = ref_rosto (ou a ficha inteira) + trechos da `descricao.md` no prompt. Personagem criado (sem foto real) segue o mesmo formato de ficha, para ficar igual em todos os vídeos.
+
 ## 7b. Cor (se `config.cor.aplicar_power_grade`)
 
 Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
