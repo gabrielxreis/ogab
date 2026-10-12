@@ -514,7 +514,11 @@ def _sub(mp, pai, nome):
 
 
 def _tipo_do_arquivo(arq):
-    ext = os.path.splitext(arq)[1].lower()
+    ext = os.path.splitext(arq)[1].lower(); partes = {x.lower() for x in arq.split(os.sep)}
+    if "motions" in partes or "renders" in partes: return "Motions"
+    if "sfx" in partes or "biblioteca_sfx" in partes: return "SFX"
+    if "legendas" in partes or "legenda_baixa" in partes: return "Legendas"
+    if partes & {"brolls", "ia_higgsfield", "ia_kling_bruto", "youtube_bruto"}: return "BRoll"
     if ext in (".srt", ".vtt"): return "Legendas"
     if ext in (".wav", ".mp3", ".aif", ".aiff", ".m4a"): return "Musicas"
     return "Footages"
