@@ -102,6 +102,20 @@ def sincronizar(transc, frases, saida, fps=30):
         out.append(f"{k + 1}\n{tc(st)} --> {tc(en)}\n{f.replace(' / ', chr(10))}\n")
     open(saida, 'w').write('\n'.join(out)); print(len(out), 'legendas ->', saida)
     equilibrar(saida); equilibrar(saida)   # 2ª passada pega o que a cadeia deixou
+    colar(saida)
+
+
+def colar(srt, max_gap=1.2):
+    """Legenda contínua (padrão aprovado pelo usuário): fecha o buraco entre uma legenda e a próxima (pausa da fala
+    de até max_gap s) esticando o fim da anterior; sem isso a legenda pisca e some nas pausas (reclamação 12/10/2026)."""
+    def s(tc): h, m, r = tc.split(':'); sec, ms = r.split(','); return int(h)*3600+int(m)*60+int(sec)+int(ms)/1000
+    tc = lambda x: f"{int(x//3600):02d}:{int(x//60%60):02d}:{int(x%60):02d},{int(round(x*1000))%1000:03d}"
+    bl = [b.split('\n') for b in open(srt).read().strip().split('\n\n')]
+    T = [[s(x.strip()) for x in b[1].split('-->')] for b in bl]
+    for k in range(len(T) - 1):
+        if 0 < T[k + 1][0] - T[k][1] <= max_gap: T[k][1] = T[k + 1][0]
+    out = [f"{b[0]}\n{tc(T[k][0])} --> {tc(T[k][1])}\n" + '\n'.join(b[2:]) + '\n' for k, b in enumerate(bl)]
+    open(srt, 'w').write('\n'.join(out))
 
 
 def equilibrar(srt, min_s=0.7, max_shift=0.35):

@@ -39,7 +39,11 @@ def ocr(r):
     img = _captura(r); x, y, w, h = r
     req = Vision.VNRecognizeTextRequest.alloc().init()
     req.setRecognitionLevel_(Vision.VNRequestTextRecognitionLevelAccurate); req.setUsesLanguageCorrection_(False)
-    Vision.VNImageRequestHandler.alloc().initWithCGImage_options_(img, None).performRequests_error_([req], None)
+    ok, _ = Vision.VNImageRequestHandler.alloc().initWithCGImage_options_(img, None).performRequests_error_([req], None)
+    if not ok:   # macOS 27: o nível Accurate falha (e5rtError) e devolve vazio; o Fast funciona
+        req = Vision.VNRecognizeTextRequest.alloc().init()
+        req.setRecognitionLevel_(Vision.VNRequestTextRecognitionLevelFast); req.setUsesLanguageCorrection_(False)
+        Vision.VNImageRequestHandler.alloc().initWithCGImage_options_(img, None).performRequests_error_([req], None)
     out = []
     for o in req.results() or []:
         t = o.topCandidates_(1)[0].string(); b = o.boundingBox()
@@ -237,13 +241,30 @@ def selecionar_alguma(caps):
         time.sleep(0.8)
     if not cab: raise RuntimeError("cabeçalho ST1 não encontrado")
     y_st = cab[0][2]
-    regua = [o for o in ocr(TIMELINE) if re.fullmatch(r"\d\d:\d\d:\d\d:\d\d", o[0].replace(" ", ""))]
+    regua = []
+    for _ in range(5):                  # OCR Fast (macOS 27) às vezes volta vazio na 1ª leitura
+        regua = [o for o in ocr(TIMELINE) if re.fullmatch(r"\d\d:\d\d:\d\d:\d\d", o[0].replace(" ", ""))]
+        if regua: break
+        time.sleep(0.8)
     if not regua: raise RuntimeError("régua da timeline não encontrada")
     r0 = min(regua, key=lambda o: o[2])
     clicar(r0[1], r0[2]); tecla(HOME); time.sleep(0.6)       # foca a timeline e volta ao início
-    regua = [o for o in ocr(TIMELINE) if o[0].replace(" ", "").startswith("01:00:00:00")]
-    if not regua: raise RuntimeError("início da timeline não visível depois do Home")
-    clicar(regua[0][3] + 3, y_st)
+    # O playhead fica em cima do "01:00:00:00" e o OCR Fast lê errado: achar o x do início pela escala das
+    # outras marcas da régua (duas marcas -> pixels por segundo -> x do segundo 0).
+    x0 = None
+    for _ in range(5):
+        marcas = []
+        for o in ocr(TIMELINE):
+            s = o[0].replace(" ", "")
+            if re.fullmatch(r"\d\d:\d\d:\d\d:\d\d", s):
+                h, m, s_, f = map(int, s.split(":")); marcas.append(((h - 1) * 3600 + m * 60 + s_, o[3]))
+        marcas = sorted(set(marcas))
+        if len(marcas) >= 2:
+            (ta, xa), (tb, xb) = marcas[0], marcas[-1]
+            if tb > ta: x0 = xa - ta * (xb - xa) / (tb - ta); break
+        time.sleep(0.8)
+    if x0 is None: raise RuntimeError("início da timeline não visível depois do Home")
+    clicar(x0 + 18, y_st)   # +3 caía na borda (trim) e não selecionava a legenda
     return True
 
 
