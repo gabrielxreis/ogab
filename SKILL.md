@@ -41,7 +41,8 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 1j. Nunca apagar nem esvaziar a V1.
 1k. Vídeo emocional: b-roll em toda imagem concreta e lettering + b-roll nas frases de efeito.
 1l. Rosto enquadrado com o mínimo de zoom, igual no vídeo todo.
-1m. **Fim de toda ação: barra de progresso de 3 linhas** gerada por `projeto.py status <pasta> [--timeline]` (detecta na timeline o que já foi feito e reescreve o Status do `PROJETO.md`); o que depende do usuário: `projeto.py marcar <pasta> legenda_validada` (ou `--pular "motivo"`). Nada além disso de status.
+1m. **Fim de TODA resposta que mexeu em vídeo, sem exceção (regra reforçada em 12/10/2026: "até a barra de progresso não teve"): barra de progresso** gerada por `projeto.py status <pasta> [--timeline]` ou, em lote, `projeto.py lote <pasta_da_empresa>` (detecta na timeline cortes, legenda, takes, COR, LETTERINGS, MOTIONS, música, SFX e reescreve o Status do `PROJETO.md`); o que depende do usuário: `projeto.py marcar <pasta> legenda_validada|abas` (ou `--pular "motivo"`). Nada além disso de status.
+1n. **Nada esquecido (regra do usuário, 12/10/2026: "tem que ter algo na skill para você não esquecer nada"):** antes de dizer "pronto", oferecer QC ou entregar, rodar `projeto.py checklist <pasta_da_empresa ou do vídeo>`. Ele lista as etapas que faltam (a COR é etapa própria: PowerGrade em todo take, logo depois de montar os takes, regra 7b) e a lista do que conferir de olho (takes legíveis, cor, SFX coerente, legenda conforme estilo.md, letterings animados, música, abas). Só seguir com tudo marcado.
 2. Tudo via MCP/API; download pelo navegador.
 3. Economizar créditos e tokens: só ilimitado; `browser_batch` + 1 screenshot pequeno; status pelo MCP; mapas de tela em `navegador/downloads.md`; arquivos por trecho.
 4. Provedores na ordem do `config.json`, pulando o que não estiver conectado.
@@ -89,7 +90,7 @@ Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usu�
 
 ## 7b. Cor (se `config.cor.aplicar_power_grade`)
 
-Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
+**OBRIGATÓRIO e logo em seguida a `montar_takes` (na mesma chamada; esquecida no lote Calverstone, 12/10/2026)** e sempre que trocar um take: `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. O `projeto.py` só marca "cor" quando todo take da V1 tem o PowerGrade. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
 
 ## 8. Lettering e motions (HyperFrames) (`docs/etapas/lettering_motions.md`)
 Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; edição dinâmica e recursos extras do HyperFrames. Legenda atrás da pessoa e pacote de entrevista: `docs/etapas/extras.md` (quando usar e como).
