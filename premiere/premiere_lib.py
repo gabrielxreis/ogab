@@ -113,6 +113,23 @@ _PRELUDIO = r"""
 const P = ppro;
 const tt = (s) => P.TickTime.createWithSeconds(Number(s));
 const proj = async () => { const p = await P.Project.getActiveProject(); if (!p) throw new Error("nenhum projeto aberto no Premiere"); return p; };
+const clip = (it) => P.ClipProjectItem.cast(it);
+// Remove itens da timeline com uma seleção própria (nunca a do usuário). A seleção só vale dentro do callback.
+const remover = (p, ed, itens, tipo) => { let ok = false; p.lockedAccess(() => { P.TrackItemSelection.createEmptySelection((sel) => {
+  for (const x of itens) sel.addItem(x, true);
+  ok = p.executeTransaction((c) => c.addAction(ed.createRemoveItemsAction(sel, false, tipo === undefined ? P.Constants.MediaType.ANY : tipo)), "Gab: remover"); }); }); return ok; };
+// Subclipe só de vídeo do take (criado uma vez, no mesmo bin): o overwrite dele não leva áudio.
+async function soVideo(p, it) {
+  const nome = it.name + " (video)";
+  const pai = it.getParentBin ? it.getParentBin() : await p.getRootItem();
+  for (const x of await pai.getItems()) if (x.name === nome) return x;
+  const c = clip(it);
+  const fim = await c.getOutPoint(P.Constants.MediaType.VIDEO);
+  await tx(p, "Gab: subclipe só vídeo", () => [c.createSubClipAction(nome, P.TickTime.TIME_ZERO, fim, false, { takeVideo: true, takeAudio: false })]);
+  for (const x of await pai.getItems()) if (x.name === nome) return x;
+  for (const x of await itens(await p.getRootItem())) if (x.name === nome) return x;
+  throw new Error("não criou o subclipe só de vídeo de " + it.name);
+}
 const tx = async (p, rotulo, fazer) => { let ok = false; p.lockedAccess(() => { ok = p.executeTransaction((c) => { for (const a of fazer()) if (a) c.addAction(a); }, rotulo); }); return ok; };
 const norm = (s) => String(s || "").replace(/\\/g, "/").toLowerCase();
 async function itens(pasta, saida = []) {
@@ -126,7 +143,7 @@ async function itemPorCaminho(p, caminho) {
   const alvo = norm(caminho);
   for (const it of await itens(await p.getRootItem())) {
     const c = P.ClipProjectItem.cast(it);
-    try { if (c && norm(await c.getMediaFilePath()) === alvo) return c; } catch (e) {}
+    try { if (c && norm(await c.getMediaFilePath()) === alvo) return it; } catch (e) {}   // item CRU: o createOverwriteItemAction recusa o cast
   }
   return null;
 }
@@ -181,7 +198,7 @@ def _bin_de(caminho):
 # ---------------------------------------------------------------- projeto e sequência
 
 def versao():
-    return js("return await P.Application.version;", "versão")
+    return js("return uxp.host.version;", "versão")
 
 
 def abrir_projeto(caminho=None):
@@ -193,13 +210,13 @@ def abrir_projeto(caminho=None):
       let p = await P.Project.getActiveProject();
       const c = args.caminho;
       if (c && (!p || norm(p.path) !== norm(c))) {
-        p = P.Project.isProject(c) ? await P.Project.open(c) : await P.Project.createProject(c);
+        p = args.existe ? await P.Project.open(c) : await P.Project.createProject(c);   // isProject() diz true para qualquer .prproj, mesmo inexistente
       }
       if (!p) throw new Error("abra ou crie um projeto no Premiere");
       for (const n of args.pastas) await bin(p, n);
       await p.save();
       return { nome: p.name, caminho: p.path };
-    """, "abrir projeto", caminho=caminho, pastas=PASTAS)
+    """, "abrir projeto", caminho=caminho, existe=bool(caminho and os.path.exists(caminho)), pastas=PASTAS)
 
 
 def criar_sequencia(nome, midia_base, w=1080, h=1920, fps=30):
@@ -208,7 +225,7 @@ def criar_sequencia(nome, midia_base, w=1080, h=1920, fps=30):
       const p = await proj();
       for (const s of await p.getSequences()) if (s.name === args.nome) { await p.setActiveSequence(s); return s.name; }
       const [base] = await importar(p, [args.midia], "Footages");
-      const s = await p.createSequenceFromMedia(args.nome, [base], await bin(p, "Timelines"));
+      const s = await p.createSequenceFromMedia(args.nome, [clip(base)], await bin(p, "Timelines"));
       const st = await s.getSettings();
       const r = await st.getVideoFrameRect(); r.width = args.w; r.height = args.h;
       await st.setVideoFrameRect(r);
@@ -237,12 +254,14 @@ _JS_COLOCAR = """
     const [it] = await importar(p, [c.arquivo], c.bin);
     if (c.de !== null || c.ate !== null) {
       const a = c.de !== null ? tt(c.de) : P.TickTime.TIME_ZERO;
-      const b = c.ate !== null ? tt(c.ate) : await it.getOutPoint(P.Constants.MediaType.ANY);
-      await tx(p, "Gab: in/out", () => [it.createSetInOutPointsAction(a, b)]);
+      const b = c.ate !== null ? tt(c.ate) : await clip(it).getOutPoint(P.Constants.MediaType.ANY);
+      await tx(p, "Gab: in/out", () => [clip(it).createSetInOutPointsAction(a, b)]);
     }
     const v = c.video === null ? -1 : c.video, au = c.audio === null ? -1 : c.audio;
-    await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(it, tt(c.tempo), v, au)]);
-    if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [it.createClearInOutPointsAction()]);
+    let fonte = it;
+    if (c.audio === null && c.video !== null) fonte = await soVideo(p, it);   // com -1 o Premiere põe o áudio do take na A1 mesmo assim
+    await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(c.tempo), v, au)]);
+    if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
     saida.push(it.name);
   }
   return saida;
@@ -271,27 +290,31 @@ def volume(seq, trilha_audio, tempo, db=0.0, fade_in=0.0, fade_out=0.0):
         if (Math.abs((await it.getStartTime()).seconds - args.tempo) < 0.05) alvo = it;
       if (!alvo) throw new Error("clipe de áudio não encontrado em " + args.tempo + " s");
       const cadeia = await alvo.getComponentChain();
-      let nivel = null;
-      for (let i = 0; i < cadeia.getComponentCount(); i++) {
-        const comp = cadeia.getComponentAtIndex(i);
-        if ((await comp.getMatchName()).toLowerCase().includes("volume")) {
-          for (let j = 0; j < comp.getParamCount(); j++) { const pr = comp.getParam(j); if (/level|nível|nivel/i.test(pr.displayName)) nivel = pr; }
-        }
-      }
-      if (!nivel) throw new Error("parâmetro Level do Volume não encontrado");
       const lin = Math.pow(10, args.db / 20);
       const ini = (await alvo.getStartTime()).seconds, fim = (await alvo.getEndTime()).seconds;
-      const acoes = [];
-      if (args.fade_in || args.fade_out) {
-        acoes.push(nivel.createSetTimeVaryingAction(true));
+      // Componentes e parâmetros só valem DENTRO do lockedAccess e sem await no meio (senão "script object is no longer valid").
+      let ok = false, achou = false;
+      p.lockedAccess(() => {
+        let nivel = null;
+        for (let i = 0; i < cadeia.getComponentCount() && !nivel; i++) {
+          const comp = cadeia.getComponentAtIndex(i);
+          for (let j = 0; j < comp.getParamCount(); j++) { const pr = comp.getParam(j); if (/^(level|nível|nivel)$/i.test(pr.displayName)) { nivel = pr; break; } }
+        }
+        if (!nivel) return;
+        achou = true;
         const k = (t, v) => { const kf = nivel.createKeyframe(v); kf.position = tt(t); return nivel.createAddKeyframeAction(kf); };
-        if (args.fade_in) { acoes.push(k(0, 0)); acoes.push(k(args.fade_in, lin)); } else acoes.push(k(0, lin));
-        if (args.fade_out) { acoes.push(k(fim - ini - args.fade_out, lin)); acoes.push(k(fim - ini, 0)); }
-      } else {
-        acoes.push(nivel.createSetValueAction(nivel.createKeyframe(lin), true));
-      }
-      await tx(p, "Gab: volume", () => acoes);
-      return { db: args.db, linear: lin };
+        ok = p.executeTransaction((c) => {
+          if (args.fade_in || args.fade_out) {
+            c.addAction(nivel.createSetTimeVaryingAction(true));
+            if (args.fade_in) { c.addAction(k(0, 0)); c.addAction(k(args.fade_in, lin)); } else c.addAction(k(0, lin));
+            if (args.fade_out) { c.addAction(k(fim - ini - args.fade_out, lin)); c.addAction(k(fim - ini, 0)); }
+          } else {
+            c.addAction(nivel.createSetValueAction(nivel.createKeyframe(lin), true));
+          }
+        }, "Gab: volume");
+      });
+      if (!achou) throw new Error("parâmetro Level do Volume não encontrado");
+      return { db: args.db, linear: lin, ok };
     """, "volume", seq=seq, trilha=trilha_audio, tempo=tempo, db=db, fade_in=fade_in, fade_out=fade_out)
 
 
@@ -327,7 +350,7 @@ def transcrever(arquivo, saida, idioma="pt-br"):
     arquivo = _abs(arquivo)
     bruto = js("""
       const p = await proj();
-      const [it] = await importar(p, [args.arquivo], "Footages");
+      const [cru] = await importar(p, [args.arquivo], "Footages"); const it = clip(cru);
       if (!P.Transcript.hasTranscript(it)) {
         const ok = await P.Transcript.transcribeClipProjectItem(it, { languageCode: args.idioma });
         if (!ok) throw new Error("o Premiere não transcreveu (pacote de idioma " + args.idioma + " instalado?)");
@@ -390,24 +413,93 @@ def luts_instalados():
     return achados
 
 
-def aplicar_lut(arquivos, lut="LUT DO GAB"):
-    """Aplica o LUT como Input LUT de cada clipe no projeto (todas as instâncias na timeline recebem). Equivale ao
-    PowerGrade do DaVinci (regra 7b). Confere lendo de volta; devolve o que ficou com o LUT."""
-    caminho = luts_instalados().get(lut, lut)
-    return js("""
-      const p = await proj(); const r = {};
-      for (const a of args.arquivos) {
-        const it = await itemPorCaminho(p, a);
-        if (!it) { r[a] = "não está no projeto"; continue; }
-        for (const id of [args.lut, args.caminho]) {
-          await tx(p, "Gab: LUT", () => [it.createSetInputLUTIDAction(id)]);
-          const atual = await it.getInputLUTID();
-          if (atual) { r[a] = atual; break; }
-        }
-        if (!r[a]) r[a] = "não aplicou";
+_JS_LUMETRI = """
+// Garante um Lumetri no clipe de vídeo e põe o parâmetro Aparência (Look) no índice pedido.
+async function lumetriLook(p, item, indice) {
+  const cadeia = await item.getComponentChain();
+  let tem = false;
+  p.lockedAccess(() => { for (let i = 0; i < cadeia.getComponentCount(); i++) { const c = cadeia.getComponentAtIndex(i); for (let j = 0; j < c.getParamCount(); j++) if (/^(look|aparência)$/i.test(c.getParam(j).displayName)) tem = true; } });
+  if (!tem) { const comp = await P.VideoFilterFactory.createComponent("AE.ADBE Lumetri"); await tx(p, "Gab: Lumetri", () => [cadeia.createAppendComponentAction(comp)]); }
+  let ok = false;
+  p.lockedAccess(() => {
+    for (let i = cadeia.getComponentCount() - 1; i >= 0 && !ok; i--) {
+      const c = cadeia.getComponentAtIndex(i);
+      for (let j = 0; j < c.getParamCount(); j++) {
+        const pr = c.getParam(j);
+        if (/^(look|aparência)$/i.test(pr.displayName)) { ok = p.executeTransaction((cc) => cc.addAction(pr.createSetValueAction(pr.createKeyframe(indice), true)), "Gab: LUT"); break; }
       }
-      return r;
-    """, "LUT", arquivos=[_abs(a) for a in arquivos], lut=lut, caminho=caminho)
+    }
+  });
+  return ok;
+}
+async function clipesDe(s, nomes) {
+  const r = [];
+  for (let i = 0; i < await s.getVideoTrackCount(); i++)
+    for (const it of (await s.getVideoTrack(i)).getTrackItems(CLIPE, false)) { const n = await it.getName(); if (nomes.some((x) => n === x || n === x + " (video)")) r.push(it); }
+  return r;
+}
+"""
+
+
+def _indice_lut(seq, lut, amostra):
+    """A API não aceita o LUT por nome: o Look do Lumetri é um índice do menu, que muda conforme os LUTs da máquina.
+    Calibra uma vez: aplica o .cube com ffmpeg num quadro da sequência (referência) e testa os índices até bater.
+    Guarda em assets/lut/indice.json (local)."""
+    cache = os.path.join(AQUI, "assets", "lut", "indice.json")
+    dados = json.load(open(cache)) if os.path.exists(cache) else {}
+    if lut in dados:
+        return dados[lut]
+    cubo = luts_instalados().get(lut)
+    if not cubo:
+        raise SystemExit(f"LUT '{lut}' não instalado nas pastas do Premiere (rode premiere/instalar).")
+    from PIL import Image, ImageChops, ImageStat
+    d = os.path.join(AQUI, "assets", "lut", "_calibracao"); os.makedirs(d, exist_ok=True)   # o Premiere não grava na pasta temporária do sistema
+    for f in os.listdir(d): os.remove(os.path.join(d, f))
+    t = amostra["tempo"]
+    def quadro(nome):
+        js("const p = await proj(); const s = await seqPorNome(p, args.seq); return await P.Exporter.exportSequenceFrame(s, tt(args.t), args.n, args.d + '/', 540, 960);",
+           "quadro", seq=seq, t=t, n=nome, d=d)
+        f = os.path.join(d, nome)
+        for _ in range(60):
+            if os.path.exists(f) and os.path.getsize(f) > 0:
+                time.sleep(0.3); return Image.open(f).convert("RGB")
+            time.sleep(0.25)
+        raise RuntimeError("o Premiere não exportou o quadro de calibração")
+    def por(i):
+        js(_JS_LUMETRI + "const p = await proj(); const s = await seqPorNome(p, args.seq); const [it] = await clipesDe(s, [args.nome]); return await lumetriLook(p, it, args.i);",
+           "LUT", seq=seq, nome=amostra["nome"], i=i)
+    por(0)
+    base = quadro("base.png")
+    import subprocess
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", os.path.join(d, "base.png"), "-vf", f"lut3d=file='{cubo}'", os.path.join(d, "ref.png")], check=True)
+    ref = Image.open(os.path.join(d, "ref.png")).convert("RGB")
+    dif = lambda im: sum(ImageStat.Stat(ImageChops.difference(im, ref)).mean) / 3
+    melhor, ant, rep = (dif(base), 0), None, 0
+    for i in range(1, 200):
+        por(i); dv = round(dif(quadro(f"i{i}.png")), 2)
+        if dv < melhor[0]: melhor = (dv, i)
+        rep = rep + 1 if dv == ant else 0; ant = dv
+        if rep >= 6: break                      # passou do fim da lista
+    if melhor[1] == 0 or melhor[0] > 10:
+        raise SystemExit(f"não achei o '{lut}' no menu Look do Lumetri (melhor diferença {melhor[0]}). Reinicie o Premiere depois de instalar o LUT.")
+    dados[lut] = melhor[1]; json.dump(dados, open(cache, "w"), indent=1)
+    return melhor[1]
+
+
+def aplicar_lut(seq, arquivos, lut="LUT DO GAB"):
+    """Cor (regra 7b, no lugar do PowerGrade do DaVinci): Lumetri com o LUT do Gab como Look em cada take da timeline.
+    Na 1ª vez por máquina calibra o índice do LUT no menu (ver _indice_lut)."""
+    nomes = [os.path.basename(a) for a in arquivos]
+    ini = js(_JS_LUMETRI + "const s = await seqPorNome(await proj(), args.seq); const c = await clipesDe(s, args.nomes); return c.length ? [await c[0].getName(), (await c[0].getStartTime()).seconds + 0.5] : null;",
+             "LUT", seq=seq, nomes=nomes)
+    if not ini:
+        raise SystemExit("nenhum dos takes está na sequência")
+    indice = _indice_lut(seq, lut, {"nome": ini[0], "tempo": ini[1]})
+    return js(_JS_LUMETRI + """
+      const p = await proj(); const s = await seqPorNome(p, args.seq); let n = 0;
+      for (const it of await clipesDe(s, args.nomes)) if (await lumetriLook(p, it, args.i)) n++;
+      return { lut: args.lut, indice: args.i, clipes: n };
+    """, "LUT", seq=seq, nomes=nomes, i=indice, lut=lut)
 
 
 def mogrts():
@@ -465,7 +557,7 @@ def isolar_voz(seq, trilha_audio=0):
     Essential Sound > Dialogue > Enhance (uma vez para todos)."""
     return js("""
       const nomes = await P.AudioFilterFactory.getDisplayNames();
-      const nome = nomes.find(n => /enhance speech|aprimorar fala|melhorar fala|voice isol/i.test(n));
+      const nome = nomes.find(n => /enhance speech|speech enhancer|aprimorador de voz|aprimorar fala|melhorar fala|voice isol/i.test(n));
       if (!nome) return { manual: true, motivo: "Enhance Speech não aparece entre os efeitos da API" };
       const p = await proj(); const s = await seqPorNome(p, args.seq);
       const tr = await s.getAudioTrack(args.trilha); let n = 0;

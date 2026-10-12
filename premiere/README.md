@@ -28,14 +28,14 @@ Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Pont
 |---|---|
 | 4. Projeto, pastas, sequência | `P.abrir_projeto("<pasta do vídeo>/<Assunto> - <Empresa>.prproj")` cria a árvore de bins (regra 1b). Um projeto por cliente/lote, uma **sequência** por vídeo (regra 1a): `P.criar_sequencia(nome, gravacao, 1080, 1920, fps)` |
 | Transcrição | `P.transcrever(arquivo, ".../legendas/transcricao.json", "pt-br")` usa o **Speech to Text do próprio Premiere** e salva no mesmo formato que o `legendas.py` já lê (segundos, como o motor whisper). Sem Whisper. Precisa do pacote de idioma pt-BR (o Premiere baixa na 1ª vez) |
-| 1d. Voice isolation | `P.isolar_voz(seq, 0)` tenta o **Enhance Speech** pela API. Se voltar `{"manual": true}` (a API desta versão não expõe o efeito), pedir ao usuário: selecionar os clipes da A1 > Essential Sound > Dialogue > Enhance, uma vez para todos |
+| 1d. Voice isolation | `P.isolar_voz(seq, 0)` aplica o **Enhance Speech** ("Aprimorador de voz" no Premiere em português) em todos os clipes da trilha. Testado no 26.5.2 |
 | Cortes | `cortes.py` igual (ffmpeg). Montar os trechos com `P.colocar(seq, arq, tempo, video=0, audio=0, de=, ate=)` |
-| 4b. Legenda | `legendas.py`/`legenda_auto.py` iguais até o `.srt`. Depois `P.importar_legenda(seq, srt)`. Estilo GAB USA: o usuário aplica uma vez o estilo de legenda salvo ("GAB USA") na trilha (Properties > Track Style). Posição Y 724 vem do estilo |
+| 4b. Legenda | `legendas.py`/`legenda_auto.py` iguais até o `.srt`. `P.importar_legenda(seq, srt)` põe o SRT no bin Legendas. **A API do 26.5 não cria trilha de legenda**: pedir ao usuário para arrastar o SRT do bin para a timeline (1 movimento) e aplicar o estilo GAB USA na trilha (Properties > Track Style). Posição Y 724 vem do estilo |
 | Legenda baixa (Y 390) | igual ao DaVinci: o `legenda_baixa.py` gera os clipes transparentes, e o Gab coloca com `P.colocar(seq, clipe, t, video=<trilha do topo>, audio=None)` e tira a legenda original do trecho |
 | 5. Música | `P.colocar_musica(seq, wav, inicio_faixa=hook - tempo_CTA, dur=, db=-10)`: WAV bruto na A2, fades no clipe (regra do usuário) |
 | 6. SFX | arquivos como hoje; `P.colocar(seq, sfx, t, video=None, audio=<A3..>, db=)` |
-| 7. Takes | `P.montar_takes(seq, [(arq, t0), ...], fim=, trilha=1)`: b-roll na V2, a V1 é intocável (regra 1j) |
-| 7b. Cor | `P.aplicar_lut([takes], "LUT DO GAB")` aplica o LUT do Gab como Input LUT de cada take (confere lendo de volta). `P.luts_instalados()` lista os disponíveis. O conversor de iPhone do DaVinci não existe aqui: take de iPhone (HLG) o Premiere já converte para Rec.709 sozinho |
+| 7. Takes | `P.montar_takes(seq, [(arq, t0), ...], fim=, trilha=1)`: b-roll na V2, a V1 é intocável (regra 1j). Vídeo narrado (sem apresentador): `trilha=0`. O take entra **sem áudio** (subclipe "<take> (video)" criado no bin) |
+| 7b. Cor | `P.aplicar_lut(seq, [takes], "LUT DO GAB")` põe um **Lumetri** em cada take com o LUT do Gab como Look. A API não aceita o LUT por nome (o Look é um índice do menu, que muda por máquina): na 1ª vez calibra sozinho (~1 min, compara quadros exportados com o `.cube` aplicado pelo ffmpeg) e guarda em `assets/lut/indice.json`. O conversor de iPhone do DaVinci não existe aqui: take de iPhone (HLG) o Premiere já converte para Rec.709 sozinho |
 | 8. Lettering | `P.mogrts()` lista os instalados; `P.lettering(seq, "<nome do mogrt>", "TEXTO", inicio, dur, trilha=2)` insere, ajusta a duração e troca o texto. Devolve os parâmetros do template para conferir |
 | 8. Motions (HyperFrames) | iguais: render MOV com alfa e `P.colocar(seq, mov, t, video=<trilha>, audio=None)` |
 | 9. Render | `P.exportar(seq, ".../videos/<nome>.mp4")` com o preset H.264 Match Source do Premiere (ou `preset=<.epr>`). Só quando o usuário pedir. `qc.py` igual no arquivo exportado |
@@ -45,6 +45,15 @@ Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Pont
 - **1g (retrato da timeline):** `retrato.py` é do DaVinci. No Premiere, antes de mexer: `P.js(...)` listando os itens de cada trilha (nome, início, fim) e salvar em `<pasta>/retrato_antes.json`. Depois, comparar e mexer só no alvo.
 - **Undo:** cada função do `premiere_lib.py` é um passo de Undo com nome "Gab: ...". Mesmo assim, não usar Undo com o usuário dentro do Premiere.
 - **`projeto.py status --timeline`** lê o DaVinci. No Premiere, usar `projeto.py status <pasta>` (sem `--timeline`) e marcar as etapas feitas à mão (`projeto.py marcar`).
+
+## Armadilhas da API (aprendidas no teste de 12/10/2026, Premiere 26.5.2)
+
+- Projeto: `Project.isProject()` diz true para qualquer caminho `.prproj`, mesmo inexistente; por isso `abrir_projeto` confere o arquivo no Python.
+- `createOverwriteItemAction` recusa o `ClipProjectItem` ("Invalid parameter"): passar o item cru do projeto. `-1` na trilha de áudio NÃO tira o áudio do take (vai para a A1 e apaga a narração): usar subclipe só de vídeo.
+- Componentes e parâmetros de efeito só valem dentro de `project.lockedAccess(...)` e sem `await` no meio (senão "script object is no longer valid"). A seleção de `TrackItemSelection.createEmptySelection` só vale dentro do callback.
+- Overwrite numa trilha que não existe dá "invalid track index"; trilhas de áudio além das existentes são criadas só em alguns casos. Nunca usar a seleção do usuário (`remover()` usa seleção própria).
+- O Premiere não grava quadro exportado na pasta temporária do sistema (`/var/folders`); a calibração usa `assets/lut/_calibracao`.
+- O painel Gab Ponte carrega mesmo na tela inicial do Premiere; plugin atualizado só carrega depois de reiniciar o Premiere.
 
 ## Arquivos
 

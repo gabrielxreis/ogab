@@ -26,10 +26,11 @@ function conectar() {
   try {
     ws = new WebSocket("ws://127.0.0.1:" + PORTA);
   } catch (e) {
+    console.log("[Gab Ponte] WebSocket recusado: " + e);
     setTimeout(conectar, 700);
     return;
   }
-  ws.onopen = () => mostrar("conectado");
+  ws.onopen = () => { conectar.avisou = false; console.log("[Gab Ponte] conectado"); mostrar("conectado"); };
   ws.onmessage = async (ev) => {
     let msg;
     try { msg = JSON.parse(ev.data); } catch (e) { return; }
@@ -43,7 +44,8 @@ function conectar() {
     mostrar("conectado");
   };
   ws.onclose = () => { mostrar("aguardando"); setTimeout(conectar, 500); };
-  ws.onerror = () => {};
+  ws.onerror = (e) => { if (!conectar.avisou) { console.log("[Gab Ponte] erro de conexão: " + (e && (e.message || e.type))); conectar.avisou = true; } };
 }
 
+console.log("[Gab Ponte] carregado");
 conectar();

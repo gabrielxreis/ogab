@@ -5,3 +5,4 @@ assets/mogrt/*
 !assets/mogrt/LEIA.md
 *.ccx
 __pycache__/
+assets/lut/indice.json
