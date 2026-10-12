@@ -786,3 +786,29 @@ def garantir_titulos_animados(p, mp, t, tentativas=3):
             except Exception: pass
             return t
     raise RuntimeError("títulos continuam secos depois de 3 cópias: conferir o pacote/preset")
+
+
+SFX_DMAX = {"riser_hollow": 2.1, "hud_loading": 0.8, "whoosh_info": 1.1, "ui_select": 0.6, "swish": 0.6, "boom": 3.0,
+            "air_swoosh": 1.9, "logo_impact": 6.0, "click": 0.4, "sparkle": 3.0, "pop": 0.3, "typing": 2.7, "stardust": 2.0}
+
+
+def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
+    """Coloca o desenho de som de `pasta_sfx/plano_sfx.txt` (linhas 'T.TTs Ax nome -NNdB: o que acompanha'), cada som
+    na primeira trilha livre (A3..A6), cortado em SFX_DMAX, volume e fade no clipe. Apaga o que havia nessas trilhas."""
+    import re as _re
+    ev = [(m[2], float(m[1]), int(m[3])) for m in (_re.match(r"\s*([\d.]+)s A\d (\S+) (-?\d+)dB", l)
+          for l in open(os.path.join(pasta_sfx, "plano_sfx.txt")).read().splitlines()) if m]
+    garantir_trilhas_audio(t, max(trilhas))
+    for k in trilhas:
+        its = t.GetItemListInTrack("audio", k) or []
+        if its: t.DeleteClips(its)
+        t.SetTrackName("audio", k, "SFX" if k == trilhas[0] else f"SFX {k - trilhas[0] + 1}")
+    S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0
+    for nome, ini, db in sorted(ev, key=lambda e: e[1]):
+        it = importar(mp, os.path.join(pasta_sfx, nome + ".wav"), "SFX"); fc = float(it.GetClipProperty("FPS") or F)
+        dur = min(SFX_DMAX.get(nome, 2.0), fim_s - ini); rf = S + round(ini * F)
+        k = next(k for k in trilhas if fim[k] < rf)
+        x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": k, "recordFrame": rf, "startFrame": 0, "endFrame": round(dur * fc)}])
+        if not x: print("SFX falhou:", nome, ini); continue
+        x[0].SetProperty("AudioVolume", db); x[0].SetFades({"FadeOut": min(8, round(dur * F / 4))}); fim[k] = x[0].GetEnd(); ok += 1
+    return ok, len(ev)
