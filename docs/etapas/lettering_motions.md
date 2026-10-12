@@ -21,6 +21,14 @@ Como fazer: escolher 4-6 palavras-chave do roteiro (números, datas, siglas, a m
 
 ## 8c. HyperFrames: motions e edição dinâmica
 
+**ANTES DE RENDERIZAR QUALQUER MOTION (regra do usuário, 12/10/2026: "verifica antes para não ter que refazer"):**
+`python3 SKILL_DIR/scripts/centro.py corrigir <pasta_do_motion> --tempos <4 a 6 tempos que cobrem a animação>`
+mede a união do conteúdo visível (fundo escondido) nos snapshots e grava a correção em `fit.json` (o build aplica num
+wrapper `#fit`). Rodar o build de novo e `centro.py medir` até dar OK; só então `hyperframes render`.
+**O motion NUNCA foge da legenda:** centro sempre em (540, 960), tamanho natural; nada de subir ou encolher para escapar
+da faixa da legenda. Quem se ajusta é a LEGENDA: as que cruzam o motion descem para Y 390 (`legenda_ui.py --indices`).
+CTA: a logo no centro exato (540, 960).
+
 O HyperFrames não é só para motion: usar para deixar a **edição inteira dinâmica** (ver 8d). Primeiro os motions:
 
 Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hyperframes`, ver README). Usar as skills `hyperframes` / `motion-graphics` para criar e renderizar.
@@ -87,7 +95,7 @@ Regras: sem rosto realista de pessoa real; cores, logo e fonte da `marca/`; nada
 - **Render leva o DaVinci para a página Deliver:** depois de todo render, `r.OpenPage("edit")` antes de qualquer clique/atalho (um clique caiu num menu do Deliver).
 - **Copiar itens de áudio entre timelines:** `GetLeftOffset`/`GetDuration` vêm em quadros da timeline; recolocar com `colocar_narracao`/`colocar_musica`/`colocar_sfx` (não com AppendToTimeline cru), senão a duração sai errada (30/24).
 - **CTA (regra do usuário): a LOGO SEMPRE NO CENTRO EXATO (540, 960)**, medida nos pixels (a folga do PNG desloca: corrigir com x/y no GSAP, `xPercent/yPercent -50`, nunca `transform` em CSS que a animação sobrescreve). O resto (chamada, site) se arruma em volta, acima da faixa da legenda.
-- **Motions e lettering acima de y≈1150:** a legenda fica toda em 724 e nada precisa de ajuste por legenda (sem OCR, sem UI).
+- ~~Motions acima de y≈1150 para a legenda não descer~~ (REVOGADO em 12/10/2026: o motion nunca foge da legenda; fica no centro e a legenda desce).
 
 - **Disco cheio (12/10/2026):** cada motion ProRes 4444 tem ~240 MB e o HyperFrames com vários workers grava ~1,5 GB de quadros temporários. Com pouco espaço: `--workers 1` (grava direto no arquivo), MOVER (não copiar) o render para a pasta do vídeo, e motion de tela cheia com fundo opaco pode sair em MP4 (`--format mp4 -q delivery`), sem alfa. Conferir `df -h /` antes de renderizar em lote.
 - **`timeline_com_letterings` apaga as trilhas de vídeo extras do modelo antes de inserir** (o modelo trazia uma V2 "BROLL" desligada e os títulos caíam nela).
