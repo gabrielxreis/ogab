@@ -96,7 +96,7 @@ Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usu�
 **OBRIGATÓRIO e logo em seguida a `montar_takes` (na mesma chamada; esquecida no lote Calverstone, 12/10/2026)** e sempre que trocar um take: `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. O `projeto.py` só marca "cor" quando todo take da V1 tem o PowerGrade. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
 
 ## 8. Lettering e motions (HyperFrames) (`docs/etapas/lettering_motions.md`)
-Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; edição dinâmica e recursos extras do HyperFrames. Legenda atrás da pessoa e pacote de entrevista: `docs/etapas/extras.md` (quando usar e como).
+Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; motions em sequência COLADOS (`colar_motions`, sem fade de fundo quando um emenda no outro); edição dinâmica e recursos extras do HyperFrames. Legenda atrás da pessoa e pacote de entrevista: `docs/etapas/extras.md` (quando usar e como).
 
 ## 9. Render, formatos e conferência (`docs/etapas/render.md`)
 Só exporta se o usuário pedir; -14 LUFS; `qc.py <pasta> --cliente ... --timeline "<nome>"` (inclui legenda picotada e motion fora do tempo da fala); capa e legenda do post.

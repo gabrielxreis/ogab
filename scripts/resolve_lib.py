@@ -143,6 +143,33 @@ def garantir_trilhas_audio(t, n):
         t.AddTrack("audio", "stereo")
 
 
+def colar_motions(t, mp, max_vao=0.6):
+    """Motions em sequência ficam COLADOS (regra do usuário, 12/10/2026: "muitos ficam com espaço pequeno entre um e outro
+    e aí entra o frame debaixo sem necessidade"). Junta todos os itens de motion (File Path com /motions/) de todas as
+    trilhas de vídeo acima da V1; se o próximo começa até `max_vao` s depois do fim do anterior, ele é recolocado no fim
+    do anterior (mesma trilha), puxando o início e, se a mídia tiver sobra, o fim. Devolve [(nome, vão_s)] corrigidos.
+    Complemento obrigatório: motion que entra logo depois de outro motion (ou por cima de um motion) é renderizado com
+    bgfade=False, senão o fade de 0,25 s do fundo mostra o take de baixo."""
+    S, F = t.GetStartFrame(), fps_tl(t); feitos = []
+    while True:
+        its = []
+        for k in range(2, t.GetTrackCount("video") + 1):
+            for x in t.GetItemListInTrack("video", k) or []:
+                mpi = x.GetMediaPoolItem()
+                if mpi and "/motions/" in (mpi.GetClipProperty("File Path") or ""): its.append((x.GetStart(), x.GetEnd(), k, x, mpi))
+        its.sort(key=lambda e: e[0]); alvo = None
+        for a, b in zip(its, its[1:]):
+            vao = b[0] - a[1]
+            if 0 < vao <= round(max_vao * F): alvo = (a, b, vao); break
+        if not alvo: return feitos
+        a, b, vao = alvo; x, mpi, k = b[3], b[4], b[2]
+        left = x.GetLeftOffset(); dur = x.GetDuration(); total = int(float(mpi.GetClipProperty("Frames")))
+        ini = max(0, left - vao); fim = min(total - 1, ini + dur + vao - 1)
+        t.DeleteClips([x], False)
+        mp.AppendToTimeline([{"mediaPoolItem": mpi, "mediaType": 1, "trackIndex": k, "recordFrame": a[1], "startFrame": ini, "endFrame": fim}])
+        feitos.append((x.GetName(), round(vao / F, 2)))
+
+
 def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in=0.5, fade_out=2.5):
     """Música BRUTA na A2 (regra do usuário, 11/10/2026): o WAV original entra inteiro no Media Pool e o corte
     é feito no DaVinci (ponto de entrada = inicio_faixa, duração = dur ou a timeline toda), com fade no clipe.
