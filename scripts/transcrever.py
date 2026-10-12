@@ -2,6 +2,8 @@
 
 Uso:
   python3 transcrever.py <audio.wav> <saida/transcricao.json> [--motor auto|davinci|whisper] [--idioma pt]
+  python3 transcrever.py <saida/transcricao.json> --clipe "<nome do clipe no Media Pool>"
+        -> lê a transcrição que já foi feita no DaVinci naquele clipe (gravação de apresentador: PREFERIR esta)
   python3 transcrever.py --versao        -> mostra a versão do DaVinci e qual motor seria usado
 
 Motores:
@@ -65,10 +67,14 @@ def via_davinci(audio, idioma):
         raise SystemExit("DaVinci fechado ou sem scripting: abra o projeto ou use --motor whisper")
     mp = r.GetProjectManager().GetCurrentProject().GetMediaPool()
     alvo = os.path.basename(audio)
+    caminho = os.path.realpath(os.path.abspath(audio))
 
     def busca(pasta):
+        # pelo CAMINHO completo: vários vídeos usam o mesmo nome (narracoes/audio.wav) e comparar só o nome
+        # devolvia a transcrição de outro vídeo (bug de 11/10/2026)
         for c in pasta.GetClipList() or []:
-            if c.GetClipProperty("File Name") == alvo:
+            fp = c.GetClipProperty("File Path") or ""
+            if fp and os.path.realpath(fp) == caminho:
                 return c
         for sub in pasta.GetSubFolderList() or []:
             achou = busca(sub)
@@ -85,6 +91,41 @@ def via_davinci(audio, idioma):
         raise SystemExit("o DaVinci não devolveu transcrição (original offline? ver PROCESSO.md); use --motor whisper")
     tr["motor"] = "davinci"
     return tr
+
+
+def via_clipe(nome_clipe):
+    """Lê a transcrição que o usuário JÁ fez no DaVinci num clipe do Media Pool (sem transcrever de novo).
+    Tempos em timecode do clipe -> segundos."""
+    r = _resolve()
+    if not r:
+        raise SystemExit("DaVinci fechado ou sem scripting")
+    mp = r.GetProjectManager().GetCurrentProject().GetMediaPool()
+
+    def busca(pasta):
+        for c in pasta.GetClipList() or []:
+            if c.GetName() == nome_clipe:
+                return c
+        for sub in pasta.GetSubFolderList() or []:
+            achou = busca(sub)
+            if achou:
+                return achou
+    item = busca(mp.GetRootFolder())
+    if not item:
+        raise SystemExit(f"clipe {nome_clipe!r} não está no Media Pool")
+    tr = item.GetTranscription()
+    if not tr or not tr.get("segments"):
+        raise SystemExit(f"o clipe {nome_clipe!r} ainda não tem transcrição no DaVinci (clique direito > Transcribe)")
+    fps = float(item.GetClipProperty("FPS") or 30)
+    def seg(tc):
+        if isinstance(tc, (int, float)): return float(tc)
+        h, m, s_, f = [int(x) for x in tc.split(":")]; return h * 3600 + m * 60 + s_ + f / fps
+    segs = []
+    for s_ in tr["segments"]:
+        ws = [{"text": w["text"].strip(), "start": round(seg(w["start"]), 3), "end": round(seg(w["end"]), 3)}
+              for w in s_.get("words", []) if w["text"].strip() and w["text"].strip() != "(...)"]
+        if ws:
+            segs.append({"start": ws[0]["start"], "end": ws[-1]["end"], "text": " ".join(w["text"] for w in ws), "words": ws})
+    return {"language": tr.get("language", "pt"), "motor": f"davinci-clipe ({nome_clipe})", "segments": segs}
 
 
 def via_whisper(audio, idioma):
@@ -122,6 +163,11 @@ def main(a):
         if v and v < MIN_AUDIO:
             print("AVISO: abaixo do 20.2.2 a API pode errar a trilha ao colocar áudio sozinho; conferir A1/A2 na timeline.")
         return
+    if "--clipe" in a:   # transcrição que o usuário já fez no DaVinci (preferida para gravação de apresentador)
+        saida = a[0]; tr = via_clipe(a[a.index("--clipe") + 1])
+        os.makedirs(os.path.dirname(os.path.abspath(saida)), exist_ok=True)
+        json.dump(tr, open(saida, "w"), ensure_ascii=False, indent=1)
+        print(f"{saida}: {sum(len(s_['words']) for s_ in tr['segments'])} palavras ({tr['motor']})"); return
     if len(a) < 2:
         raise SystemExit(__doc__)
     audio, saida = a[0], a[1]

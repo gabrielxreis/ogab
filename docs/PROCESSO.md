@@ -220,3 +220,21 @@ Antes de entregar:
 Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`, `links.txt`, `narracoes/`, `musica/`, `brolls/`, `videos/`, `legendas/`. Perfis das empresas ficam em `~/.claude/skills/ogab/clientes/<empresa>/`.
 
 - **Fade dos letterings:** a curva de opacidade é gravada com `SetKeyFrames(kf, True)` (substitui tudo). `SetInput(valor, quadro)` soma com keyframes antigos e o texto reaparecia depois do fade em alguns. Antes de entregar, rodar `checar_fades(t)`: todo lettering tem que cair para 0 e não voltar.
+
+## Bugs encontrados e corrigidos (registro; não repetir)
+
+| Data | Bug | Causa | Correção |
+|---|---|---|---|
+| 11/10/2026 | `transcrever.py` (motor davinci) devolveu a MESMA transcrição para 3 vídeos | buscava o item do Media Pool só pelo nome (`narracoes/audio.wav` em todos) | compara o caminho completo; gravação de apresentador: `transcrever.py saida.json --clipe "<clipe>"` lê a transcrição que o usuário já fez no DaVinci |
+| 11/10/2026 | Whisper perdeu retakes e bagunçou tempos em gravação de rua | Whisper funde palavras e pula repetições | usar a transcrição do DaVinci (`--clipe`); Whisper só como último recurso |
+| 11/10/2026 | `cortes.py` comeu palavras curtas ("não", "quanto") e inverteu o sentido de uma frase | o detector de silêncio corta palavra falada baixo | silêncio só é cortado fora das palavras da transcrição; o plano avisa "palavras fora dos cortes" |
+| 11/10/2026 | sobrou o fim de uma palavra removida ("Porque") | a margem de 0,1 s antes do trecho invadia a palavra cortada | margem limitada pela palavra removida vizinha |
+| 11/10/2026 | timeline nova saiu 1920x1080 | `CreateEmptyTimeline` usa o padrão do projeto (horizontal) | `cortes.py montar` copia resolução/fps da "<nome> - bruto" |
+| 11/10/2026 | Voice Isolation não ligou | `SetVoiceIsolationState` só vale para a timeline ATUAL | `p.SetCurrentTimeline(t)` antes e conferir com `GetVoiceIsolationState` |
+| 11/10/2026 | música não entrou na A2 (sem erro) | timeline de gravação só tem A1 | `colocar_musica` cria a trilha (`garantir_trilhas_audio`) e para com erro se não entrar |
+| 11/10/2026 | música pré-cortada no ffmpeg não dava para ajustar | o usuário quer mexer na timeline | `colocar_musica(..., inicio_faixa=)` põe o WAV original com ponto de entrada e fades no clipe |
+| 11/10/2026 | b-roll sumiu calado / ficou com 0,9 s | `AppendToTimeline` falha em silêncio quando não cabe no vão, e apara clipes sobrepostos | `broll.py` encurta ao vão livre, confere se entrou e avisa |
+| 11/10/2026 | foto (still) ocupou 5 s e bloqueou o clipe seguinte | still entra com 5 s e a API não apara | `broll.py` coloca fotos por último, encaixadas no vão |
+| 11/10/2026 | legenda/b-roll em tempo errado depois do usuário editar | tempos da fonte != tempos da timeline | `broll.transcricao_na_timeline(t, ...)` converte pela `GetSourceStartTime` de cada corte da V1 |
+| 11/10/2026 | Magnific Kling cobrou/recusou ilimitado | o gerador abre com 1080p e ∞ OFF | 720p + ∞ ON e só gerar se aparecer "Unlimited videos for this resolution" (ver navegador/downloads.md) |
+| 11/10/2026 | SKILL.md não carregava no `npx skills` | YAML: ":" sem aspas na description | description entre aspas |
