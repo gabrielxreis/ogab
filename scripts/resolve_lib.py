@@ -810,10 +810,10 @@ SFX_DMAX = {"riser_hollow": 2.1, "hud_loading": 0.8, "whoosh_info": 1.1, "ui_sel
 
 
 def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
-    """Coloca o desenho de som de `pasta_sfx/plano_sfx.txt` (linhas 'T.TTs Ax nome -NNdB: o que acompanha'), cada som
+    """Coloca o desenho de som de `pasta_sfx/plano_sfx.txt` (linhas 'T.TTs Ax nome -NNdB[ D.Ds]: o que acompanha'), cada som
     na primeira trilha livre (A3..A6), cortado em SFX_DMAX, volume e fade no clipe. Apaga o que havia nessas trilhas."""
     import re as _re
-    ev = [(m[2], float(m[1]), int(m[3])) for m in (_re.match(r"\s*([\d.]+)s A\d (\S+) (-?\d+)dB", l)
+    ev = [(m[2], float(m[1]), int(m[3]), float(m[4]) if m[4] else None) for m in (_re.match(r"\s*([\d.]+)s A\d (\S+) (-?\d+)dB(?: ([\d.]+)s)?", l)
           for l in open(os.path.join(pasta_sfx, "plano_sfx.txt")).read().splitlines()) if m]
     garantir_trilhas_audio(t, max(trilhas))
     for k in trilhas:
@@ -821,9 +821,9 @@ def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
         if its: t.DeleteClips(its)
         t.SetTrackName("audio", k, "SFX" if k == trilhas[0] else f"SFX {k - trilhas[0] + 1}")
     S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0
-    for nome, ini, db in sorted(ev, key=lambda e: e[1]):
+    for nome, ini, db, dmax in sorted(ev, key=lambda e: e[1]):
         it = importar(mp, os.path.join(pasta_sfx, nome + ".wav"), "SFX"); fc = float(it.GetClipProperty("FPS") or F)
-        dur = min(SFX_DMAX.get(nome, 2.0), fim_s - ini); rf = S + round(ini * F)
+        dur = min(dmax or SFX_DMAX.get(nome, 2.0), fim_s - ini); rf = S + round(ini * F)   # 'NN dB D.Ds' na linha = duração própria
         k = next(k for k in trilhas if fim[k] < rf)
         x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": k, "recordFrame": rf, "startFrame": 0, "endFrame": round(dur * fc)}])
         if not x: print("SFX falhou:", nome, ini); continue
