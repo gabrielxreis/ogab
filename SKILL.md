@@ -179,6 +179,9 @@ Regras: sem rosto realista de pessoa real; cores, logo e fonte da `marca/`; nada
 
 ## 9. Legenda
 
+**ORDEM DA LEGENDA (regra do usuário, 12/10/2026), sempre sobre a timeline ATUAL (o usuário mexe nos cortes):** 1) **Create Subtitles from Audio** da própria timeline (`Timeline.CreateSubtitlesFromAudio`, 1 linha, até 25 caracteres) para os tempos baterem com a fala que está na timeline agora; 2) **métrica** (`legendas.py metrica`/reflow: 0 problema, grafia do cliente); 3) **preset GAB USA** (trilha do modelo/`timeline_do_modelo` ou `legenda_ui.py --preset`). Nunca reaproveitar SRT gerado antes de uma edição da timeline. Antes de entregar, conferir que cada legenda bate com a fala (a 1ª e a última, e uma amostra no meio).
+
+
 **Métrica da legenda (regra fixa do usuário, conferir SEMPRE antes de colocar e de exportar):**
 - **Uma linha só** (nunca quebrar linha), até `config.regras.legenda.max_caracteres` (25 no 9:16), contando caracteres e não bytes (º, ç, ã contam 1).
 - **Pedaço natural da frase**: cada legenda tem sentido sozinha. Nunca picotar (ex.: ruim "Quem espera entra / no fim de uma fila"; bom "Quem espera / entra no fim de uma fila").
