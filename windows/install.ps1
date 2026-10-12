@@ -233,6 +233,9 @@ Info "10/10 After Effects (extensao Gab Ponte AE, motions editaveis)"
 & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "aftereffects\instalar.ps1")
 $env:OGAB_SEM_CONFIG = ""
 
+Info "Conferencia final (doctor: confere tudo e corrige o que der)"
+Py (Join-Path $DEST "scripts\doctor.py") --corrigir
+
 Write-Host @"
 
 Pronto. Seu Gab vai editar no: $editor   |   motions: $motion

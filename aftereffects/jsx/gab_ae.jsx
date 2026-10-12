@@ -399,9 +399,9 @@ GAB.mogrt = function (nome, arquivo) {
     var ef = ctl.property("ADBE Effect Parade").property(j);
     try { ef.property(1).addToMotionGraphicsTemplateAs(c, ef.name); n++; } catch (e2) {}
   }
-  // exportar renderiza a prévia do template: agendado pelo mesmo motivo do render. `arquivo` é a PASTA de destino
-  // (o AE grava "<nome da comp>.mogrt" dentro dela).
-  app.scheduleTask("var __c = null; for (var __i = 1; __i <= app.project.numItems; __i++) if (app.project.item(__i).id === " + c.id + ") __c = app.project.item(__i); if (__c) __c.exportAsMotionGraphicsTemplate(true, " + GAB.json(arquivo) + ");", 300, false);
+  // `arquivo` é a PASTA de destino (o AE grava "<nome da comp>.mogrt" dentro dela). Exporta direto: o agendamento
+  // (app.scheduleTask) não roda com o AE em segundo plano.
+  c.exportAsMotionGraphicsTemplate(true, arquivo);
   return { pasta: arquivo, campos: n };
 };
 

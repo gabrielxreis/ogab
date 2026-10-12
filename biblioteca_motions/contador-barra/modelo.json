@@ -1,0 +1,76 @@
+{
+ "nome": "contador-barra",
+ "descricao": "Número grande que sobe até o valor (com separador de milhar), legenda curta embaixo e barra que enche junto. Bom para dados, estatísticas, salários, vagas.",
+ "tags": [
+  "numero",
+  "contador",
+  "dado",
+  "estatistica"
+ ],
+ "autor": "gabrielxreis",
+ "criado": "2026-10-12",
+ "dur": 3.5,
+ "campos": {
+  "valor": {
+   "tipo": "numero",
+   "exemplo": 141000
+  },
+  "sufixo": {
+   "tipo": "texto",
+   "exemplo": " médicos"
+  },
+  "legenda": {
+   "tipo": "texto",
+   "exemplo": "faltam nos EUA até 2038"
+  }
+ },
+ "spec": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "elementos": [
+   {
+    "tipo": "fundo"
+   },
+   {
+    "tipo": "contador",
+    "nome": "NUMERO",
+    "de": 0,
+    "ate": "{{valor}}",
+    "sufixo": "{{sufixo}}",
+    "fonte": "Inter-Bold",
+    "tamanho": 110,
+    "cor": "texto",
+    "y": 900,
+    "inicio": 0.2,
+    "dur": 1.8,
+    "entrada": "fade_up",
+    "dur_entrada": 0.5,
+    "saida_em": "fim-0.5"
+   },
+   {
+    "tipo": "barra",
+    "nome": "BARRA",
+    "w": 700,
+    "h": 16,
+    "y": 1010,
+    "inicio": 0.2,
+    "dur": 1.8,
+    "saida_em": "fim-0.5"
+   },
+   {
+    "tipo": "texto",
+    "nome": "LEGENDA",
+    "texto": "{{legenda}}",
+    "fonte": "Inter-Bold",
+    "tamanho": 44,
+    "cor": "destaque",
+    "y": 1090,
+    "inicio": 1.2,
+    "entrada": "fade_up",
+    "dur_entrada": 0.6,
+    "saida_em": "fim-0.5"
+   }
+  ]
+ }
+}

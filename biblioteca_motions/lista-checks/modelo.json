@@ -1,0 +1,120 @@
+{
+ "nome": "lista-checks",
+ "descricao": "Título pequeno em caixa alta e itens em cartões entrando um a um, cada um com check que se desenha. Bom para requisitos, formações, documentos, etapas concluídas.",
+ "tags": [
+  "lista",
+  "checks",
+  "requisitos",
+  "etapas"
+ ],
+ "autor": "gabrielxreis",
+ "criado": "2026-10-12",
+ "dur": 2.4,
+ "dur_por_item": 0.95,
+ "campos": {
+  "titulo": {
+   "tipo": "texto",
+   "exemplo": "Se você é formada em"
+  },
+  "itens": {
+   "tipo": "lista",
+   "exemplo": [
+    "Enfermagem",
+    "Biomedicina",
+    "Fisioterapia",
+    "Nutrição",
+    "Odontologia"
+   ],
+   "max": 6
+  }
+ },
+ "spec": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "elementos": [
+   {
+    "tipo": "fundo"
+   },
+   {
+    "tipo": "texto",
+    "nome": "TITULO",
+    "texto": "{{titulo}}",
+    "caixa_alta": true,
+    "fonte": "Inter-Bold",
+    "tamanho": 40,
+    "tracking": 220,
+    "cor": "destaque",
+    "y": 520,
+    "inicio": 0,
+    "entrada": "fade_up",
+    "dur_entrada": 0.7,
+    "saida_em": "fim-0.5"
+   },
+   {
+    "repetir": "itens",
+    "passo": {
+     "y": 150,
+     "inicio": 0.95
+    },
+    "elementos": [
+     {
+      "tipo": "caixa",
+      "nome": "LINHA {{n}}",
+      "w": 820,
+      "h": 118,
+      "raio": 22,
+      "cor": "#0D2547",
+      "borda": "destaque",
+      "borda_largura": 2,
+      "y": 680,
+      "inicio": 0.45,
+      "entrada": "slide_esq",
+      "dur_entrada": 0.6,
+      "saida_em": "fim-0.5",
+      "sombra": true
+     },
+     {
+      "tipo": "texto",
+      "nome": "NUM {{n}}",
+      "texto": "{{n2}}",
+      "fonte": "Inter-Bold",
+      "tamanho": 40,
+      "cor": "destaque",
+      "alinhar": "esquerda",
+      "x": 175,
+      "y": 680,
+      "inicio": 0.5,
+      "entrada": "slide_esq",
+      "dur_entrada": 0.6,
+      "saida_em": "fim-0.5"
+     },
+     {
+      "tipo": "texto",
+      "nome": "ITEM {{n}}",
+      "texto": "{{item}}",
+      "fonte": "Inter-Bold",
+      "tamanho": 52,
+      "cor": "texto",
+      "alinhar": "esquerda",
+      "x": 260,
+      "y": 680,
+      "inicio": 0.55,
+      "entrada": "slide_esq",
+      "dur_entrada": 0.6,
+      "saida_em": "fim-0.5"
+     },
+     {
+      "tipo": "check",
+      "nome": "CHECK {{n}}",
+      "x": 880,
+      "y": 680,
+      "tamanho": 64,
+      "inicio": 0.8,
+      "saida_em": "fim-0.5"
+     }
+    ]
+   }
+  ]
+ }
+}

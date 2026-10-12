@@ -3,3 +3,4 @@ assets/lut/indice.json
 assets/lut/_calibracao/
 *.ccx
 __pycache__/
+assets/mogrt/_projeto/

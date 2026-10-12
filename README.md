@@ -5,16 +5,20 @@
 [![Último commit](https://img.shields.io/github/last-commit/gabrielxreis/video-redes-skill?color=brightgreen&label=atualizado&style=for-the-badge)](https://github.com/gabrielxreis/video-redes-skill/commits/main "Histórico")
 [![Claude Code](https://img.shields.io/badge/Claude_Code-skill-D97757.svg?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.com/claude-code "Claude Code")
 [![DaVinci Resolve Studio](https://img.shields.io/badge/DaVinci_Resolve-Studio_21.1+-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)](#requisitos "Requisitos")
+[![Premiere Pro](https://img.shields.io/badge/Premiere_Pro-2026+-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)](premiere/README.md "Premiere")
+[![After Effects](https://img.shields.io/badge/After_Effects-motions-9999FF.svg?style=for-the-badge&logo=adobeaftereffects&logoColor=white)](aftereffects/README.md "After Effects")
 [![macOS](https://img.shields.io/badge/-macOS-lightblue.svg?style=for-the-badge&logo=apple&logoColor=black)](#instalacao "Instalação")
+[![Windows](https://img.shields.io/badge/-Windows-0078D6.svg?style=for-the-badge&logo=windows&logoColor=white)](windows/README.md "Windows")
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](#requisitos "Requisitos")
 [![Licença: MIT](https://img.shields.io/badge/-MIT-red.svg?style=for-the-badge)](LICENSE "Licença")
 
 </div>
 
-**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **dentro do DaVinci Resolve**: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci.
+**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve ou no Adobe Premiere Pro** (Mac e Windows), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci.
 
 > **Cada pessoa usa as PRÓPRIAS contas.** A skill não traz conta, chave nem login. Você conecta os seus serviços (ElevenLabs, Artlist, Envato, Magnific...) no seu Claude e faz login nos sites no seu navegador. Nada disso vai para o repositório nem para o `config.json`.
 
+* [NOVIDADES](#novidades)
 * [INSTALAÇÃO](#instalacao)
     * [Um comando](#um-comando)
     * [Passo a passo manual](#passo-a-passo-manual)
@@ -31,13 +35,25 @@
     * [Perfil, pronúncia e estilo de edição](#perfil-pronuncia-e-estilo-de-edicao)
 * [PASTA DO VÍDEO](#pasta-do-video)
 * [LEGENDA](#legenda)
+* [EDITORES E MOTIONS](#editores-e-motions)
 * [MOTIONS](#motions)
+    * [Biblioteca de motions](#biblioteca-de-motions)
 * [ÁUDIO E EXPORT](#audio-e-export)
 * [SCRIPTS](#scripts)
 * [ARMADILHAS CONHECIDAS](#armadilhas-conhecidas)
 * [ESTRUTURA DO REPOSITÓRIO](#estrutura-do-repositorio)
 * [LICENÇA](#licenca)
 
+
+# NOVIDADES
+
+O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo no começo da conversa. Histórico completo em [`CHANGELOG.md`](CHANGELOG.md). Últimas:
+
+- **Adobe Premiere Pro 2026** como editor (além do DaVinci), com transcrição e Enhance Speech do próprio Premiere e o LUT DO GAB.
+- **Motions no After Effects:** cada motion montado em camadas editáveis (texto, número, check, cor), ou automáticos no HyperFrames. Você escolhe.
+- **Biblioteca de motions:** modelos prontos que crescem a cada vídeo e chegam para todo mundo no update. Também viram **MOGRT** para o Premiere.
+- **Windows:** instalador próprio em PowerShell.
+- **Instalador completo + doctor:** instala tudo (DaVinci, Premiere e After Effects), confere e corrige sozinho o que der.
 
 # INSTALAÇÃO
 
@@ -64,12 +80,27 @@ Cole no **Terminal** do Mac:
 curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/install.sh | bash
 ```
 
+No **Windows**, no PowerShell (usuário normal):
+
+```powershell
+irm https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/windows/install.ps1 | iex
+```
+
+O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
+1. **Editor:** DaVinci Resolve ou Adobe Premiere Pro.
+2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).
+
+Trocar depois, sem reinstalar: `/ogab config editor davinci|premiere` e `/ogab config motion hyperframes|aftereffects`.
+
 O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
 - instala **Homebrew** (se faltar), **ffmpeg**, **yt-dlp**, **Node.js**, **Python 3**, **git** e **Pillow**;
 - baixa a skill em `~/.claude/skills/ogab` e cria o seu `config.json`;
 - instala o **HyperFrames** e roda o `hyperframes doctor`;
 - instala as fontes livres (Poppins, Playfair Display, Lobster) e o **lettering animado** (@gabrielxreis_ Text Presets) no DaVinci;
-- confere o **DaVinci Resolve Studio** e o scripting, **detecta a versão** e, abaixo da 21.1, instala o **Whisper local** para a transcrição.
+- confere o **DaVinci Resolve Studio** e o scripting, **detecta a versão** e, abaixo da 21.1, instala o **Whisper local** para a transcrição;
+- instala a parte do **Premiere** (plugin Gab Ponte, LUT DO GAB e os MOGRTs da biblioteca) e do **After Effects** (extensão Gab Ponte AE);
+- instala o **Docker Desktop** (o HyperFrames pede);
+- no fim roda o **doctor**, que confere tudo e corrige sozinho o que der, e diz em uma linha o que só você pode fazer.
 
 Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar as suas contas e o Claude in Chrome (passos 5, 8 e 9 abaixo). Reinicie o Claude Code e peça um vídeo.
 
@@ -103,7 +134,7 @@ Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar 
 
 ## Atualizar
 
-A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.json` nem em `clientes/`). Para forçar:
+A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.json` nem em `clientes/`) e, se veio coisa nova, **mostra as novidades** antes de seguir. Se o update travar por alguma mudança local sua, o `/ogab doctor` guarda a mudança (sem apagar) e atualiza. Para forçar:
 
 ```
 /ogab update
@@ -113,8 +144,9 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 
 | | Mínimo | Observação |
 |---|---|---|
-| Sistema | macOS | Testado em Apple Silicon |
-| DaVinci Resolve | **Studio 21.1+** | A versão grátis não tem scripting externo. Abaixo da 21.1 a transcrição vai para o Whisper local |
+| Sistema | macOS ou Windows 10/11 | Testado em Apple Silicon; diferenças do Windows em [`windows/README.md`](windows/README.md) |
+| Editor | **DaVinci Resolve Studio 21.1+** ou **Adobe Premiere Pro 2026+** | DaVinci: a versão grátis não tem scripting externo. Premiere: ver [`premiere/README.md`](premiere/README.md) |
+| After Effects | 2024+ (só se escolher motions no AE) | Ver [`aftereffects/README.md`](aftereffects/README.md) |
 | Python | 3.10+ | Pillow; `pyobjc-framework-Vision` para o `legenda_ui.py` |
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
 | yt-dlp | qualquer recente (`brew upgrade yt-dlp` se o YouTube mudar) | Baixar trecho de vídeo público do YouTube (reportagem, cena histórica) para b-roll |
@@ -136,6 +168,10 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | `/ogab pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
 | `/ogab config <chave> <valor>` | Liga ou desliga opções. Ex.: `config opcoes.multi_formatos true` |
 | `/ogab ajuda` | Mostra o que está habilitado e os provedores escolhidos |
+| `/ogab doctor` | Confere a instalação inteira, corrige o que der e guia você no resto |
+| `/ogab comecar` | Primeiro uso: roda o doctor e explica como pedir |
+| `/ogab config editor premiere` | Troca o editor (`davinci` ou `premiere`) |
+| `/ogab config motion aftereffects` | Troca os motions (`hyperframes` ou `aftereffects`) |
 | `/ogab update` | Atualiza a skill |
 
 ## O fluxo
@@ -233,11 +269,33 @@ No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / 
 - Legendas que faltam se **acrescentam sem apagar** as que já existem: SRT só com as novas, com o tempo contado a partir do fim da última legenda.
 
 
+# EDITORES E MOTIONS
+
+| | DaVinci Resolve | Adobe Premiere Pro |
+|---|---|---|
+| Como o Gab controla | API de scripting do Resolve | plugin **Gab Ponte** (painel UXP, uma vez: Window > UXP Plugins > Gab Ponte) |
+| Transcrição | do DaVinci (21.1+) | Speech to Text do Premiere |
+| Isolar voz | Voice Isolation | Enhance Speech ("Aprimorador de voz") |
+| Cor | PowerGrade (.drx) | LUT DO GAB pelo Lumetri |
+| Lettering | @gabrielxreis_ Text Presets (.drfx) | MOGRTs da biblioteca |
+| Detalhes | [`docs/etapas/`](docs/etapas) | [`premiere/README.md`](premiere/README.md) |
+
+**Motions:** `hyperframes` (automático, em código) ou `aftereffects`: cada motion é montado no After Effects como **camadas nativas** (cada texto, número, check e cor editável, e uma camada CONTROLES que troca as cores da marca do motion inteiro) e entra na timeline como MOV com alfa. O `.aep` fica na pasta do vídeo. Detalhes em [`aftereffects/README.md`](aftereffects/README.md).
+
 # MOTIONS
 
 - Feitos no **HyperFrames**, com as cores, a fonte e a logo da marca, numa trilha `MOTIONS`.
 - **Sempre centralizados**, medidos com `guias.py` (cutaway no centro da tela, imersivo abaixo do queixo). Nada sobre o rosto: se cobriria o rosto, vira tela cheia sobre um BG animado, que fica contínuo entre motions próximos.
 - Acabamento caprichado e variado, sem repetir o mesmo layout.
+- **Inspiração:** antes de um motion novo, o Gab busca referências de movimento numa coleção de 850+ vídeos feitos em código (`scripts/inspiracao.py`).
+
+## Biblioteca de motions
+
+Modelos prontos em [`biblioteca_motions/`](biblioteca_motions) (cada um com `modelo.json` e `previa.png`): lista com checks, contador com barra, frase em duas linhas... O Gab preenche os campos do vídeo (título, itens, números) e as cores do cliente, e o modelo se ajusta (quantidade de itens, duração, centro da tela). **Cresce a cada vídeo:** todo motion novo aprovado vira modelo e é publicado aqui; você recebe no próximo update. Os modelos também viram **MOGRT** para o Premiere (`scripts/gerar_mogrts.py`, em `premiere/assets/mogrt/`), com texto e cores editáveis no Essential Graphics.
+
+```bash
+python3 ~/.claude/skills/ogab/scripts/biblioteca_motions.py listar
+```
 
 
 # ÁUDIO E EXPORT
@@ -315,9 +373,15 @@ Já tratadas pela skill:
 ```
 SKILL.md                 instruções que o Claude segue (o "cérebro" da skill)
 README.md                este arquivo
-install.sh               instalador de um comando
+install.sh               instalador de um comando (Mac)
+CHANGELOG.md             novidades por versão (o Gab mostra as novas ao abrir)
+windows/                 instalador e camada do Windows
+premiere/                plugin Gab Ponte, premiere_lib.py, LUT e MOGRTs
+aftereffects/            extensão Gab Ponte AE, ae_lib.py e gab_ae.jsx (motions editáveis)
+biblioteca_motions/      modelos de motion prontos (modelo.json + previa.png)
 config.example.json      modelo de configuração (copie para config.json)
-scripts/                 resolve_lib, legendas, legenda_ui, guias, cortes, qc, transcrever, marca, midia, pauta
+scripts/                 resolve_lib, legendas, legenda_ui, guias, cortes, qc, transcrever, marca, midia, pauta,
+                         doctor, novidades, biblioteca_motions, gerar_mogrts, inspiracao
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa

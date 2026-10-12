@@ -36,7 +36,7 @@ Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Pont
 | 6. SFX | arquivos como hoje; `P.colocar(seq, sfx, t, video=None, audio=<A3..>, db=)` |
 | 7. Takes | `P.montar_takes(seq, [(arq, t0), ...], fim=, trilha=1)`: b-roll na V2, a V1 é intocável (regra 1j). Vídeo narrado (sem apresentador): `trilha=0`. O take entra **sem áudio** (subclipe "<take> (video)" criado no bin) |
 | 7b. Cor | `P.aplicar_lut(seq, [takes], "LUT DO GAB")` põe um **Lumetri** em cada take com o LUT do Gab como Look. A API não aceita o LUT por nome (o Look é um índice do menu, que muda por máquina): na 1ª vez calibra sozinho (~1 min, compara quadros exportados com o `.cube` aplicado pelo ffmpeg) e guarda em `assets/lut/indice.json`. O conversor de iPhone do DaVinci não existe aqui: take de iPhone (HLG) o Premiere já converte para Rec.709 sozinho |
-| 8. Lettering | `P.mogrts()` lista os instalados; `P.lettering(seq, "<nome do mogrt>", "TEXTO", inicio, dur, trilha=2)` insere, ajusta a duração e troca o texto. Devolve os parâmetros do template para conferir |
+| 8. Lettering | MOGRTs da biblioteca de motions (`premiere/assets/mogrt/`, gerados no AE por `scripts/gerar_mogrts.py`: lista-checks, contador-barra, frase-duas-linhas...) + os que o usuário criar. `P.mogrts()` lista os instalados; `P.lettering(seq, "<nome do mogrt>", "TEXTO", inicio, dur, trilha=2)` insere, ajusta a duração e troca o texto. Devolve os parâmetros do template para conferir |
 | 8. Motions (HyperFrames) | iguais: render MOV com alfa e `P.colocar(seq, mov, t, video=<trilha>, audio=None)` |
 | 9. Render | `P.exportar(seq, ".../videos/<nome>.mp4")` com o preset H.264 Match Source do Premiere (ou `preset=<.epr>`). Só quando o usuário pedir. `qc.py` igual no arquivo exportado |
 

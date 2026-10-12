@@ -71,14 +71,20 @@ Se a fonte não estiver instalada, o Gab recebe um aviso (`[AE] aviso: fonte ...
 **Qualquer coisa além disso:** `AE.jsx("...ExtendScript...", arg=valor)` roda direto no AE (as funções `GAB.*` de `jsx/gab_ae.jsx` estão disponíveis). Ex.: trocar a cor de destaque de uma comp:
 `AE.jsx("GAB.comp(args.c).layer('CONTROLES').property('ADBE Effect Parade').property('Cor de destaque').property(1).setValue(GAB.rgb('#E04848')); return 1;", c="m01-formacoes")`
 
+## Biblioteca de motions (modelos prontos)
+
+Antes de montar um motion do zero, ver se já existe modelo: `python3 SKILL_DIR/scripts/biblioteca_motions.py listar` (prévias em `biblioteca_motions/<modelo>/previa.png`). Se servir: `B.aplicar("<modelo>", {campos do vídeo}, cores_do_cliente)` devolve o spec pronto para `AE.motion(spec)` (centralizado em 960, duração ajustada ao número de itens).
+
+**Salvar todo motion novo aprovado (regra do usuário, 12/10/2026):** quando um motion feito do zero for aprovado, transformar em modelo (textos viram `{{campos}}`, listas viram `repetir`, sem cores fixas da marca) e salvar: `python3 SKILL_DIR/scripts/biblioteca_motions.py salvar modelo.json --previa quadro.png`. No Mac do dono (`config.json` "dono_biblioteca": true) ele publica no GitHub e todo usuário recebe no próximo update; nos outros usuários fica só local (`biblioteca_motions_local/`).
+
 ## MOGRT para o Premiere
 
-`AE.mogrt(comp, pasta)` expõe os textos e as cores da CONTROLES no Essential Graphics e exporta `<comp>.mogrt` (textos e cores editáveis dentro do Premiere). **Ainda não confirmado:** no teste de 12/10/2026 a exportação travou o AE (ver armadilhas). Até confirmar, entregar o MOV + o `.aep`.
+`AE.mogrt(comp, pasta)` expõe os textos e as cores da CONTROLES no Essential Graphics e exporta `<comp>.mogrt` (textos e cores editáveis dentro do Premiere). Confirmado em 12/10/2026 (2,9 s; o travamento do 1º teste vinha do `aerender` preso ao mesmo tempo). Os modelos da biblioteca viram MOGRT com `python3 SKILL_DIR/scripts/gerar_mogrts.py [modelo]` (vai para `premiere/assets/mogrt/` e é publicado no Mac do dono). **Falta conferir** a inserção desses MOGRTs dentro do Premiere (`premiere_lib.lettering`).
 
 ## Armadilhas (teste de 12/10/2026, AE 26.5 no Mac, sem ninguém na frente da tela)
 
 - **Janela modal trava tudo**, inclusive o ping da ponte. Todo comando roda com `app.beginSuppressDialogs()`, mas as mensagens de erro do próprio AE (fora do script) continuam aparecendo. Se o Gab receber "não respondeu em N s", pedir ao usuário para olhar o AE e fechar o aviso.
-- **Render:** a fila de render (`renderQueue.render()` dentro da chamada), o `aerender` e a prévia do MOGRT travaram neste Mac (o `aerender` até com o AE fechado). O `app.scheduleTask` aceita a tarefa mas ela não roda com o AE em segundo plano. Por isso o render padrão é por quadros: `saveFrameToPng` em cada quadro (~12/s, com alfa) + ffmpeg em ProRes 4444. `renderizar(..., motor="ae")` e `motor="aerender"` ficam para quando o usuário confirmar na tela que não há aviso pendente no primeiro render.
+- **Render:** a fila de render (`renderQueue.render()` dentro da chamada) e o `aerender` travaram neste Mac (o `aerender` até com o AE fechado). O `app.scheduleTask` aceita a tarefa mas ela não roda com o AE em segundo plano. Por isso o render padrão é por quadros: `saveFrameToPng` em cada quadro (~12/s, com alfa) + ffmpeg em ProRes 4444. `renderizar(..., motor="ae")` e `motor="aerender"` ficam para quando o usuário confirmar na tela que não há aviso pendente no primeiro render.
 - **Fechar:** nunca Cmd+Q nem `quit` do AppleScript (a pergunta "salvar alterações?" cancela o fechamento e o AE continua aberto). Usar `AE.fechar()`.
 - **Depois de um fechamento forçado** o AE para num aviso de inicialização; o `conectar()` aperta Return no AE depois de 45 s sem ponte.
 - **Salvar logo depois de `quadro()`** uma vez gerou erro de salvamento (arquivo temporário `.aep` pela metade). Conferir quadros e só depois salvar, ou salvar pelo `motion()`.

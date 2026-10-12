@@ -15,6 +15,10 @@ Pasta da skill: `~/.claude/skills/ogab/` (chamada de `SKILL_DIR` abaixo). Script
 
 Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR pull --ff-only --quiet` (sem pedir confirmação). Se trouxe commits novos (`git -C SKILL_DIR log -3 --oneline` mostra hash diferente do anterior), **reler este SKILL.md** e só então seguir com o pedido. Se o pull falhar (sem internet, mudança local não commitada), avisar em uma linha e seguir com a versão local; nunca descartar mudanças locais. `config.json` e `clientes/` ficam fora do git e não são tocados.
 
+**Novidades (regra do usuário, 12/10/2026):** logo depois do pull, rodar `python3 SKILL_DIR/scripts/novidades.py`. Se imprimir algo, a PRIMEIRA coisa da resposta é mostrar ao usuário essas novidades (curtas, em lista) e só depois seguir com o pedido. Ele marca sozinho o que já foi visto. Se o pull falhou por mudança local, rodar `python3 SKILL_DIR/scripts/doctor.py --corrigir` (guarda as mudanças locais com stash e atualiza).
+
+**Manutenção (quem edita a skill):** toda mudança que o usuário percebe ganha uma linha no topo de `CHANGELOG.md` (nova versão `AAAA.MM.DD-N`), no mesmo commit, em linguagem de usuário (o que mudou e o que ele precisa fazer, se precisar).
+
 ## Editor do usuário: DaVinci OU Premiere (escolhido na instalação)
 
 `config.json` > `editor`: `"davinci"` (padrão, também quando a chave não existe) ou `"premiere"`. O Gab monta os vídeos **só no editor escolhido** e nunca abre nem cita o outro.
@@ -34,9 +38,10 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 - `ajuda` ou `help` (o `/help` puro é do Claude Code e não pode ser trocado): mostrar em tabela o que está **habilitado/desabilitado** em `SKILL_DIR/config.json` (se não existir, copiar de `config.example.json`), os provedores escolhidos por etapa e os comandos. Oferecer mudar qualquer item; ao mudar, editar `config.json` e confirmar.
 - `config <chave> <valor>`: muda direto (ex.: `config opcoes.multi_formatos true`, `config provedores.musica ["envato"]`).
 - `update`: `git -C SKILL_DIR pull --ff-only` e mostrar o que mudou (`git log -5 --oneline`). Nunca sobrescrever `config.json` nem `clientes/`.
+- `doctor` (também quando algo da instalação falhar, ou o usuário disser que "não funciona"): rodar `python3 SKILL_DIR/scripts/doctor.py --corrigir`. Ele corrige sozinho o que dá; para cada linha com "!" que sobrar, guiar o usuário passo a passo (um passo por vez, esperando ele dizer "feito") e rodar o doctor de novo até ficar "Tudo certo". Itens com "·" são de apps que ele não escolheu: não insistir.
 - `cliente <nome>`: criar/atualizar o perfil do cliente (etapa 1).
 - `pauta [cliente]`: rodar a pauta automática (etapa 2b) e sugerir roteiros.
-- `comecar` (ou primeira vez que a skill roda: `config.json` sem `boas_vindas_mostrada`): mostrar o guia de `docs/BEM_VINDO.md` resumido e marcar `boas_vindas_mostrada: true`.
+- `comecar` (ou primeira vez que a skill roda: `config.json` sem `boas_vindas_mostrada`): rodar o `doctor` primeiro (e resolver as pendências com o usuário), depois mostrar o guia de `docs/BEM_VINDO.md` resumido e marcar `boas_vindas_mostrada: true`.
 - sem subcomando ou pedido livre ("faz um vídeo para X"): rodar o fluxo completo.
 
 ## Regras fixas (resumo; texto completo e exemplos em `docs/etapas/regras.md`, ler ao começar um vídeo)

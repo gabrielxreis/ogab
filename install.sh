@@ -203,6 +203,9 @@ info "9/9 After Effects (extensão Gab Ponte AE, motions editáveis)"
 OGAB_SEM_CONFIG=1 bash "$DEST/aftereffects/instalar.sh" | sed -n '/^ /p' || true   # sem AE (ou AE aberto) só avisa
 
 
+info "Conferência final (doctor: confere tudo e corrige o que der)"
+python3 "$DEST/scripts/doctor.py" --corrigir || true
+
 cat <<EOF
 
 Pronto. Seu Gab vai editar no: $OGAB_EDITOR   |   motions: $OGAB_MOTION

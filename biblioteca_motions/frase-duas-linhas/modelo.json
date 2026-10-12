@@ -1,0 +1,59 @@
+{
+ "nome": "frase-duas-linhas",
+ "descricao": "Frase de efeito em duas linhas: a primeira entra palavra por palavra, a segunda (destaque) sai do desfoque. Bom para gancho, virada e fechamento.",
+ "tags": [
+  "frase",
+  "lettering",
+  "gancho",
+  "impacto"
+ ],
+ "autor": "gabrielxreis",
+ "criado": "2026-10-12",
+ "dur": 3.0,
+ "campos": {
+  "linha1": {
+   "tipo": "texto",
+   "exemplo": "SEM ATALHO."
+  },
+  "linha2": {
+   "tipo": "texto",
+   "exemplo": "COM PROCESSO."
+  }
+ },
+ "spec": {
+  "w": 1080,
+  "h": 1920,
+  "fps": 30,
+  "elementos": [
+   {
+    "tipo": "fundo"
+   },
+   {
+    "tipo": "texto",
+    "nome": "LINHA 1",
+    "texto": "{{linha1}}",
+    "fonte": "Inter-Bold",
+    "tamanho": 110,
+    "cor": "texto",
+    "y": 890,
+    "inicio": 0.1,
+    "entrada": "palavras",
+    "dur_entrada": 0.9,
+    "saida_em": "fim-0.4"
+   },
+   {
+    "tipo": "texto",
+    "nome": "LINHA 2",
+    "texto": "{{linha2}}",
+    "fonte": "Inter-Bold",
+    "tamanho": 110,
+    "cor": "destaque",
+    "y": 1030,
+    "inicio": 0.9,
+    "entrada": "blur_in",
+    "dur_entrada": 0.8,
+    "saida_em": "fim-0.4"
+   }
+  ]
+ }
+}
