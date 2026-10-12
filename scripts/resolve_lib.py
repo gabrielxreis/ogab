@@ -604,7 +604,8 @@ def trocar_pela_copia(p, mp, t):
     """Títulos mexidos pela API travam (entram secos no render). Duplica a timeline, apaga a original e devolve a cópia
     com o mesmo nome; mantém o Voice Isolation da A1."""
     nome, vi = t.GetName(), t.GetVoiceIsolationState(1)
-    d = t.DuplicateTimeline(nome + " (novo)"); p.SetCurrentTimeline(d); mp.DeleteTimelines([t]); d.SetName(nome)
+    # 12/10/2026: apagar a original fazia a cópia renderizar seca de novo. A ORIGINAL FICA (renomeada) e a cópia vira a principal.
+    t.SetName(nome + " (titulos via API)"); d = t.DuplicateTimeline(nome); p.SetCurrentTimeline(d)
     if vi and vi.get("isEnabled") and not d.GetVoiceIsolationState(1).get("isEnabled"): d.SetVoiceIsolationState(1, vi)
     # a cópia NÃO leva os fades dos títulos: reaplicar o fade de saída padrão em todo lettering
     for j in range(2, d.GetTrackCount("video") + 1):
@@ -705,3 +706,22 @@ def renderizar_trecho(p, pasta, nome, ini, fim, so_v1=True):
         return os.path.join(pasta, nome + ".mp4")
     finally:
         for tipo, k in desligadas: t.SetTrackEnable(tipo, k, True)
+
+
+def timeline_com_letterings(p, mp, nome, lista, w=1080, h=1920, fps=30):
+    """Timeline NOVA (do modelo GAB USA) com os letterings EDITÁVEIS (Fusion Title do pacote) já animados, sem UI.
+    Por quê (12/10/2026): título inserido numa timeline que já tem mídia entra SECO (sem animação) e a API só insere na V1;
+    numa timeline vazia ele anima. Então: insere os títulos primeiro na V1 vazia, em ordem, e cria uma trilha de vídeo na
+    posição 1 (os títulos sobem para a V2 = LETTERING). Depois montar takes na V1, motions acima, áudio e legenda.
+    lista = [(TEXTO, inicio_s, template[, centro_y]), ...]."""
+    t = timeline_do_modelo(p, mp, nome, w, h, fps) or criar_timeline(p, mp, nome, w, h, fps)
+    p.SetCurrentTimeline(t); S = t.GetStartFrame(); F = fps_tl(t)
+    for item in sorted(lista, key=lambda x: x[1]):
+        texto, ini, tpl = item[:3]; cy = item[3] if len(item) > 3 else None
+        f = S + max(0, round(ini * F)); _ir(t, f); time.sleep(0.6); _ir(t, f)
+        it = t.InsertFusionTitleIntoTimeline(tpl)
+        if not it or it.GetStart() != f: raise RuntimeError(f"título {texto!r} não caiu em {ini}s")
+        ajustar_titulo(it, texto, centro_y=cy)
+    t.AddTrack("video", {"index": 1}); t.SetTrackName("video", 2, "LETTERING")
+    while t.GetTrackCount("audio") < 3: t.AddTrack("audio", "stereo")
+    return t
