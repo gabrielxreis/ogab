@@ -142,6 +142,12 @@ else {
   git clone --depth 1 -q https://github.com/voltagent/awesome-design-md.git $ref 2>$null | Out-Null
   if ($LASTEXITCODE -eq 0) { Ok "awesome-design-md em ~/.claude/referencias" } else { Warn "nao consegui clonar o awesome-design-md" }
 }
+$insp = Join-Path $HOME ".claude\referencias\awesome-opus5-5-videos"
+if (Test-Path (Join-Path $insp ".git")) { git -C $insp pull -q 2>$null | Out-Null; Ok "awesome-opus5-5-videos atualizado" }
+else {
+  git clone --depth 1 -q https://github.com/yihui-dev/awesome-opus5-5-videos.git $insp 2>$null | Out-Null
+  if ($LASTEXITCODE -eq 0) { Ok "awesome-opus5-5-videos (inspiracao de motions) em ~/.claude/referencias" } else { Warn "nao consegui clonar o awesome-opus5-5-videos" }
+}
 
 Info "7/8 Fontes (Poppins, Playfair Display, Lobster, licenca OFL)"
 $fontesUser = Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts"

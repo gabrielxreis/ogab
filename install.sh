@@ -117,6 +117,12 @@ else
   git clone --depth 1 -q https://github.com/voltagent/awesome-design-md.git "$HOME/.claude/referencias/awesome-design-md" >/dev/null 2>&1 \
     && ok "awesome-design-md (DESIGN.md de 70+ marcas) em ~/.claude/referencias" || warn "não consegui clonar o awesome-design-md"
 fi
+if [ -d "$HOME/.claude/referencias/awesome-opus5-5-videos/.git" ]; then
+  git -C "$HOME/.claude/referencias/awesome-opus5-5-videos" pull -q >/dev/null 2>&1; ok "awesome-opus5-5-videos atualizado"
+else
+  git clone --depth 1 -q https://github.com/yihui-dev/awesome-opus5-5-videos.git "$HOME/.claude/referencias/awesome-opus5-5-videos" >/dev/null 2>&1 \
+    && ok "awesome-opus5-5-videos (inspiração de motions, 850+ prompts) em ~/.claude/referencias" || warn "não consegui clonar o awesome-opus5-5-videos"
+fi
 
 info "6/7 Fontes (Poppins, Playfair Display, Lobster, licença OFL)"
 mkdir -p "$HOME/Library/Fonts"

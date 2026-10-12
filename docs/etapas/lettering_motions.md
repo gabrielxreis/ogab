@@ -51,6 +51,8 @@ Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hype
 5. **Timeline:** `colocar_motions(p, t, mp, [(arquivo, segundo), ...])` duplica a timeline como backup e põe tudo numa trilha própria **MOTIONS**, acima de takes e letterings.
 6. **Conflito com palavra-chave:** motion e lettering de palavra-chave no mesmo momento brigam no centro. Preferir o motion e tirar o lettering daquele trecho (e devolver a legenda nesse intervalo); avisar o usuário quais saíram.
 
+**Inspiração de motion (regra do usuário, 12/10/2026):** antes de desenhar um motion NOVO (não o que já existe no cliente), buscar referência de movimento na coleção awesome-opus5-5-videos: `python3 SKILL_DIR/scripts/inspiracao.py "<termos em inglês>" --cat motion,explainer --n 5` (ex.: "counter numbers", "map route", "checklist", "card reveal"). Abrir o link do vídeo para ver o movimento e usar só a ideia de ritmo e transição. As regras desta skill mandam sobre a referência: centro 540/960, visual do site do cliente, calmo, duração medida na fala. Nunca copiar o prompt de terceiro inteiro nem citar o autor no vídeo. A coleção fica fora da skill (`~/.claude/referencias/`, o install clona; `--atualizar` puxa a versão nova).
+
 **Skills de design (instaladas pelo install.sh):** ao desenhar motion/cartão/CTA no HyperFrames, seguir `design-taste-frontend` (nada de cara de template) e conferir com `web-design-guidelines` (contraste e leitura no celular); para copiar um visual de referência (print de site, cartão de notícia), `image-to-code`; referências de sistema visual em `~/.claude/referencias/awesome-design-md/design-md/`; captura/rolagem de página do cliente para motion de site com `playwright-cli`.
 
 ## 8d. Edição dinâmica com HyperFrames (ritmo de Reels)
