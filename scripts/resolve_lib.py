@@ -314,14 +314,10 @@ def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=31, entrelinha=0.8
 
 
 def checar_fades(t):
-    """Confere se TODO lettering (título Fusion acima da V1) tem fade out no bloco (SetFades) e nenhum nó FadeSaida antigo."""
-    ruins = []
-    for v in range(2, t.GetTrackCount("video") + 1):
-        for it in t.GetItemListInTrack("video", v) or []:
-            if not it.GetFusionCompCount(): continue
-            c = it.GetFusionCompByIndex(1); txt = (_textos(c) or [None])[0]
-            nome = txt.GetInput("StyledText") if txt else it.GetName()
-            if c.FindTool("FadeSaida") or not (it.GetFades() or {}).get("FadeOut"): ruins.append(nome)
+    """Confere se TODO lettering (título, item sem MediaPoolItem acima da V1) tem fade out no bloco. NÃO abre a
+    composição do Fusion (abrir congela a animação no render)."""
+    ruins = [it.GetName() for v in range(2, t.GetTrackCount("video") + 1) for it in (t.GetItemListInTrack("video", v) or [])
+             if it.GetMediaPoolItem() is None and not (it.GetFades() or {}).get("FadeOut")]
     print("fades OK" if not ruins else f"SEM FADE NO BLOCO: {ruins}")
     return ruins
 
@@ -601,16 +597,17 @@ def aplicar_enquadramento(t, enq, trilha=1):
 
 
 def trocar_pela_copia(p, mp, t):
-    """Títulos mexidos pela API travam (entram secos no render). Duplica a timeline, apaga a original e devolve a cópia
-    com o mesmo nome; mantém o Voice Isolation da A1."""
+    """RECEITA QUE FUNCIONA (12/10/2026) para o lettering editável entrar ANIMADO: título inserido/ajustado pela API
+    congela (render seco) na timeline em que a composição do Fusion foi aberta (GetFusionCompByIndex). A CÓPIA anima,
+    desde que: (1) a original FIQUE no projeto (apagar a original fazia a cópia travar) e (2) NINGUÉM abra a
+    composição dos títulos na cópia (nada de GetFusionCompByIndex/_textos/ajustar_titulo/checar_fades antigo).
+    A cópia já leva os fades do bloco (conferido). Devolve a cópia com o nome original."""
     nome, vi = t.GetName(), t.GetVoiceIsolationState(1)
-    # 12/10/2026: apagar a original fazia a cópia renderizar seca de novo. A ORIGINAL FICA (renomeada) e a cópia vira a principal.
     t.SetName(nome + " (titulos via API)"); d = t.DuplicateTimeline(nome); p.SetCurrentTimeline(d)
     if vi and vi.get("isEnabled") and not d.GetVoiceIsolationState(1).get("isEnabled"): d.SetVoiceIsolationState(1, vi)
-    # a cópia NÃO leva os fades dos títulos: reaplicar o fade de saída padrão em todo lettering
-    for j in range(2, d.GetTrackCount("video") + 1):
+    for j in range(2, d.GetTrackCount("video") + 1):          # título = item sem MediaPoolItem (não abre a composição)
         for x in d.GetItemListInTrack("video", j) or []:
-            if x.GetFusionCompCount() and _textos(x.GetFusionCompByIndex(1)): x.SetFades({"FadeOut": FADE_LETTERING})
+            if x.GetMediaPoolItem() is None and not (x.GetFades() or {}).get("FadeOut"): x.SetFades({"FadeOut": FADE_LETTERING})
     return d
 
 
@@ -736,7 +733,7 @@ def conferir_entrada_titulos(p, t, pasta="/tmp/ogab_titulos", quadro_ini=1, quad
     os.makedirs(pasta, exist_ok=True); S, F = t.GetStartFrame(), fps_tl(t); out = []
     # só os títulos no render (fundo preto): desliga os outros clipes de vídeo e religa no fim (fundo claro enganava a conta)
     outros = [x for v in range(1, t.GetTrackCount("video") + 1) for x in (t.GetItemListInTrack("video", v) or [])
-              if not (x.GetFusionCompCount() and _textos(x.GetFusionCompByIndex(1))) and x.GetClipEnabled()]
+              if x.GetMediaPoolItem() is not None and x.GetClipEnabled()]
     for x in outros: x.SetClipEnabled(False)
     try:
         out = _conferir_titulos(p, t, pasta, quadro_ini, quadro_fim, S, F)
@@ -752,8 +749,8 @@ def _conferir_titulos(p, t, pasta, quadro_ini, quadro_fim, S, F):
     out = []
     for v in range(2, t.GetTrackCount("video") + 1):
         for it in t.GetItemListInTrack("video", v) or []:
-            if not it.GetFusionCompCount() or not _textos(it.GetFusionCompByIndex(1)): continue
-            txt = _textos(it.GetFusionCompByIndex(1))[0].GetInput("StyledText"); nome = f"tit_{it.GetStart()}"
+            if it.GetMediaPoolItem() is not None: continue      # só títulos; NÃO abrir a composição (congela)
+            txt = it.GetName(); nome = f"tit_{it.GetStart()}"
             for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
             p.SetCurrentRenderFormatAndCodec("mp4", "H264")
             p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": it.GetStart(), "MarkOut": it.GetStart() + quadro_fim + 2,
