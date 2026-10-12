@@ -70,6 +70,41 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
    **Ao retomar um vídeo** (sessão nova, "continua o vídeo X", ajuste numa timeline existente): ler o `PROJETO.md` **primeiro** e seguir dali, sem reler o histórico nem os arquivos grandes. É o que deixa uma sessão nova barata.
 10. **Modelo e esforço por tipo de tarefa** (economia de tokens). Pensamento pesado com **Opus em esforço alto**: roteiro, escolhas de edição (takes, música, ritmo, onde entra cada motion), problemas difíceis e conferência final. Tarefas mecânicas com **Sonnet ou esforço baixo**: renomear e mover arquivos, baixar e converter mídia, importar, encaixar clipes já decididos, trocar uma versão na timeline, ajustes pequenos. A sessão **não pode trocar o próprio modelo** (o app bloqueia, para ninguém ter a cobrança alterada sem ver). Então, na mudança de fase, **avisar numa linha** o usuário para trocar no seletor do app: "Agora é parte mecânica (importar e encaixar os takes): pode passar para Sonnet / esforço baixo." e, antes de decisão criativa: "Próximo passo é escolher a música: volta para Opus alto." Lote grande de trabalho mecânico já decidido (baixar e converter vários takes, renomear e organizar a pasta) pode ir para um subagente com `model: "sonnet"` e instruções fechadas (caminhos, nomes, o que conferir), e o resultado volta para o `PROJETO.md`.
 
+## Padrão: Reels de apresentador falando (comum a todos os clientes)
+
+Tirado do que os dois clientes aprovaram até agora (Bora Imigrar: 5 vídeos em 11/10/2026; X-Trader Academy: 3 vídeos em 12/10/2026). É o ponto de partida de QUALQUER vídeo de pessoa falando para a câmera; o `estilo.md` do cliente só muda o que for diferente (marca, música, fps).
+
+**Formato e timeline**
+- Gravado no iPhone, vertical 1080x1920, Reels de 60 a 90 s (teto da plataforma: 1:30). Timeline no fps do projeto do usuário (Bora 30, X-Trader 24): copiar da timeline original, nunca o padrão do DaVinci.
+- Camadas: V1 apresentador intocado (só enquadramento e cor); acima b-roll, lettering, BG e motions, na trilha onde couber. A1 voz com Voice Isolation | A2 música bruta a -10 dB | A3 SFX.
+- Enquadramento fixo no vídeo todo, com o mínimo de zoom, queixo acima da faixa da legenda; nada de punch-in alternado no apresentador.
+- Ordem: cortes (retakes fora, versão mais limpa, dentro da duração) > legenda completa > b-roll/takes > lettering/motions > música/SFX > QC.
+
+**Dois tipos de vídeo (decidir antes de planejar o b-roll)**
+- **Informativo** (dado, mercado, regra, categoria): o MOTION faz o papel do b-roll; pouco take. Dado com fonte e data quando for número.
+- **Emocional / história** (família, recomeço, sonho, propósito): b-roll ou take de IA em TODA imagem concreta da fala, takes curtos colados (1,3 a 4,5 s), e lettering + b-roll nas frases de efeito. Abrir com b-roll já no 0 s cobrindo o gancho.
+
+**Legenda** (os dois iguais): preset GAB USA, uma linha, até 25 caracteres, do primeiro ao último segundo (CTA incluso), Y 724, desce para 390 só sob lettering/card de CTA. Gerada da timeline atual e com as quebras revisadas à mão (nada picotado).
+
+**Motions** (HyperFrames)
+- Visual tirado do SITE do cliente (cores, fontes, componentes: cards, pílulas, botões), não um estilo genérico; registrar o sistema visual no arquivo do cliente.
+- Sempre no centro (540, 960); a legenda é que se ajusta. Calmos e legíveis: cada informação pelo menos 1 a 1,5 s parada.
+- Duração = a fala que ele ilustra, medida na legenda; elementos entram junto com as palavras.
+- Cutaway em tela cheia com BG animado da marca; motions próximos compartilham o mesmo BG.
+- Marca de terceiros (Apple etc.) só com logo oficial em motion; IA desenha logo torto.
+- **CTA fixo no fim:** logo do cliente + chamada curta + o site PEQUENO num botão; entra na fala do CTA e termina junto com o vídeo. Um destino só (o site principal).
+
+**Música e áudio**
+- O cliente escolhe por vídeo entre 3-4 opções; o gênero muda por marca (Bora: pop leve positivo; X-Trader: cinematográfica/emotiva). Perguntar na 1ª vez e salvar no arquivo do cliente.
+- WAV bruto na A2, -10 dB, cortes e fades no próprio clipe; o final de verdade da faixa termina junto com o vídeo (corte no meio + crossfade se precisar). Sem quadro preto no fim.
+- SFX discretos: whoosh na entrada de motion/b-roll forte, pop em lettering.
+- Master -14 LUFS, pico -1,5 dBTP.
+
+**Conteúdo e tom**
+- Nunca prometer resultado (visto aprovado, lucro); nunca simular fato real como registro; dado com fonte.
+- Takes de IA com o apresentador: sempre a ficha de personagem do cliente como referência, cenas simbólicas.
+- Preferências do cliente vão no arquivo dele (`estilo.md` / `.md` da marca); aqui só o que vale para todos.
+
 ## 1. Cliente (primeira vez por empresa)
 
 Se não existir `SKILL_DIR/clientes/<empresa>/empresa.md`: pedir **site** + **logo** (PNG transparente, claro e escuro) + cores/fontes + redes. Assim que o usuário mandar o site (ou qualquer material da empresa), **varrer tudo antes de começar**: usar a skill **`competitor-profiling`** (`anthropic-skills:competitor-profiling`) apontada para a PRÓPRIA empresa (o que faz, produtos, preços, público, posicionamento, diferenciais, provas sociais, tom, redes, concorrentes), complementar lendo as páginas do site, e só então criar, copiando de `clientes/_exemplo/`. Se a skill não estiver instalada, avisar e oferecer instalar (ver README), ou seguir lendo o site direto:
