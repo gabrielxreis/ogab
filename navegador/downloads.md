@@ -64,3 +64,5 @@ const pick=s=>{const e=document.querySelector(s); if(!e) return null; const c=ge
 Anotar no `marca/identidade.md`. A imagem de compartilhamento (og:image) pode ser de uma versão antiga do site: valer o que a página mostra hoje.
 
 **Artlist (11/10/2026):** em algumas faixas (Artlist Original) o menu MP3/WAV só aparece depois de clicar no ícone de download pela COORDENADA (o clique por ref não abre); depois do clique os botões MP3 e WAV aparecem na linha do Play. Esperar a página sair do esqueleto cinza (7 a 10 s) antes.
+
+**Magnific: Chrome bloqueando downloads (12/10/2026).** Se o zip/MP4 não chega em ~/Downloads, o Chrome está segurando "downloads automáticos" do magnific.com: o usuário libera no ícone de download da barra. Plano B que funcionou sem depender disso: um receptor local (`python3 receptor.py <pasta>` em 127.0.0.1:8765, página GET que lê `#nome=..&u=..`, baixa e faz POST para si mesma) e, na aba da criação, `location.href='http://127.0.0.1:8765/#nome=X.mp4&u='+encodeURIComponent(document.querySelector('video').currentSrc)`. O fetch direto da página do Magnific para o localhost é bloqueado pelo CSP do site; navegar para a página local não é.
