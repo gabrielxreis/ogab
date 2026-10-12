@@ -596,6 +596,23 @@ def aplicar_enquadramento(t, enq, trilha=1):
         for k, v in (("ZoomX", z), ("ZoomY", z), ("Pan", pan), ("Tilt", tilt)): x.SetProperty(k, v)
 
 
+def abrir_em_abas(p, nomes, r=None):
+    """Regra 1c: deixa as timelines dos vídeos ABERTAS EM ABAS (Stacked Timelines) para o usuário, a 1ª da lista na frente.
+    Rodar no FIM de toda etapa que mexe no DaVinci e depois de todo trocar_pela_copia/DuplicateTimeline (trocar a timeline
+    fecha a aba dela). Abre na página Edit, da última para a primeira. Ignora as auxiliares ("(titulos via API)",
+    "(backup ...)", modelo). O Stacked Timelines em si é ligado pela interface (Timeline View Options, 1º ícone da barra
+    da timeline > "Display Stacked Timelines"): conferir com um screenshot na criação do projeto."""
+    r = r or conectar(abrir=False)
+    r.OpenPage("edit")
+    tls = {p.GetTimelineByIndex(i).GetName(): p.GetTimelineByIndex(i) for i in range(1, p.GetTimelineCount() + 1)}
+    for n in reversed(nomes):
+        if n in tls:
+            p.SetCurrentTimeline(tls[n]); time.sleep(1.5)
+        else:
+            print("AVISO: timeline não encontrada para abrir em aba:", n)
+    return [n for n in nomes if n in tls]
+
+
 def trocar_pela_copia(p, mp, t):
     """RECEITA QUE FUNCIONA (12/10/2026) para o lettering editável entrar ANIMADO: título inserido/ajustado pela API
     congela (render seco) na timeline em que a composição do Fusion foi aberta (GetFusionCompByIndex). A CÓPIA anima,
