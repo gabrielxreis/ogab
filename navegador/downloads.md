@@ -66,3 +66,8 @@ Anotar no `marca/identidade.md`. A imagem de compartilhamento (og:image) pode se
 **Artlist (11/10/2026):** em algumas faixas (Artlist Original) o menu MP3/WAV só aparece depois de clicar no ícone de download pela COORDENADA (o clique por ref não abre); depois do clique os botões MP3 e WAV aparecem na linha do Play. Esperar a página sair do esqueleto cinza (7 a 10 s) antes.
 
 **Magnific: Chrome bloqueando downloads (12/10/2026).** Se o zip/MP4 não chega em ~/Downloads, o Chrome está segurando "downloads automáticos" do magnific.com: o usuário libera no ícone de download da barra. Plano B que funcionou sem depender disso: um receptor local (`python3 receptor.py <pasta>` em 127.0.0.1:8765, página GET que lê `#nome=..&u=..`, baixa e faz POST para si mesma) e, na aba da criação, `location.href='http://127.0.0.1:8765/#nome=X.mp4&u='+encodeURIComponent(document.querySelector('video').currentSrc)`. O fetch direto da página do Magnific para o localhost é bloqueado pelo CSP do site; navegar para a página local não é.
+
+## Higgsfield (imagem ilimitada) + Magnific (vídeo)
+- Plano do usuário: Ultimate, com Nano Banana Pro, Seedream 4.5, Seedream 5.0 Lite/Pro e outros ilimitados (conferir `supports_unlim` no `models_list` do MCP e o ∞ no site).
+- O MCP conectado só LÊ (saldo, catálogo, histórico). Gerar pelo site higgsfield.ai no navegador; depois `show_generations(type="image")` devolve a URL direta (d8j0ntlcm91z4.cloudfront.net/...png) do resultado: baixar com `curl -L -o <pasta>/brolls/ia_XX.png <url>`.
+- Vídeo: subir essa imagem no Magnific (Video > Kling 2.5, 720p, ∞ ON, 10 s) e baixar como já descrito acima.
