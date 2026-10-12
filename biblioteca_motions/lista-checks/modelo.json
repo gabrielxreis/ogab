@@ -1,15 +1,17 @@
 {
  "nome": "lista-checks",
- "descricao": "Título pequeno em caixa alta e itens em cartões entrando um a um, cada um com check que se desenha. Bom para requisitos, formações, documentos, etapas concluídas.",
+ "descricao": "Título pequeno em serifa espaçada, divisor dourado com losango e itens em cartões de vidro entrando alternados (esquerda/direita), cada um com brilho que atravessa e check que gira com passada; fundo degradê animado com grade e brilhos; saída em cascata. Bom para requisitos, formações, documentos, etapas.",
  "tags": [
   "lista",
   "checks",
   "requisitos",
-  "etapas"
+  "etapas",
+  "vidro"
  ],
  "autor": "gabrielxreis",
  "criado": "2026-10-12",
- "dur": 2.4,
+ "origem": "calverstone k01-formacoes (HyperFrames), refeito fiel no AE",
+ "dur": 2.75,
  "dur_por_item": 0.95,
  "campos": {
   "titulo": {
@@ -34,87 +36,199 @@
   "fps": 30,
   "elementos": [
    {
-    "tipo": "fundo"
+    "tipo": "fundo_rico"
    },
    {
     "tipo": "texto",
     "nome": "TITULO",
     "texto": "{{titulo}}",
     "caixa_alta": true,
-    "fonte": "Inter-Bold",
-    "tamanho": 40,
-    "tracking": 220,
+    "fonte": "Cardo-Regular",
+    "tamanho": 26,
+    "tracking": 340,
     "cor": "destaque",
-    "y": 520,
-    "inicio": 0,
-    "entrada": "fade_up",
-    "dur_entrada": 0.7,
-    "saida_em": "fim-0.5"
+    "y": 583,
+    "anim": [
+     {
+      "de": {
+       "y": -20,
+       "opacidade": 0,
+       "escala": 112
+      },
+      "t": 0.05,
+      "dur": 0.6,
+      "ease": "out"
+     },
+     {
+      "para": {
+       "y": -80,
+       "opacidade": 0,
+       "escala": 90
+      },
+      "t": "fim-0.3",
+      "dur": 0.45,
+      "ease": "in"
+     }
+    ]
    },
    {
     "repetir": "itens",
     "passo": {
-     "y": 150,
-     "inicio": 0.95
+     "y": 128
     },
     "elementos": [
      {
-      "tipo": "caixa",
+      "tipo": "grupo",
       "nome": "LINHA {{n}}",
-      "w": 820,
-      "h": 118,
-      "raio": 22,
-      "cor": "#0D2547",
-      "borda": "destaque",
-      "borda_largura": 2,
-      "y": 680,
-      "inicio": 0.45,
-      "entrada": "slide_esq",
-      "dur_entrada": 0.6,
-      "saida_em": "fim-0.5",
-      "sombra": true
+      "x": 540,
+      "y": 699.5,
+      "anim": [
+       {
+        "de": {
+         "x": "{{lado}}",
+         "opacidade": 0
+        },
+        "t": "{{t_item}}",
+        "dur": 0.5,
+        "ease": "out"
+       },
+       {
+        "para": {
+         "y": -80,
+         "opacidade": 0,
+         "escala": 90
+        },
+        "t": "fim-0.35",
+        "dur": 0.45,
+        "ease": "in"
+       }
+      ],
+      "elementos": [
+       {
+        "tipo": "cartao",
+        "nome": "CARTAO {{n}}",
+        "w": 700,
+        "h": 104,
+        "x": 540,
+        "y": 699.5,
+        "raio": 26,
+        "brilho": {
+         "t": "{{t_brilho}}",
+         "dur": 1.0
+        }
+       },
+       {
+        "tipo": "texto",
+        "nome": "NUM {{n}}",
+        "texto": "{{n2}}",
+        "fonte": "Cardo-Regular",
+        "tamanho": 34,
+        "cor": "destaque",
+        "alinhar": "esquerda",
+        "x": 220,
+        "y": 699.5
+       },
+       {
+        "tipo": "texto",
+        "nome": "ITEM {{n}}",
+        "texto": "{{item}}",
+        "fonte": "Inter-Bold",
+        "tamanho": 44,
+        "tracking": -10,
+        "cor": "texto",
+        "alinhar": "esquerda",
+        "x": 292,
+        "y": 699.5
+       },
+       {
+        "tipo": "check_rico",
+        "nome": "CHECK {{n}}",
+        "x": 833,
+        "y": 699.5,
+        "tamanho": 54,
+        "anim": [
+         {
+          "de": {
+           "escala": 0,
+           "rot": -90
+          },
+          "t": "{{t_check}}",
+          "dur": 0.4,
+          "ease": "back"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "vars": {
+     "lado": {
+      "alterna": [
+       -240,
+       240
+      ]
+     },
+     "t_item": {
+      "lista": [
+       0.6,
+       1.65,
+       2.6,
+       3.55,
+       4.2,
+       5.15
+      ]
+     },
+     "t_brilho": {
+      "lista": [
+       0.95,
+       2.0,
+       2.95,
+       3.9,
+       4.55,
+       5.5
+      ]
+     },
+     "t_check": {
+      "lista": [
+       1.0,
+       2.05,
+       3.0,
+       3.95,
+       4.6,
+       5.55
+      ]
+     }
+    }
+   },
+   {
+    "tipo": "divisor",
+    "nome": "DIVISOR",
+    "y": "{{y_divisor}}",
+    "anim": [
+     {
+      "de": {
+       "escalaX": 0,
+       "opacidade": 0
+      },
+      "t": 0.2,
+      "dur": 0.6,
+      "ease": "out"
      },
      {
-      "tipo": "texto",
-      "nome": "NUM {{n}}",
-      "texto": "{{n2}}",
-      "fonte": "Inter-Bold",
-      "tamanho": 40,
-      "cor": "destaque",
-      "alinhar": "esquerda",
-      "x": 175,
-      "y": 680,
-      "inicio": 0.5,
-      "entrada": "slide_esq",
-      "dur_entrada": 0.6,
-      "saida_em": "fim-0.5"
-     },
-     {
-      "tipo": "texto",
-      "nome": "ITEM {{n}}",
-      "texto": "{{item}}",
-      "fonte": "Inter-Bold",
-      "tamanho": 52,
-      "cor": "texto",
-      "alinhar": "esquerda",
-      "x": 260,
-      "y": 680,
-      "inicio": 0.55,
-      "entrada": "slide_esq",
-      "dur_entrada": 0.6,
-      "saida_em": "fim-0.5"
-     },
-     {
-      "tipo": "check",
-      "nome": "CHECK {{n}}",
-      "x": 880,
-      "y": 680,
-      "tamanho": 64,
-      "inicio": 0.8,
-      "saida_em": "fim-0.5"
+      "para": {
+       "y": -80,
+       "opacidade": 0,
+       "escala": 90
+      },
+      "t": "fim-0.25",
+      "dur": 0.45,
+      "ease": "in"
      }
     ]
    }
   ]
+ },
+ "calc": {
+  "y_divisor": "699.5 + 128*(n-1) + 132"
  }
 }

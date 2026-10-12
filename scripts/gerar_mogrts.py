@@ -38,7 +38,7 @@ def gerar(nomes=None):
         m = ms[n]
         exemplos = {c: d.get("exemplo") for c, d in m["campos"].items()}
         spec = B.aplicar(n, exemplos, CORES, nome_comp=n)
-        spec["elementos"] = [e for e in spec["elementos"] if e.get("tipo") != "fundo"]   # transparente
+        spec["elementos"] = [e for e in spec["elementos"] if e.get("tipo") not in ("fundo", "fundo_rico")]   # transparente
         AE.motion(spec, salvar=False)
         AE.jsx("return GAB.mogrt(args.comp, args.p);", "mogrt", espera=180, comp=n, p=DESTINO)
         arq = os.path.join(DESTINO, n + ".mogrt")

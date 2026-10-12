@@ -58,9 +58,10 @@ spec = {"nome": "m01-formacoes", "w": 1080, "h": 1920, "fps": 30, "dur": 5.9,
 
 | Campo | Valores |
 |---|---|
-| `tipo` | `fundo`, `texto`, `caixa`, `check`, `barra`, `contador`, `imagem` |
+| `tipo` | `fundo_rico` (degradê radial + grade que desliza + brilhos que se movem + vinheta), `cartao` (vidro com borda dourada, sombra longa e `brilho: {t, dur}` que atravessa), `divisor` (linhas + losango), `check_rico` (círculo + visto do SVG), `grupo` (null com filhos: anima posição/escala e uma Opacidade do grupo), `texto`, `contador`, `barra`, `imagem`; os simples `fundo`, `caixa`, `check` continuam valendo |
 | `cor` | `"principal"`, `"destaque"`, `"texto"`, `"fundo"` (ligadas à camada CONTROLES) ou `"#hex"` fixo |
 | `entrada` | `fade`, `fade_up`, `fade_down`, `slide_esq`, `slide_dir`, `pop`, `blur_in`, `digitando` (letra a letra), `palavras` (palavra por palavra) |
+| `anim` (preferido) | lista no formato do GSAP: `{"de": {...}, "t": 0.6, "dur": 0.5, "ease": "out"}` (entra vindo de) ou `{"para": {...}, ...}` (sai para). Chaves: `x`, `y` (px), `opacidade`, `escala`, `escalaX`, `escalaY`, `rot`. Eases: `out` (power3.out), `in` (power2.in), `inout`, `back` (passa do ponto e volta), `calmo`, `linear` |
 | `saida_em` / `saida` | segundo em que sai / `fade`, `fade_up`, `fade_down` |
 | texto | `fonte` (nome PostScript: `Inter-Bold`, `Poppins-Bold`, `PlayfairDisplay-Bold`...), `tamanho`, `tracking`, `alinhar` (`esquerda`, `direita`), `caixa_alta` |
 
@@ -70,6 +71,12 @@ Se a fonte não estiver instalada, o Gab recebe um aviso (`[AE] aviso: fonte ...
 
 **Qualquer coisa além disso:** `AE.jsx("...ExtendScript...", arg=valor)` roda direto no AE (as funções `GAB.*` de `jsx/gab_ae.jsx` estão disponíveis). Ex.: trocar a cor de destaque de uma comp:
 `AE.jsx("GAB.comp(args.c).layer('CONTROLES').property('ADBE Effect Parade').property('Cor de destaque').property(1).setValue(GAB.rgb('#E04848')); return 1;", c="m01-formacoes")`
+
+## Acabamento: o AE tem que ficar IGUAL ao padrão do HyperFrames (regra do usuário, 12/10/2026)
+
+"Faltava animação, acabamento, BG animado": motion no AE nunca sai chapado. Sempre `fundo_rico` (ou o take por trás), cartões em `cartao` com brilho, `divisor` com losango quando a marca tiver, entradas alternadas e com `ease` (`out`/`back`), saída em cascata, fontes da marca (Calverstone: Cardo no título e números, Inter Bold no texto).
+
+**Quando já existe o motion em HyperFrames** (ou o usuário mostra um como referência): traduzir o HTML 1:1. Posições (`top` + metade da altura; o `#fit` soma o `translate`), fontes e tamanhos do CSS, `letter-spacing` em em vira `tracking` x1000, cada `tl.from(...)` vira um `{"de": ...}` com o mesmo `t`, `dur` e ease, `gsap.to` vira `{"para": ...}`. Depois conferir com quadros nos mesmos instantes contra o MOV original: diferença média abaixo de 10 (de 255). Exemplo feito assim: o k01-formacoes da Calverstone (5,5 a 7,9 de diferença; a versão sem acabamento dava 14,6).
 
 ## Biblioteca de motions (modelos prontos)
 

@@ -63,6 +63,14 @@ def _subst(v, ctx):
     return v
 
 
+def _desloca(e, k, d):
+    """Soma d na chave k do elemento e de todos os elementos dentro dele (grupos)."""
+    if isinstance(e.get(k), (int, float)):
+        e[k] = round(e[k] + d, 3)
+    for f in e.get("elementos", []) or []:
+        _desloca(f, k, d)
+
+
 def _expandir(elementos, ctx, valores):
     out = []
     for e in elementos:
@@ -71,10 +79,16 @@ def _expandir(elementos, ctx, valores):
             passo = e.get("passo", {})
             for i, item in enumerate(lista):
                 sub = dict(ctx, item=item, n=i + 1, n2=f"{i + 1:02d}")
+                for nome, regra in (e.get("vars") or {}).items():     # valores que mudam por item
+                    if "alterna" in regra:
+                        sub[nome] = regra["alterna"][i % len(regra["alterna"])]
+                    elif "lista" in regra:
+                        sub[nome] = regra["lista"][min(i, len(regra["lista"]) - 1)]
+                    else:
+                        sub[nome] = round(regra.get("de", 0) + regra.get("passo", 0) * i, 3)
                 for filho in _expandir(e["elementos"], sub, valores):
                     for k, d in passo.items():
-                        if isinstance(filho.get(k), (int, float)):
-                            filho[k] = round(filho[k] + d * i, 3)
+                        _desloca(filho, k, d * i)
                     out.append(filho)
         else:
             out.append(_subst(copy.deepcopy(e), ctx))
@@ -91,16 +105,19 @@ def aplicar(nome, valores, cores=None, nome_comp=None):
             raise SystemExit(f"falta o campo '{c}' ({d.get('tipo')}), ex.: {d.get('exemplo')}")
     n = max([len(v) for v in valores.values() if isinstance(v, list)] or [0])
     dur = round(m.get("dur", 5) + m.get("dur_por_item", 0) * max(0, n - 1), 3)
-    ctx = dict(valores, dur=dur)
+    ctx = dict(valores, dur=dur, n_itens=n)
+    for var, expr in (m.get("calc") or {}).items():           # contas simples com n_itens e dur
+        ctx[var] = round(eval(expr, {"__builtins__": {}}, {"n": n, "dur": dur}), 3)
     spec = copy.deepcopy(m["spec"])
     spec["elementos"] = _expandir(spec["elementos"], ctx, valores)
     if spec.pop("centralizar", True):          # regra do Gab: o bloco do motion fica centrado em y = h/2
-        ys = [e["y"] for e in spec["elementos"] if isinstance(e.get("y"), (int, float)) and e.get("tipo") != "fundo"]
+        fundos = ("fundo", "fundo_rico")
+        ys = [e["y"] for e in spec["elementos"] if isinstance(e.get("y"), (int, float)) and e.get("tipo") not in fundos]
         if ys:
             d = round(spec.get("h", 1920) / 2 - (min(ys) + max(ys)) / 2, 1)
             for e in spec["elementos"]:
-                if isinstance(e.get("y"), (int, float)) and e.get("tipo") != "fundo":
-                    e["y"] = round(e["y"] + d, 1)
+                if e.get("tipo") not in fundos:
+                    _desloca(e, "y", d)
     spec["nome"] = nome_comp or nome
     spec["dur"] = valores.get("dur", dur)
     if cores:

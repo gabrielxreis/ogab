@@ -60,8 +60,9 @@ GAB.projeto = function (caminho) {
   var f = new File(caminho);
   if (app.project && app.project.file && app.project.file.fsName === f.fsName) return app.project.file.fsName;
   // salva o projeto aberto antes de trocar (senão o AE pergunta "salvar alterações?" e trava)
-  if (app.project && app.project.file) app.project.close(CloseOptions.SAVE_CHANGES);
-  else if (app.project) app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
+  if (app.project && app.project.file && app.project.file.parent.exists) {
+    try { app.project.close(CloseOptions.SAVE_CHANGES); } catch (x) { app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES); }
+  } else if (app.project) app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
   if (f.exists) app.open(f);
   else { app.newProject(); app.project.save(f); }
   return app.project.file ? app.project.file.fsName : null;
@@ -316,22 +317,17 @@ GAB.motion = function (spec) {
   comp.bgColor = GAB.rgb((spec.cores && spec.cores.fundo) || "#000000");
   var criados = [];
   for (var i = 0; i < spec.elementos.length; i++) {
-    var e = spec.elementos[i];
-    if (e.x === undefined) e.x = comp.width / 2;
-    if (e.y === undefined) e.y = comp.height / 2;
-    var fn = { texto: GAB.texto, caixa: GAB.caixa, check: GAB.check, barra: GAB.barra, contador: GAB.contador, imagem: GAB.imagem, fundo: GAB.fundo }[e.tipo];
-    if (!fn) throw new Error("tipo de elemento desconhecido: " + e.tipo);
-    var r = fn(comp, e);
-    var ls = r instanceof Array ? r : [r];
-    for (var k = 0; k < ls.length; k++) {
-      if (e.tipo !== "check" && e.tipo !== "barra") GAB.entrada(ls[k], e.entrada, e.inicio || 0, e.dur_entrada);
-      if (e.saida_em !== undefined) GAB.saida(ls[k], e.saida || "fade", e.saida_em, e.dur_saida);
-      ls[k].moveToBeginning();
-      criados.push(ls[k].name);
-    }
+    var ls = GAB.criar(comp, spec.elementos[i]);
+    for (var k = 0; k < ls.length; k++) criados.push(ls[k]);
+  }
+  // ordem de empilhamento: o primeiro da lista fica embaixo
+  for (var m = 0; m < criados.length; m++) criados[m].moveToBeginning();
+  if (spec.saida_geral) {      // saída do motion inteiro (como o out() do HyperFrames)
+    for (var q = 0; q < criados.length; q++) if (!criados[q].parent && criados[q].enabled && criados[q].name.indexOf("BG ") !== 0) GAB.animar(criados[q], [spec.saida_geral]);
   }
   GAB.controles(comp, spec.cores || {}).moveToBeginning();
   app.endUndoGroup();
+  var nomes = []; for (var z = 0; z < criados.length; z++) nomes.push(criados[z].name);
   return { comp: comp.name, camadas: criados.length, duracao: comp.duration };
 };
 
@@ -412,4 +408,259 @@ GAB.listar = function () {
     if (it instanceof CompItem) r.push({ nome: it.name, dur: it.duration, w: it.width, h: it.height, camadas: it.numLayers });
   }
   return r;
+};
+
+// ==================================================================================================================
+// ACABAMENTO (12/10/2026): mesma linguagem dos motions do HyperFrames, para o AE ficar igual ao original.
+// Animações no formato do GSAP:  "anim": [ {"de": {...}, "t": 0.6, "dur": 0.5, "ease": "out"},
+//                                         {"para": {...}, "t": 5.6, "dur": 0.45, "ease": "in"} ]
+// chaves: x, y (deslocamento em px), opacidade (0-100), escala (%), escalaX (%), rot (graus)
+// ease: "out" (power3.out), "in" (power2.in), "inout" (power2.inOut), "back" (back.out, com passada), "linear", "calmo"
+// ==================================================================================================================
+
+GAB.EASES = { out: [8, 92], "in": [92, 8], inout: [62, 62], calmo: [80, 80], linear: [0.1, 0.1], back: [8, 70] };
+
+GAB.dims = function (prop) {
+  var t = prop.propertyValueType;
+  return t === PropertyValueType.TwoD ? 2 : (t === PropertyValueType.ThreeD ? 3 : 1);
+};
+
+GAB.easeEntre = function (prop, k0, k1, tipo) {
+  var e = GAB.EASES[tipo] || GAB.EASES.calmo, n = GAB.dims(prop), i;
+  var saida = [], chegada = [];
+  for (i = 0; i < n; i++) { saida.push(new KeyframeEase(0, e[0])); chegada.push(new KeyframeEase(0, e[1])); }
+  try {
+    prop.setTemporalEaseAtKey(k0, prop.keyInTemporalEase(k0), saida);
+    prop.setTemporalEaseAtKey(k1, chegada, prop.keyOutTemporalEase(k1));
+  } catch (x) {}
+};
+
+// Anima uma propriedade de v0 a v1 entre t e t+dur com a curva pedida ("back" passa do ponto e volta).
+GAB.tween = function (prop, t, dur, v0, v1, tipo) {
+  if (tipo === "back") {
+    var over;
+    if (v1 instanceof Array) { over = []; for (var i = 0; i < v1.length; i++) over.push(v1[i] + (v1[i] - v0[i]) * 0.12); }
+    else over = v1 + (v1 - v0) * 0.12;
+    prop.setValueAtTime(t, v0); prop.setValueAtTime(t + dur * 0.62, over); prop.setValueAtTime(t + dur, v1);
+    GAB.easeEntre(prop, prop.nearestKeyIndex(t), prop.nearestKeyIndex(t + dur * 0.62), "out");
+    GAB.easeEntre(prop, prop.nearestKeyIndex(t + dur * 0.62), prop.nearestKeyIndex(t + dur), "inout");
+    return;
+  }
+  prop.setValueAtTime(t, v0); prop.setValueAtTime(t + dur, v1);
+  GAB.easeEntre(prop, prop.nearestKeyIndex(t), prop.nearestKeyIndex(t + dur), tipo);
+};
+
+// Aplica as animações. `alvoOpacidade` permite animar o slider de um grupo em vez da opacidade da camada.
+GAB.animar = function (layer, anims, alvoOpacidade) {
+  if (!anims) return;
+  var tr = layer.property("ADBE Transform Group");
+  var pos = tr.property("ADBE Position"), sc = tr.property("ADBE Scale"), rot = tr.property("ADBE Rotate Z");
+  var op = alvoOpacidade || tr.property("ADBE Opacity");
+  var base = { pos: pos.value, sc: sc.value, rot: rot.value, op: op.value };
+  for (var i = 0; i < anims.length; i++) {
+    var a = anims[i], d = a.de || a.para, ida = !!a.de, t = a.t || 0, dur = a.dur || 0.5, tipo = a.ease || "calmo";
+    var par = function (alt, normal) { return ida ? [alt, normal] : [normal, alt]; };
+    if (d.x !== undefined || d.y !== undefined) {
+      var p2 = [base.pos[0] + (d.x || 0), base.pos[1] + (d.y || 0)];
+      var pp = par(p2, base.pos); GAB.tween(pos, t, dur, pp[0], pp[1], tipo === "back" ? "out" : tipo);
+    }
+    if (d.escala !== undefined || d.escalaX !== undefined || d.escalaY !== undefined) {
+      var s2 = [d.escalaX !== undefined ? d.escalaX : (d.escala !== undefined ? d.escala : base.sc[0]),
+                d.escalaY !== undefined ? d.escalaY : (d.escala !== undefined ? d.escala : base.sc[1]), base.sc[2]];
+      var ps = par(s2, base.sc); GAB.tween(sc, t, dur, ps[0], ps[1], tipo);
+    }
+    if (d.rot !== undefined) { var pr = par(d.rot, base.rot); GAB.tween(rot, t, dur, pr[0], pr[1], tipo); }
+    if (d.opacidade !== undefined) { var po = par(d.opacidade, base.op); GAB.tween(op, t, dur, po[0], po[1], tipo === "back" ? "out" : tipo); }
+  }
+};
+
+// Fundo com acabamento: degradê radial na cor do fundo (CONTROLES), grade dourada que desliza, dois brilhos que se
+// movem devagar e vinheta. Tudo editável (camadas "BG ...").
+GAB.fundoRico = function (comp, e) {
+  var W = comp.width, H = comp.height, ls = [];
+  var base = comp.layers.addSolid([0.04, 0.12, 0.23], "BG degradê", W, H, 1, comp.duration);
+  var rp = base.property("ADBE Effect Parade").addProperty("ADBE Ramp");
+  rp = base.property("ADBE Effect Parade").property(1);
+  rp.property("ADBE Ramp-0001").setValue([W / 2, H * 0.479]);
+  rp.property("ADBE Ramp-0003").setValue([W / 2, H * 0.5 + 1300]);
+  try { rp.property("ADBE Ramp-0005").setValue(2); } catch (x) {}
+  rp.property("ADBE Ramp-0002").expression = 'var c = thisComp.layer("CONTROLES").effect("Cor do fundo")(1); [Math.min(1, c[0]*1.75), Math.min(1, c[1]*1.68), Math.min(1, c[2]*1.6), 1]';
+  rp.property("ADBE Ramp-0004").expression = 'var c = thisComp.layer("CONTROLES").effect("Cor do fundo")(1); [c[0]*0.45, c[1]*0.48, c[2]*0.5, 1]';
+  ls.push(base);
+  if (e.grade !== false) {
+    var g = comp.layers.addSolid([0, 0, 0], "BG grade", W, H, 1, comp.duration);
+    var ge = g.property("ADBE Effect Parade").addProperty("ADBE Grid");
+    ge = g.property("ADBE Effect Parade").property(1);
+    try { ge.property("ADBE Grid-0002").setValue(2); } catch (x1) {}          // tamanho pela largura
+    try { ge.property("ADBE Grid-0004").setValue(60); } catch (x2) {}         // largura da célula
+    try { ge.property("ADBE Grid-0006").setValue(1); } catch (x3) {}          // espessura
+    try { ge.property("ADBE Grid-0001").expression = "var o = (time*10) % 60; [o, o]"; } catch (x4) {}
+    try { ge.property("ADBE Grid-0010").expression = 'thisComp.layer("CONTROLES").effect("Cor de destaque")(1)'; } catch (x5) {}
+    g.property("ADBE Transform Group").property("ADBE Opacity").setValue(e.grade_opacidade || 6);
+    ls.push(g);
+  }
+  // brilho = degradê radial dourado -> preto em modo Tela (o preto não soma nada): igual ao radialGradient do original
+  var brilho = function (nome, x, y, r, opac, expr) {
+    var b = comp.layers.addSolid([0, 0, 0], nome, W, H, 1, comp.duration);
+    b.property("ADBE Effect Parade").addProperty("ADBE Ramp");
+    var rp2 = b.property("ADBE Effect Parade").property(1);
+    try { rp2.property("ADBE Ramp-0005").setValue(2); } catch (x0) {}
+    rp2.property("ADBE Ramp-0001").expression = expr;
+    rp2.property("ADBE Ramp-0003").expression = "var p = effect(1)(1); [p[0] + " + r + ", p[1]]";
+    rp2.property("ADBE Ramp-0002").expression = 'thisComp.layer("CONTROLES").effect("Cor de destaque")(1)';
+    rp2.property("ADBE Ramp-0004").setValue([0, 0, 0, 1]);
+    b.blendingMode = BlendingMode.SCREEN;
+    b.property("ADBE Transform Group").property("ADBE Opacity").setValue(opac);
+    return b;
+  };
+  if (e.brilhos !== false) {
+    ls.push(brilho("BG brilho 1", 220, 560, 560, 13, "[220 + 70*Math.sin(time*0.5), 560 + 50*Math.cos(time*0.4)]"));
+    ls.push(brilho("BG brilho 2", 880, 1380, 600, 10, "[880 - 60*Math.sin(time*0.45), 1380 + 60*Math.sin(time*0.6)]"));
+  }
+  if (e.vinheta !== false) {
+    var vi = comp.layers.addSolid([0, 0, 0], "BG vinheta", W, H, 1, comp.duration);
+    var m = vi.property("ADBE Mask Parade").addProperty("ADBE Mask Atom");
+    var sh = new Shape(), rx = 700, ry = 700, k = 0.5523, cx = W / 2, cy = H / 2;
+    sh.vertices = [[cx, cy - ry], [cx + rx, cy], [cx, cy + ry], [cx - rx, cy]];
+    sh.inTangents = [[-rx * k, 0], [0, -ry * k], [rx * k, 0], [0, ry * k]];
+    sh.outTangents = [[rx * k, 0], [0, ry * k], [-rx * k, 0], [0, -ry * k]];
+    sh.closed = true;
+    m = vi.property("ADBE Mask Parade").property(1);
+    m.property("ADBE Mask Shape").setValue(sh);
+    m.inverted = true;
+    m.property("ADBE Mask Feather").setValue([550, 550]);
+    vi.property("ADBE Transform Group").property("ADBE Opacity").setValue(55);
+    ls.push(vi);
+  }
+  for (var i = 0; i < ls.length; i++) { ls[i].label = 16; }
+  return ls;
+};
+
+// Cartão "vidro": cor com transparência, borda dourada fina, sombra longa e brilho que atravessa (track matte).
+GAB.cartao = function (comp, e) {
+  var card = GAB.caixa(comp, { nome: e.nome || "CARTAO", w: e.w, h: e.h, x: e.x, y: e.y, raio: e.raio === undefined ? 26 : e.raio,
+                               cor: e.cor || "#0F284C", borda: e.borda || "destaque", borda_largura: e.borda_largura || 1.5,
+                               opacidade_fill: e.opacidade_fill === undefined ? 93 : e.opacidade_fill });
+  try {
+    var s = card.property("ADBE Root Vectors Group").property("Caixa").property("ADBE Vectors Group").property("ADBE Vector Graphic - Stroke");
+    s.property("ADBE Vector Stroke Opacity").setValue(e.borda_opacidade === undefined ? 45 : e.borda_opacidade);
+  } catch (x) {}
+  var ds = card.property("ADBE Effect Parade").addProperty("ADBE Drop Shadow");
+  ds = card.property("ADBE Effect Parade").property(1);
+  ds.property("ADBE Drop Shadow-0002").setValue(140);   // opacidade (0-255) ~55%
+  ds.property("ADBE Drop Shadow-0003").setValue(180);   // direção: para baixo
+  ds.property("ADBE Drop Shadow-0004").setValue(30);    // distância
+  ds.property("ADBE Drop Shadow-0005").setValue(70);    // suavidade
+  var out = [card];
+  if (e.brilho) {
+    var matte = card.duplicate(); matte.name = card.name + " (máscara do brilho)";
+    try { matte.property("ADBE Effect Parade").property(1).remove(); } catch (x2) {}
+    matte.enabled = false;
+    var sh = comp.layers.addShape(); sh.name = card.name + " brilho";
+    sh.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Faixa";
+    var v = sh.property("ADBE Root Vectors Group").property("Faixa").property("ADBE Vectors Group");
+    v.addProperty("ADBE Vector Shape - Rect").property("ADBE Vector Rect Size").setValue([120, e.h * 1.4]);
+    var f = sh.property("ADBE Root Vectors Group").property("Faixa").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+    f.property("ADBE Vector Fill Color").setValue(GAB.rgb("#FFF0C8"));
+    f.property("ADBE Vector Fill Opacity").setValue(35);
+    try { sh.property("ADBE Root Vectors Group").property("Faixa").property("ADBE Vector Transform Group").property("ADBE Vector Skew").setValue(20); } catch (x3) {}
+    var bl = sh.property("ADBE Effect Parade").addProperty("ADBE Gaussian Blur 2");
+    sh.property("ADBE Effect Parade").property(1).property(1).setValue(40);
+    try { sh.property("ADBE Effect Parade").property(1).property("ADBE Gaussian Blur 2-0002").setValue(2); } catch (x4) {}   // só horizontal
+    var x0 = e.x - e.w / 2 - 160, x1 = x0 + 1500;
+    var pos = sh.property("ADBE Transform Group").property("ADBE Position");
+    pos.setValue([x0, e.y]);
+    GAB.tween(pos, e.brilho.t, e.brilho.dur || 1.0, [x0, e.y], [x1, e.y], "inout");
+    try { sh.setTrackMatte(matte, TrackMatteType.ALPHA); } catch (x5) { GAB.avisos.push("track matte do brilho: " + x5); }
+    out.push(matte); out.push(sh);
+  }
+  return out;
+};
+
+// Divisor dourado: duas linhas e um losango no meio (o losango da logo).
+GAB.divisor = function (comp, e) {
+  var l = comp.layers.addShape(); l.name = e.nome || "DIVISOR";
+  var raiz = l.property("ADBE Root Vectors Group"), lin = e.linha || 90, gap = e.gap || 14, d = e.losango || 12;
+  var peca = function (nome, w, h, x, rot) {
+    l.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = nome;
+    var g = l.property("ADBE Root Vectors Group").property(nome);
+    g.property("ADBE Vectors Group").addProperty("ADBE Vector Shape - Rect").property("ADBE Vector Rect Size").setValue([w, h]);
+    var f = l.property("ADBE Root Vectors Group").property(nome).property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+    GAB.corDe(f.property("ADBE Vector Fill Color"), e.cor || "destaque");
+    var tg = l.property("ADBE Root Vectors Group").property(nome).property("ADBE Vector Transform Group");
+    tg.property("ADBE Vector Position").setValue([x, 0]);
+    if (rot) tg.property("ADBE Vector Rotation").setValue(rot);
+  };
+  var off = gap + d * 0.7 + lin / 2;
+  peca("Linha esq", lin, 2, -off, 0); peca("Losango", d, d, 0, 45); peca("Linha dir", lin, 2, off, 0);
+  l.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
+  return l;
+};
+
+// Check do HyperFrames: círculo dourado e o visto (path do SVG 24x24) em navy, aparece girando com passada.
+GAB.checkRico = function (comp, e) {
+  var t = e.tamanho || 54, pad = e.pad === undefined ? 12 : e.pad, k = (t - 2 * pad) / 24;
+  var l = comp.layers.addShape(); l.name = e.nome || "CHECK";
+  l.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Visto";
+  var vv = l.property("ADBE Root Vectors Group").property("Visto").property("ADBE Vectors Group");
+  var pth = vv.addProperty("ADBE Vector Shape - Group");
+  var sh = new Shape(), pts = [[5, 12.5], [9.5, 17], [19, 7.5]];
+  for (var i = 0; i < pts.length; i++) pts[i] = [(pts[i][0] - 12) * k, (pts[i][1] - 12) * k];
+  sh.vertices = pts; sh.closed = false;
+  pth.property("ADBE Vector Shape").setValue(sh);
+  var stk = l.property("ADBE Root Vectors Group").property("Visto").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Stroke");
+  GAB.corDe(stk.property("ADBE Vector Stroke Color"), e.cor_visto || "principal");
+  stk.property("ADBE Vector Stroke Width").setValue(3 * k);
+  stk.property("ADBE Vector Stroke Line Cap").setValue(2); stk.property("ADBE Vector Stroke Line Join").setValue(2);
+  l.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Circulo";
+  var vc = l.property("ADBE Root Vectors Group").property("Circulo").property("ADBE Vectors Group");
+  vc.addProperty("ADBE Vector Shape - Ellipse").property("ADBE Vector Ellipse Size").setValue([t, t]);
+  var fc = l.property("ADBE Root Vectors Group").property("Circulo").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+  GAB.corDe(fc.property("ADBE Vector Fill Color"), e.cor || "destaque");
+  l.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
+  return l;
+};
+
+// Grupo: um null no centro (posição/escala/rotação animadas) e uma "Opacidade do grupo" que multiplica a de cada filho.
+GAB.grupo = function (comp, e) {
+  var n = comp.layers.addNull(comp.duration);
+  n.name = e.nome || "GRUPO"; n.label = 11;
+  n.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
+  n.property("ADBE Effect Parade").addProperty("ADBE Slider Control").name = "Opacidade do grupo";
+  var slider = n.property("ADBE Effect Parade").property("Opacidade do grupo").property(1);
+  slider.setValue(100);
+  var filhos = [];
+  for (var i = 0; i < e.elementos.length; i++) {
+    var ls = GAB.criar(comp, e.elementos[i]);
+    for (var j = 0; j < ls.length; j++) {
+      ls[j].parent = n;
+      var op = ls[j].property("ADBE Transform Group").property("ADBE Opacity");
+      if (ls[j].enabled) op.expression = 'value * thisComp.layer("' + n.name + '").effect("Opacidade do grupo")(1) / 100';
+      filhos.push(ls[j]);
+    }
+  }
+  GAB.animar(n, e.anim, slider);
+  return [n].concat(filhos);
+};
+
+// Cria um elemento de qualquer tipo e aplica as animações dele. Devolve as camadas criadas.
+GAB.criar = function (comp, e) {
+  if (e.x === undefined) e.x = comp.width / 2;
+  if (e.y === undefined) e.y = comp.height / 2;
+  var fn = { texto: GAB.texto, caixa: GAB.caixa, check: GAB.check, barra: GAB.barra, contador: GAB.contador, imagem: GAB.imagem,
+             fundo: GAB.fundo, fundo_rico: GAB.fundoRico, cartao: GAB.cartao, divisor: GAB.divisor, check_rico: GAB.checkRico,
+             grupo: GAB.grupo }[e.tipo];
+  if (!fn) throw new Error("tipo de elemento desconhecido: " + e.tipo);
+  var r = fn(comp, e), ls = r instanceof Array ? r : [r];
+  if (e.tipo !== "grupo") {
+    for (var k = 0; k < ls.length; k++) {
+      if (!ls[k].enabled && !ls[k].hasVideo) continue;
+      if (e.anim) GAB.animar(ls[k], e.anim);
+      else {      // formato antigo (entrada/saida_em)
+        if (e.tipo !== "check" && e.tipo !== "barra" && e.entrada) GAB.entrada(ls[k], e.entrada, e.inicio || 0, e.dur_entrada);
+        if (e.saida_em !== undefined) GAB.saida(ls[k], e.saida || "fade", e.saida_em, e.dur_saida);
+      }
+    }
+  }
+  return ls;
 };
