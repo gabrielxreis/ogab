@@ -185,5 +185,6 @@
       "6 Vortex"
     ]
   },
-  "ficha_layout_exemplo": "caminho de uma ficha já aprovada (só para o layout; o rosto dela nunca é usado)"
+  "ficha_layout_exemplo": "caminho de uma ficha já aprovada (só para o layout; o rosto dela nunca é usado)",
+  "boas_vindas_mostrada": false
 }

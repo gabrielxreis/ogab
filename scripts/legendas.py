@@ -232,3 +232,25 @@ if __name__ == '__main__':
     elif a[0] == 'reflow': reflow(a[1], a[2], opt('--cliente'), int(opt('--max', 25)))
     elif a[0] == 'metrica': sys.exit(1 if metrica(a[1], int(opt('--max', 25))) else 0)
     else: print(__doc__)
+
+
+def picotado(srt, compostos=()):
+    """Frase/palavra picotada (o que a métrica não pega, regra do usuário 12/10/2026). Devolve a lista de problemas:
+    - legenda termina em determinante/possessivo/pronome que pede a palavra seguinte ("os seus / limites.");
+    - palavra órfã: a seguinte é UMA palavra só fechando a frase ("ganhou / ontem.") e a atual não terminou frase;
+    - termo composto partido entre duas legendas (compostos + termos com espaço do pronuncia.json do cliente)."""
+    bl = [b.split('\n') for b in open(srt).read().strip().split('\n\n')]
+    txt = [' '.join(b[2:]).strip() for b in bl]; probs = []
+    norm = lambda s: re.sub(r'[^\wà-ú ]', '', s.lower())
+    base = {'gestão de risco', 'centros financeiros', 'estados unidos', 'nova york', 'wall street', 'world trade center'} | {c.lower() for c in compostos}
+    for k in range(len(txt) - 1):
+        a, b = txt[k], txt[k + 1]; ult = norm(a.split()[-1]) if a.split() else ''
+        fecha = bool(re.search(r'[.?!,;:]$', a))
+        if not fecha and ult in NAO_FECHA: probs.append(f"#{k + 1} [{a}] termina em '{ult}' (pede a palavra seguinte)")
+        if not re.search(r'[.?!]$', a) and len(b.split()) == 1 and re.search(r'[.?!]$', b) and k + 1 < len(txt) - 1:
+            probs.append(f"#{k + 2} [{b}] palavra órfã depois de [{a}]")
+        junta = norm(a + ' ' + b)
+        for c in base:
+            if c in junta and c not in norm(a) and c not in norm(b) and len(c.split()) > 1:
+                probs.append(f"#{k + 1}-{k + 2} termo '{c}' partido: [{a}] / [{b}]")
+    return probs

@@ -1,12 +1,13 @@
 """Conferência automática antes de entregar.
 
-  python3 qc.py <pasta_do_video> [--cliente <pasta_cliente>] [--plataforma instagram|meta_ads|youtube_shorts]
+  python3 qc.py <pasta_do_video> [--cliente <pasta_cliente>] [--plataforma instagram|meta_ads|youtube_shorts] [--timeline "<nome>"]
 
 Confere:
   1. Pastas e arquivos obrigatórios (roteiro.txt, links.txt, narracoes/, musica/, brolls/, videos/, legendas/).
   2. Vídeo final: resolução, duração dentro da regra da plataforma, quadros pretos (blackdetect), loudness (LUFS).
   3. Legendas: uma linha só, tamanho máximo, grafias proibidas do cliente (erros de transcrição), palavra fraca no fim.
   4. Takes: green screen, arquivos pesados (4K/ProRes) que travam o playback.
+  4b. Legenda picotada (legendas.picotado) e, com --timeline, motions fora do tempo da fala.
   5. Gera folha de contato (qc_folha.jpg) com 6 quadros do vídeo final.
 Saída: lista de OK / AVISO / ERRO. Corrigir os ERROs antes de entregar.
 """
@@ -25,11 +26,38 @@ def cfg():
     return {}
 
 
-def main(pasta, cliente=None, plataforma="instagram"):
+def motions_no_tempo(nome_tl, ok, av, tol_ini=0.5, tol_fim=0.8):
+    """Motion tem que nascer com a fala que ilustra (regra 1h): início perto do início de uma legenda e fim perto do fim
+    de uma legenda (ou do fim do vídeo). Fora disso, o motion foi feito no tempo errado: medir de novo e re-renderizar."""
+    import resolve_lib as Rl
+    from projeto import MOTION
+    p = Rl.conectar().GetProjectManager().GetCurrentProject()
+    t = next((p.GetTimelineByIndex(i) for i in range(1, p.GetTimelineCount() + 1) if p.GetTimelineByIndex(i).GetName() == nome_tl), None)
+    if not t: av(f"timeline '{nome_tl}' não encontrada: checagem de motions pulada"); return
+    F = float(t.GetSetting("timelineFrameRate")); S = t.GetStartFrame(); sec = lambda f: (f - S) / F
+    subs = [(sec(x.GetStart()), sec(x.GetEnd())) for x in t.GetItemListInTrack("subtitle", 1) or []]
+    fim_tl = sec(max(x.GetEnd() for x in t.GetItemListInTrack("video", 1)))
+    for k in range(2, t.GetTrackCount("video") + 1):
+        for x in t.GetItemListInTrack("video", k) or []:
+            if not MOTION.search(x.GetName()): continue
+            a, b = sec(x.GetStart()), sec(x.GetEnd())
+            bom_ini = "cta" in x.GetName().lower() or any(abs(a - s0) <= tol_ini for s0, _ in subs)   # CTA: só o fim conta (termina com o vídeo)
+            bom_fim = abs(b - fim_tl) <= tol_fim or any(abs(b - s1) <= tol_fim for _, s1 in subs)
+            (ok if bom_ini and bom_fim else av)(f"motion {x.GetName()} {a:.1f}-{b:.1f}s " + ("bate com a fala" if bom_ini and bom_fim else
+                f"fora do tempo da fala ({'início' if not bom_ini else ''}{' e ' if not bom_ini and not bom_fim else ''}{'fim' if not bom_fim else ''}): medir na legenda e re-renderizar"))
+
+
+def main(pasta, cliente=None, plataforma="instagram", timeline=None):
     C = cfg(); R = C.get("regras", {}); res = []
     ok = lambda m: res.append(("OK", m)); av = lambda m: res.append(("AVISO", m)); er = lambda m: res.append(("ERRO", m))
 
-    for item in ("roteiro.txt", "links.txt", "narracoes|gravacao", "musica", "brolls", "videos", "legendas", "videos/capa.png", "videos/legenda_post.txt"):
+    # gravado pela pessoa (talking head): não há narração gerada por voz de IA, então não há roteiro.txt
+    gravado = os.path.isdir(os.path.join(pasta, "gravacao")) or not glob.glob(os.path.join(pasta, "narracoes", "narracao*.wav"))
+    itens = ["links.txt", "narracoes|gravacao", "musica", "brolls", "legendas"] + ([] if gravado else ["roteiro.txt"])
+    if C.get("opcoes", {}).get("renderizar_video"): itens.append("videos")
+    for item in (["videos/capa.png", "videos/legenda_post.txt"] if C.get("opcoes", {}).get("capa_e_legenda_post") else []):
+        (ok if os.path.exists(os.path.join(pasta, item)) else av)(f"entrega: {item} (capa e legenda do post)")
+    for item in itens:
         # vídeo gravado pela pessoa (talking head) tem gravacao/ no lugar de narracoes/
         (ok if any(os.path.exists(os.path.join(pasta, x)) for x in item.split("|")) else er)(f"estrutura: {item}")
 
@@ -81,6 +109,12 @@ def main(pasta, cliente=None, plataforma="instagram"):
         import io, contextlib
         with contextlib.redirect_stdout(io.StringIO()): probs = metrica(srts[-1], mx)
         (er if probs else ok)("métrica da legenda" + (f": {probs[:3]}" if probs else " (0 problema)"))
+        from legendas import picotado
+        comp = []
+        if cliente and os.path.exists(os.path.join(cliente, "pronuncia.json")):
+            comp = [t["grafia"] for t in json.load(open(os.path.join(cliente, "pronuncia.json"))).get("termos", []) if " " in t.get("grafia", "")]
+        pic = picotado(srts[-1], comp)
+        (er if pic else ok)("legenda sem frase/palavra picotada" + (f": {pic[:3]}" if pic else ""))
         if cliente and os.path.exists(os.path.join(cliente, "pronuncia.json")):
             bruto = " ".join(l for b in linhas for l in b)
             for t in json.load(open(os.path.join(cliente, "pronuncia.json"))).get("termos", []):
@@ -91,6 +125,8 @@ def main(pasta, cliente=None, plataforma="instagram"):
                     if so_caixa and L.get("preset_trilha", {}).get("caixa_alta"): achou = False  # legenda vai em caixa alta
                     (er if achou else ok)(f"grafia: '{e}' -> '{t['grafia']}'")
     else: er("nenhum SRT em legendas/")
+
+    if timeline: motions_no_tempo(timeline, ok, av)
 
     for f in sorted(glob.glob(os.path.join(pasta, "brolls", "take_*"))):
         nome = os.path.basename(f)
@@ -108,4 +144,4 @@ if __name__ == "__main__":
     a = sys.argv[1:]
     if not a: print(__doc__); sys.exit()
     opt = lambda k, d=None: a[a.index(k) + 1] if k in a else d
-    main(a[0], opt("--cliente"), opt("--plataforma", "instagram"))
+    main(a[0], opt("--cliente"), opt("--plataforma", "instagram"), opt("--timeline"))
