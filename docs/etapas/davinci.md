@@ -6,5 +6,7 @@
 
 **Gravação de apresentador (vlog, talking head):** transcrição = a do DaVinci que o usuário fez no clipe (`transcrever.py saida.json --clipe "<clipe>"`), cortes com `scripts/cortes.py` (plano por frase/retake + `montar`), legenda pela `broll.transcricao_na_timeline`, depois b-roll com `scripts/broll.py`. Bugs já resolvidos e suas causas: `docs/PROCESSO.md` > Bugs encontrados.
 
+**Whisper é só RESERVA (regra do usuário, 12/10/2026):** DaVinci 21.1+ transcreve sozinho; o Whisper só roda em DaVinci antigo ou se o usuário pedir `--motor whisper` (o install nem instala na 21.1+). Nunca chamar o Whisper "para conferir".
+
 **Transcrição (tempo de cada palavra):** sempre por `python3 SKILL_DIR/scripts/transcrever.py narracoes/narracao.wav narracoes/transcricao.json`. Ele **detecta sozinho a versão do DaVinci**: na **21.1 ou mais nova** usa a transcrição do próprio DaVinci (`TranscribeAudio` + `GetTranscription`); **abaixo da 21.1** (a API não devolve o texto, mesmo o DaVinci transcrevendo na interface desde a 18.5) usa o **Whisper local** (mlx-whisper no Apple Silicon, faster-whisper no Intel, grátis; o `install.sh` instala só quando a versão precisa). `transcrever.py --versao` mostra qual caminho vai ser usado. Abaixo da 20.2.2, conferir se narração e música caíram em A1/A2 (bug da API corrigido nessa versão).
 

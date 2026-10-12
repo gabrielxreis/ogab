@@ -34,13 +34,13 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 1d. Voice Isolation em todo áudio de iPhone/câmera (`SetVoiceIsolationState` com a timeline atual).
 1e. Nada em cima do rosto (legenda, lettering, motion).
 1f. **Ordem: cortes > legenda > VALIDAÇÃO DA LEGENDA pelo usuário > b-roll/motions** (o tempo dos motions vem da legenda).
-1g. **A timeline é do usuário:** retrato pela API antes, mexer só no alvo pelo nome, comparar depois; nunca clicar/digitar/Undo no DaVinci com ele dentro.
+1g. **A timeline é do usuário:** `retrato.py antes "<timeline>" <pasta>` antes de mexer e `retrato.py depois ... --alvo <trilhas/nomes>` depois (sai com erro se algo fora do alvo mudou); mexer só no alvo pelo nome; nunca clicar/digitar/Undo no DaVinci com ele dentro.
 1h. Acabamento aprendido: b-roll já no 0 s, motion com a duração da fala, takes curtos colados, punch-in leve, música termina com o vídeo.
 1i. Nunca parado esperando: enquanto algo gera/renderiza, adiantar outra etapa.
 1j. Nunca apagar nem esvaziar a V1.
 1k. Vídeo emocional: b-roll em toda imagem concreta e lettering + b-roll nas frases de efeito.
 1l. Rosto enquadrado com o mínimo de zoom, igual no vídeo todo.
-1m. **Fim de toda ação: barra de progresso de 3 linhas** (`X ▰▰▰▱ N de 9` / `Falta: ...` / `Próximo: ...`), nada além disso de status.
+1m. **Fim de toda ação: barra de progresso de 3 linhas** gerada por `projeto.py status <pasta> [--timeline]` (detecta na timeline o que já foi feito e reescreve o Status do `PROJETO.md`); o que depende do usuário: `projeto.py marcar <pasta> legenda_validada` (ou `--pular "motivo"`). Nada além disso de status.
 2. Tudo via MCP/API; download pelo navegador.
 3. Economizar créditos e tokens: só ilimitado; `browser_batch` + 1 screenshot pequeno; status pelo MCP; mapas de tela em `navegador/downloads.md`; arquivos por trecho.
 4. Provedores na ordem do `config.json`, pulando o que não estiver conectado.
@@ -74,15 +74,14 @@ Listar 3-5 vozes no idioma (ElevenLabs `creative_list_voices`; incluir vozes do 
 Projeto com fps/resolução certos e a árvore de pastas; narração/gravação; transcrição do DaVinci (`transcrever.py`); cortes de gravação com `cortes.py`.
 
 ## 4b. Legenda (PARAR para o usuário validar antes de takes e motions) (`docs/etapas/legenda.md`)
-Create Subtitles from Audio da timeline atual > métrica > quebras revisadas à mão > preset GAB USA (`legenda_auto.py`, modelo GAB USA). Mostrar e esperar a validação, avisando que legenda fora de tempo deixa o motion fora de tempo.
+Create Subtitles from Audio da timeline atual > métrica > quebras revisadas à mão > preset GAB USA (`legenda_auto.py`, modelo GAB USA). Mostrar e esperar a validação, avisando que legenda fora de tempo deixa o motion fora de tempo. Depois dos motions: `legenda_baixa.py "<timeline>" <pasta>` desce para Y 390, sem clicar, toda legenda que cruza motion/CTA/lettering (`--desfazer` volta).
 
 ## 5. Música
 
 Clima padrão: **emotiva, que faz sonhar**, instrumental, priorizando as mais baixadas/em alta (Artlist `sortBy: TOP_DOWNLOADS`, Envato `sortBy: popular`). Mostrar 3-4 opções com prévia; o usuário escolhe. Baixar WAV pelo navegador. **Música BRUTA na timeline (regra do usuário, 11/10/2026): nunca cortar/renderizar o WAV antes.** `colocar_musica(t, mp, wav_original, inicio_faixa=hookStartSeconds - tempo_do_CTA, db=-10)` põe o arquivo original na A2 com ponto de entrada no trecho (clímax no CTA) e fades no próprio clipe (0,5 s in, 2,5 s out), para o usuário arrastar e reajustar no DaVinci. Cria a A2 se a timeline só tiver A1.
 
 ## 6. Efeitos sonoros (se `opcoes.efeitos_sonoros`)
-
-Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoosh suave nas trocas de take principais, um impacto/riser no gancho, um "ding"/pop no CTA. Poucos e baixos (`colocar_sfx`, -6 dB na A3). Registrar em `links.txt`.
+`sfx_auto.py "<timeline>"` depois dos motions/b-roll: whoosh no início de cada motion (pico na entrada) e de cada b-roll forte (o que entra depois de 1,5 s só com o apresentador), pop em cada lettering, tudo na A3 "SFX" (-12/-18/-16 dB, chave `AudioVolume`). Sons em `SKILL_DIR/biblioteca_sfx/` (fora do git; whoosh e pop licenciados do usuário). `--simular` mostra antes; rodar de novo substitui só os SFX dele.
 
 ## 7. Takes e ficha de personagem (`docs/etapas/takes.md`)
 Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usuário (imagem Higgsfield ilimitado no site + vídeo Magnific Kling 2.5 720p ∞ 10 s). Pessoa real: ficha de personagem primeiro (7a).
@@ -92,8 +91,8 @@ Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usu�
 Depois de montar os takes (e sempre que trocar um take), `aplicar_grade(r, t, config.cor.drx, config.cor.drx_iphone)` em todos os takes da V1. **Take de iPhone** (`midia.py iphone`): recebe o PowerGrade combinado (conversor do iPhone antes, LUT depois), automático. Conferir 2-3 quadros: se algum take de banco estourar (contraste/saturação exagerados), avisar o usuário. Lettering e legenda não recebem grade.
 
 ## 8. Lettering e motions (HyperFrames) (`docs/etapas/lettering_motions.md`)
-Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; edição dinâmica e recursos extras do HyperFrames.
+Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; edição dinâmica e recursos extras do HyperFrames. Legenda atrás da pessoa e pacote de entrevista: `docs/etapas/extras.md` (quando usar e como).
 
 ## 9. Render, formatos e conferência (`docs/etapas/render.md`)
-Só exporta se o usuário pedir; -14 LUFS; qc.py; capa e legenda do post.
+Só exporta se o usuário pedir; -14 LUFS; `qc.py <pasta> --cliente ... --timeline "<nome>"` (inclui legenda picotada e motion fora do tempo da fala); capa e legenda do post.
 

@@ -681,3 +681,23 @@ def mover_e_relinkar(mp, origem, destino):
             n += bool(c.ReplaceClip(destino))
     return n
 
+def renderizar_trecho(p, pasta, nome, ini, fim, so_v1=True):
+    """Exporta só um trecho (segundos da timeline), por padrão só a V1 (sem b-roll, motions e legenda), para mandar
+    ao HyperFrames (legenda atrás da pessoa, pacote de entrevista). Religa tudo que desligou, mesmo se falhar."""
+    t = p.GetCurrentTimeline(); F = fps_tl(t); S = t.GetStartFrame(); desligadas = []
+    try:
+        if so_v1:
+            for tipo in ("video", "subtitle"):
+                for k in range(1, t.GetTrackCount(tipo) + 1):
+                    if (tipo, k) != ("video", 1) and t.GetIsTrackEnabled(tipo, k):
+                        t.SetTrackEnable(tipo, k, False); desligadas.append((tipo, k))
+        for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
+        os.makedirs(pasta, exist_ok=True); p.SetCurrentRenderFormatAndCodec("mp4", "H264")
+        p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": S + round(ini * F), "MarkOut": S + round(fim * F) - 1,
+                             "TargetDir": pasta, "CustomName": nome, "ExportVideo": True, "ExportAudio": True,
+                             "FormatWidth": int(t.GetSetting("timelineResolutionWidth")), "FormatHeight": int(t.GetSetting("timelineResolutionHeight"))})
+        jid = p.AddRenderJob(); p.StartRendering(jid)
+        while p.IsRenderingInProgress(): time.sleep(1)
+        return os.path.join(pasta, nome + ".mp4")
+    finally:
+        for tipo, k in desligadas: t.SetTrackEnable(tipo, k, True)

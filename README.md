@@ -176,7 +176,8 @@ Tudo em `config.json` (copiado de `config.example.json`, fora do git).
 | `opcoes.lettering_no_gancho` | `perguntar` | Título animado no começo |
 | `opcoes.multi_formatos` | `false` | Renderiza também 4:5, 16:9 e cortes de 15/30/60 s para Ads |
 | `opcoes.origem_takes` | `perguntar` | `ia`, `banco` ou `misto` |
-| `opcoes.pacote_entrevista` | `perguntar` | Gráficos de entrevista (nome/cargo, números, citações) |
+| `opcoes.pacote_entrevista` | `perguntar` | Gráficos de entrevista (nome/cargo, números, citações) com `talking-head-recut`; quando e como em `docs/etapas/extras.md` |
+| `opcoes.legenda_atras_da_pessoa` | `true` | Legenda atrás da pessoa (`embedded-captions`) no gancho e nas frases de efeito; ver `docs/etapas/extras.md` |
 | `opcoes.renderizar_video` | `false` | Exporta o MP4 sozinho (senão entrega a timeline pronta) |
 | `opcoes.capa_e_legenda_post` | `true` | `capa.png` e `legenda_post.txt` em `videos/` |
 | `opcoes.conferencia_automatica` | `true` | Roda o `qc.py` antes de entregar |
