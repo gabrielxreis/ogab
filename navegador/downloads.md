@@ -71,3 +71,10 @@ Anotar no `marca/identidade.md`. A imagem de compartilhamento (og:image) pode se
 - Plano do usuário: Ultimate, com Nano Banana Pro, Seedream 4.5, Seedream 5.0 Lite/Pro e outros ilimitados (conferir `supports_unlim` no `models_list` do MCP e o ∞ no site).
 - O MCP gera, mas o ilimitado não vale por ele (cobra crédito: NB Pro 2K = 2, Seedream 4.5 = 1). Gerar pelo site higgsfield.ai no navegador (ilimitado); depois `show_generations(type="image")` devolve a URL direta (d8j0ntlcm91z4.cloudfront.net/...png) do resultado: baixar com `curl -L -o <pasta>/brolls/ia_XX.png <url>`.
 - Vídeo: subir essa imagem no Magnific (Video > Kling 2.5, 720p, ∞ ON, 10 s) e baixar como já descrito acima.
+
+### Higgsfield no site: mapa da tela (testado 12/10/2026, sem explorar de novo)
+1. `https://higgsfield.ai/ai/image` (a URL `?model=nano_banana_pro` dá "Oops"; escolher o modelo no seletor da barra de baixo: "Nano Banana Pro" com selo UNLIMITED).
+2. Botão `+` da barra abre o painel Uploads; o `input[type=file]` aparece só depois disso (`find` "Upload media") -> `file_upload` com ref_corpo.jpg + ref_rosto.jpg; clicar nas miniaturas para anexar ("Added to prompt box"); fechar o painel no X.
+3. Ligar o toggle **Unlimited** (o botão Generate passa a mostrar "Unlimited" sem custo), proporção 9:16, 2K, 1/4.
+4. Clicar no campo "Describe the scene", digitar o prompt, Generate. Leva ~40 s.
+5. Acompanhar e baixar pelo MCP: `show_generations(type="image", size=1, only_completed=false)` -> `results.rawUrl` -> curl. (No histórico o modelo aparece como `nano_banana_2`, é o Pro do site.) Conferir `balance` antes/depois: crédito não muda no ilimitado.
