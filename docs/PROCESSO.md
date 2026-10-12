@@ -242,3 +242,5 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 | 12/10/2026 | `legenda_ui.py` leu o chat do Claude e clicou fora | a janela do Claude fica por cima do Inspector | `coberta()` para com erro claro; `--preset "GAB USA"` carrega o preset pela interface quando precisar |
 | 12/10/2026 | régua da timeline não achada pelo OCR | painéis com outra altura | área de busca da régua ampliada (`TIMELINE`) |
 | 12/10/2026 | download em lote do Magnific não chegou (zip e avulso) | Chrome segurando downloads seguidos do site | liberar "downloads automáticos" para magnific.com no Chrome (ícone de download da barra) |
+| 12/10/2026 | b-roll caiu no tempo errado (0 s) | a frase também existia num retake cortado e o script usava a 1ª ocorrência | `broll.py` pula para a 1ª ocorrência que ficou na timeline |
+| 12/10/2026 | "NÃO ENTROU" falso | a conferência exigia o quadro exato; o DaVinci desloca 1-2 quadros | confere pelo nome do arquivo com tolerância de 1 s |

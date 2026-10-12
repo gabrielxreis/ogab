@@ -68,7 +68,15 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
     ws = palavras(trans); mapa = mapa_fonte(t); feitos = []
     plano = []
     for b in lista:
-        seg_t = fonte_para_timeline(mapa, achar_frase(ws, b["frase"], b.get("depois", 0.0)))
+        seg_t, dep = None, b.get("depois", 0.0)
+        for _ in range(6):   # a mesma frase pode existir num retake cortado: usa a 1a ocorrência que ficou na timeline
+            try:
+                seg_f = achar_frase(ws, b["frase"], dep)
+            except ValueError:
+                break
+            if any(a - 0.05 <= seg_f <= bb + 0.05 for a, bb, _ in mapa):
+                seg_t = fonte_para_timeline(mapa, seg_f); break
+            dep = seg_f + 0.01
         if seg_t is None:
             print("  pulei (frase fora da timeline):", b["frase"]); continue
         plano.append((seg_t + b.get("atraso", 0.0), dict(b)))
@@ -103,7 +111,8 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
         if not res:
             print("  falhou:", b["frase"], os.path.basename(b["arquivo"])); continue
         x = res[0]
-        if not any(abs(y.GetStart() - ini_f) <= 1 for y in (t.GetItemListInTrack("video", trilha) or [])):
+        nome_arq = os.path.basename(b["arquivo"])
+        if not any(y.GetName() == nome_arq and abs(y.GetStart() - ini_f) <= F for y in (t.GetItemListInTrack("video", trilha) or [])):
             print("  NÃO ENTROU (sobreposição?):", b["frase"]); continue
         try:
             w, h = [int(v) for v in (pr.get("Resolution") or "0x0").split("x")]
