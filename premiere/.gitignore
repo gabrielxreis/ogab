@@ -1,0 +1,7 @@
+# Material do usuário (não vai para o repositório público sem autorização)
+assets/lut/*
+!assets/lut/LEIA.md
+assets/mogrt/*
+!assets/mogrt/LEIA.md
+*.ccx
+__pycache__/

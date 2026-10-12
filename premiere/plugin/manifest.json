@@ -1,0 +1,35 @@
+{
+  "id": "com.gabrielxreis.ogab.ponte",
+  "name": "Gab Ponte",
+  "version": "1.0.0",
+  "main": "index.html",
+  "host": {
+    "app": "premierepro",
+    "minVersion": "25.6.0"
+  },
+  "manifestVersion": 5,
+  "requiredPermissions": {
+    "localFileSystem": "fullAccess",
+    "allowCodeGenerationFromStrings": true,
+    "network": {
+      "domains": ["ws://127.0.0.1:8765", "ws://localhost:8765"]
+    }
+  },
+  "entrypoints": [
+    {
+      "id": "gabponte",
+      "type": "panel",
+      "label": { "default": "Gab Ponte" },
+      "minimumSize": { "width": 200, "height": 80 },
+      "maximumSize": { "width": 2000, "height": 2000 },
+      "preferredDockedSize": { "width": 230, "height": 100 },
+      "preferredFloatingSize": { "width": 260, "height": 110 },
+      "icons": [
+        { "width": 23, "height": 23, "path": "icons/icon.png", "scale": [1, 2], "theme": ["all"] }
+      ]
+    }
+  ],
+  "icons": [
+    { "width": 48, "height": 48, "path": "icons/icon.png", "scale": [1, 2], "theme": ["all"], "species": ["pluginList"] }
+  ]
+}
