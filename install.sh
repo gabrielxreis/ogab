@@ -144,5 +144,10 @@ Pronto. Falta só o que precisa de você (uma vez):
      ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/
   5. Opcional: skill competitor-profiling (Personalização > Skills no Claude).
 
-Reinicie o Claude Code e peça: "faz um vídeo para <empresa> sobre <tema>" ou digite /ogab ajuda (o Gab é o seu editor)
+  6. Opcional: Higgsfield e Magnific logados no Chrome (imagem e vídeo de IA no ilimitado, pelo site).
+
+Reinicie o Claude Code e digite:  /ogab comecar
+O Gab mostra em 1 minuto como pedir, onde ele para para você aprovar, e como gastar menos tokens:
+  - uma conversa por vídeo; para retomar: /ogab continua o vídeo X (ele lê o PROJETO.md do vídeo)
+  - no fim de cada ação você recebe só uma barrinha: feito / falta / próximo
 EOF

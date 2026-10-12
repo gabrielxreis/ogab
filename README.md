@@ -46,6 +46,16 @@
 [![HyperFrames](https://img.shields.io/badge/-HyperFrames-6E40C9.svg?style=for-the-badge)](https://github.com/heygen-com/hyperframes)
 [![Provedores](https://img.shields.io/badge/-Provedores-orange.svg?style=for-the-badge)](docs/PROVEDORES.md)
 
+## Primeiro uso (leia isto)
+
+Depois de instalar, abra o Claude Code e digite **`/ogab comecar`**. O Gab explica em 1 minuto:
+- **Como pedir:** `/ogab edita o vídeo X do cliente Y`, `/ogab faz um reels para Y sobre Z`, ou mande o site/briefing de um cliente novo.
+- **Onde ele para e espera você:** roteiro, voz, **legenda** (valide antes dos motions: o tempo de tudo depende dela), música.
+- **O que você recebe no fim de cada ação:** só uma barrinha (`▰▰▰▱ 4 de 9`, o que falta, o próximo passo).
+- **Como gastar menos tokens:** uma conversa por vídeo; para retomar, `/ogab continua o vídeo X` (ele lê o `PROJETO.md` da pasta do vídeo, que guarda status, decisões, arquivos e pendências); peça várias coisas de uma vez; avise quando mexer na timeline.
+
+Guia completo: [`docs/BEM_VINDO.md`](docs/BEM_VINDO.md). O `SKILL.md` é só o mapa; cada etapa tem seu arquivo em `docs/etapas/`, lido só quando chega nela.
+
 ## Um comando
 
 Cole no **Terminal** do Mac:
