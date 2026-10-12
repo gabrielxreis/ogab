@@ -68,6 +68,8 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
     ws = palavras(trans); mapa = mapa_fonte(t); feitos = []
     plano = []
     for b in lista:
+        if "tempo" in b:   # tempo exato na timeline (ex.: CTA que termina junto com a última fala)
+            plano.append((float(b["tempo"]), dict(b))); continue
         seg_t, dep = None, b.get("depois", 0.0)
         for _ in range(6):   # a mesma frase pode existir num retake cortado: usa a 1a ocorrência que ficou na timeline
             try:
