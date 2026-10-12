@@ -33,6 +33,19 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 - `aftereffects`: o MESMO plano de motions (centro, visual do cliente, calmo, duração da fala), mas cada motion é montado no After Effects como camadas nativas editáveis (texto, número, check, cor, keyframe) e entra na timeline como MOV com alfa. Ler `aftereffects/README.md` ao chegar na etapa 8.
 - `/ogab config motion aftereffects|hyperframes` troca; ao trocar para aftereffects, rodar `aftereffects/instalar.sh` (Mac) ou `aftereffects\instalar.ps1` (Windows) com o AE fechado, se a extensão Gab Ponte AE ainda não estiver instalada.
 
+## Economia de tokens: troca de modelo e ajudante barato (OBRIGATÓRIO, regra do usuário)
+
+**1. Avisar para trocar de modelo em toda mudança de fase.** A sessão não troca o próprio modelo (o app bloqueia), então o Gab AVISA numa linha, no começo da resposta, sempre que a fase muda:
+
+| Fase | Modelo |
+|---|---|
+| Roteiro, escolha de voz/música/takes, ritmo, onde entra cada motion, problema difícil, conferência final | **Opus, esforço alto** |
+| Baixar, converter, importar, encaixar o que já foi decidido, trocar versão na timeline, renomear, ajustes pequenos | **Sonnet ou esforço baixo** |
+
+Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode passar para Sonnet ou esforço baixo no seletor do app."; voltando a decidir, "Próximo passo é <decisão>: volta para Opus, esforço alto." Uma vez por mudança de fase, sem repetir a cada mensagem.
+
+**2. Lote mecânico vai para um ajudante barato, nunca para a conversa principal.** Downloads em lote do Envato, da Artlist e do Magnific (o vaivém no navegador é o que mais gasta), conversões, organização de pastas e conferências repetitivas: o Gab decide a lista e passa para um subagente (`Agent` com `model: "sonnet"` se precisar do Chrome, `"haiku"` se for só terminal), em segundo plano, e recebe só o resultado (uma linha por item). Modelos de pedido e o que nunca delegar: `docs/etapas/ajudante.md` (ler antes do primeiro lote).
+
 ## 0. Subcomandos (`/ogab <sub>`)
 
 - `ajuda` ou `help` (o `/help` puro é do Claude Code e não pode ser trocado): mostrar em tabela o que está **habilitado/desabilitado** em `SKILL_DIR/config.json` (se não existir, copiar de `config.example.json`), os provedores escolhidos por etapa e os comandos. Oferecer mudar qualquer item; ao mudar, editar `config.json` e confirmar.
@@ -70,7 +83,7 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 7. Movimentos nos takes e lettering no gancho: perguntar (salvo `config`).
 8. Sem travessão (em dash) nos textos e legendas.
 9. **`PROJETO.md` em cada vídeo** (status, decisões, DaVinci, arquivos, custos, pendências): atualizar a cada etapa; ao retomar ("continua o vídeo X"), ler ele primeiro em vez de reconstruir pela conversa.
-10. Modelo/esforço por tarefa: decisão criativa e conferência com esforço alto; tarefas mecânicas com Sonnet/Haiku ou esforço baixo. **Lote mecânico vai para subagente barato** (ferramenta Agent com `model: "haiku"`, ou `"sonnet"` se precisar de navegador): baixar vários takes/músicas/SFX, converter e organizar mídia, conferir arquivos. O subagente recebe a lista pronta e devolve só o resultado (caminhos e o que falhou); a decisão criativa fica aqui.
+10. Modelo/esforço por tarefa e ajudante barato: ver "Economia de tokens" no topo (aviso de troca de modelo em toda mudança de fase; lote mecânico sempre em subagente).
 
 ## Padrão: Reels de apresentador falando (`docs/etapas/padrao_reels.md`)
 Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): vertical, 60-90 s, V1 intocada, legenda GAB USA do início ao fim, recurso escolhido trecho a trecho (motion, IA com apresentador, personagem criado, banco, material real), motions no centro com o visual do site e a duração da fala, CTA com o site pequeno, música bruta terminando com o vídeo. O `estilo.md` do cliente só muda o que for diferente.

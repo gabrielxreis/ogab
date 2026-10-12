@@ -4,7 +4,7 @@ O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiz
 Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos itens.
 
 ## 2026.10.12-6 (12/10/2026)
-- **Gasta menos tokens:** tarefas repetitivas (baixar vários takes, converter, organizar) vão para um ajudante mais barato, e os motions começam pela biblioteca de modelos antes de serem feitos do zero.
+- **Gasta menos tokens:** o Gab avisa quando trocar para Sonnet (ou esforço baixo) nas fases mecânicas e quando voltar para Opus nas decisões. Downloads em lote (Envato, Artlist), conversões e conferências vão para um ajudante mais barato, que devolve só o resultado. Os motions começam pela biblioteca de modelos.
 - **Docker não é mais instalado:** o Gab não usa. Se o `hyperframes doctor` avisar "Docker: not found", pode ignorar. Quem já instalou pode manter ou desinstalar, tanto faz.
 
 ## 2026.10.12-5 (12/10/2026)

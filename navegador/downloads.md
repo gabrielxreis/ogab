@@ -4,6 +4,8 @@ Os conectores (MCP) de Envato, Artlist, Magnific etc. **buscam**, mas **não bai
 
 Antes de baixar: o usuário precisa estar logado no site. A IA **nunca** digita senha.
 
+**Quem baixa é o ajudante:** lote de downloads não é feito na conversa principal. O Gab passa a lista para um subagente (`docs/etapas/ajudante.md`), que segue as receitas abaixo e devolve só o resultado.
+
 ## Envato Elements (vídeo, música, efeitos)
 
 **Receita que funcionou em lote (11/10/2026, 21 b-rolls sem erro):** usar `browser_batch` com, por clipe: `navigate` (link elements.envato.com) -> `computer screenshot` com `scale 0.2` (**sem screenshot a página não redireciona** para app.envato.com) -> `wait 8` -> `javascript_tool` com o script abaixo. 3 a 4 clipes por lote. Se o script responder "ainda na pagina antiga", repetir screenshot + espera.
