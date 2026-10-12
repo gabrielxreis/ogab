@@ -27,6 +27,14 @@ Antes de escolher o som, ler o motion/take e perguntar: que OBJETO ou AÇÃO rea
 | take com ação real (limpar, dobrar roupa) | foley da ação, baixo, sob a voz | cloth_wipe, cloth_whoosh |
 Biblioteca: `~/Desktop/<Empresa>/_sfx_artlist/` (normalizada a -16 LUFS, 48 kHz) e o `playableUrl` do `search_sfx` como plano B de download. No plano, `-NNdB D.Ds` define a duração do som (ex.: `drawer_close -12dB 3.0s`); sem isso vale o SFX_DMAX.
 
+**CADA MOVIMENTO TEM SOM (regra do usuário, 12/10/2026: "os sfx eu quero que cada movimento tenha som").**
+Não basta som nos momentos principais: toda entrada, saída, batida, check, brilho, contador e troca de cena do motion ganha som. Como garantir sem esquecer nenhum:
+1. `OUT=mov.json node SKILL_DIR/scripts/movimentos.mjs <pasta>/motions <id...>` lista cada tween (início, duração, alvo, propriedades, ease).
+2. Tempo absoluto = posição do motion na timeline - offset do clipe + início do tween. Batida com ease `.in` (carimbo `power4.in`) soa no FIM do tween; entrada com `.out`/`back.out` soa no INÍCIO.
+3. Cada movimento sem som a até 0,4 s ganha um, pelo objeto (tabela acima) e senão pelo tipo: troca de cena = swish; card/papel = paper_slide; ícone/pino/ponto com back.out = pop; número grande = stone_hit; linha/barra crescendo = whoosh_info; brilho = stardust curto (1-1,5 s); cor acendendo = ui_select; texto subindo = swish baixo (-21 dB); botão = click. Ignorar fundo (#bg), respiração (sine longo) e tremidinha (<0,06 s).
+4. O início do arquivo no plano = instante do movimento - ataque do som (`HIT` em sfx: swish 0,09, paper_slide 0,42, rubber_stamp 0,34, logo_impact 1,18, stardust 0,1, pop 0, whoosh_info 0,24, ui_select 0,05, stone_hit 0,06).
+5. Plano denso passa de 5 trilhas: `colocar_plano_sfx(..., trilhas=tuple(range(3, 11)))`.
+
 **Som certo para cada animação (só depois de decidir o objeto/ação acima)**
 | Animação | Som | Exemplo do Artlist (já testado) |
 |---|---|---|
