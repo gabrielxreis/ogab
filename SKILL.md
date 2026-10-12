@@ -15,6 +15,13 @@ Pasta da skill: `~/.claude/skills/ogab/` (chamada de `SKILL_DIR` abaixo). Script
 
 Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR pull --ff-only --quiet` (sem pedir confirmação). Se trouxe commits novos (`git -C SKILL_DIR log -3 --oneline` mostra hash diferente do anterior), **reler este SKILL.md** e só então seguir com o pedido. Se o pull falhar (sem internet, mudança local não commitada), avisar em uma linha e seguir com a versão local; nunca descartar mudanças locais. `config.json` e `clientes/` ficam fora do git e não são tocados.
 
+## Editor do usuário: DaVinci OU Premiere (escolhido na instalação)
+
+`config.json` > `editor`: `"davinci"` (padrão, também quando a chave não existe) ou `"premiere"`. O Gab monta os vídeos **só no editor escolhido** e nunca abre nem cita o outro.
+- `davinci`: tudo como descrito neste SKILL.md e em `docs/` (`resolve_lib.py`).
+- `premiere`: o método é o mesmo (roteiro, voz, legenda, música, SFX, takes, cor, lettering, motions, QC), mas toda etapa que mexe no editor segue `premiere/README.md` (`premiere/premiere_lib.py` no lugar do `resolve_lib.py`). Ler esse arquivo ao começar.
+- `/ogab config editor premiere|davinci` troca. Ao trocar para premiere, rodar `premiere/instalar.sh` (Mac) ou `premiere\instalar.ps1` (Windows) se o plugin Gab Ponte ainda não estiver instalado.
+
 ## 0. Subcomandos (`/ogab <sub>`)
 
 - `ajuda` ou `help` (o `/help` puro é do Claude Code e não pode ser trocado): mostrar em tabela o que está **habilitado/desabilitado** em `SKILL_DIR/config.json` (se não existir, copiar de `config.example.json`), os provedores escolhidos por etapa e os comandos. Oferecer mudar qualquer item; ao mudar, editar `config.json` e confirmar.

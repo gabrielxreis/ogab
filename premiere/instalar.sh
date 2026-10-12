@@ -41,6 +41,14 @@ MG="$HOME/Library/Application Support/Adobe/Common/Motion Graphics Templates"; m
 n=0; for f in "$AQUI"/assets/mogrt/*.mogrt; do [ -f "$f" ] && cp "$f" "$MG/" && n=$((n+1)); done
 [ "$n" -gt 0 ] && ok "$n MOGRT(s) instalados" || warn "nenhum .mogrt em premiere/assets/mogrt ainda (lettering fica para quando existir)"
 
+# Quem roda este instalador escolheu o Premiere: grava no config.json (o Gab trabalha só nele).
+CFG="$AQUI/../config.json"; [ -f "$CFG" ] || cp "$AQUI/../config.example.json" "$CFG"
+python3 - "$CFG" <<'PY' && ok "config.json: editor = premiere"
+import json, sys
+c = json.load(open(sys.argv[1])); c["editor"] = "premiere"
+json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
+PY
+
 # Aviso para o Gab ler o guia do Premiere (no CLAUDE.md do usuário, fora do repositório).
 CM="$HOME/.claude/CLAUDE.md"; MARCA="ogab/premiere/README.md"
 if ! grep -qs "$MARCA" "$CM"; then

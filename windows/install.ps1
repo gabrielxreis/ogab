@@ -60,6 +60,17 @@ $cfg = Join-Path $DEST "config.json"
 if (-not (Test-Path $cfg)) { Copy-Item (Join-Path $DEST "config.example.json") $cfg; Ok "config.json criado (fica so na sua maquina)" }
 else { Ok "config.json mantido" }
 
+# Editor: cada usuario escolhe UM (DaVinci ou Premiere) e o Gab trabalha so nele (config.json "editor").
+$cfgJ = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
+$editor = if ($env:OGAB_EDITOR) { $env:OGAB_EDITOR } elseif ($cfgJ.editor) { $cfgJ.editor } else { "" }
+if (-not $editor) {
+  Write-Host "`n  Em qual editor o Gab vai montar seus videos?`n    1) DaVinci Resolve Studio`n    2) Adobe Premiere Pro"
+  $esc = Read-Host "  Escolha [1/2]"
+  $editor = if ($esc -eq "2") { "premiere" } else { "davinci" }
+}
+Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['editor']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $editor
+Ok "editor: $editor (para trocar: /ogab config editor davinci|premiere)"
+
 Info "5/8 Ambiente do Windows (Resolve, Python, atalho python3)"
 $api  = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting"
 $appd = Join-Path $env:ProgramFiles "Blackmagic Design\DaVinci Resolve"
@@ -135,6 +146,10 @@ New-Item -ItemType Directory -Force -Path $libFonts | Out-Null
 Copy-Item (Join-Path $DEST "assets\fontes\Poppins\Poppins-Bold.ttf") (Join-Path $libFonts "Poppins-Bold.ttf") -Force
 Ok "Poppins-Bold tambem em ~/Library/Fonts (usada pelo legenda_baixa.py)"
 
+if ($editor -eq "premiere") {
+  Info "8/8 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
+  & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "premiere\instalar.ps1")
+} else {
 Info "8/8 DaVinci Resolve e transcricao"
 $exe = Join-Path $appd "Resolve.exe"
 $precisaWhisper = $true
@@ -168,6 +183,8 @@ if ($precisaWhisper) {
 # Teste rapido: a camada do Windows carrega e acha a API do Resolve.
 Py -c "import os, DaVinciResolveScript; print('  [ok] API do Resolve importada (', os.environ['RESOLVE_SCRIPT_LIB'], ')')" 2>$null
 if ($LASTEXITCODE -ne 0) { Warn "a API do Resolve ainda nao importa; confira o Resolve Studio instalado e abra um terminal novo" }
+
+}
 
 Write-Host @"
 

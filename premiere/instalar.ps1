@@ -48,6 +48,12 @@ $m = @(Get-ChildItem (Join-Path $AQUI "assets\mogrt") -Filter *.mogrt -ErrorActi
 $m | ForEach-Object { Copy-Item $_.FullName $mg -Force }
 if ($m.Count -gt 0) { Ok "$($m.Count) MOGRT(s) instalados" } else { Warn "nenhum .mogrt em premiere\assets\mogrt ainda (lettering fica para quando existir)" }
 
+# Quem roda este instalador escolheu o Premiere: grava no config.json (o Gab trabalha so nele).
+$cfg = Join-Path $AQUI "..\config.json"
+if (-not (Test-Path $cfg)) { Copy-Item (Join-Path $AQUI "..\config.example.json") $cfg }
+& py -3 -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['editor']='premiere';json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg
+Ok "config.json: editor = premiere"
+
 $cm = Join-Path $HOME ".claude\CLAUDE.md"; $marca = "ogab/premiere/README.md"
 if (-not (Test-Path $cm) -or -not (Select-String -Path $cm -SimpleMatch $marca -Quiet)) {
   Add-Content -Path $cm -Encoding UTF8 -Value "`n- Premiere: quando o /ogab for editar no Adobe Premiere (config.json `"editor`": `"premiere`" ou pedido do usuario), ler antes ~/.claude/skills/$marca (premiere_lib.py no lugar do resolve_lib.py)."

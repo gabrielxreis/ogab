@@ -55,6 +55,22 @@ else
   ok "config.json mantido"
 fi
 
+# Editor: cada usuário escolhe UM (DaVinci ou Premiere) e o Gab trabalha só nele (config.json "editor").
+EDITOR_ATUAL="$(python3 -c "import json;print(json.load(open('$DEST/config.json')).get('editor',''))" 2>/dev/null || true)"
+OGAB_EDITOR="${OGAB_EDITOR:-$EDITOR_ATUAL}"
+if [ -z "$OGAB_EDITOR" ] && [ -r /dev/tty ]; then
+  printf "\n  Em qual editor o Gab vai montar seus vídeos?\n    1) DaVinci Resolve Studio\n    2) Adobe Premiere Pro\n  Escolha [1/2]: "
+  read -r esc < /dev/tty || true
+  [ "${esc:-1}" = "2" ] && OGAB_EDITOR="premiere" || OGAB_EDITOR="davinci"
+fi
+OGAB_EDITOR="${OGAB_EDITOR:-davinci}"
+python3 - "$DEST/config.json" "$OGAB_EDITOR" <<'PY'
+import json, sys
+c = json.load(open(sys.argv[1])); c["editor"] = sys.argv[2]
+json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
+PY
+ok "editor: $OGAB_EDITOR (para trocar: /ogab config editor davinci|premiere)"
+
 info "5/7 HyperFrames (motions, gráficos, edição dinâmica)"
 npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/null 2>&1 \
   && ok "skills do HyperFrames instaladas" \
@@ -95,6 +111,10 @@ while IFS= read -r -d '' f; do
 done < <(find "$DEST/assets/fontes" -type f \( -name '*.ttf' -o -name '*.otf' \) -print0)
 ok "$n fonte(s) nova(s) instalada(s)"
 
+if [ "$OGAB_EDITOR" = "premiere" ]; then
+info "7/7 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
+bash "$DEST/premiere/instalar.sh" | sed -n '/^ /p'
+else
 info "7/7 DaVinci Resolve e transcrição"
 APP="/Applications/DaVinci Resolve/DaVinci Resolve.app"
 precisa_whisper=1
@@ -133,7 +153,21 @@ if [ "$precisa_whisper" -eq 1 ]; then
       || warn "não consegui instalar o $WPKG; rode: python3 -m pip install --user $WPKG"
   fi
 fi
+fi
 
+if [ "$OGAB_EDITOR" = "premiere" ]; then
+cat <<'EOF'
+
+Pronto. Falta só o que precisa de você (uma vez):
+  1. No Premiere: Window > UXP Plugins > Gab Ponte (deixe o painel encaixado; ele mostra "conectado").
+  2. Conectar as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific... só o que usar.
+  3. Instalar a extensão Claude in Chrome e fazer login nos sites (downloads são pelo navegador).
+  4. Opcional: seus letterings (.mogrt) em ~/.claude/skills/ogab/premiere/assets/mogrt e rode o instalador de novo.
+  5. Opcional: Higgsfield e Magnific logados no Chrome (imagem e vídeo de IA no ilimitado, pelo site).
+
+Reinicie o Claude Code e digite:  /ogab comecar
+EOF
+else
 cat <<'EOF'
 
 Pronto. Falta só o que precisa de você (uma vez):
@@ -151,3 +185,4 @@ O Gab mostra em 1 minuto como pedir, onde ele para para você aprovar, e como ga
   - uma conversa por vídeo; para retomar: /ogab continua o vídeo X (ele lê o PROJETO.md do vídeo)
   - no fim de cada ação você recebe só uma barrinha: feito / falta / próximo
 EOF
+fi
