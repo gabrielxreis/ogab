@@ -80,9 +80,15 @@ Tirado do que os dois clientes aprovaram até agora (Bora Imigrar: 5 vídeos em 
 - Enquadramento fixo no vídeo todo, com o mínimo de zoom, queixo acima da faixa da legenda; nada de punch-in alternado no apresentador.
 - Ordem: cortes (retakes fora, versão mais limpa, dentro da duração) > legenda completa > b-roll/takes > lettering/motions > música/SFX > QC.
 
-**Dois tipos de vídeo (decidir antes de planejar o b-roll)**
-- **Informativo** (dado, mercado, regra, categoria): o MOTION faz o papel do b-roll; pouco take. Dado com fonte e data quando for número.
-- **Emocional / história** (família, recomeço, sonho, propósito): b-roll ou take de IA em TODA imagem concreta da fala, takes curtos colados (1,3 a 4,5 s), e lettering + b-roll nas frases de efeito. Abrir com b-roll já no 0 s cobrindo o gancho.
+**O que entra em cada trecho (decidir trecho a trecho, regra do usuário, 12/10/2026)**
+Não é uma regra fixa por tipo de vídeo: para CADA trecho da fala (legenda validada), avaliar qual recurso conta melhor aquela ideia e montar o plano em tabela (trecho | tempo | recurso | o que mostra) antes de gerar:
+- **Motion:** número, dado, data, lista, comparação, passo a passo, marca/logo, conceito abstrato (índice, gestão de risco). Duração = a fala.
+- **IA com o apresentador** (ficha de personagem): a história DELE e cenas simbólicas com ele (estudando, recomeçando, olhando o memorial).
+- **IA com um personagem criado:** quando a fala é sobre "você", o público, um cliente, "o trader" genérico, uma família; criar um personagem consistente (ficha própria, salva no cliente) e usar o mesmo nos vídeos.
+- **Banco de imagens** (Envato etc.): lugar e ação real e comum que existe pronta (skyline, escritório, mãos no teclado, cidade); mais barato e realista que IA.
+- **Material real:** gravações e fotos do próprio cliente no Media Pool (preferir quando existir; ex.: foto da família) e vídeo público para fato real.
+- **Ficar no apresentador:** gancho forte dito olhando para a câmera, pergunta para o público, CTA falado; nem todo trecho precisa de cobertura.
+Tendência por tipo: **informativo** puxa mais motion; **emocional/história** puxa b-roll/IA em toda imagem concreta, já no 0 s, com takes curtos colados; lettering + b-roll nas frases de efeito. Mostrar o plano ao usuário quando houver escolha não óbvia.
 
 **Legenda** (os dois iguais): preset GAB USA, uma linha, até 25 caracteres, do primeiro ao último segundo (CTA incluso), Y 724, desce para 390 só sob lettering/card de CTA. Gerada da timeline atual e com as quebras revisadas à mão (nada picotado).
 
@@ -146,7 +152,7 @@ Buscar no Artlist (`search_sfx`) ou Envato (`search_sound_effects`): whoosh/swoo
 ## 7. Takes
 
 0. **Origem dos takes: perguntar ao usuário** (se `opcoes.origem_takes` = `perguntar`): **tudo com IA** (Magnific ilimitado), **tudo de banco** (Envato etc.) ou **misto** (banco no que existir de verdade, IA no que for conceitual ou não achar). Seguir a escolha nos passos abaixo.
-1. Dividir a narração em blocos de 2-5 s pelos tempos da transcrição.
+1. Dividir a narração em blocos de 2-5 s pelos tempos da transcrição. Para cada bloco escolher o recurso pelo quadro "O que entra em cada trecho" (motion, IA com o apresentador, IA com personagem criado, banco, material real ou ficar no apresentador).
 2. Se for banco ou misto, primeiro **banco** (`provedores.takes_banco`, ex.: Envato `search_stock_video` com `orientation` certa). Baixar 1080P pelo navegador -> `brolls/take_XX`.
 2b. **Vídeo público do YouTube (yt-dlp)**: quando a fala cita um fato/lugar/momento público e real (ex.: 11 de setembro, discurso do Fed, abertura da bolsa, evento esportivo), buscar uma reportagem ou vídeo que mostre a cena e usar só o trecho: `python3 SKILL_DIR/scripts/baixar_video.py buscar "<termos>" --n 5` (lista título, canal, duração, link; mostrar ao usuário quando a escolha não for óbvia) e `baixar_video.py baixar <url> <pasta do vídeo>/brolls take_XX_<assunto> --de mm:ss --ate mm:ss` (baixa só o trecho, ≤1080p, H.264 sem áudio, `--com-audio` se o som da cena importar, e anota a origem em `links.txt`). Regras: trecho curto (2 a 6 s), preferir canal oficial (museu, órgão público, emissora), evitar quadro com marca d'água/logo da emissora grande ou legenda queimada em cima (cortar/reenquadrar), nunca música de terceiros, e para anúncio pago (Meta Ads) avisar o usuário do risco de direito autoral e preferir banco licenciado. Fato real se mostra com imagem real (vídeo público); nunca recriar com IA cena de tragédia ou fato histórico.
 3. Se não achar, **gerar com a IA que o usuário escolher** (`provedores.geracao_takes`; regra do usuário, 12/10/2026): Magnific, **Higgsfield** ou qualquer outra que ele usar. Perguntar na 1ª vez qual ferramenta e qual plano ele tem, salvar no config e respeitar os limites dela (ilimitado x créditos: conferir o custo antes de gerar e avisar se for gastar crédito). Valem para qualquer ferramenta: take de **10 s** para ter margem no corte e, com pessoa real do cliente em cena, SEMPRE a ficha de personagem como referência. Padrão quando ele não escolher: Magnific pelo site, **só ilimitado** (Nano Banana 2 1K + Kling 2.5 720p **10 s**, regra do usuário 12/10/2026: sempre 10 s para ter margem no corte; conferir se o ∞ continua ON com 10 s). Pessoa real do cliente em cena: SEMPRE com a ficha de personagem do cliente como referência (@img1/@img2), ver `clientes/<empresa>/empresa.md`. Se só sair pago, avisar e propor alternativa.
