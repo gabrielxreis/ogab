@@ -80,8 +80,8 @@ Create Subtitles from Audio da timeline atual > métrica > quebras revisadas à 
 
 Clima padrão: **emotiva, que faz sonhar**, instrumental, priorizando as mais baixadas/em alta (Artlist `sortBy: TOP_DOWNLOADS`, Envato `sortBy: popular`). Mostrar 3-4 opções com prévia; o usuário escolhe. Baixar WAV pelo navegador. **Música BRUTA na timeline (regra do usuário, 11/10/2026): nunca cortar/renderizar o WAV antes.** `colocar_musica(t, mp, wav_original, inicio_faixa=hookStartSeconds - tempo_do_CTA, db=-10)` põe o arquivo original na A2 com ponto de entrada no trecho (clímax no CTA) e fades no próprio clipe (0,5 s in, 2,5 s out), para o usuário arrastar e reajustar no DaVinci. Cria a A2 se a timeline só tiver A1.
 
-## 6. Efeitos sonoros (se `opcoes.efeitos_sonoros`)
-`sfx_auto.py "<timeline>"` depois dos motions/b-roll: whoosh no início de cada motion (pico na entrada) e de cada b-roll forte (o que entra depois de 1,5 s só com o apresentador), pop em cada lettering, tudo na A3 "SFX" (-12/-18/-16 dB, chave `AudioVolume`). Sons em `SKILL_DIR/biblioteca_sfx/` (fora do git; whoosh e pop licenciados do usuário). `--simular` mostra antes; rodar de novo substitui só os SFX dele.
+## 6. Efeitos sonoros (se `opcoes.efeitos_sonoros`) (`docs/etapas/sfx.md`)
+Desenho de som que dá vida à cena: cada elemento que se mexe ganha o som do SEU tipo de animação (blur = swell/ar, slide = whoosh, HUD = blip, check = UI select, palavra de impacto = boom, logo = impacto alinhado pelo onset, brilho = chime; pop só em pop). Pico no instante do movimento, várias trilhas SFX, plano em `sfx/plano_sfx.txt`.
 
 ## 7. Takes e ficha de personagem (`docs/etapas/takes.md`)
 Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usuário (imagem Higgsfield ilimitado no site + vídeo Magnific Kling 2.5 720p ∞ 10 s). Pessoa real: ficha de personagem primeiro (7a).
