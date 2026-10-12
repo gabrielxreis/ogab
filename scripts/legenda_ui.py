@@ -5,6 +5,7 @@ pela interface sozinho: clica, digita e CONFERE por OCR (Vision da Apple), numa 
 
   python3 legenda_ui.py "<nome da timeline>"            # trilha em 724 e desce as legendas do lettering p/ 390
   python3 legenda_ui.py "<timeline>" --indices 4,5,6     # índices (1 = primeira legenda) escolhidos à mão
+  python3 legenda_ui.py "<timeline>" --trilha 390        # vídeo todo em motion: a trilha inteira em 390
   python3 legenda_ui.py "<timeline>" --so-listar         # só mostra quais legendas cruzam a trilha LETTERING
   python3 legenda_ui.py "<timeline>" --preset "GAB USA" [--arquivo x.preset]  # carrega o preset de estilo na trilha e segue
   python3 legenda_ui.py "<timeline>" --conferir          # render + checa a altura do texto de cada legenda
@@ -246,6 +247,38 @@ def playhead_x(reg=None):
     return x + col.argmax() * w / W
 
 
+def clicar_cmd(x, y):
+    """Cmd+clique (adiciona à seleção) pelo Quartz."""
+    for tipo in (Quartz.kCGEventLeftMouseDown, Quartz.kCGEventLeftMouseUp):
+        e = Quartz.CGEventCreateMouseEvent(None, tipo, (x, y), Quartz.kCGMouseButtonLeft)
+        Quartz.CGEventSetFlags(e, Quartz.kCGEventFlagMaskCommand); Quartz.CGEventPost(Quartz.kCGHIDEventTap, e); time.sleep(0.04)
+    time.sleep(0.25)
+
+
+def selecionar_varias(caps, idxs, fps):
+    """Dica do usuário (12/10/2026): seleciona TODAS as legendas que mudam de uma vez (clique + Cmd+clique) para trocar a
+    Position delas numa vez só. Sem OCR na régua: Shift+Z (zoom para caber), playhead pela API em dois tempos e a escala
+    px/quadro pela linha vermelha; o y da linha ST1 pelo OCR do cabeçalho."""
+    r = L.conectar(abrir=False); t = r.GetProjectManager().GetCurrentProject().GetCurrentTimeline()
+    cab = []
+    for _ in range(4):
+        cab = [o for o in ocr((0, 560, 170, 460)) if _norm(o[0]).replace(" ", "") in ("st1", "sti", "stl")]
+        if cab: break
+        time.sleep(0.8)
+    if not cab: raise RuntimeError("cabeçalho ST1 não encontrado")
+    y_st = cab[0][2]
+    _se('keystroke "z" using shift down'); time.sleep(0.8)          # zoom para caber a timeline inteira
+    a, b = caps[0]["ini"], caps[-1]["fim"]
+    t.SetCurrentTimecode(_tc(a, fps)); time.sleep(0.7); xa = playhead_x()
+    t.SetCurrentTimecode(_tc(b, fps)); time.sleep(0.7); xb = playhead_x()
+    if xa is None or xb is None or xb <= xa: raise RuntimeError("não consegui medir a escala da timeline pelo playhead")
+    esc = (xb - xa) / (b - a)
+    for n, i in enumerate(idxs):
+        x = xa + ((caps[i]["ini"] + caps[i]["fim"]) / 2 - a) * esc
+        (clicar if n == 0 else clicar_cmd)(x, y_st)
+    return True
+
+
 def selecionar_alguma(caps):
     """Seleciona a 1ª legenda: acha a linha ST1 pelo cabeçalho e o início da timeline pela régua (01:00:00:00)."""
     cab = []
@@ -343,6 +376,9 @@ def main():
     if "--conferir" in a: conferir(nome); return
     r, p, t, fps, caps, descer = dados(nome)
     if "--indices" in a: descer = [int(x) - 1 for x in a[a.index("--indices") + 1].split(",")]
+    global Y_PADRAO
+    if "--trilha" in a:      # vídeo todo em motion: a TRILHA inteira vai para esse Y (ex.: 390), sem ajuste por legenda
+        Y_PADRAO = int(a[a.index("--trilha") + 1]); descer = []
     print(f"{nome}: {len(caps)} legendas; descem p/ {Y_LETTERING}: {[i + 1 for i in descer]}")
     if "--so-listar" in a: return
     frente()
@@ -354,6 +390,15 @@ def main():
     if not setar_y(Y_PADRAO, rolagem=True): raise RuntimeError("trilha não ficou em 724")
     aba("Caption")
     feitos = []
+    if descer and "--uma-a-uma" not in a:     # padrão: todas de uma vez (seleção múltipla)
+        try:
+            selecionar_varias(caps, descer, fps); aba("Caption")
+            if not customizar(Y_LETTERING): raise RuntimeError("Position Y não ficou")
+            if not integridade(t, caps): raise RuntimeError("legendas mudaram: pare e reanexe o SRT")
+            r.GetProjectManager().SaveProject()
+            print(f"pronto (de uma vez): {len(descer)} legendas em {Y_LETTERING}, trilha em {Y_PADRAO}"); return
+        except Exception as e:
+            print("seleção múltipla falhou, indo uma a uma:", e); selecionar_alguma(caps); aba("Caption")
     for i in descer:
         navegar(i, caps, fps)
         if not customizar(Y_LETTERING): raise RuntimeError(f"legenda {i + 1} não ficou em {Y_LETTERING}")

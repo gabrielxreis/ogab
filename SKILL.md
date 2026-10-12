@@ -30,7 +30,7 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 0. Contas e conectores são de quem usa a skill.
 1. Pastas: `<pasta_saida>/<Empresa>/<Assunto> - <Empresa>/` (gravacao, narracoes, legendas, brolls, musica, sfx, motions, videos).
 1b. **Media Pool com a árvore Timelines, Footages, BRoll, SFX, Musicas, Motions, Legendas criada assim que abre/cria o projeto** (`criar_projeto`/`abrir_projeto` -> `garantir_pastas`; `organizar` para arrumar).
-1c. Stacked Timelines ligado e todas as timelines abertas em abas no fim.
+1c. **Stacked Timelines ligado DESDE A CRIAÇÃO do projeto** (regra do usuário, 12/10/2026) e todas as timelines do projeto abertas em abas; ao abrir projeto existente, conferir e ligar se estiver desligado. Fica no botão Timeline View Options (1º ícone da barra da timeline), não há menu nem API.
 1d. Voice Isolation em todo áudio de iPhone/câmera (`SetVoiceIsolationState` com a timeline atual).
 1e. Nada em cima do rosto (legenda, lettering, motion).
 1f. **Ordem: cortes > legenda > VALIDAÇÃO DA LEGENDA pelo usuário > b-roll/motions** (o tempo dos motions vem da legenda).
