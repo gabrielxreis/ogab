@@ -45,6 +45,7 @@ def cobertos(t, minimo=0.3):
              or not (x.GetMediaPoolItem() and x.GetMediaPoolItem().GetClipProperty("File Path"))]
     out = []
     for x in t.GetItemListInTrack("subtitle", 1) or []:
+        if not x.GetClipEnabled(): continue   # desativada sob motion (estilo do cliente): fica desativada, não desce
         a, b = sec(x.GetStart()), sec(x.GetEnd())
         if any(min(b, d) - max(a, c) >= minimo * (b - a) for c, d in tampa): out.append((x, a, b))
     return out
