@@ -127,6 +127,13 @@ while IFS= read -r -d '' f; do
 done < <(find "$DEST/assets/fontes" -type f \( -name '*.ttf' -o -name '*.otf' \) -print0)
 ok "$n fonte(s) nova(s) instalada(s)"
 
+# Lettering animado: pacote @gabrielxreis_ Text Presets (títulos do Fusion) na pasta de Templates do DaVinci
+TPL="$HOME/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates"
+mkdir -p "$TPL"
+for f in "$DEST"/assets/lettering/*.drfx; do
+  [ -f "$f" ] && cp -f "$f" "$TPL/" && ok "lettering $(basename "$f") instalado (reinicie o DaVinci)"
+done
+
 if [ "$OGAB_EDITOR" = "premiere" ]; then
 info "7/7 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
 bash "$DEST/premiere/instalar.sh" | sed -n '/^ /p'
@@ -190,8 +197,8 @@ Pronto. Falta só o que precisa de você (uma vez):
   1. No DaVinci: Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
   2. Conectar as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific... só o que usar.
   3. Instalar a extensão Claude in Chrome e fazer login nos sites (downloads são pelo navegador).
-  4. Opcional: seu pacote de lettering (.drfx) em
-     ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/
+  4. Reiniciar o DaVinci para ele carregar o lettering (@gabrielxreis_ Text Presets, já instalado em
+     ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/).
   5. Opcional: skill competitor-profiling (Personalização > Skills no Claude).
 
   6. Opcional: Higgsfield e Magnific logados no Chrome (imagem e vídeo de IA no ilimitado, pelo site).

@@ -68,7 +68,7 @@ O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
 - instala **Homebrew** (se faltar), **ffmpeg**, **yt-dlp**, **Node.js**, **Python 3**, **git** e **Pillow**;
 - baixa a skill em `~/.claude/skills/ogab` e cria o seu `config.json`;
 - instala o **HyperFrames** e roda o `hyperframes doctor`;
-- instala as fontes livres (Poppins, Playfair Display, Lobster);
+- instala as fontes livres (Poppins, Playfair Display, Lobster) e o **lettering animado** (@gabrielxreis_ Text Presets) no DaVinci;
 - confere o **DaVinci Resolve Studio** e o scripting, **detecta a versão** e, abaixo da 21.1, instala o **Whisper local** para a transcrição.
 
 Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar as suas contas e o Claude in Chrome (passos 5, 8 e 9 abaixo). Reinicie o Claude Code e peça um vídeo.
@@ -94,7 +94,7 @@ Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar 
    O `pyobjc-framework-Vision` é o OCR da Apple usado pelo `legenda_ui.py`.
 5. **No DaVinci:** Preferences > System > General > **External scripting using: Local**.
 6. **Fontes:** instale as de `assets/fontes/` (licença OFL). O preset de legenda padrão usa **Poppins Bold**.
-7. **Lettering animado (opcional):** a skill foi feita com o pacote **@gabrielxreis_ Text Presets** (Cinematic, Palavra Por Palavra, Blur Up, Destacado, Zoom Out...), que **não** vem no repositório. Use o seu pacote de títulos do Fusion (`.drfx`) em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`, reinicie o Resolve e coloque os nomes em `config.json > lettering`.
+7. **Lettering animado:** o pacote **@gabrielxreis_ Text Presets** (29 animações: Cinematic, Palavra Por Palavra, Blur Up, Destacado, Zoom Out...) vem em [`assets/lettering/`](assets/lettering) e o instalador já copia para `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/`. Na mão: copie o `.drfx` para essa pasta e **reinicie o Resolve**. Para usar outro pacote, coloque os nomes em `config.json > lettering`.
 8. **Conectar as SUAS contas** ([docs/PROVEDORES.md](docs/PROVEDORES.md)): ElevenLabs, Artlist, Envato, Magnific etc. Só o que você usa.
 9. **Claude in Chrome:** instale a extensão e faça login nos sites. Downloads são sempre pelo navegador; a IA nunca digita senha.
 10. **Acessibilidade:** dê permissão de Acessibilidade ao app que roda o Claude Code (Ajustes do Sistema > Privacidade e Segurança > Acessibilidade). Só é necessário para os ajustes de legenda feitos pela interface.
@@ -149,7 +149,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | 5 | Música (pop/remix leve por padrão), -10 dB, fade | Escolhe entre 3-4 | Artlist ou Envato |
 | 6 | Efeitos sonoros (whoosh, pop, impacto) | Liga/desliga | Artlist ou Envato |
 | 7 | Takes: IA, banco ou misto; geração só no modo ilimitado | Origem | Envato, Artlist, Pexels / Magnific |
-| 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista | Seu pacote `.drfx` |
+| 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista | @gabrielxreis_ Text Presets (`.drfx`) |
 | 9 | **Motions** centralizados e medidos, com as cores da marca, CTA animado | Vê a tabela | HyperFrames + `guias.py` |
 | 10 | **Legenda** de uma linha, métrica obrigatória, do início ao fim | - | `legendas.py`, `legenda_ui.py` |
 | 11 | Timeline pronta, **conferência**, **master** e export (se pedir), capa e texto do post | - | `resolve_lib.py`, `qc.py` |
@@ -324,12 +324,13 @@ docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
 clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
 assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
+assets/lettering/        @gabrielxreis_ Text Presets.drfx (29 títulos animados do Fusion)
 ```
 
 
 # LICENÇA
 
-Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. Pacotes de lettering, músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas.
+Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. O pacote de lettering `@gabrielxreis_ Text Presets` (`assets/lettering/`) é de Gabriel Reis, liberado para uso com a skill. Músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas.
 
 ## Skills extras instaladas junto (install.sh, passo 5b)
 

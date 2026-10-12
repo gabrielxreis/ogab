@@ -104,7 +104,7 @@
     "geracao_so_ilimitada": true
   },
   "lettering": {
-    "_leia": "Pacote de títulos animados do Fusion (.drfx) instalado em ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/. O nome do template é o nome do arquivo .setting dentro do pacote. Use o seu próprio pacote e liste os nomes aqui.",
+    "_leia": "Pacote de títulos animados do Fusion (.drfx) instalado em ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/. O nome do template é o nome do arquivo .setting dentro do pacote. O pacote @gabrielxreis_ Text Presets vem em assets/lettering/ e o instalador já copia; para usar outro pacote, instale e liste os nomes aqui.",
     "pacote": "@gabrielxreis_ Text Presets.drfx",
     "template_gancho": "@gabrielxreis_ Cinematic",
     "templates_disponiveis": [

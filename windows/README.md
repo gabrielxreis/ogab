@@ -32,7 +32,7 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
    - **`--conferir`** (render + altura do texto): conferir pelo `qc.py` e por quadros extraídos com ffmpeg.
 4. **Título na V2 (Option+2 no Mac):** não mandar tecla. Usar `timeline_com_letterings()` em timeline nova, ou pedir ao usuário para apertar **Alt+2** na timeline (destino de vídeo na V2) e então rodar `inserir_letterings_na_trilha(t, 2, ...)`.
 5. **Conferências por screenshot do DaVinci** (Stacked Timelines ligado, barra de abas): o computer-use do Claude só existe no Mac. No Windows, perguntar ao usuário ("Stacked Timelines está ligado? as abas X, Y, Z estão abertas?") e marcar com `projeto.py marcar <pasta> abas` depois da resposta.
-6. **Pacote de lettering (.drfx):** `%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\` (reiniciar o Resolve depois).
+6. **Pacote de lettering (.drfx):** vem no repositório (`assets/lettering/`) e o `install.ps1` copia para `%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\` (reiniciar o Resolve depois).
 7. **Pastas:** `pasta_saida` em `config.json` pode ficar `~/Desktop`; se a Área de Trabalho estiver no OneDrive, trocar por uma pasta local fixa (ex.: `C:/Videos`) para o OneDrive não deixar mídia "só online" e o DaVinci achar offline. Usar `/` nos caminhos do `config.json`.
 8. **Temporários:** não passar caminho `/tmp/...` do Git Bash para o Python (são pastas diferentes no Windows). Usar a pasta do vídeo ou o scratchpad.
 9. **Transcrição:** igual (DaVinci 21.1+ pela API). Abaixo disso o Whisper local é o `faster-whisper` (CPU; com placa NVIDIA dá para trocar para CUDA).

@@ -2,7 +2,6 @@ config.json
 clientes/*
 !clientes/_exemplo/
 assets/*.drfx
-assets/lettering/
 __pycache__/
 .DS_Store
 assets/grade/

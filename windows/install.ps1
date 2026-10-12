@@ -165,6 +165,14 @@ New-Item -ItemType Directory -Force -Path $libFonts | Out-Null
 Copy-Item (Join-Path $DEST "assets\fontes\Poppins\Poppins-Bold.ttf") (Join-Path $libFonts "Poppins-Bold.ttf") -Force
 Ok "Poppins-Bold tambem em ~/Library/Fonts (usada pelo legenda_baixa.py)"
 
+# Lettering animado: pacote @gabrielxreis_ Text Presets (titulos do Fusion) na pasta de Templates do DaVinci
+$tpl = Join-Path $env:APPDATA "Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates"
+New-Item -ItemType Directory -Force -Path $tpl | Out-Null
+Get-ChildItem -Path (Join-Path $DEST "assets\lettering") -Filter *.drfx -ErrorAction SilentlyContinue | ForEach-Object {
+  Copy-Item $_.FullName (Join-Path $tpl $_.Name) -Force
+  Ok "lettering $($_.Name) instalado (reinicie o DaVinci)"
+}
+
 if ($editor -eq "premiere") {
   Info "8/8 Adobe Premiere Pro (plugin Gab Ponte, LUT e letterings)"
   & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "premiere\instalar.ps1")
@@ -211,8 +219,8 @@ Pronto. Falta so o que precisa de voce (uma vez):
   1. No DaVinci: Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
   2. Conectar as SUAS contas no Claude (Configuracoes > Conectores): ElevenLabs, Artlist, Envato, Magnific... so o que usar.
   3. Instalar a extensao Claude in Chrome e fazer login nos sites (downloads sao pelo navegador).
-  4. Opcional: seu pacote de lettering (.drfx) em
-     %APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\
+  4. Reiniciar o DaVinci para ele carregar o lettering (@gabrielxreis_ Text Presets, ja instalado em
+     %APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\).
   5. Opcional: Higgsfield e Magnific logados no Chrome (imagem e video de IA no ilimitado, pelo site).
 
 FECHE e abra de novo o Claude Code (para pegar as variaveis novas) e digite:  /ogab comecar
