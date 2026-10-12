@@ -1,0 +1,3 @@
+#!/bin/sh
+# Atalho "python3" para o Git Bash no Windows (os docs do /ogab chamam python3). Usa o launcher oficial "py".
+exec py -3 "$@"
