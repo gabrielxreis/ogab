@@ -88,3 +88,6 @@ Regras: sem rosto realista de pessoa real; cores, logo e fonte da `marca/`; nada
 - **Copiar itens de áudio entre timelines:** `GetLeftOffset`/`GetDuration` vêm em quadros da timeline; recolocar com `colocar_narracao`/`colocar_musica`/`colocar_sfx` (não com AppendToTimeline cru), senão a duração sai errada (30/24).
 - **CTA (regra do usuário): a LOGO SEMPRE NO CENTRO EXATO (540, 960)**, medida nos pixels (a folga do PNG desloca: corrigir com x/y no GSAP, `xPercent/yPercent -50`, nunca `transform` em CSS que a animação sobrescreve). O resto (chamada, site) se arruma em volta, acima da faixa da legenda.
 - **Motions e lettering acima de y≈1150:** a legenda fica toda em 724 e nada precisa de ajuste por legenda (sem OCR, sem UI).
+
+- **Disco cheio (12/10/2026):** cada motion ProRes 4444 tem ~240 MB e o HyperFrames com vários workers grava ~1,5 GB de quadros temporários. Com pouco espaço: `--workers 1` (grava direto no arquivo), MOVER (não copiar) o render para a pasta do vídeo, e motion de tela cheia com fundo opaco pode sair em MP4 (`--format mp4 -q delivery`), sem alfa. Conferir `df -h /` antes de renderizar em lote.
+- **`timeline_com_letterings` apaga as trilhas de vídeo extras do modelo antes de inserir** (o modelo trazia uma V2 "BROLL" desligada e os títulos caíam nela).

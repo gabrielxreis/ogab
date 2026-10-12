@@ -713,6 +713,8 @@ def timeline_com_letterings(p, mp, nome, lista, w=1080, h=1920, fps=30):
     lista = [(TEXTO, inicio_s, template[, centro_y]), ...]."""
     t = timeline_do_modelo(p, mp, nome, w, h, fps) or criar_timeline(p, mp, nome, w, h, fps)
     p.SetCurrentTimeline(t); S = t.GetStartFrame(); F = fps_tl(t)
+    # o modelo traz uma V2 "BROLL" DESLIGADA (e a API não religa): apagar toda trilha de vídeo além da V1 antes
+    for v in range(t.GetTrackCount("video"), 1, -1): t.DeleteTrack("video", v)
     for item in sorted(lista, key=lambda x: x[1]):
         texto, ini, tpl = item[:3]; cy = item[3] if len(item) > 3 else None
         f = S + max(0, round(ini * F)); _ir(t, f); time.sleep(0.6); _ir(t, f)
