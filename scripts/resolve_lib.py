@@ -725,3 +725,65 @@ def timeline_com_letterings(p, mp, nome, lista, w=1080, h=1920, fps=30):
     t.AddTrack("video", {"index": 1}); t.SetTrackName("video", 2, "LETTERING")
     while t.GetTrackCount("audio") < 3: t.AddTrack("audio", "stereo")
     return t
+
+
+def conferir_entrada_titulos(p, t, pasta="/tmp/ogab_titulos", quadro_ini=1, quadro_fim=45):
+    """Prova que cada lettering (Fusion Title acima da V1) ENTRA ANIMADO: renderiza o começo de cada título e conta
+    os pixels de texto (quase brancos, faixa central) no quadro 1 e no 45. Animado = quadro 1 com bem menos texto que
+    o 45 (o preset começa invisível/borrado/parcial). Seco = os dois iguais. Devolve [(texto, inicio_s, razao, ok)]."""
+    import numpy as np
+    from PIL import Image
+    os.makedirs(pasta, exist_ok=True); S, F = t.GetStartFrame(), fps_tl(t); out = []
+    # só os títulos no render (fundo preto): desliga os outros clipes de vídeo e religa no fim (fundo claro enganava a conta)
+    outros = [x for v in range(1, t.GetTrackCount("video") + 1) for x in (t.GetItemListInTrack("video", v) or [])
+              if not (x.GetFusionCompCount() and _textos(x.GetFusionCompByIndex(1))) and x.GetClipEnabled()]
+    for x in outros: x.SetClipEnabled(False)
+    try:
+        out = _conferir_titulos(p, t, pasta, quadro_ini, quadro_fim, S, F)
+    finally:
+        for x in outros: x.SetClipEnabled(True)
+    if any(x.GetClipEnabled() is False for x in outros): raise RuntimeError("clipe não religou depois da conferência")
+    return out
+
+
+def _conferir_titulos(p, t, pasta, quadro_ini, quadro_fim, S, F):
+    import numpy as np
+    from PIL import Image
+    out = []
+    for v in range(2, t.GetTrackCount("video") + 1):
+        for it in t.GetItemListInTrack("video", v) or []:
+            if not it.GetFusionCompCount() or not _textos(it.GetFusionCompByIndex(1)): continue
+            txt = _textos(it.GetFusionCompByIndex(1))[0].GetInput("StyledText"); nome = f"tit_{it.GetStart()}"
+            for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
+            p.SetCurrentRenderFormatAndCodec("mp4", "H264")
+            p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": it.GetStart(), "MarkOut": it.GetStart() + quadro_fim + 2,
+                                 "TargetDir": pasta, "CustomName": nome, "ExportVideo": True, "ExportAudio": False,
+                                 "ExportSubtitle": False})
+            jid = p.AddRenderJob(); p.StartRendering(jid)
+            while p.IsRenderingInProgress(): time.sleep(0.5)
+            conta = []
+            for q in (quadro_ini, quadro_fim):
+                png = os.path.join(pasta, f"{nome}_{q}.png")
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", os.path.join(pasta, nome + ".mp4"),
+                                "-vf", f"select=eq(n\\,{q})", "-frames:v", "1", png], check=True)
+                a = np.asarray(Image.open(png).convert("RGB")).astype(int); h = a.shape[0]
+                faixa = a[int(h * 0.15):int(h * 0.85)]
+                conta.append(int((faixa.max(axis=2) > 200).sum()))
+            razao = conta[0] / max(conta[1], 1)
+            out.append((txt, round((it.GetStart() - S) / F, 2), round(razao, 2), razao < 0.6))
+    return out
+
+
+def garantir_titulos_animados(p, mp, t, tentativas=3):
+    """Regra do usuário (12/10/2026): lettering editável SEMPRE entra animado. Título inserido pela API sai seco na timeline
+    onde foi inserido; a cópia (com a original mantida) anima. Faz a cópia, confere a entrada de cada título renderizando,
+    e repete se algum continuar seco. Devolve a timeline final (a principal, com o nome original)."""
+    for k in range(tentativas):
+        t = trocar_pela_copia(p, mp, t)
+        res = conferir_entrada_titulos(p, t)
+        for r_ in res: print(("animado" if r_[3] else "SECO"), r_)
+        if all(r_[3] for r_ in res):
+            try: conectar(abrir=False).OpenPage("edit")
+            except Exception: pass
+            return t
+    raise RuntimeError("títulos continuam secos depois de 3 cópias: conferir o pacote/preset")

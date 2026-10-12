@@ -69,3 +69,16 @@ Regras: sem rosto realista de pessoa real; cores, logo e fonte da `marca/`; nada
 - **Mixagem de áudio** (`hyperframes-audio`): música abaixando sozinha quando a voz entra (ducking), compressor, limitador, equalizador, fades. Mantém as regras de volume (narração +5, música -10 no DaVinci) como base.
 - **Remover fundo** de foto ou vídeo (`media-use` / `hyperframes remove-background`): pessoa ou produto do cliente por cima de outro cenário, take ou motion.
 
+
+
+## 8f. Soluções confirmadas (12/10/2026, Bora Comunicação) — ler antes de pôr lettering/CTA
+
+- **Lettering é SEMPRE o título editável do pacote** (o mesmo de Effects > Titles), nunca MOV renderizado: o usuário quer poder mudar o texto no DaVinci.
+- **Pôr título na V2 sem clicar:** com o DaVinci na frente, `System Events keystroke "2" using option down` (Option+2 = destino de vídeo na V2) e depois `inserir_letterings_na_trilha(t, 2, ...)` (trava as outras trilhas e confere que nada andou). Sem o Option+2 a API insere na V1 com ripple (corta o take): se isso acontecer, `DeleteClips([titulo], True)` e recolocar o take inteiro.
+- **Timeline nova com letterings:** `timeline_com_letterings()` insere os títulos na V1 vazia e sobe para a V2 com `AddTrack("video", {"index": 1})`.
+- **Título "seco" (sem animação) no render:** na timeline onde a API inseriu/mexeu no título o render pode sair com o texto inteiro desde o quadro 0. A cópia (`DuplicateTimeline`) com a ORIGINAL MANTIDA renderiza animada (`trocar_pela_copia` não apaga mais a original). Se o usuário disser que no DaVinci a animação está certa, NÃO mexer de novo: o viewer dele vale mais que o render de conferência. Conferência por render (`conferir_entrada_titulos`) ainda em teste: não usar para decidir sozinho.
+- **Trilha desligada vinda do modelo GAB USA:** a V2 do modelo veio desligada; `SetTrackEnable` devolve True mas não liga. Conferir `GetIsTrackEnabled` de todas as trilhas antes do render; ligar com um clique no ícone de filme do cabeçalho.
+- **Render leva o DaVinci para a página Deliver:** depois de todo render, `r.OpenPage("edit")` antes de qualquer clique/atalho (um clique caiu num menu do Deliver).
+- **Copiar itens de áudio entre timelines:** `GetLeftOffset`/`GetDuration` vêm em quadros da timeline; recolocar com `colocar_narracao`/`colocar_musica`/`colocar_sfx` (não com AppendToTimeline cru), senão a duração sai errada (30/24).
+- **CTA (regra do usuário): a LOGO SEMPRE NO CENTRO EXATO (540, 960)**, medida nos pixels (a folga do PNG desloca: corrigir com x/y no GSAP, `xPercent/yPercent -50`, nunca `transform` em CSS que a animação sobrescreve). O resto (chamada, site) se arruma em volta, acima da faixa da legenda.
+- **Motions e lettering acima de y≈1150:** a legenda fica toda em 724 e nada precisa de ajuste por legenda (sem OCR, sem UI).
