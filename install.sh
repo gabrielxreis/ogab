@@ -61,7 +61,7 @@ npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/nu
   || warn "não consegui instalar o HyperFrames agora; rode depois: npx skills add heygen-com/hyperframes -g -a claude-code -s '*' -y"
 npx --yes hyperframes doctor >/dev/null 2>&1 && ok "hyperframes doctor ok" || warn "rode 'npx hyperframes doctor' para ver o que falta no HyperFrames"
 
-info "5b/7 Skills de design e navegador (taste, web-design-guidelines, image-to-code, playwright-cli, awesome-design-md)"
+info "5b/7 Skills de design, navegador e engenharia reversa (taste, web-design-guidelines, image-to-code, playwright-cli, REA, awesome-design-md)"
 npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y >/dev/null 2>&1 \
   && ok "taste-skill (design-taste-frontend, image-to-code) instaladas" \
   || warn "rode depois: npx skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y"
@@ -74,6 +74,10 @@ if command -v playwright-cli >/dev/null 2>&1 || npm install -g @playwright/cli@l
 else
   warn "não consegui instalar o playwright-cli; rode: npm install -g @playwright/cli@latest"
 fi
+npx --yes skills add morluto/rea -g -a claude-code -s reverse-engineer-anything -y >/dev/null 2>&1 \
+  && ok "REA (reverse-engineer-anything) skill instalada" || warn "rode depois: npx skills add morluto/rea -g -a claude-code -s reverse-engineer-anything -y"
+npx --yes rea-agents setup --client claude_code --yes >/dev/null 2>&1 \
+  && ok "REA MCP registrado no Claude Code (backup em ~/.claude.json.rea.backup)" || warn "rode depois: npx rea-agents setup --client claude_code"
 mkdir -p "$HOME/.claude/referencias"
 if [ -d "$HOME/.claude/referencias/awesome-design-md/.git" ]; then
   git -C "$HOME/.claude/referencias/awesome-design-md" pull -q >/dev/null 2>&1; ok "awesome-design-md atualizado"
