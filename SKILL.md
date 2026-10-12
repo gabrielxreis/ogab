@@ -56,6 +56,9 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 ## Padrão: Reels de apresentador falando (`docs/etapas/padrao_reels.md`)
 Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): vertical, 60-90 s, V1 intocada, legenda GAB USA do início ao fim, recurso escolhido trecho a trecho (motion, IA com apresentador, personagem criado, banco, material real), motions no centro com o visual do site e a duração da fala, CTA com o site pequeno, música bruta terminando com o vídeo. O `estilo.md` do cliente só muda o que for diferente.
 
+## Vídeo só motion + música (`docs/etapas/so_motion.md`)
+Sem narração: cenas na batida da música (bpm do Artlist), fonte em cada dado, render MP4 `--workers 1`, foley pelo que a cena mostra, entrega na Área de Trabalho.
+
 ## 1. Cliente (primeira vez por empresa) (`docs/etapas/cliente.md`)
 Pedir o máximo de fontes (site, redes, .md/briefing) e logo; varrer tudo e criar `clientes/<empresa>/` (empresa.md, estilo.md, pronuncia.json) + pasta da marca. Depois só ler.
 
