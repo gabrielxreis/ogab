@@ -51,11 +51,26 @@ def criar_projeto(nome, w=1080, h=1920, fps=30):
     else:
         p = pm.LoadProject(nome)
     mp = p.GetMediaPool()
-    root = mp.GetRootFolder()
-    existentes = {f.GetName() for f in root.GetSubFolderList()}
-    for b in ("NARRACAO", "MUSICA", "SFX", "BROLLS", "LEGENDAS"):
-        if b not in existentes: mp.AddSubFolder(root, b)
+    garantir_pastas(mp)   # árvore do Media Pool logo ao criar/abrir (regra 1b)
     return p, mp
+
+
+def abrir_projeto(nome=None):
+    """Abre o projeto (ou usa o atual) e JÁ cria a árvore de pastas do Media Pool (regra 1b). Usar no início
+    de toda edição de projeto existente, antes de importar qualquer coisa."""
+    r = conectar(); pm = r.GetProjectManager()
+    p = pm.LoadProject(nome) if nome else pm.GetCurrentProject()
+    mp = p.GetMediaPool(); garantir_pastas(mp)
+    return p, mp
+
+
+def garantir_pastas(mp):
+    """Cria na raiz do Media Pool as pastas Timelines, Footages, BRoll, SFX, Musicas, Motions, Legendas (as que faltarem).
+    Não move nada; para arrumar o que já existe, `organizar(...)`."""
+    root = mp.GetRootFolder(); tem = {f.GetName() for f in root.GetSubFolderList() or []}
+    for n in PASTAS_PROJETO:
+        if n not in tem: mp.AddSubFolder(root, n)
+    mp.SetCurrentFolder(root)
 
 
 
@@ -67,7 +82,14 @@ def checar_playback(p):
     if not ok: print(f"AVISO: playback {pb} fps != timeline {tl} fps (áudio vai picotar)")
     return ok
 
+# nomes antigos/variações caem na pasta certa da árvore (regra 1b)
+ALIAS_PASTA = {"NARRACAO": "Footages", "GRAVACOES": "Footages", "FOOTAGE": "Footages", "FOTOS": "Footages",
+               "MUSICA": "Musicas", "MUSICAS": "Musicas", "BROLLS": "BRoll", "BROLL": "BRoll", "TAKES": "BRoll",
+               "LEGENDAS": "Legendas", "LEGENDA": "Legendas", "MOTIONS": "Motions", "SFX": "SFX", "TIMELINES": "Timelines"}
+
+
 def _bin(mp, nome):
+    nome = ALIAS_PASTA.get(nome.upper(), nome)
     for f in mp.GetRootFolder().GetSubFolderList():
         if f.GetName() == nome:
             mp.SetCurrentFolder(f); return f
@@ -533,7 +555,7 @@ def organizar(p, mp, videos):
     return {f.GetName(): sum(1 for _ in todas(f)) for f in root.GetSubFolderList()}
 
 
-# Rosto (regras 1e e 1f do SKILL.md): medir onde está e reenquadrar com zoom + Pan/Tilt, sem nada por cima.
+# Rosto (regras 1e e 1l do SKILL.md): medir onde está e reenquadrar com zoom + Pan/Tilt, sem nada por cima.
 QUEIXO_MAX = 1140     # em 1080x1920: queixo acima da faixa da legenda
 
 
@@ -589,7 +611,7 @@ def trocar_pela_copia(p, mp, t):
 
 def inserir_letterings_na_trilha(t, trilha, lista, template, centro_y=None):
     """Insere letterings [(TEXTO, inicio_s, dur_s[, template[, centro_y]]), ...] direto na trilha `trilha` (acima da V1),
-    SEM tocar na linha principal (regra 1h). PRÉ-REQUISITO: o destino da timeline (patch no cabeçalho) tem que estar
+    SEM tocar na linha principal (regra 1j). PRÉ-REQUISITO: o destino da timeline (patch no cabeçalho) tem que estar
     nessa trilha (a API não muda o destino; fazer pela interface). Trava todas as outras trilhas durante a inserção
     (o InsertFusionTitleIntoTimeline faz ripple) e confere que nada mais andou. Ordem cronológica."""
     F = fps_tl(t); S = t.GetStartFrame()
