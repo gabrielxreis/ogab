@@ -204,18 +204,20 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1):
 
 def colocar_legendas(t, mp, srt, trocar=True, p=None):
     """Importa o SRT na trilha de legenda. Se a trilha já existe, troca só os itens (mantém o preset de estilo)."""
+    # DeleteClips/AppendToTimeline só valem na timeline ATUAL: abrir `t` antes de tudo
+    if p: p.SetCurrentTimeline(t); import time; time.sleep(0.5)
     if t.GetTrackCount("subtitle") == 0: t.AddTrack("subtitle")
     elif trocar:
         antigos = t.GetItemListInTrack("subtitle", 1) or []
-        if antigos: t.DeleteClips(antigos, False)
+        if antigos and not t.DeleteClips(antigos, False):
+            raise RuntimeError(f"não apagou as legendas antigas de '{t.GetName()}' (timeline atual?)")
     # O Media Pool reaproveita item pelo NOME do arquivo: SRT com mesmo nome em vídeos diferentes faz um vídeo
     # receber a legenda do outro. Sempre importar com nome único (pasta do vídeo + nome).
     pasta_video = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(srt))))
     unico = os.path.join(os.path.dirname(srt), f"{pasta_video.split(' - ')[0].replace(' ', '_')}__{os.path.basename(srt)}")
     if not os.path.exists(unico): import shutil; shutil.copy(srt, unico)
     it = importar(mp, unico, "LEGENDAS")
-    # AppendToTimeline usa a timeline ABERTA: abrir `t` antes (senão a legenda cai em outro vídeo) e conferir
-    if p: p.SetCurrentTimeline(t)
+    # AppendToTimeline usa a timeline ABERTA (já aberta acima; sem p= a legenda pode cair em outro vídeo)
     # trilha de legenda DESABILITADA recusa o SRT em silêncio (render sem legenda pode deixá-la desligada)
     t.SetTrackEnable("subtitle", 1, True)
     n0 = len(t.GetItemListInTrack("subtitle", 1) or [])

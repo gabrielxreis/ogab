@@ -210,7 +210,7 @@ def metrica(srt, maxc=25, min_s=0.7):
         if len(linha) > maxc: probs.append(f"{tag} {len(linha)} caracteres (máx {maxc})")
         ult = re.sub(r'[,;:]$', '', linha.split()[-1]) if linha.split() else ''
         pen = linha.split()[-2].lower() if len(linha.split()) > 1 else ''
-        if k + 1 < len(bl) and not re.search(r'[.?!]$', linha) and fraca(ult) and not re.fullmatch(r'[\d.,º]+', ult) and not (ult.lower() == 'que' and pen == 'por'):
+        if k + 1 < len(bl) and not re.search(r'[.?!]$', linha) and fraca(ult) and not re.fullmatch(r'[\d.,º]+', ult) and not (ult.lower() == 'que' and pen == 'por') and not (ult.lower() == 'mais' and pen == 'que'):
             probs.append(f"{tag} termina em palavra fraca '{ult}'")
         if d < min_s - 0.02: probs.append(f"{tag} dura {d:.2f}s (mín {min_s})")
         if k and a < ant_fim - 0.001: probs.append(f"{tag} começa antes do fim da anterior (sobreposta)")
