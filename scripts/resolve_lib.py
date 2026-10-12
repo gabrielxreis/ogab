@@ -177,12 +177,15 @@ def colocar_sfx(t, mp, lista, db=-6):
     return out
 
 
-def montar_takes(t, mp, takes, fim, zoom=1.0):
+def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False):
     """takes = [(arquivo, inicio_s), ...] em ordem. Cada take vai até o início do próximo, sem buraco:
-    encadeia pelo GetEnd() real e usa ceil (fontes 24/25 fps numa timeline 30 deixariam 1-2 quadros pretos)."""
+    encadeia pelo GetEnd() real e usa ceil (fontes 24/25 fps numa timeline 30 deixariam 1-2 quadros pretos).
+    respeitar_inicio=True: cada take entra NO SEU TEMPO planejado mesmo que o anterior seja curto (o vão fica sob
+    um motion de tela cheia). Sem isso, take curto ADIANTA todos os seguintes (bug do lote Calverstone 04-06)."""
     S, F = t.GetStartFrame(), fps_tl(t)
     cur = S + round(takes[0][1] * F); fim_f = S + round(fim * F); itens = []
     for k, (arq, ini) in enumerate(takes):
+        if respeitar_inicio: cur = max(cur, S + round(ini * F))
         nxt = S + round(takes[k + 1][1] * F) if k + 1 < len(takes) else fim_f
         it = importar(mp, arq, "BROLLS")
         sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
