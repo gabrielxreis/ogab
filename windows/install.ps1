@@ -41,27 +41,6 @@ foreach ($p in $pacotes) {
   AtualizaPath
   if (Tem $p.bin) { Ok "$($p.bin) instalado" } else { Warn "nao consegui instalar $($p.id); rode: winget install --id $($p.id) -e" }
 }
-Info "2b/10 Docker Desktop (obrigatorio: o hyperframes doctor exige para o render dos motions)"
-$dockerExe = Join-Path $env:ProgramFiles "Docker\Docker\Docker Desktop.exe"
-if (-not (Tem docker) -and -not (Test-Path $dockerExe)) {
-  Write-Host "  Instalando o Docker Desktop (o Windows vai pedir permissao de administrador; pode pedir para ativar o WSL 2)..."
-  winget install --id Docker.DockerDesktop -e --silent --accept-package-agreements --accept-source-agreements | Out-Null
-  AtualizaPath
-}
-if (Test-Path $dockerExe) {
-  Ok "Docker Desktop instalado"
-  docker info 2>$null | Out-Null
-  if ($LASTEXITCODE -ne 0) {
-    Start-Process $dockerExe
-    Write-Host "  Abrindo o Docker Desktop: aceite os termos na primeira vez (o instalador espera ate 3 min)..."
-    for ($i = 0; $i -lt 60; $i++) { docker info 2>$null | Out-Null; if ($LASTEXITCODE -eq 0) { break }; Start-Sleep 3 }
-  }
-  docker info 2>$null | Out-Null
-  if ($LASTEXITCODE -eq 0) { Ok "Docker rodando" } else { Warn "o Docker ainda nao respondeu: se pediu para reiniciar o Windows (WSL 2), reinicie, abra o Docker Desktop e rode este instalador de novo" }
-} else { Warn "nao consegui instalar o Docker Desktop; instale em https://www.docker.com/products/docker-desktop/ e rode o instalador de novo" }
-
-if (-not (Tem py)) { Warn "sem Python ('py'): instale o Python 3.12 e rode de novo."; exit 1 }
-
 Info "3/10 Pillow (Python)"
 Py -c "import PIL" 2>$null
 if ($LASTEXITCODE -eq 0) { Ok "Pillow ja instalado" } else { Py -m pip install --user --quiet pillow; Ok "Pillow instalado" }

@@ -31,22 +31,6 @@ for pkg in ffmpeg yt-dlp node python git; do
   if command -v "$bin" >/dev/null 2>&1; then ok "$pkg já instalado"; else brew install "$pkg"; ok "$pkg instalado"; fi
 done
 
-info "2b/9 Docker Desktop (obrigatório: o hyperframes doctor exige para o render dos motions)"
-if ! command -v docker >/dev/null 2>&1 && [ ! -d "/Applications/Docker.app" ]; then
-  brew install --cask docker-desktop 2>/dev/null || brew install --cask docker
-fi
-if [ -d "/Applications/Docker.app" ]; then
-  ok "Docker Desktop instalado"
-  if ! docker info >/dev/null 2>&1; then
-    open -a Docker
-    echo "  Abrindo o Docker Desktop: aceite os termos e a senha do Mac na primeira vez (o instalador espera até 3 min)..."
-    for _ in $(seq 1 60); do docker info >/dev/null 2>&1 && break; sleep 3; done
-  fi
-  docker info >/dev/null 2>&1 && ok "Docker rodando" || warn "o Docker ainda não respondeu: abra o Docker Desktop, conclua a primeira configuração e rode o instalador de novo"
-else
-  warn "não consegui instalar o Docker Desktop; instale em https://www.docker.com/products/docker-desktop/ e rode o instalador de novo"
-fi
-
 info "3/9 Pillow (Python)"
 if python3 -c "import PIL" 2>/dev/null; then ok "Pillow já instalado"
 else

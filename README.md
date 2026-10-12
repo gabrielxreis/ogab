@@ -99,7 +99,6 @@ O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
 - instala as fontes livres (Poppins, Playfair Display, Lobster) e o **lettering animado** (@gabrielxreis_ Text Presets) no DaVinci;
 - confere o **DaVinci Resolve Studio** e o scripting, **detecta a versão** e, abaixo da 21.1, instala o **Whisper local** para a transcrição;
 - instala a parte do **Premiere** (plugin Gab Ponte, LUT DO GAB e os MOGRTs da biblioteca) e do **After Effects** (extensão Gab Ponte AE);
-- instala o **Docker Desktop** (o HyperFrames pede);
 - no fim roda o **doctor**, que confere tudo e corrige sozinho o que der, e diz em uma linha o que só você pode fazer.
 
 Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar as suas contas e o Claude in Chrome (passos 5, 8 e 9 abaixo). Reinicie o Claude Code e peça um vídeo.
@@ -151,7 +150,7 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
 | yt-dlp | qualquer recente (`brew upgrade yt-dlp` se o YouTube mudar) | Baixar trecho de vídeo público do YouTube (reportagem, cena histórica) para b-roll |
 | Node.js | 18+ | HyperFrames |
-| Docker Desktop | qualquer recente, **obrigatório** (o `install.sh` instala e abre) | Exigido pelo `hyperframes doctor` para o render dos motions |
+| Docker Desktop | **não precisa** | O `hyperframes doctor` avisa "Docker: not found", mas o HyperFrames só usa Docker no render com `--docker`, que o Gab não usa. Pode ignorar |
 
 
 # USO E COMANDOS

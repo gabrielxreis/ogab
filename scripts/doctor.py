@@ -113,24 +113,13 @@ def ferramentas():
 
 
 def docker():
+    """Docker é OPCIONAL: o HyperFrames só usa no render com --docker (saída idêntica entre máquinas), que o Gab não
+    usa. O aviso "Docker: not found" do hyperframes doctor pode ser ignorado."""
     app = "/Applications/Docker.app" if MAC else os.path.join(os.environ.get("ProgramFiles", ""), "Docker", "Docker", "Docker Desktop.exe")
-    instalado = shutil.which("docker") or os.path.exists(app)
-    if not instalado:
-        # no Mac a instalação pede a senha: só tenta com alguém no terminal (instalador), senão orienta
-        if CORRIGIR and (instalar_pacote("", "Docker.DockerDesktop") if WIN else
-                         (sys.stdin.isatty() and roda(["brew", "install", "--cask", "docker-desktop"]).returncode == 0)):
-            item("⟳", "ferramentas", "Docker Desktop instalado (abra uma vez e aceite os termos)")
-        else:
-            item("!", "ferramentas", "Docker Desktop não instalado: no Terminal rode  brew install --cask docker-desktop  (pede a senha do Mac)"
-                 if MAC else "Docker Desktop não instalado: winget install --id Docker.DockerDesktop -e")
-        return
-    if roda(["docker", "info"], timeout=20).returncode == 0:
-        item("✓", "ferramentas", "Docker rodando")
-    elif CORRIGIR:
-        roda(["open", "-a", "Docker"] if MAC else ["cmd", "/c", "start", "", app], timeout=20)
-        item("⟳", "ferramentas", "Docker Desktop aberto (se for a 1ª vez, aceite os termos na janela dele)")
+    if shutil.which("docker") or os.path.exists(app):
+        item("·", "ferramentas", "Docker instalado (opcional, o Gab não usa)")
     else:
-        item("!", "ferramentas", "Docker instalado mas parado: abra o Docker Desktop")
+        item("·", "ferramentas", "Docker não instalado: opcional, o Gab não usa (ignore o aviso do hyperframes doctor)")
 
 
 def extras():
