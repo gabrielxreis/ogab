@@ -115,3 +115,20 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
         feitos.append((round(seg_t, 2), os.path.basename(b["arquivo"]), b["frase"]))
         print(f"  {seg_t:6.2f}s  {os.path.basename(b['arquivo'])}  <- {b['frase']}")
     return feitos
+
+
+def transcricao_na_timeline(t, trans, saida):
+    """Transcrição da gravação (tempo da fonte) -> tempo da timeline cortada, só com as palavras que ficaram.
+    Base para a legenda (cortes > legenda > b-roll)."""
+    mapa = mapa_fonte(t); out = []
+    for w in palavras(trans):
+        a, b = w["start"], w["end"]
+        for fa, fb, tl in mapa:
+            dentro = min(b, fb) - max(a, fa)
+            if dentro > 0 and dentro >= 0.4 * max(0.01, b - a):
+                out.append({"text": w["text"], "start": round(tl + max(0.0, a - fa), 3),
+                            "end": round(tl + min(fb, b) - fa, 3)})
+                break
+    out.sort(key=lambda x: x["start"])
+    json.dump({"segments": [{"words": out}]}, open(saida, "w"), ensure_ascii=False)
+    return out

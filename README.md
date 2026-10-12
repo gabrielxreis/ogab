@@ -318,3 +318,13 @@ assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
 # LICENÇA
 
 Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. Pacotes de lettering, músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas.
+
+## Skills extras instaladas junto (install.sh, passo 5b)
+
+| O quê | Para quê no Gab |
+|---|---|
+| `design-taste-frontend` (leonxlnx/taste-skill) | motions, cards, CTA e qualquer peça visual em HTML (HyperFrames) sem cara de template |
+| `image-to-code` (leonxlnx/taste-skill) | recriar em código uma referência visual (print de site, cartão, layout) para motion |
+| `web-design-guidelines` (vercel-labs/agent-skills) | conferir legibilidade, contraste e acessibilidade dos motions/peças |
+| `playwright-cli` (microsoft/playwright-cli) | automação de navegador por linha de comando (capturar página do cliente, prints, rolagem para motion de site) |
+| `awesome-design-md` (voltagent) | `~/.claude/referencias/awesome-design-md/design-md/<marca>/DESIGN.md`: sistemas visuais de 70+ marcas como referência de estilo |

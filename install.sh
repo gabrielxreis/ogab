@@ -61,6 +61,27 @@ npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/nu
   || warn "não consegui instalar o HyperFrames agora; rode depois: npx skills add heygen-com/hyperframes -g -a claude-code -s '*' -y"
 npx --yes hyperframes doctor >/dev/null 2>&1 && ok "hyperframes doctor ok" || warn "rode 'npx hyperframes doctor' para ver o que falta no HyperFrames"
 
+info "5b/7 Skills de design e navegador (taste, web-design-guidelines, image-to-code, playwright-cli, awesome-design-md)"
+npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y >/dev/null 2>&1 \
+  && ok "taste-skill (design-taste-frontend, image-to-code) instaladas" \
+  || warn "rode depois: npx skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y"
+npx --yes skills add vercel-labs/agent-skills -g -a claude-code -s web-design-guidelines -y >/dev/null 2>&1 \
+  && ok "web-design-guidelines instalada" \
+  || warn "rode depois: npx skills add vercel-labs/agent-skills -g -a claude-code -s web-design-guidelines -y"
+if command -v playwright-cli >/dev/null 2>&1 || npm install -g @playwright/cli@latest >/dev/null 2>&1; then
+  (cd "$HOME" && playwright-cli install --skills >/dev/null 2>&1) && ok "playwright-cli + skill instalados" \
+    || warn "rode depois: cd ~ && playwright-cli install --skills"
+else
+  warn "não consegui instalar o playwright-cli; rode: npm install -g @playwright/cli@latest"
+fi
+mkdir -p "$HOME/.claude/referencias"
+if [ -d "$HOME/.claude/referencias/awesome-design-md/.git" ]; then
+  git -C "$HOME/.claude/referencias/awesome-design-md" pull -q >/dev/null 2>&1; ok "awesome-design-md atualizado"
+else
+  git clone --depth 1 -q https://github.com/voltagent/awesome-design-md.git "$HOME/.claude/referencias/awesome-design-md" >/dev/null 2>&1 \
+    && ok "awesome-design-md (DESIGN.md de 70+ marcas) em ~/.claude/referencias" || warn "não consegui clonar o awesome-design-md"
+fi
+
 info "6/7 Fontes (Poppins, Playfair Display, Lobster, licença OFL)"
 mkdir -p "$HOME/Library/Fonts"
 n=0

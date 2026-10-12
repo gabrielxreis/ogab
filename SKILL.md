@@ -1,6 +1,6 @@
 ---
 name: ogab
-description: Gab, o editor de vídeo com IA (comando /ogab). Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve (cortar, montar, legendar, colocar música, takes, lettering, motions, cor, áudio, exportar). Leva do roteiro até a timeline pronta no DaVinci: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions e gráficos com HyperFrames, legenda com métrica e conferência automática. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill; as outras skills de vídeo (hyperframes, motion-graphics etc.) entram como ferramentas DENTRO deste fluxo. Comando: /ogab <pedido> ou /ogab <subcomando> (ajuda, config, update, pauta, cliente).
+description: "Gab, o editor de vídeo com IA (comando /ogab). Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve (cortar, montar, legendar, colocar música, takes, lettering, motions, cor, áudio, exportar). Leva do roteiro até a timeline pronta no DaVinci: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions e gráficos com HyperFrames, legenda com métrica e conferência automática. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill; as outras skills de vídeo (hyperframes, motion-graphics etc.) entram como ferramentas DENTRO deste fluxo. Comando: /ogab <pedido> ou /ogab <subcomando> (ajuda, config, update, pauta, cliente)."
 ---
 
 # Gab, o editor (/ogab)
@@ -146,6 +146,8 @@ Pré-requisito: skill **HyperFrames** instalada (`npx skills add heygen-com/hype
 4. **Render:** MOV ProRes 4444 com alfa, 1080x1920 (ou o formato da plataforma), mesmo fps da timeline, em `<pasta do vídeo>/motions/mNN-nome.mov`. O projeto HyperFrames fica fora da pasta do vídeo (ex.: `~/Documents/videos/<assunto>-motions/`). Conferir quadro a quadro sobre um quadro do vídeo antes de entregar.
 5. **Timeline:** `colocar_motions(p, t, mp, [(arquivo, segundo), ...])` duplica a timeline como backup e põe tudo numa trilha própria **MOTIONS**, acima de takes e letterings.
 6. **Conflito com palavra-chave:** motion e lettering de palavra-chave no mesmo momento brigam no centro. Preferir o motion e tirar o lettering daquele trecho (e devolver a legenda nesse intervalo); avisar o usuário quais saíram.
+
+**Skills de design (instaladas pelo install.sh):** ao desenhar motion/cartão/CTA no HyperFrames, seguir `design-taste-frontend` (nada de cara de template) e conferir com `web-design-guidelines` (contraste e leitura no celular); para copiar um visual de referência (print de site, cartão de notícia), `image-to-code`; referências de sistema visual em `~/.claude/referencias/awesome-design-md/design-md/`; captura/rolagem de página do cliente para motion de site com `playwright-cli`.
 
 ## 8d. Edição dinâmica com HyperFrames (ritmo de Reels)
 
