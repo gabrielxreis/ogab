@@ -46,3 +46,4 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
 | DaVinci Resolve **Studio** | 21.1+ (a versão grátis não tem scripting externo). Preferences > System > General > External scripting using: **Local** |
 | Claude Code | com Git Bash (o próprio instalador do Claude Code pede) |
 | Google Chrome | com a extensão Claude in Chrome logada |
+| Docker Desktop | **obrigatório** (o `install.ps1` instala; no Windows precisa do WSL 2 e pode pedir reinício) |

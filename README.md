@@ -119,6 +119,7 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
 | yt-dlp | qualquer recente (`brew upgrade yt-dlp` se o YouTube mudar) | Baixar trecho de vídeo público do YouTube (reportagem, cena histórica) para b-roll |
 | Node.js | 18+ | HyperFrames |
+| Docker Desktop | qualquer recente, **obrigatório** (o `install.sh` instala e abre) | Exigido pelo `hyperframes doctor` para o render dos motions |
 
 
 # USO E COMANDOS
