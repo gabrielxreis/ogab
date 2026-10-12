@@ -232,6 +232,20 @@ def navegar(alvo, caps, fps, limite=400):
 HOME = 115
 
 
+def playhead_x(reg=None):
+    """x (pontos de tela) da linha vermelha do playhead na faixa das trilhas, pela cor (sem OCR)."""
+    import numpy as np
+    x, y, w, h = reg or TIMELINE
+    img = _captura((x, y + 60, w, h - 60)); W, H = Quartz.CGImageGetWidth(img), Quartz.CGImageGetHeight(img)
+    prov = Quartz.CGImageGetDataProvider(img); buf = Quartz.CGDataProviderCopyData(prov); bpr = Quartz.CGImageGetBytesPerRow(img)
+    a = np.frombuffer(buf, np.uint8).reshape(H, bpr)[:, :W * 4].reshape(H, W, 4)   # BGRA
+    b, g, r_ = a[..., 0].astype(int), a[..., 1].astype(int), a[..., 2].astype(int)
+    verm = (r_ > 180) & (g < 90) & (b < 90)
+    col = verm.sum(axis=0)
+    if col.max() < H * 0.5: return None
+    return x + col.argmax() * w / W
+
+
 def selecionar_alguma(caps):
     """Seleciona a 1ª legenda: acha a linha ST1 pelo cabeçalho e o início da timeline pela régua (01:00:00:00)."""
     cab = []
@@ -241,30 +255,14 @@ def selecionar_alguma(caps):
         time.sleep(0.8)
     if not cab: raise RuntimeError("cabeçalho ST1 não encontrado")
     y_st = cab[0][2]
-    regua = []
-    for _ in range(5):                  # OCR Fast (macOS 27) às vezes volta vazio na 1ª leitura
-        regua = [o for o in ocr(TIMELINE) if re.fullmatch(r"\d\d:\d\d:\d\d:\d\d", o[0].replace(" ", ""))]
-        if regua: break
-        time.sleep(0.8)
-    if not regua: raise RuntimeError("régua da timeline não encontrada")
-    r0 = min(regua, key=lambda o: o[2])
-    clicar(r0[1], r0[2]); tecla(HOME); time.sleep(0.6)       # foca a timeline e volta ao início
-    # O playhead fica em cima do "01:00:00:00" e o OCR Fast lê errado: achar o x do início pela escala das
-    # outras marcas da régua (duas marcas -> pixels por segundo -> x do segundo 0).
-    x0 = None
-    for _ in range(5):
-        marcas = []
-        for o in ocr(TIMELINE):
-            s = o[0].replace(" ", "")
-            if re.fullmatch(r"\d\d:\d\d:\d\d:\d\d", s):
-                h, m, s_, f = map(int, s.split(":")); marcas.append(((h - 1) * 3600 + m * 60 + s_, o[3]))
-        marcas = sorted(set(marcas))
-        if len(marcas) >= 2:
-            (ta, xa), (tb, xb) = marcas[0], marcas[-1]
-            if tb > ta: x0 = xa - ta * (xb - xa) / (tb - ta); break
-        time.sleep(0.8)
-    if x0 is None: raise RuntimeError("início da timeline não visível depois do Home")
-    clicar(x0 + 18, y_st)   # +3 caía na borda (trim) e não selecionava a legenda
+    # SEM OCR na régua (falhava): playhead pela API no meio da 1ª legenda e o x dele pela COR (linha vermelha).
+    r = L.conectar(abrir=False); t = r.GetProjectManager().GetCurrentProject().GetCurrentTimeline()
+    fps = int(round(float(t.GetSetting("timelineFrameRate") or 30)))
+    meio = (caps[0]["ini"] + caps[0]["fim"]) // 2
+    t.SetCurrentTimecode(_tc(meio, fps)); time.sleep(0.8)
+    x0 = playhead_x()
+    if x0 is None: raise RuntimeError("playhead (linha vermelha) não encontrado na timeline")
+    clicar(x0, y_st)        # o playhead está no meio da 1ª legenda
     return True
 
 
@@ -353,7 +351,7 @@ def main():
         arq = a[a.index("--arquivo") + 1] if "--arquivo" in a else os.path.expanduser("~/Desktop/GAB USA Subtitle.preset")
         carregar_preset(a[a.index("--preset") + 1], arq)
     aba("Track")
-    if not setar_y(Y_PADRAO, rolagem=False): raise RuntimeError("trilha não ficou em 724")
+    if not setar_y(Y_PADRAO, rolagem=True): raise RuntimeError("trilha não ficou em 724")
     aba("Caption")
     feitos = []
     for i in descer:
