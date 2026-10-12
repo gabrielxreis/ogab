@@ -244,3 +244,4 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 | 12/10/2026 | download em lote do Magnific não chegou (zip e avulso) | Chrome segurando downloads seguidos do site | liberar "downloads automáticos" para magnific.com no Chrome (ícone de download da barra) |
 | 12/10/2026 | b-roll caiu no tempo errado (0 s) | a frase também existia num retake cortado e o script usava a 1ª ocorrência | `broll.py` pula para a 1ª ocorrência que ficou na timeline |
 | 12/10/2026 | "NÃO ENTROU" falso | a conferência exigia o quadro exato; o DaVinci desloca 1-2 quadros | confere pelo nome do arquivo com tolerância de 1 s |
+| 12/10/2026 | 4 takes offline na timeline | o usuário tinha usado os arquivos direto de ~/Downloads e eu movi/renomeei para a pasta do vídeo | `resolve_lib.mover_e_relinkar(mp, origem, destino)`: move e faz ReplaceClip; sempre usar ao organizar arquivos que podem já estar no projeto |

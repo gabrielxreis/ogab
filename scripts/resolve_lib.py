@@ -640,3 +640,20 @@ def timeline_do_modelo(p, mp, nome, w=None, h=None, fps=None, modelo=MODELO_LEGE
         if v: t.SetSetting(k, str(v))
     return t
 
+
+def mover_e_relinkar(mp, origem, destino):
+    """Move/renomeia um arquivo e, se ele já estiver no Media Pool (o usuário pode ter usado direto de ~/Downloads),
+    faz ReplaceClip para o caminho novo, sem ficar offline na timeline (bug de 12/10/2026)."""
+    import shutil
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    shutil.move(origem, destino)
+    alvo = os.path.realpath(origem); n = 0
+    def walk(f):
+        for c in f.GetClipList() or []: yield c
+        for sub in f.GetSubFolderList() or []: yield from walk(sub)
+    for c in walk(mp.GetRootFolder()):
+        fp = c.GetClipProperty("File Path") or ""
+        if fp and os.path.realpath(fp) == alvo:
+            n += bool(c.ReplaceClip(destino))
+    return n
+
