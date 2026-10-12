@@ -90,6 +90,18 @@ if (-not $editor) {
 Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['editor']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $editor
 Ok "editor: $editor (para trocar: /ogab config editor davinci|premiere)"
 
+# Motions: automatico (HyperFrames) ou no After Effects (camadas editaveis). So pergunta se houver AE instalado.
+$motion = if ($env:OGAB_MOTION) { $env:OGAB_MOTION } elseif ($cfgJ.motion) { $cfgJ.motion } else { "" }
+$temAE = Get-ChildItem (Join-Path $env:ProgramFiles "Adobe") -Directory -Filter "Adobe After Effects 20*" -ErrorAction SilentlyContinue
+if (-not $motion -and $temAE) {
+  Write-Host "`n  Como o Gab faz os motions?`n    1) Automatico (HyperFrames, rapido)`n    2) No After Effects (camadas editaveis: texto, numeros, checks, cores)"
+  $escm = Read-Host "  Escolha [1/2]"
+  $motion = if ($escm -eq "2") { "aftereffects" } else { "hyperframes" }
+}
+if (-not $motion) { $motion = "hyperframes" }
+Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['motion']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $motion
+Ok "motions: $motion (para trocar: /ogab config motion hyperframes|aftereffects)"
+
 Info "5/8 Ambiente do Windows (Resolve, Python, atalho python3)"
 $api  = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting"
 $appd = Join-Path $env:ProgramFiles "Blackmagic Design\DaVinci Resolve"
@@ -177,6 +189,13 @@ New-Item -ItemType Directory -Force -Path $tpl | Out-Null
 Get-ChildItem -Path (Join-Path $DEST "assets\lettering") -Filter *.drfx -ErrorAction SilentlyContinue | ForEach-Object {
   Copy-Item $_.FullName (Join-Path $tpl $_.Name) -Force
   Ok "lettering $($_.Name) instalado (reinicie o DaVinci)"
+}
+
+if ($motion -eq "aftereffects") {
+  Info "After Effects (extensao Gab Ponte AE)"
+  $env:OGAB_SEM_CONFIG = "1"
+  & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "aftereffects\instalar.ps1")
+  $env:OGAB_SEM_CONFIG = ""
 }
 
 if ($editor -eq "premiere") {

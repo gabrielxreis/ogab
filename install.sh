@@ -87,6 +87,22 @@ json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
 ok "editor: $OGAB_EDITOR (para trocar: /ogab config editor davinci|premiere)"
 
+# Motions: automático (HyperFrames) ou no After Effects (camadas editáveis). Só pergunta se houver AE instalado.
+MOTION_ATUAL="$(python3 -c "import json;print(json.load(open('$DEST/config.json')).get('motion',''))" 2>/dev/null || true)"
+OGAB_MOTION="${OGAB_MOTION:-$MOTION_ATUAL}"
+if [ -z "$OGAB_MOTION" ] && ls -d /Applications/Adobe\ After\ Effects\ 20* >/dev/null 2>&1 && [ -r /dev/tty ]; then
+  printf "\n  Como o Gab faz os motions?\n    1) Automático (HyperFrames, rápido)\n    2) No After Effects (camadas editáveis: texto, números, checks, cores)\n  Escolha [1/2]: "
+  read -r escm < /dev/tty || true
+  [ "${escm:-1}" = "2" ] && OGAB_MOTION="aftereffects" || OGAB_MOTION="hyperframes"
+fi
+OGAB_MOTION="${OGAB_MOTION:-hyperframes}"
+python3 - "$DEST/config.json" "$OGAB_MOTION" <<'PY'
+import json, sys
+c = json.load(open(sys.argv[1])); c["motion"] = sys.argv[2]
+json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
+PY
+ok "motions: $OGAB_MOTION (para trocar: /ogab config motion hyperframes|aftereffects)"
+
 info "5/7 HyperFrames (motions, gráficos, edição dinâmica)"
 npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/null 2>&1 \
   && ok "skills do HyperFrames instaladas" \
@@ -182,6 +198,11 @@ if [ "$precisa_whisper" -eq 1 ]; then
       || warn "não consegui instalar o $WPKG; rode: python3 -m pip install --user $WPKG"
   fi
 fi
+fi
+
+if [ "$OGAB_MOTION" = "aftereffects" ]; then
+info "7b/7 After Effects (extensão Gab Ponte AE)"
+OGAB_SEM_CONFIG=1 bash "$DEST/aftereffects/instalar.sh" | sed -n '/^ /p'
 fi
 
 if [ "$OGAB_EDITOR" = "premiere" ]; then

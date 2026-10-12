@@ -22,6 +22,13 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 - `premiere`: o método é o mesmo (roteiro, voz, legenda, música, SFX, takes, cor, lettering, motions, QC), mas toda etapa que mexe no editor segue `premiere/README.md` (`premiere/premiere_lib.py` no lugar do `resolve_lib.py`). Ler esse arquivo ao começar.
 - `/ogab config editor premiere|davinci` troca. Ao trocar para premiere, rodar `premiere/instalar.sh` (Mac) ou `premiere\instalar.ps1` (Windows) se o plugin Gab Ponte ainda não estiver instalado.
 
+## Motions: automático OU After Effects (escolhido na instalação)
+
+`config.json` > `motion`: `"hyperframes"` (padrão, também sem a chave) ou `"aftereffects"`. Vale com qualquer editor.
+- `hyperframes`: motions em código, como em `docs/etapas/lettering_motions.md`.
+- `aftereffects`: o MESMO plano de motions (centro, visual do cliente, calmo, duração da fala), mas cada motion é montado no After Effects como camadas nativas editáveis (texto, número, check, cor, keyframe) e entra na timeline como MOV com alfa. Ler `aftereffects/README.md` ao chegar na etapa 8.
+- `/ogab config motion aftereffects|hyperframes` troca; ao trocar para aftereffects, rodar `aftereffects/instalar.sh` (Mac) ou `aftereffects\instalar.ps1` (Windows) com o AE fechado, se a extensão Gab Ponte AE ainda não estiver instalada.
+
 ## 0. Subcomandos (`/ogab <sub>`)
 
 - `ajuda` ou `help` (o `/help` puro é do Claude Code e não pode ser trocado): mostrar em tabela o que está **habilitado/desabilitado** em `SKILL_DIR/config.json` (se não existir, copiar de `config.example.json`), os provedores escolhidos por etapa e os comandos. Oferecer mudar qualquer item; ao mudar, editar `config.json` e confirmar.
