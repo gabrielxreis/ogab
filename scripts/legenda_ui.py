@@ -247,6 +247,24 @@ def playhead_x(reg=None):
     return x + col.argmax() * w / W
 
 
+def y_legenda():
+    """y (pontos) da trilha de legenda pela COR: os clipes de legenda são bege; a 1ª faixa bege de cima para baixo."""
+    import numpy as np
+    x, y, w, h = TIMELINE
+    img = _captura((x, y, w, h)); W, H = Quartz.CGImageGetWidth(img), Quartz.CGImageGetHeight(img)
+    buf = Quartz.CGDataProviderCopyData(Quartz.CGImageGetDataProvider(img)); bpr = Quartz.CGImageGetBytesPerRow(img)
+    a = np.frombuffer(buf, np.uint8).reshape(H, bpr)[:, :W * 4].reshape(H, W, 4).astype(int)
+    b, g, r_ = a[..., 0], a[..., 1], a[..., 2]
+    bege = (r_ > 160) & (r_ < 235) & (g > 140) & (g < 215) & (b > 90) & (b < 175) & (r_ > g) & (g > b) & ((r_ - b) > 22)
+    linhas = np.where(bege.sum(axis=1) > W * 0.15)[0]
+    if len(linhas) == 0: return None
+    ini = linhas[0]; fim = ini
+    for l in linhas[1:]:
+        if l - fim > 2: break
+        fim = l
+    return y + ((ini + fim) / 2) * h / H
+
+
 def clicar_cmd(x, y):
     """Cmd+clique (adiciona à seleção) pelo Quartz."""
     for tipo in (Quartz.kCGEventLeftMouseDown, Quartz.kCGEventLeftMouseUp):
@@ -260,13 +278,8 @@ def selecionar_varias(caps, idxs, fps):
     Position delas numa vez só. Sem OCR na régua: Shift+Z (zoom para caber), playhead pela API em dois tempos e a escala
     px/quadro pela linha vermelha; o y da linha ST1 pelo OCR do cabeçalho."""
     r = L.conectar(abrir=False); t = r.GetProjectManager().GetCurrentProject().GetCurrentTimeline()
-    cab = []
-    for _ in range(4):
-        cab = [o for o in ocr((0, 560, 170, 460)) if _norm(o[0]).replace(" ", "") in ("st1", "sti", "stl")]
-        if cab: break
-        time.sleep(0.8)
-    if not cab: raise RuntimeError("cabeçalho ST1 não encontrado")
-    y_st = cab[0][2]
+    y_st = y_legenda()
+    if y_st is None: raise RuntimeError("trilha de legenda (clipes bege) não encontrada na timeline")
     _se('keystroke "z" using shift down'); time.sleep(0.8)          # zoom para caber a timeline inteira
     a, b = caps[0]["ini"], caps[-1]["fim"]
     t.SetCurrentTimecode(_tc(a, fps)); time.sleep(0.7); xa = playhead_x()
@@ -281,13 +294,8 @@ def selecionar_varias(caps, idxs, fps):
 
 def selecionar_alguma(caps):
     """Seleciona a 1ª legenda: acha a linha ST1 pelo cabeçalho e o início da timeline pela régua (01:00:00:00)."""
-    cab = []
-    for _ in range(4):                  # a timeline recém-aberta demora a desenhar; OCR às vezes lê "STI"/"STl"
-        cab = [o for o in ocr((0, 560, 170, 460)) if _norm(o[0]).replace(" ", "") in ("st1", "sti", "stl")]
-        if cab: break
-        time.sleep(0.8)
-    if not cab: raise RuntimeError("cabeçalho ST1 não encontrado")
-    y_st = cab[0][2]
+    y_st = y_legenda()
+    if y_st is None: raise RuntimeError("trilha de legenda (clipes bege) não encontrada na timeline")
     # SEM OCR na régua (falhava): playhead pela API no meio da 1ª legenda e o x dele pela COR (linha vermelha).
     r = L.conectar(abrir=False); t = r.GetProjectManager().GetCurrentProject().GetCurrentTimeline()
     fps = int(round(float(t.GetSetting("timelineFrameRate") or 30)))
