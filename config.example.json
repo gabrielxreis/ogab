@@ -23,6 +23,7 @@
     "geracao_takes": [
       "magnific_site_ilimitado"
     ],
+    "geracao_takes_obs": "ordem de preferência; qualquer IA que o usuário use: magnific_site_ilimitado, higgsfield, kling_site, runway... A skill pergunta na 1a vez e salva aqui.",
     "download": "navegador",
     "editor": "davinci_resolve"
   },
