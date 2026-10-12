@@ -1,8 +1,5 @@
-# Material do usuário (não vai para o repositório público sem autorização)
-assets/lut/*
-!assets/lut/LEIA.md
-assets/mogrt/*
-!assets/mogrt/LEIA.md
+# LUT e MOGRTs do Gab são publicados (autorizado em 12/10/2026). Só o que é da máquina fica de fora.
+assets/lut/indice.json
+assets/lut/_calibracao/
 *.ccx
 __pycache__/
-assets/lut/indice.json
