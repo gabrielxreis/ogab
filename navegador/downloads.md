@@ -45,6 +45,8 @@ if(c){c.click();await new Promise(r=>setTimeout(r,900));const o=[...document.que
 2. Clicar no ícone de download (seta para baixo ao lado de "Play"); aparecem os botões **MP3** e **WAV**. Clicar em **WAV**.
 3. O arquivo cai como `Artista - Música.wav` em `~/Downloads` (44,1 kHz: a skill corta o trecho e converte para 48 kHz com fade).
 
+**Artlist (12/10/2026, receita que funcionou para 5 faixas seguidas):** abrir a página da faixa, esperar ~18 s (esqueleto cinza), `hover` no ícone de download e DEPOIS clicar nele (sem o hover o clique às vezes não abre nada); aparecem os botões MP3 e WAV na linha do Play: clicar no **WAV** (~123 px à direita do ícone). Se nada chegar em ~/Downloads, recarregar a página e repetir. Faixa já baixada antes: a página **Downloads** do Artlist (menu lateral) tem MP3/WAV por faixa e entrega na hora. O `playableUrl` do MCP é a faixa inteira (AAC) e serve de plano B com o mesmo master (mesma duração), trocando depois por `ReplaceClip`.
+
 ## Magnific (geração de takes, só ilimitado)
 
 - Imagem: `magnific.com/app/ai-image-generator`, modelo **Google Nano Banana 2**, **1K**, proporção da plataforma. Conferir "Unlimited" no botão Generate e a proporção antes de cada lote (ela pode mudar sozinha).
