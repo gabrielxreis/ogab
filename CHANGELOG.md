@@ -1,7 +1,10 @@
 # Novidades do Gab (/ogab)
 
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
-Mais novo em cima. Cada versão é uma linha `## 2026.10.13-7 (13/10/2026)
+Mais novo em cima. Cada versão é uma linha `## 2026.10.13-8 (13/10/2026)
+- **Motions colados continuam no tempo da fala:** ao fechar o vãozinho entre motions em sequência, o Gab estica o motion anterior em vez de puxar o seguinte; antes, numa sequência longa, os últimos entravam alguns quadros antes da palavra.
+
+## 2026.10.13-7 (13/10/2026)
 - **Motion sem fade embutido:** o motion sai do render sem fade de entrada e saída; a transição fica no DaVinci, onde você ajusta.
 - **Motion com fundo próprio:** motion de tela cheia tem o fundo na identidade do assunto (nunca por cima do vídeo cru); foto ou take entra dentro do motion, em moldura.
 

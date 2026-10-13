@@ -162,9 +162,19 @@ def colar_motions(t, mp, max_vao=0.6):
             vao = b[0] - a[1]
             if 0 < vao <= round(max_vao * F): alvo = (a, b, vao); break
         if not alvo: return feitos
-        a, b, vao = alvo; x, mpi, k = b[3], b[4], b[2]
+        a, b, vao = alvo
+        # 1º: esticar o ANTERIOR até o próximo (se a mídia dele tiver sobra): o próximo fica no tempo da fala.
+        # Puxar o próximo para trás acumulava atraso (13/10/2026: 10 motions colados ficaram 5 quadros adiantados).
+        xa, mpa, ka = a[3], a[4], a[2]
+        la = xa.GetLeftOffset(); da = xa.GetDuration(); ta = int(float(mpa.GetClipProperty("Frames")))
+        if la + da + vao <= ta:
+            rec = xa.GetStart(); t.DeleteClips([xa], False)
+            mp.AppendToTimeline([{"mediaPoolItem": mpa, "mediaType": 1, "trackIndex": ka, "recordFrame": rec,
+                                  "startFrame": la, "endFrame": la + da + vao}])
+            feitos.append((xa.GetName(), round(vao / F, 2))); continue
+        x, mpi, k = b[3], b[4], b[2]
         left = x.GetLeftOffset(); dur = x.GetDuration(); total = int(float(mpi.GetClipProperty("Frames")))
-        ini = max(0, left - vao); fim = min(total - 1, ini + dur + vao - 1)
+        ini = max(0, left - vao); fim = min(total, ini + dur + vao)   # endFrame é exclusivo
         t.DeleteClips([x], False)
         mp.AppendToTimeline([{"mediaPoolItem": mpi, "mediaType": 1, "trackIndex": k, "recordFrame": a[1], "startFrame": ini, "endFrame": fim}])
         feitos.append((x.GetName(), round(vao / F, 2)))
