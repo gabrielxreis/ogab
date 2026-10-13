@@ -1,7 +1,10 @@
 # Novidades do Gab (/ogab)
 
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
-Mais novo em cima. Cada versão é uma linha `## 2026.10.13-3 (13/10/2026)
+Mais novo em cima. Cada versão é uma linha `## 2026.10.13-6 (13/10/2026)
+- **Motion no tempo da fala:** cada elemento do motion (número, frase, selo, título) entra junto com a palavra falada, medido na transcrição palavra a palavra. Nada aparece antes de ser dito.
+
+## 2026.10.13-3 (13/10/2026)
 - **Novos nomes:** o preset "pontilhismo" agora é **point cloud** e o "metáforas" agora é **vector motion**.
 - **O Gab escolhe o preset sozinho:** ao planejar o vídeo trecho a trecho, ele usa vitrine, point cloud ou vector motion onde cada um combina (curiosidade e história em point cloud, frase de efeito em vector motion, coisa de interface em vitrine) e diz o que escolheu. Dá para misturar no mesmo vídeo.
 
