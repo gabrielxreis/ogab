@@ -3,6 +3,7 @@
   python3 sonorizar.py analisar <video> [--pasta <saida>]      # momentos de ação, cortes, pan e folha de quadros
   python3 sonorizar.py medir <som.wav|pasta> ...                # ataque (onset), pico e duração de cada som
   python3 sonorizar.py mixar <plano.json> [--sem-voz]           # camadas, pan, ducking, -14 LUFS: stems + prévia
+  python3 sonorizar.py conferir <plano.json>                     # o que cada som É (CLAP) x a cena; barra o incoerente
   python3 sonorizar.py davinci <plano.json> <pasta_sfx>         # vira plano_sfx.txt (colocar_plano_sfx no DaVinci)
 
 analisar: OpenCV mede o movimento quadro a quadro e devolve, por evento, o tempo, o tipo (entrada = algo começa a
@@ -16,10 +17,14 @@ plano.json (o Gab escreve; tempos em segundos do vídeo):
    "ambiente": [{"arquivo": "parque.wav", "de": 0, "ate": 12, "db": -24, "fade": 1.0, "pan": 0}],
    "eventos":  [{"t": 3.2, "arquivo": "passo.wav", "db": -14, "pan": -0.4, "dur": 0.8, "alinhar": "onset", "nota": "pé esq."}],
    "musica":   {"arquivo": "trilha.wav", "db": -18, "de": 0, "inicio_arquivo": 0, "duck": true},
-   "camera_lenta": [{"de": 3.55, "ate": 5.85, "entrada": 0.3, "saida": 0.05}]}
+   "camera_lenta": [{"de": 3.55, "ate": 5.85, "entrada": 0.3, "saida": 0.05}],
+   "superficie": "terra", "proibidos": ["..."]}
+  superficie (asfalto, terra, areia, grama, agua, madeira, neve): o chão da cena; com ela (ou proibidos) o mixar roda
+  `conferir` antes e PARA se algum som for do chão errado (ex.: pneu cantando no asfalto numa estrada de terra).
   camera_lenta: o mundo ABAFA na janela (grave + reverb, entra em `entrada` s e volta SECO em `saida` s, no impacto).
   Evento com "velocidade": 0.4 = som lento e grave (motor/impacto em câmera lenta); "reverso": true = som ao contrário
-  que CRESCE e termina em t (sucção antes do impacto); "livre": true = não abafa na câmera lenta (o som do slow-mo).
+  que CRESCE e termina em t (sucção antes do impacto); "livre": true = não abafa na câmera lenta (o som do slow-mo);
+  "de_arquivo"/"ate_arquivo" = usar só esse trecho do arquivo.
   alinhar: "onset" (padrão: o ATAQUE do som cai em t), "pico" (o pico cai em t; impacto com subida) ou "inicio".
   dur = quanto o som continua DEPOIS de t (a subida antes de t entra sozinha); sem dur, até o fim do arquivo.
   Camadas de um som importante = vários eventos no MESMO t (ataque, corpo, cauda) com db e dur diferentes.
@@ -70,14 +75,17 @@ def medir(arq):
 def preparar(arq, ev):
     """Som com velocidade (asetrate: mais lento = mais grave) e/ou reverso vira um WAV processado (cache ao lado)."""
     v = float(ev.get("velocidade") or 1.0); rev = bool(ev.get("reverso"))
-    if v == 1.0 and not rev:
+    a, b = ev.get("de_arquivo"), ev.get("ate_arquivo")   # só um trecho de um arquivo longo (ex.: 12-15 s de um rally)
+    if v == 1.0 and not rev and a is None and b is None:
         return arq
     pasta = os.path.join(os.path.dirname(os.path.abspath(arq)), "_processados"); os.makedirs(pasta, exist_ok=True)
-    nome = os.path.splitext(os.path.basename(arq))[0] + (f"_v{int(v * 100)}" if v != 1.0 else "") + ("_rev" if rev else "") + ".wav"
+    nome = (os.path.splitext(os.path.basename(arq))[0] + (f"_{a}-{b}s" if a is not None or b is not None else "") +
+            (f"_v{int(v * 100)}" if v != 1.0 else "") + ("_rev" if rev else "") + ".wav")
     dst = os.path.join(pasta, nome)
     if not os.path.exists(dst):
+        corte = (["-ss", str(a)] if a is not None else []) + (["-to", str(b)] if b is not None else [])
         f = (f"asetrate={int(SR * v)},aresample={SR}" if v != 1.0 else "anull") + (",areverse" if rev else "")
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", arq, "-ar", str(SR), "-af", f, "-c:a", "pcm_s24le", dst], check=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y"] + corte + ["-i", arq, "-ar", str(SR), "-af", f, "-c:a", "pcm_s24le", dst], check=True)
     return dst
 
 
@@ -264,6 +272,11 @@ def _abafar(arq, lentas):
 
 def mixar(plano_arq, com_voz=True):
     plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq))
+    if plano.get("superficie") or plano.get("proibidos"):   # trava: som do chão errado não entra
+        ruins = [r for r in conferir(plano_arq) if r[3]]
+        if ruins:
+            raise SystemExit("PAROU: som que não combina com a cena (superfície " + str(plano.get("superficie")) + "):\n" +
+                             "\n".join(f"  {n} ({a}): {p}" for n, a, _, p in ruins) + "\nTrocar o som (sfx_conferir/conferir) e rodar de novo.")
     video = _caminho(base, plano["video"]); out = _caminho(base, plano.get("saida", "sonorizacao")); os.makedirs(out, exist_ok=True)
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video], capture_output=True, text=True).stdout)
     fmt = f"aformat=sample_rates={SR}:channel_layouts=stereo"
@@ -345,6 +358,40 @@ def mixar(plano_arq, com_voz=True):
             "voz": tem_voz, "loudness": li, "pico": pk, "eventos": len(plano.get("eventos", []))}
 
 
+# ------------------------------------------------------------------ conferir (o som combina com a cena?)
+SUPERFICIE = {  # o que NÃO pode tocar em cada chão (rótulos do CLAP em sfx_conferir.ROTULOS)
+    "terra": ["tires squealing on asphalt", "footsteps on wood floor"],
+    "areia": ["tires squealing on asphalt", "footsteps on wood floor"],
+    "grama": ["tires squealing on asphalt", "footsteps on wood floor"],
+    "neve": ["tires squealing on asphalt", "footsteps on wood floor"],
+    "agua": ["tires squealing on asphalt", "footsteps on wood floor", "footsteps on gravel"],
+    "asfalto": ["car skidding on gravel and dirt", "footsteps on gravel"],
+    "madeira": ["footsteps on gravel", "car skidding on gravel and dirt"],
+}
+
+
+def conferir(plano_arq, limite=0.38):
+    """Classifica cada som do plano com o CLAP (scripts/sfx_conferir.py) e devolve [(nota, arquivo, top3, problema)].
+    Problema = rótulo proibido (pela superfície ou pela lista do plano) em 1º lugar ou acima de `limite`."""
+    import sfx_conferir as C
+    plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq))
+    proib = set(plano.get("proibidos", [])) | set(SUPERFICIE.get(plano.get("superficie", ""), []))
+    faltam = proib - set(C.ROTULOS)
+    if faltam:
+        C.ROTULOS += sorted(faltam)
+    top = C._clap(); res = []; vistos = {}
+    itens = [(a.get("nota", "ambiente"), a) for a in plano.get("ambiente", [])] + [(e.get("nota", ""), e) for e in plano.get("eventos", [])]
+    for nota, it in itens:
+        arq = preparar(_caminho(base, it["arquivo"]), it)
+        if arq not in vistos:
+            pares = [x.rsplit(" ", 1) for x in top(C._pcm(arq, 0, 10), n=len(C.ROTULOS)).split(" | ")]
+            vistos[arq] = [(r, float(v)) for r, v in pares]
+        cl = vistos[arq]
+        prob = [f"{r} {v:.2f}" for i, (r, v) in enumerate(cl) if r in proib and (i == 0 or v >= limite)]
+        res.append((nota, os.path.basename(arq), " | ".join(f"{r} {v:.2f}" for r, v in cl[:3]), "; ".join(prob)))
+    return res
+
+
 # ------------------------------------------------------------------ DaVinci
 def davinci(plano_arq, pasta_sfx):
     """Escreve <pasta_sfx>/plano_sfx.txt (formato de resolve_lib.colocar_plano_sfx) e copia os sons como WAV 48 kHz.
@@ -388,6 +435,12 @@ if __name__ == "__main__":
             m = medir(f); print(f"  {os.path.basename(f):40s} ataque {m['onset']:5.2f}s  pico {m['pico']:5.2f}s  dur {m['dur']:6.2f}s")
     elif a[0] == "mixar" and len(a) >= 2:
         print(json.dumps(mixar(a[1], "--sem-voz" not in a), indent=1, ensure_ascii=False))
+    elif a[0] == "conferir" and len(a) >= 2:
+        rs = conferir(a[1])
+        for n, arq, t3, p in rs:
+            print(f"  {'X' if p else 'ok'}  {n[:38]:38s} {arq[:28]:28s} {t3}" + (f"\n      PROIBIDO AQUI: {p}" if p else ""))
+        if any(r[3] for r in rs):
+            sys.exit(1)
     elif a[0] == "davinci" and len(a) >= 3:
         print(*davinci(a[1], a[2]))
     else:

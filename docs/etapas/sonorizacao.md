@@ -15,6 +15,17 @@ pelo OpenCV, o som vem do Artlist (`search_sfx`, assinatura) e das bibliotecas l
   O QUE é (objeto/ação) olhando a folha. Evento que não é nada (balanço de câmera) se ignora; ação que o script não
   pegou (fala, gesto pequeno) se acrescenta à mão.
 
+## 1b. Nomear a AÇÃO certa e o CHÃO da cena (regra do usuário, 12/10/2026: "a queda dele tem barulho de pneu no asfalto e não condiz com a cena, isso é bizarro, isso não pode acontecer")
+- Olhar a sequência de quadros e dizer a ação exata: **queda** (cai e para pelo impacto: peso, lataria, suspensão, terra
+  espirrando, quiques), **freada/derrapagem** (desliza com as rodas no chão), **passagem**, **parada**. Carro que salta e
+  cai NÃO derrapa; objeto no ar não tem som de chão nenhum.
+- Dizer o chão: asfalto, terra, areia, grama, água, madeira, neve. Pneu cantando é só asfalto/concreto; na terra é
+  ruído largo de cascalho, sem nota.
+- Pôr `"superficie": "<chão>"` no plano: o `mixar` roda `sonorizar.py conferir` (CLAP) antes e PARA se algum som for do
+  chão errado (barra pneu no asfalto na terra, passo em madeira na grama...). `"proibidos": [...]` acrescenta rótulos.
+  Gravação de "carro passando" traz pneu no asfalto junto: para motor puro, usar trecho só de motor (`de_arquivo`).
+- `sonorizar.py conferir <plano>` sempre antes de mostrar: a coluna do meio é o que o som É; tem que bater com a nota.
+
 ## 2. Lista de som em 3 camadas (antes de buscar qualquer arquivo)
 | Camada | O que é | Exemplo (carro no deserto) | Nível típico |
 |---|---|---|---|

@@ -15,7 +15,9 @@ ROTULOS = ["air whoosh swoosh", "glitch digital distortion", "keyboard typing", 
            "computer beeps and blips", "magic shimmer chimes sparkle", "choir singing pad", "horror scary hit",
            "dark drone ambience", "warm bright hopeful ambient pad", "ocean waves on beach", "lake water lapping with birds",
            "birds chirping outdoors", "crowd of people chatting", "quiet room tone", "city street traffic ambience",
-           "old tv turning on static", "fabric bag rustling", "book pages flipping", "stick swinging", "stamp thud hit"]
+           "old tv turning on static", "fabric bag rustling", "book pages flipping", "stick swinging", "stamp thud hit",
+           "tires squealing on asphalt", "car skidding on gravel and dirt", "car engine revving", "footsteps on gravel",
+           "footsteps on wood floor", "splashing water", "wind blowing"]
 
 
 def _pcm(f, ini=None, fim=None, sr=48000):
