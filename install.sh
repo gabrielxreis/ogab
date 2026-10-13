@@ -41,6 +41,10 @@ for par in "PIL:pillow" "numpy:numpy" "cv2:opencv-python" "Vision:pyobjc-framewo
   fi
 done
 
+info "3b/9 Blender (3D de verdade nos motions)"
+if [ -d "/Applications/Blender.app" ]; then ok "Blender já instalado"
+else brew install --cask blender >/dev/null 2>&1 && ok "Blender instalado" || warn "não consegui instalar o Blender: brew install --cask blender"; fi
+
 info "4/9 Gab (/ogab)"
 if [ ! -e "$DEST" ] && [ -d "$HOME/.claude/skills/video-redes/.git" ]; then
   mv "$HOME/.claude/skills/video-redes" "$DEST" && ok "pasta antiga video-redes renomeada para ogab"

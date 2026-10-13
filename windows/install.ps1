@@ -52,6 +52,10 @@ foreach ($par in @(@("PIL", "pillow"), @("numpy", "numpy"), @("cv2", "opencv-pyt
   }
 }
 
+Info "3b/10 Blender (3D de verdade nos motions)"
+if (Get-ChildItem (Join-Path $env:ProgramFiles "Blender Foundation") -Directory -ErrorAction SilentlyContinue) { Ok "Blender ja instalado" }
+else { winget install --id BlenderFoundation.Blender -e --silent --accept-package-agreements --accept-source-agreements | Out-Null; if ($LASTEXITCODE -eq 0) { Ok "Blender instalado" } else { Warn "nao consegui instalar o Blender: winget install --id BlenderFoundation.Blender -e" } }
+
 Info "4/10 Gab (/ogab)"
 if (Test-Path (Join-Path $DEST ".git")) {
   git -C $DEST pull --ff-only --quiet

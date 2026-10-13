@@ -179,6 +179,16 @@ def docker():
         item("·", "ferramentas", "Docker não instalado: opcional, o Gab não usa (ignore o aviso do hyperframes doctor)")
 
 
+def blender():
+    cands = ["/Applications/Blender.app"] if MAC else glob.glob(os.path.join(os.environ.get("ProgramFiles", ""), "Blender Foundation", "Blender*"))
+    if any(os.path.exists(c) for c in cands):
+        item("✓", "extras", "Blender (3D de verdade: tresd/tresd.py)")
+    elif CORRIGIR and (sys.stdin.isatty() or WIN) and instalar_pacote("--cask blender" if False else "blender", "BlenderFoundation.Blender") if WIN else (CORRIGIR and sys.stdin.isatty() and roda(["brew", "install", "--cask", "blender"]).returncode == 0):
+        item("⟳", "extras", "Blender instalado")
+    else:
+        item("·", "extras", "Blender não instalado (só para motion 3D): " + ("brew install --cask blender" if MAC else "winget install --id BlenderFoundation.Blender -e"))
+
+
 def extras():
     if os.path.isdir(os.path.join(HOME, ".claude", "skills", "hyperframes")):
         item("✓", "extras", "skills do HyperFrames")
@@ -363,7 +373,7 @@ def windows():
 
 
 def main():
-    skill(); python(); ferramentas(); ffmpeg_detalhes(); extras(); windows()
+    skill(); python(); ferramentas(); ffmpeg_detalhes(); extras(); blender(); windows()
     c = cfg()
     davinci(c.get("editor", "davinci") == "davinci")
     premiere(c.get("editor") == "premiere")
