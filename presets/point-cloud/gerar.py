@@ -1,4 +1,4 @@
-"""Preset PONTILHISMO: milhares de pontos desenham fotos reais, textos com volume e formas, e migram de uma cena para a
+"""Preset POINT CLOUD: milhares de pontos desenham fotos reais, textos com volume e formas, e migram de uma cena para a
 outra com câmera 3D (HyperFrames + canvas, determinístico, renderiza quadro a quadro).
 
   python3 gerar.py plano.json <pasta_saida> [--render saida.mp4] [--previa]
@@ -113,7 +113,7 @@ def gerar(plano, pasta):
              "largura": plano.get("largura", 0.82), "fase": rng.random(n).round(3).tolist(), "atraso": rng.random(n).round(3).tolist(),
              "cenas": cenas, "alvos": alvos}
     open(os.path.join(pasta, "dados.js"), "w").write("window.PONTOS = " + json.dumps(dados, separators=(",", ":")) + ";\n")
-    shutil.copy(os.path.join(AQUI, "kit", "pontilhismo.js"), pasta)
+    shutil.copy(os.path.join(AQUI, "kit", "pointcloud.js"), pasta)
     os.makedirs(os.path.join(pasta, "fonts"), exist_ok=True)
     for f in ("PlayfairDisplay/PlayfairDisplay-Italic.ttf", "PlayfairDisplay/PlayfairDisplay-Regular.ttf", "Poppins/Poppins-Light.ttf"):
         shutil.copy(os.path.join(FONTES, f), os.path.join(pasta, "fonts"))

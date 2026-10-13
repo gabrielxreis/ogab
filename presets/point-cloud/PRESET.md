@@ -1,4 +1,4 @@
-# Preset PONTILHISMO (motion minimalista em pontos)
+# Preset POINT CLOUD (motion minimalista em pontos)
 
 Milhares de pontos claros sobre fundo preto desenham fotos reais, textos com volume e formas, e **migram de uma cena para
 a outra** enquanto a câmera gira em 3D. Tipografia mínima (serifa itálica + linha pequena espaçada) e crédito da imagem
@@ -8,7 +8,7 @@ clássico em pontos girando. Serve para curiosidade, história, filosofia, ciên
 Exemplo: `exemplo/exemplo_previa.mp4` (prévia leve; o render cheio sai com `gerar.py ... --render`) (13,6 s: nuvem -> galáxia -> "?" -> busto de Sócrates -> esfera), plano em `exemplo/plano.json`.
 
 ## Como pedir
-`/ogab faz um vídeo no preset pontilhismo sobre <tema>` (ou `preset: pontilhismo` no estilo.md do cliente).
+`/ogab faz um vídeo no preset point cloud sobre <tema>` (ou `preset: point cloud` no estilo.md do cliente).
 Narração: a do usuário (voz clonada ou gravada); cada frase da fala troca a figura (a figura entra JUNTO com a palavra).
 
 ## Processo (o que o Gab faz)
@@ -22,7 +22,7 @@ Narração: a do usuário (voz clonada ou gravada); cada frase da fala troca a f
 3. Plano (ver `gerar.py`, docstring): `tipo` imagem | texto | galaxia | esfera | anel | onda | grade | nuvem, `dur`,
    `transicao` (1,1-1,6 s), `giro` (graus na cena; foto: 15-25, forma: 40-70), `inclinacao`, `relevo` (foto), `profundidade`
    (texto), `titulo` (`<i>` para itálico), `kicker`, `credito`. Cores: `fundo`, `cor` (pontos), `destaque` (itálico) -> cor da marca se pedir.
-4. `python3 presets/pontilhismo/gerar.py plano.json <pasta>/motions/pontilhismo --render <pasta>/motions/pontilhismo.mp4`
+4. `python3 presets/point-cloud/gerar.py plano.json <pasta>/motions/point-cloud --render <pasta>/motions/point-cloud.mp4`
    (7000 pontos, ~2-4 min de render para 15 s). Conferir 1 folha de quadros antes de entregar.
 5. Legenda GAB USA e som seguem o Gab; som: ambiente suave + "sopro"/shimmer quando os pontos migram, nada de whoosh pesado.
 

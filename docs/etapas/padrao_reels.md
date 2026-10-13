@@ -17,6 +17,7 @@ Não é uma regra fixa por tipo de vídeo: para CADA trecho da fala (legenda val
 - **IA com um personagem criado:** quando a fala é sobre "você", o público, um cliente, "o trader" genérico, uma família; criar um personagem consistente (ficha própria, salva no cliente) e usar o mesmo nos vídeos.
 - **Banco de imagens** (Envato etc.): lugar e ação real e comum que existe pronta (skyline, escritório, mãos no teclado, cidade); mais barato e realista que IA.
 - **Material real:** gravações e fotos do próprio cliente no Media Pool (preferir quando existir; ex.: foto da família) e vídeo público para fato real.
+- **Preset de motion (vitrine, point cloud, vector motion):** quando o trecho bate com a tabela "Quando usar cada preset" do SKILL.md (curiosidade/história/personagem histórico -> point cloud; frase de efeito, mentalidade, hábito, rotina -> vector motion; coisa de interface -> vitrine). Escrever o preset na coluna recurso do plano.
 - **Ficar no apresentador:** gancho forte dito olhando para a câmera, pergunta para o público, CTA falado; nem todo trecho precisa de cobertura.
 Tendência por tipo: **informativo** puxa mais motion; **emocional/história** puxa b-roll/IA em toda imagem concreta, já no 0 s, com takes curtos colados; lettering + b-roll nas frases de efeito. Mostrar o plano ao usuário quando houver escolha não óbvia.
 

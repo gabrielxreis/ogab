@@ -91,10 +91,25 @@ Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode p
 Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): vertical, 60-90 s, V1 intocada, legenda GAB USA do início ao fim, recurso escolhido trecho a trecho (motion, IA com apresentador, personagem criado, banco, material real), motions no centro com o visual do site e a duração da fala, CTA com o site pequeno, música bruta terminando com o vídeo. O `estilo.md` do cliente só muda o que for diferente.
 
 ## Presets de edição e motion (`presets/<nome>/PRESET.md`)
-Estilos completos (ritmo, transições, visual, som e kit de motions) que o usuário escolhe pelo nome: "no preset vitrine" no pedido ou `preset: <nome>` no `estilo.md` do cliente. Com preset, ler o `PRESET.md` dele ANTES do plano trecho a trecho; ele só troca o que descreve (legenda, V1, música bruta, pastas e QC seguem o Gab).
+Estilos completos (ritmo, transições, visual, som e kit de motions): o usuário pede pelo nome ("no preset vitrine", "point cloud", "vector motion") ou `preset: <nome>` no `estilo.md`; sem pedido, o Gab escolhe pela tabela abaixo. Com preset, ler o `PRESET.md` dele ANTES do plano trecho a trecho; ele só troca o que descreve (legenda, V1, música bruta, pastas e QC seguem o Gab).
 - **vitrine**: interface limpa de luxo; cada frase vira um pedaço de interface (conversor, perfil, cartão do canal, caixa de seleção, janela, pílula), fundo branco/preto e uma cor de destaque, tudo entrando com desfoque (`presets/vitrine/`).
-- **pontilhismo**: milhares de pontos desenham fotos reais (com crédito, Wikimedia domínio público/CC0), textos em 3D e formas (galáxia, esfera...) e migram de uma cena para a outra com câmera 3D; fundo preto, serifa itálica (`presets/pontilhismo/`, `gerar.py plano.json`).
-- **metaforas** ("1 prompt, 1 vídeo"): roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões, herói...), preto e branco com o protagonista brilhando; estilos `destaque`, `bolhas`, `grade`, `objetos` (`presets/metaforas/`, `gerar.py plano.json`).
+- **point cloud** (antes "pontilhismo"): milhares de pontos desenham fotos reais (com crédito, Wikimedia domínio público/CC0), textos em 3D e formas (galáxia, esfera...) e migram de uma cena para a outra com câmera 3D; fundo preto, serifa itálica (`presets/point-cloud/`, `gerar.py plano.json`).
+- **vector motion** (antes "metáforas", "1 prompt, 1 vídeo"): roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões, herói...), preto e branco com o protagonista brilhando; estilos `destaque`, `bolhas`, `grade`, `objetos` (`presets/vector-motion/`, `gerar.py plano.json`).
+
+**Quando usar cada preset (o Gab escolhe sozinho no plano trecho a trecho e diz qual escolheu e por quê; o usuário pode trocar):**
+
+| O trecho/vídeo é... | Preset | Por quê |
+|---|---|---|
+| frase cita coisa concreta de interface: valor, preço, perfil, seguidores, arquivo, aviso, canal | **vitrine** | a fala vira a tela que mostraria aquilo |
+| curiosidade, história, filosofia, ciência, "você sabia", pessoa/obra histórica, abertura de marca contemplativa | **point cloud** | figura real ou símbolo se formando em pontos dá ar de documentário minimalista |
+| frase de efeito, motivacional, comportamento, mentalidade, hábito, "enquanto todos... você..." | **vector motion** (`destaque` ou `bolhas`) | a ideia abstrata vira metáfora simples, um protagonista contra o resto |
+| rotina, plano, metas, produtividade, progresso, antes e depois | **vector motion** `grade` | caminho, calendário, cartões e o herói no fim |
+| transformação, escolha, identidade, nova fase | **vector motion** `objetos` | forma que vira outra, digital, aviões, porta |
+| dado com fonte, notícia, número | motion normal do cliente (cards, contadores) | precisão primeiro; preset só se o usuário pedir |
+
+- Num mesmo vídeo dá para MISTURAR: ex. point cloud no gancho (o "?" ou o personagem histórico), vector motion nas frases de efeito e o motion da marca no dado e no CTA. Cada trecho segue a duração da fala.
+- Vídeo de cliente com `estilo.md`: o preset só troca o visual do trecho; cores da marca entram (`cor`/`destaque` no point cloud, `"cores": {"hi": ...}` no vector motion); a logo e o CTA continuam os do cliente.
+- Sem encaixe claro na tabela: não forçar preset; usar o motion padrão do Gab.
 
 ## Vídeo só motion + música (`docs/etapas/so_motion.md`)
 Sem narração: cenas na batida da música (bpm do Artlist), fonte em cada dado, render MP4 `--workers 1`, foley pelo que a cena mostra, entrega na Área de Trabalho.

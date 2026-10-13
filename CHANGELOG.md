@@ -1,7 +1,11 @@
 # Novidades do Gab (/ogab)
 
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
-Mais novo em cima. Cada versão é uma linha `## 2026.10.13-2 (13/10/2026)
+Mais novo em cima. Cada versão é uma linha `## 2026.10.13-3 (13/10/2026)
+- **Novos nomes:** o preset "pontilhismo" agora é **point cloud** e o "metáforas" agora é **vector motion**.
+- **O Gab escolhe o preset sozinho:** ao planejar o vídeo trecho a trecho, ele usa vitrine, point cloud ou vector motion onde cada um combina (curiosidade e história em point cloud, frase de efeito em vector motion, coisa de interface em vitrine) e diz o que escolheu. Dá para misturar no mesmo vídeo.
+
+## 2026.10.13-2 (13/10/2026)
 - **Preset pontilhismo:** vídeo minimalista em pontos: fotos reais (com crédito), textos com volume e formas se desenham com milhares de pontos que migram de uma cena para a outra, com câmera 3D. Peça "no preset pontilhismo".
 - **Preset metáforas ("1 prompt, 1 vídeo"):** você manda um roteiro curto e cada frase vira uma metáfora visual em preto e branco (um entre muitos, multidão, caminho, porta, calendário, cartões de vidro, herói...), em 4 estilos: destaque, bolhas, grade e objetos. Peça "no preset metáforas, estilo grade".
 

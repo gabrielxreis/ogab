@@ -1,4 +1,4 @@
-# Preset METÁFORAS ("1 prompt, 1 vídeo")
+# Preset VECTOR MOTION ("1 prompt, 1 vídeo")
 
 Réplica do processo dos 5 vídeos "1 prompt · 1 vídeo" da página "O Minimalista com IA" (estudados quadro a quadro em
 13/10/2026): **roteiro curto de 4-6 frases; cada frase vira UMA metáfora visual; tudo em preto e branco; o protagonista
@@ -37,8 +37,8 @@ Exemplos (11-12 s cada) em `exemplos/`: `a_destaque_previa.mp4`, `b_bolhas_previ
 ## Processo (o que o Gab faz)
 1. Roteiro: 4-6 frases curtas (2-3 s cada; 10-15 s no total) ou o texto do usuário quebrado assim. Uma ideia por frase.
 2. Para cada frase escolher a metáfora da tabela (a pergunta: "o que a pessoa precisa ver para entender isso?").
-   Faltou metáfora? Criar a função nova no `kit/metaforas.js` (mesma assinatura) e acrescentar na tabela.
+   Faltou metáfora? Criar a função nova no `kit/vectormotion.js` (mesma assinatura) e acrescentar na tabela.
 3. Estilo: o que o usuário pedir; sem pedido, `destaque`. Cor da marca: `"cores": {"hi": "#fd7f3b"}` troca o branco do protagonista.
-4. `python3 presets/metaforas/gerar.py plano.json <pasta>/motions/metaforas --render <pasta>/motions/metaforas.mp4` (~2 min).
+4. `python3 presets/vector-motion/gerar.py plano.json <pasta>/motions/vector-motion --render <pasta>/motions/vector-motion.mp4` (~2 min).
 5. Som: piano/ambiente minimalista, whoosh leve nas transições, "ding" no check, sem impacto pesado. Narração opcional
    (com narração, cada cena dura o tempo da frase falada; legenda GAB USA sai, porque o texto já está na tela).

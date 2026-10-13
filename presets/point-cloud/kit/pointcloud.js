@@ -1,4 +1,4 @@
-// Motor do preset PONTILHISMO (Gab /ogab). Pontos migram entre alvos (foto, texto 3D, formas) com câmera 3D.
+// Motor do preset POINT CLOUD (Gab /ogab). Pontos migram entre alvos (foto, texto 3D, formas) com câmera 3D.
 // Tudo é função do tempo t (determinístico): o HyperFrames busca qualquer quadro.
 (function () {
   const D = window.PONTOS, N = D.n, W = D.w, H = D.h, C = D.cenas;
@@ -57,5 +57,5 @@
       tl.to(el, { opacity: 0, filter: "blur(8px)", duration: .35, ease: "power2.in" }, sai);
     }
   });
-  window.__timelines = window.__timelines || {}; window.__timelines["pontilhismo"] = tl;
+  window.__timelines = window.__timelines || {}; window.__timelines["point-cloud"] = tl;
 })();

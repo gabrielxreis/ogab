@@ -1,4 +1,4 @@
-"""Preset METÁFORAS ("1 prompt, 1 vídeo"): roteiro curto -> cada frase vira uma metáfora visual num estilo.
+"""Preset VECTOR MOTION ("1 prompt, 1 vídeo"): roteiro curto -> cada frase vira uma metáfora visual num estilo.
 
   python3 gerar.py plano.json <pasta_saida> [--render saida.mp4]
 
@@ -20,7 +20,7 @@ def gerar(plano, pasta):
     plano = dict(plano); plano.setdefault("w", 1080); plano.setdefault("h", 1920); plano.setdefault("fps", 30); plano.setdefault("estilo", "destaque")
     plano["icones"] = json.load(open(os.path.join(K, "icones.json")))
     open(os.path.join(pasta, "plano.js"), "w").write("window.PLANO = " + json.dumps(plano, ensure_ascii=False) + ";\n")
-    shutil.copy(os.path.join(K, "metaforas.js"), pasta)
+    shutil.copy(os.path.join(K, "vectormotion.js"), pasta)
     shutil.copy(os.path.join(K, "icones.ttf"), os.path.join(pasta, "fonts")); shutil.copy(os.path.join(K, "Oswald-SemiBold.ttf"), os.path.join(pasta, "fonts"))
     for f in ("Medium", "SemiBold", "Bold", "ExtraBold"): shutil.copy(os.path.join(FON, "Poppins", f"Poppins-{f}.ttf"), os.path.join(pasta, "fonts"))
     dur = round(sum(c.get("dur", 2.5) for c in plano["cenas"]), 3)

@@ -1,4 +1,4 @@
-// Motor do preset METÁFORAS (Gab /ogab): cada frase vira uma metáfora visual (protagonista em destaque, resto em cinza).
+// Motor do preset VECTOR MOTION (Gab /ogab): cada frase vira uma metáfora visual (protagonista em destaque, resto em cinza).
 // Estilos: destaque (v1), bolhas (v3), grade (v4/v5), objetos (v2). Tudo função de t (determinístico p/ HyperFrames).
 (function () {
   const P = window.PLANO, W = P.w, H = P.h, CN = P.cenas, IC = P.icones;
@@ -217,5 +217,5 @@
     }
     tl.to(el, { opacity: 0, duration: .25, ease: "power2.in" }, sai);
   });
-  window.__timelines = window.__timelines || {}; window.__timelines["metaforas"] = tl;
+  window.__timelines = window.__timelines || {}; window.__timelines["vector-motion"] = tl;
 })();

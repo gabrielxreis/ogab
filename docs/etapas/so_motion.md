@@ -15,3 +15,5 @@ Quando o usuário pede "só motion e música": o texto anima na tela no ritmo da
 **Timeline:** uma por vídeo no projeto do cliente, nome "Motion NN Assunto"; V1 = MOTIONS (o MP4), A2 música bruta -10 dB, A3..A7 SFX de foley pelo que a cena MOSTRA (contador, dinheiro, carimbo, papel, avião, digitação em chat, notificação). Sem legenda, sem cor (não há take), sem lettering (o texto está no motion): marcar essas etapas como puladas no `projeto.py`.
 
 **Entrega:** `renderizar` (master -14 LUFS) e cópia na Área de Trabalho "<Cliente> - NN Assunto.mp4"; `videos/legenda_post.txt` com fontes e o aviso obrigatório do cliente.
+
+**Presets:** vídeo só motion também pode sair inteiro num preset (ver "Quando usar cada preset" no SKILL.md): curiosidade/história em **point cloud**, frases de efeito/hábito em **vector motion** (escolher o estilo), interface em **vitrine**. As cenas continuam na batida da música.
