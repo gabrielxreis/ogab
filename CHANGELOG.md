@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-11
+- Trava: o Gab não consegue mais colocar na timeline um take que ele mesmo re-renderizou (acelerado, cortado, foto virada vídeo). Só o arquivo original baixado entra.
+
 ## 2026.10.13-10
 - Vídeo baixado entra ORIGINAL na timeline: o Gab não re-renderiza nem muda a velocidade, só se você pedir.
 

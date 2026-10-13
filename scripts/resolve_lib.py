@@ -112,7 +112,8 @@ def criar_timeline(p, mp, nome, w=None, h=None, fps=None):
     return t
 
 
-def importar(mp, caminho, bin_nome):
+def importar(mp, caminho, bin_nome, permitir_render=False):
+    if bin_nome.upper() in ("BROLLS", "BROLL", "FOOTAGES", "TAKES"): checar_take_original(caminho, permitir_render)
     _bin(mp, bin_nome)
     itens = mp.ImportMedia([caminho])
     if not itens: raise RuntimeError(f"não importou {caminho}")
@@ -224,7 +225,38 @@ def _zoom_preencher(it, t):
         return 1.0
 
 
-def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, preencher=True):
+
+# ---- TRAVA: take nunca re-renderizado (regra do usuário, 13/10/2026: "apaga os takes que você renderizou e coloque
+# os originais... garanta que isso nunca mais aconteça"). Vídeo que entra como take tem que ser o arquivo BAIXADO
+# (Magnific, Higgsfield, banco, YouTube, câmera). Arquivo feito pelo ffmpeg DESTA máquina (cópia acelerada, cortada,
+# re-encodada, foto virada vídeo) carrega no stream de vídeo a tag encoder da libavcodec local: é recusado (remux do yt-dlp passa). Motions (HyperFrames,
+# pasta motions/) e áudio não passam por aqui. Só libera com permitir_render=True quando o USUÁRIO pedir.
+_LAVF_LOCAL = None
+def _lavf_local():
+    global _LAVF_LOCAL
+    if _LAVF_LOCAL is None:
+        out = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True).stdout
+        m = __import__("re").search(r"libavcodec\s+(\d+)\.\s*(\d+)\.\s*(\d+)", out)
+        _LAVF_LOCAL = f"Lavc{m.group(1)}.{m.group(2)}.{m.group(3)}" if m else ""
+    return _LAVF_LOCAL
+
+
+def take_renderizado_aqui(arq):
+    """True se o VÍDEO foi re-encodado pelo ffmpeg desta máquina (tag encoder do stream de vídeo começa com a libavcodec
+    local, ex. 'Lavc62.28.102 libx264'). Remux sem re-encode (yt-dlp juntando áudio e vídeo) não tem essa tag e passa."""
+    if not str(arq).lower().endswith((".mp4", ".mov", ".m4v", ".mkv", ".webm")): return False
+    tag = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream_tags=encoder", "-of", "default=nw=1:nk=1", arq],
+                         capture_output=True, text=True).stdout.strip()
+    return bool(_lavf_local()) and tag.startswith(_lavf_local())
+
+
+def checar_take_original(arq, permitir_render=False):
+    if not permitir_render and take_renderizado_aqui(arq):
+        raise RuntimeError(f"TAKE RE-RENDERIZADO RECUSADO: {arq}. Use o arquivo original baixado; velocidade/corte/zoom "
+                           "se fazem no DaVinci, e só se o usuário pedir (permitir_render=True).")
+
+
+def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, preencher=True, permitir_render=False):
     """takes = [(arquivo, inicio_s), ...] ou [(arquivo, inicio_s, entrada_s), ...] em ordem. Cada take vai até o
     início do próximo, sem buraco: encadeia pelo GetEnd() real e usa ceil (fontes 24/25 fps numa timeline 30
     deixariam 1-2 quadros pretos).
@@ -240,6 +272,7 @@ def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, 
         arq, ini = tk[0], tk[1]; entrada = tk[2] if len(tk) > 2 else 0.0
         if respeitar_inicio: cur = max(cur, S + round(ini * F))
         nxt = S + round(takes[k + 1][1] * F) if k + 1 < len(takes) else fim_f
+        checar_take_original(arq, permitir_render)
         it = importar(mp, arq, "BROLLS")
         sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
         e0 = min(int(round(entrada * sf)), mx - 1)
