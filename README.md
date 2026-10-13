@@ -49,6 +49,7 @@
 * [CONFIGURAÇÃO](#configuracao)
     * [Opções](#opcoes)
     * [Cor e vídeos de iPhone](#cor-e-videos-de-iphone)
+* [PRESETS DE EDIÇÃO](#presets-de-edicao)
 * [CLIENTES](#clientes)
     * [Perfil, pronúncia e estilo de edição](#perfil-pronuncia-e-estilo-de-edicao)
 * [INSTAGRAM](#instagram)
@@ -254,6 +255,15 @@ Tudo em `config.json` (copiado de `config.example.json`, fora do git).
 - `cor.drx`: PowerGrade padrão, aplicado em todos os takes.
 - `cor.drx_iphone`: PowerGrade **combinado** para iPhone (conversor do iPhone primeiro, depois os nós do seu LUT). A skill detecta iPhone sozinha (metadado Apple ou HEVC HLG/Dolby Vision).
 - A API não empilha dois PowerGrades no mesmo clipe, por isso o combinado: grave o still na Gallery e exporte (.dpx + .drx) para `assets/grade/`.
+
+
+# PRESETS DE EDIÇÃO
+
+Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som e um kit de motions pronto. Peça "faz um reels da X **no preset vitrine**" ou coloque `preset: vitrine` no `estilo.md` do cliente.
+
+| Preset | Estilo | Exemplo |
+|---|---|---|
+| **VITRINE** ([guia](presets/vitrine/PRESET.md)) | Interface limpa de luxo: cada frase vira interface (conversor que digita, perfil com seguidores subindo, cartão do canal com sino, caixa de seleção, janela de arquivos, pílula de aviso), fundo branco e preto, uma cor de destaque, tudo entrando com desfoque. Gancho com troca a cada 1,2-1,8 s, som de interface em cada movimento | <img src="presets/vitrine/exemplo.gif" width="160" alt="Exemplo do preset Vitrine"> |
 
 
 # CLIENTES
@@ -471,6 +481,7 @@ docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
 instagram/               parte de Instagram: 9 especialidades (legenda, carrossel, hashtags, humanizer...), referências e lib de publicação
 instagram/carrossel/     gerador de carrossel em imagem (Next.js): carrossel.py novo | previa | exportar
+presets/<nome>/           presets de edição e motion (PRESET.md, kit HyperFrames, exemplo)
 docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado...)
 clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
 assets/fontes/           Poppins, Playfair Display, Lobster (OFL)

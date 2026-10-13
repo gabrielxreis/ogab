@@ -1,0 +1,66 @@
+/* VITRINE: preset de motion do Gab (interface limpa, monocromático + uma cor de destaque).
+   Copiar vitrine.css e vitrine.js para a pasta do projeto HyperFrames e trocar só as variáveis abaixo pelo cliente. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=block");
+
+:root {
+  --v-claro: #ffffff;          /* fundo claro */
+  --v-escuro: #000000;         /* fundo escuro */
+  --v-cartao: #1c1c1e;         /* cartão escuro (janela, conversor) */
+  --v-cartao-claro: #f2f2f4;   /* cartão claro */
+  --v-texto: #111113;          /* texto sobre claro */
+  --v-texto-inv: #f5f5f7;      /* texto sobre escuro */
+  --v-mudo: #8e8e93;           /* texto secundário */
+  --v-linha: rgba(255,255,255,.08);
+  --v-destaque: #e5531a;       /* A ÚNICA cor viva: troque pela cor de ação do cliente */
+  --v-destaque-fundo: rgba(229,83,26,.55);
+  --v-raio: 28px;
+  --v-fonte: -apple-system, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+.v-cena { position: absolute; inset: 0; overflow: hidden; font-family: var(--v-fonte); -webkit-font-smoothing: antialiased; }
+.v-claro { background: var(--v-claro); color: var(--v-texto); }
+.v-escuro { background: var(--v-escuro); color: var(--v-texto-inv); }
+.v-centro { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+/* palavras que sobem com desfoque */
+.v-frase { white-space: nowrap; font-weight: 600; letter-spacing: -.02em; }
+.v-palavra { display: inline-block; margin-right: .26em; }
+
+/* cartão de celular (carrossel) */
+.v-cel { position: absolute; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.18); background: #ddd center/cover; }
+
+/* cartões de interface */
+.v-ui { position: absolute; border-radius: var(--v-raio); padding: 44px 48px; }
+.v-ui.escuro { background: var(--v-cartao); color: var(--v-texto-inv); border: 1px solid var(--v-linha); }
+.v-ui.claro { background: var(--v-cartao-claro); color: var(--v-texto); }
+.v-rotulo { font-size: .42em; color: var(--v-mudo); font-weight: 500; }
+.v-campo { display: flex; justify-content: space-between; align-items: center; border: 2px solid rgba(255,255,255,.55);
+  border-radius: 14px; padding: 18px 22px; margin-top: 18px; font-weight: 500; }
+.v-campo.mudo { border-color: rgba(255,255,255,.14); }
+.v-cursor { display: inline-block; width: 3px; height: 1em; background: currentColor; vertical-align: -0.12em; margin-left: 2px; }
+
+/* caixa de seleção com alças (destaque de título) */
+.v-selecao { position: absolute; padding: .12em .32em; background: var(--v-destaque-fundo); color: #fff; font-weight: 600;
+  white-space: nowrap; border: 1.5px solid var(--v-destaque); }
+.v-selecao::before, .v-selecao::after { content: ""; position: absolute; width: .32em; height: .32em; border-radius: 50%; background: var(--v-destaque); }
+.v-selecao::before { left: -.2em; top: -.2em; }
+.v-selecao::after { right: -.2em; bottom: -.2em; }
+
+/* janela (estilo macOS) */
+.v-janela { position: absolute; border-radius: 22px; background: #2a2a2c; border: 1px solid rgba(255,255,255,.1); overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.v-janela .linha { display: flex; align-items: center; gap: 14px; padding: 10px 26px; font-size: 26px; color: #e8e8ea; }
+.v-janela .linha:nth-child(odd) { background: rgba(255,255,255,.035); }
+.v-pasta { width: 30px; height: 22px; border-radius: 4px; background: #4fa8ff; position: relative; }
+.v-cabecalho { position: absolute; font-weight: 600; color: var(--v-texto-inv); }
+.v-cabecalho b { color: var(--v-destaque); }
+
+/* pílula (ilha dinâmica) */
+.v-pilula { position: absolute; height: 76px; border-radius: 40px; background: #1c1c1e; color: #f5f5f7; display: flex; align-items: center;
+  justify-content: center; gap: 14px; overflow: hidden; white-space: nowrap; font-weight: 600; font-size: 28px;
+  border: 1px solid rgba(255,255,255,.1); box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.v-pilula .txt { opacity: 0; }
+
+/* flash e cortina */
+.v-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.v-cortina { position: absolute; left: 0; right: 0; bottom: 0; height: 100%; background: var(--v-escuro); }   /* V.cortina() esconde e anima */

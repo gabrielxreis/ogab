@@ -89,6 +89,10 @@ Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode p
 ## Padrão: Reels de apresentador falando (`docs/etapas/padrao_reels.md`)
 Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): vertical, 60-90 s, V1 intocada, legenda GAB USA do início ao fim, recurso escolhido trecho a trecho (motion, IA com apresentador, personagem criado, banco, material real), motions no centro com o visual do site e a duração da fala, CTA com o site pequeno, música bruta terminando com o vídeo. O `estilo.md` do cliente só muda o que for diferente.
 
+## Presets de edição e motion (`presets/<nome>/PRESET.md`)
+Estilos completos (ritmo, transições, visual, som e kit de motions) que o usuário escolhe pelo nome: "no preset vitrine" no pedido ou `preset: <nome>` no `estilo.md` do cliente. Com preset, ler o `PRESET.md` dele ANTES do plano trecho a trecho; ele só troca o que descreve (legenda, V1, música bruta, pastas e QC seguem o Gab).
+- **vitrine**: interface limpa de luxo; cada frase vira um pedaço de interface (conversor, perfil, cartão do canal, caixa de seleção, janela, pílula), fundo branco/preto e uma cor de destaque, tudo entrando com desfoque (`presets/vitrine/`).
+
 ## Vídeo só motion + música (`docs/etapas/so_motion.md`)
 Sem narração: cenas na batida da música (bpm do Artlist), fonte em cada dado, render MP4 `--workers 1`, foley pelo que a cena mostra, entrega na Área de Trabalho.
 

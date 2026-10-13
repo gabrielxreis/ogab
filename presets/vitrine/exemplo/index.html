@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="vitrine.css" />
+<script src="vitrine.js"></script>
+<style>
+html, body { width: 1080px; height: 1920px; margin: 0; overflow: hidden; background: #fff; }
+#root { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+/* 1 abertura */
+#c1 .v-frase { font-size: 70px; }
+/* 2 carrossel */
+.reel { box-sizing: border-box; width: 300px; height: 533px; top: 694px; display: flex; flex-direction: column; justify-content: flex-end; padding: 26px; color: #fff; }
+.reel b { font-size: 30px; font-weight: 700; } .reel i { font-style: normal; font-size: 22px; opacity: .8; }
+.reel .barra { height: 5px; border-radius: 3px; background: rgba(255,255,255,.35); margin-top: 14px; }
+.reel .barra s { display: block; height: 100%; width: 40%; background: #fff; border-radius: 3px; }
+/* 3 conversor */
+#conv { left: 110px; top: 690px; width: 860px; font-size: 64px; }
+#conv .v-campo { font-size: 38px; }
+#res { color: var(--v-destaque); }
+/* 4 perfil */
+#perfil { left: 60px; top: 740px; width: 960px; padding: 50px; font-size: 34px; background: #fff; color: #111; }
+#perfil .topo { display: flex; align-items: center; gap: 46px; }
+#perfil .av { width: 200px; height: 200px; border-radius: 50%; background: linear-gradient(135deg,#f3d9c4,#a8735a); flex: none; }
+#perfil .num { font-weight: 700; font-size: 58px; } #perfil .lb { font-size: 30px; color: #6b6b70; }
+#perfil .bio { margin-top: 36px; font-size: 34px; line-height: 1.4; color: #333; }
+/* 5 canal */
+#canal { left: 140px; top: 640px; width: 800px; text-align: center; }
+#banner { height: 210px; border-radius: 30px; background: #c9c9cc; display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.9); font-size: 26px; letter-spacing: .2em; font-weight: 600; }
+#foto { width: 170px; height: 170px; border-radius: 50%; margin: -85px auto 0; border: 8px solid #fff; background: linear-gradient(135deg,#6b5040,#1f1611); }
+#nome { font-size: 66px; font-weight: 700; margin-top: 22px; min-height: 80px; color: #111; }
+#arroba { font-size: 30px; color: #8e8e93; }
+#insc { margin: 40px auto 0; width: 520px; height: 84px; border-radius: 42px; background: #ececee; display: flex; align-items: center;
+  justify-content: center; gap: 14px; font-size: 32px; font-weight: 600; color: #111; }
+#bell { width: 34px; height: 34px; }
+/* 6 avisos */
+#selbox { left: 175px; top: 900px; font-size: 76px; transform-origin: left center; }
+/* 7 janela + pílula */
+#cab { left: 100px; top: 540px; font-size: 38px; }
+#jan { left: 90px; top: 620px; width: 900px; height: 700px; }
+#jan .linha { font-size: 32px; padding: 12px 30px; }
+#jan .tit { padding: 22px 26px; font-size: 24px; color: #9b9ba0; border-bottom: 1px solid rgba(255,255,255,.08); }
+#pil { left: 50%; top: 1380px; transform: translateX(-50%); }
+#pil svg { width: 32px; height: 32px; flex: none; }
+</style></head>
+<body>
+<div id="root" data-composition-id="vitrine" data-start="0" data-duration="14" data-width="1080" data-height="1920" data-fps="30">
+
+  <div class="v-cena v-claro" id="c1"><div class="v-centro"><div class="v-frase" id="f1">Como eu edito um Reels</div></div></div>
+
+  <div class="v-cena v-claro" id="c2" style="opacity:0">
+    <div class="v-cel reel" id="r1" style="left:105px;background:linear-gradient(160deg,#d8c3ad,#6e4f3a)"><b>Bastidores</b><i>1,2 mi views</i><div class="barra"><s></s></div></div>
+    <div class="v-cel reel" id="r2" style="left:435px;background:linear-gradient(160deg,#cfd6dd,#3c4a57)"><b>Lançamento</b><i>860 mil views</i><div class="barra"><s></s></div></div>
+    <div class="v-cel reel" id="r3" style="left:765px;background:linear-gradient(160deg,#e9d6c9,#9b5d43)"><b>Coleção</b><i>2,4 mi views</i><div class="barra"><s></s></div></div>
+  </div>
+
+  <div class="v-cena v-escuro" id="c3" style="opacity:0">
+    <div class="v-ui escuro" id="conv">
+      <div class="v-rotulo">1 Euro igual a</div>
+      <div style="font-weight:500">5,92 Real brasileiro</div>
+      <div class="v-campo"><span id="digit"></span><span style="color:#8e8e93">Euro</span></div>
+      <div class="v-campo mudo"><span id="res">0</span><span style="color:#8e8e93">Real brasileiro</span></div>
+    </div>
+  </div>
+
+  <div class="v-cena v-claro" id="c4" style="opacity:0">
+    <div class="v-ui" id="perfil">
+      <div class="topo"><div class="av"></div>
+        <div><div class="num">105</div><div class="lb">posts</div></div>
+        <div><div class="num" id="seg">15,5 mil</div><div class="lb">seguidores</div></div>
+        <div><div class="num">405</div><div class="lb">seguindo</div></div></div>
+      <div class="bio"><b>Ana</b> · criadora de conteúdo<br>Moda, viagem e as coisas boas da vida</div>
+    </div>
+  </div>
+
+  <div class="v-cena v-claro" id="c5" style="opacity:0">
+    <div class="v-ui" id="canal" style="padding:0">
+      <div id="banner">SEJA O EDITOR DA SUA VIDA</div>
+      <div id="foto"></div>
+      <div id="nome"></div>
+      <div id="arroba">@seucanal</div>
+      <div id="insc"><svg id="bell" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zm-2 16a2 2 0 0 0 4 0" fill="none" stroke="#111" stroke-width="1.8" stroke-linejoin="round"/></svg>Inscrito</div>
+    </div>
+  </div>
+
+  <div class="v-cena v-escuro" id="c6" style="opacity:0"><div class="v-selecao" id="selbox"></div></div>
+
+  <div class="v-cena v-escuro" id="c7" style="opacity:0">
+    <div class="v-cabecalho" id="cab"><b>1º</b> Aviso importante</div>
+    <div class="v-janela" id="jan">
+      <div class="tit">Nome</div>
+      <div class="linha"><span class="v-pasta"></span>01 Tipografia</div>
+      <div class="linha"><span class="v-pasta"></span>02 Overlay</div>
+      <div class="linha"><span class="v-pasta"></span>03 Background</div>
+      <div class="linha"><span class="v-pasta"></span>04 Efeitos sonoros</div>
+      <div class="linha"><span class="v-pasta"></span>05 Trilhas</div>
+      <div class="linha"><span class="v-pasta"></span>06 Banco de vídeos</div>
+      <div class="linha"><span class="v-pasta"></span>07 Ícones</div>
+      <div class="linha"><span class="v-pasta"></span>08 Presets</div>
+      <div class="linha"><span class="v-pasta"></span>09 LUTs</div>
+      <div class="linha"><span class="v-pasta"></span>10 Projetos</div>
+    </div>
+    <div class="v-pilula" id="pil"><span class="txt"></span></div>
+  </div>
+
+  <div class="v-cortina" id="cort"></div>
+  <div class="v-flash" id="flash"></div>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+const PASTA = '<svg viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z" fill="#4fa8ff"/></svg>Pasta na descrição!';
+const ALERTA = '<svg viewBox="0 0 24 24"><path d="M12 3 2 21h20z" fill="#f5f5f7"/><path d="M12 10v5M12 18v.5" stroke="#1c1c1e" stroke-width="2.2" stroke-linecap="round"/></svg>Atenção no processo!';
+const mostra = (id, t) => tl.set(id, { opacity: 1 }, t), esconde = (id, t) => tl.set(id, { opacity: 0 }, t);
+
+// 1. abertura: palavras sobem com desfoque, saem em chicote (0-1.3)
+V.palavras(tl, "#f1", 0.1, { dur: 1.0 });
+V.chicote(tl, "#f1", 1.05);
+// 2. carrossel de Reels (1.3-2.9)
+mostra("#c2", 1.3); esconde("#c1", 1.3);
+V.carrossel(tl, "#c2 .reel", 1.3, { dur: 1.4 });
+// 3. cortina preta sobe; conversor cai, digita 600 e o resultado conta (2.9-4.9)
+V.cortina(tl, "#cort", 2.85);
+mostra("#c3", 3.23); esconde("#c2", 3.23); tl.set("#cort", { yPercent: 100 }, 3.24);
+V.cai(tl, "#conv", 3.25);
+V.digita(tl, "#digit", 3.75, "600");
+V.conta(tl, "#res", 3.95, 0, 3551.88, { casas: 2, dur: 0.6 });
+V.viraTema(tl, "#c3", "#conv", 4.75);
+// 4. perfil cresce e os seguidores contam; sai desfocando (4.9-6.4)
+mostra("#c4", 4.95); esconde("#c3", 4.95);
+V.zoomCartao(tl, "#perfil", 4.95, { de: 0.4, dur: 1.2 });
+V.conta(tl, "#seg", 5.0, 15.5, 27.2, { casas: 1, sufixo: " mil", dur: 1.0 });
+V.someDesfocando(tl, "#perfil", 6.15);
+// 5. clarão; cartão do canal: banner escurece, nome digita, sino toca (6.4-8.6)
+V.clarao(tl, "#flash", 6.3);
+mostra("#c5", 6.46); esconde("#c4", 6.46);
+V.janela(tl, "#canal", 6.5, { dur: 0.5 });
+tl.to("#banner", { backgroundColor: "#2a1a12", duration: 1.0, ease: "power1.inOut" }, 6.6);
+V.letras(tl, "#nome", 6.75, "Seu Nome Aqui", { cps: 18 });
+V.sino(tl, "#bell", 7.7);
+// 6. corte seco no preto: caixa de seleção digita o título do bloco (8.6-10.1)
+mostra("#c6", 8.6); esconde("#c5", 8.6);
+V.selecao(tl, "#selbox", 8.7, "Avisos importantes!");
+// 7. janela acende, cabeçalho entra, pílula abre "Pasta na descrição!" e troca para "Atenção no processo!" (10.1-14)
+mostra("#c7", 10.1); esconde("#c6", 10.1);
+V.janela(tl, "#jan", 10.15);
+tl.fromTo("#cab", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 10.4);
+tl.fromTo("#jan", { scale: 1 }, { scale: 0.97, duration: 3.6, ease: "none" }, 10.6);
+V.pilula(tl, "#pil", 10.9, PASTA, { largura: 470 });
+V.fechaPilula(tl, "#pil", 12.4);
+tl.call(() => { document.querySelector("#cab").innerHTML = "<b>2º</b> Aviso importante"; }, null, 12.5);
+V.pilula(tl, "#pil", 12.8, ALERTA, { largura: 500 });
+tl.to("#c7", { opacity: 0, filter: "blur(12px)", duration: 0.35 }, 13.6);
+window.__timelines["vitrine"] = tl;
+</script>
+</body></html>
