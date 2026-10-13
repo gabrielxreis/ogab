@@ -263,7 +263,7 @@ Tudo em `config.json` (copiado de `config.example.json`, fora do git).
 
 # PRESETS DE EDIÇÃO
 
-Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som e um kit de motions pronto. Peça "faz um reels da X **no preset vitrine**" (ou **point cloud**, **vector motion**) ou coloque `preset: <nome>` no `estilo.md` do cliente. **Sem pedir, o Gab escolhe sozinho trecho a trecho** (curiosidade e história em point cloud, frase de efeito em vector motion, coisa de interface em vitrine) e pode misturar no mesmo vídeo.
+Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som e um kit de motions pronto. Peça "faz um reels da X **no preset vitrine**" (ou **point cloud**, **vector motion**, **sketch**) ou coloque `preset: <nome>` no `estilo.md` do cliente. **Sem pedir, o Gab escolhe sozinho trecho a trecho** (curiosidade e história em point cloud, frase de efeito em vector motion, coisa de interface em vitrine) e pode misturar no mesmo vídeo.
 
 <div align="center">
 
@@ -272,9 +272,10 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/vector-motion/exemplos/b_bolhas.gif" width="150" alt="Vector motion bolhas">&nbsp;
 <img src="presets/vector-motion/exemplos/c_grade.gif" width="150" alt="Vector motion grade">&nbsp;
 <img src="presets/vector-motion/exemplos/d_objetos.gif" width="150" alt="Vector motion objetos">&nbsp;
-<img src="presets/vitrine/exemplo.gif" width="150" alt="Vitrine">
+<img src="presets/vitrine/exemplo.gif" width="150" alt="Vitrine">&nbsp;
+<img src="presets/sketch/exemplo.gif" width="150" alt="Sketch">
 
-<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine</sub>
+<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch</sub>
 
 </div>
 
@@ -283,6 +284,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **VITRINE** ([guia](presets/vitrine/PRESET.md)) | Interface limpa de luxo: cada frase vira interface (conversor que digita, perfil com seguidores subindo, cartão do canal com sino, caixa de seleção, janela de arquivos, pílula de aviso), fundo branco e preto, uma cor de destaque, tudo entrando com desfoque. Gancho com troca a cada 1,2-1,8 s, som de interface em cada movimento | <img src="presets/vitrine/exemplo.gif" width="160" alt="Exemplo do preset Vitrine"> |
 | **POINT CLOUD** ([guia](presets/point-cloud/PRESET.md)) | Milhares de pontos desenham fotos reais (com crédito, domínio público), textos com volume e formas (galáxia, esfera, anel) e migram de uma cena para a outra com câmera 3D. Fundo preto, serifa itálica. Para curiosidade, história, filosofia, ciência e abertura de marca | <img src="presets/point-cloud/exemplo.gif" width="160" alt="Exemplo do preset Point cloud"> |
 | **VECTOR MOTION** ([guia](presets/vector-motion/PRESET.md)) | "1 prompt, 1 vídeo": roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões de vidro, herói), preto e branco com o protagonista brilhando. 4 estilos: **destaque**, **bolhas**, **grade**, **objetos**. Para frase de efeito, mentalidade, hábito e rotina | <img src="presets/vector-motion/exemplos/c_grade.gif" width="160" alt="Exemplo do preset Vector motion"> |
+| **SKETCH** ([guia](presets/sketch/PRESET.md)) | Desenho de marcador sobre fundo preto: contornos coloridos que se traçam na hora, cursor piscando, ícones desenhados, texto manuscrito digitado letra a letra, setas que se desenham e o traço "tremendo" como animação feita à mão. Blocos prontos: "A → B", grade de apps com botão, número de capítulo, ferramenta → painel (editor de vídeo, gráfico, lista, chat), frase sublinhada e checklist. Vertical e horizontal. Para tutorial, "X ferramentas que...", passo a passo, tecnologia e IA | <img src="presets/sketch/exemplo.gif" width="160" alt="Exemplo do preset Sketch"> |
 | **TELA DIVIDIDA** ([guia](presets/tela-dividida/PRESET.md)) | Reels de talking head com o painel de motion em cima (46,5 %) e você embaixo, legenda em etiqueta branca na emenda e quebras em tela cheia a cada 3-5 s. O Gab enquadra o rosto sozinho no DaVinci. Para vídeo explicativo que cita app, site, número ou passo a passo | <img src="presets/tela-dividida/guia.png" width="120" alt="Guia do layout tela dividida"> |
 
 

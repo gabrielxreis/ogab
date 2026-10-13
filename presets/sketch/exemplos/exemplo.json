@@ -1,0 +1,22 @@
+{"formato": "vertical", "fps": 30,
+ "cenas": [
+  {"blocos": [
+    {"tipo": "cabecalho", "partes": [{"icone": "github", "texto": "GitHub"}, {"seta": true},
+                                     {"texto": "App Store", "cor": "destaque", "grande": true}]},
+    {"tipo": "cabecalho", "partes": [{"texto": "do"}, {"icone": "claude", "texto": "Claude Code", "cor": "laranja"}]},
+    {"tipo": "grade", "colunas": 2, "itens": [
+      {"icones": ["video"], "rotulo": "editar vídeo", "botao": "instalar"},
+      {"icones": ["gmail", "drive"], "rotulo": "Gmail e Drive", "botao": "instalar"},
+      {"icones": ["instagram", "tiktok"], "rotulo": "Instagram e TikTok", "botao": "instalar"},
+      {"icones": ["grafico"], "rotulo": "relatórios", "botao": "instalar"}]}
+  ], "segurar": 1.4},
+  {"blocos": [
+    {"tipo": "numero", "n": "1", "linha1": "projeto 1 de 5", "linha2": "o que mais me chamou a atenção", "cor": "laranja"},
+    {"tipo": "fluxo", "de": {"icone": "claude", "rotulo": "Claude Code", "cor": "laranja"},
+                      "painel": {"mock": "editor_video", "titulo": "editor de vídeo"}}
+  ], "segurar": 1.6},
+  {"blocos": [
+    {"tipo": "frase", "texto": "instala uma vez e usa pra sempre", "cor": "branco"},
+    {"tipo": "lista", "itens": ["corta os silêncios", "coloca legenda", "exporta pro Reels"], "cor": "verde"}
+  ], "segurar": 1.6}
+ ]}

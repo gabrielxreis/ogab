@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-14 (13/10/2026)
+- **Preset novo: SKETCH.** Motion com cara de desenho de marcador sobre fundo preto: os contornos coloridos se desenham na hora, um cursor pisca, os ícones surgem, o texto manuscrito aparece digitado e as setas se traçam, com o traço tremendo como animação feita à mão. Ótimo para tutorial, lista de ferramentas e passo a passo. Peça "no preset sketch".
+
 ## 2026.10.13-13 (13/10/2026)
 - **Seus motions podem virar motions de todo mundo:** quando você salva um motion novo na biblioteca, o Gab pode mandar a estrutura dele (sem textos, cores da marca, nomes ou pastas) para o Gabriel, que publica os melhores para todos. O Gab vai perguntar uma vez se pode, junto com os relatos de erro.
 

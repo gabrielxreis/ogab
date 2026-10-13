@@ -102,6 +102,7 @@ Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): ver
 Estilos completos (ritmo, transições, visual, som e kit de motions): o usuário pede pelo nome ("no preset vitrine", "point cloud", "vector motion") ou `preset: <nome>` no `estilo.md`; sem pedido, o Gab escolhe pela tabela abaixo. Com preset, ler o `PRESET.md` dele ANTES do plano trecho a trecho; ele só troca o que descreve (legenda, V1, música bruta, pastas e QC seguem o Gab).
 - **vitrine**: interface limpa de luxo; cada frase vira um pedaço de interface (conversor, perfil, cartão do canal, caixa de seleção, janela, pílula), fundo branco/preto e uma cor de destaque, tudo entrando com desfoque (`presets/vitrine/`).
 - **point cloud** (antes "pontilhismo"): milhares de pontos desenham fotos reais (com crédito, Wikimedia domínio público/CC0), textos em 3D e formas (galáxia, esfera...) e migram de uma cena para a outra com câmera 3D; fundo preto, serifa itálica (`presets/point-cloud/`, `gerar.py plano.json`).
+- **sketch** ("esboço", desenho de marcador): fundo preto, contornos coloridos que se traçam, cursor piscando, ícones desenhados, texto manuscrito digitado, setas que se desenham e traço tremido de animação feita à mão; cabeçalho "A → B", grade de apps com botão, número de capítulo, fluxo ferramenta → painel, lista com check (`presets/sketch/`, `gerar.py plano.json`).
 - **vector motion** (antes "metáforas", "1 prompt, 1 vídeo"): roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões, herói...), preto e branco com o protagonista brilhando; estilos `destaque`, `bolhas`, `grade`, `objetos` (`presets/vector-motion/`, `gerar.py plano.json`).
 
 **Quando usar cada preset (o Gab escolhe sozinho no plano trecho a trecho e diz qual escolheu e por quê; o usuário pode trocar):**
@@ -114,6 +115,7 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 | rotina, plano, metas, produtividade, progresso, antes e depois | **vector motion** `grade` | caminho, calendário, cartões e o herói no fim |
 | transformação, escolha, identidade, nova fase | **vector motion** `objetos` | forma que vira outra, digital, aviões, porta |
 | talking head explicativo que cita app, site, número, marca, passo a passo (40-60 s), ou pedido de "tela dividida" | **tela dividida** | painel de motion em cima, apresentador embaixo, legenda-etiqueta na emenda ([guia](presets/tela-dividida/PRESET.md)) |
+| tutorial, "X apps/ferramentas que...", passo a passo, fluxo ferramenta → resultado, tecnologia/IA/produtividade | **sketch** | tudo vira esboço de marcador se desenhando, didático e leve ([guia](presets/sketch/PRESET.md)) |
 | dado com fonte, notícia, número | motion normal do cliente (cards, contadores) | precisão primeiro; preset só se o usuário pedir |
 
 - Num mesmo vídeo dá para MISTURAR: ex. point cloud no gancho (o "?" ou o personagem histórico), vector motion nas frases de efeito e o motion da marca no dado e no CTA. Cada trecho segue a duração da fala.

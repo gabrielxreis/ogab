@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=%W%, height=%H%" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Sketch"; src: url("fonts/PatrickHand-Regular.ttf"); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: %W%px; height: %H%px; overflow: hidden; background: %FUNDO%; }
+#root { position: relative; width: 100%; height: 100%; }
+svg { position: absolute; inset: 0; }
+text { font-family: "Sketch", "Comic Sans MS", cursive; }
+</style></head><body>
+<div id="root" data-composition-id="sketch" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%">
+<svg id="sv" width="%W%" height="%H%" viewBox="0 0 %W% %H%" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+<script src="plano.js"></script>
+<script src="icones.js"></script>
+<script src="sketch.js"></script>
+</body></html>
