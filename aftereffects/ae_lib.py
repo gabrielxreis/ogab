@@ -188,22 +188,40 @@ def renderizar(comp, saida, motor="quadros", limite=1800):
     return saida
 
 
-def seguir(comp, camada, trilha_json, inicio_no_arquivo=0.0, deslocamento=(0, -120), comp_inicio=0.0):
-    """Faz a camada (texto, forma, grupo) acompanhar a trajetória de scripts/rastrear.py: keyframes de posição.
-    deslocamento em pixels da comp (dy < 0 = acima). inicio_no_arquivo: segundo do arquivo rastreado que cai em
-    comp_inicio na comp. As posições são convertidas da resolução do vídeo para a da comp."""
+def seguir(comp, camada, trilha_json, inicio_no_arquivo=0.0, deslocamento=(0, -120), comp_inicio=0.0, nome_null=None,
+           seguir_escala=False):
+    """Texto/forma que ACOMPANHA a trajetória de scripts/rastrear.py, do jeito que um editor faria no AE: um null
+    "RASTREIO <camada>" com os keyframes de posição (e escala) e a camada presa a ele (parent). Para mudar a distância
+    entre o texto e o objeto, o usuário só arrasta o texto. deslocamento = posição do texto em relação ao ponto
+    rastreado, em px da comp. inicio_no_arquivo: segundo do arquivo rastreado que cai em comp_inicio na comp."""
     tr = json.load(open(trilha_json)) if isinstance(trilha_json, str) else trilha_json
-    pts = [[round(t - inicio_no_arquivo + comp_inicio, 4), x, y] for t, x, y, e in tr["pontos"] if t >= inicio_no_arquivo]
+    pts = [[round(t - inicio_no_arquivo + comp_inicio, 4), x, y, e] for t, x, y, e in tr["pontos"] if t >= inicio_no_arquivo]
     return jsx("""
       var c = GAB.comp(args.comp); if (!c) throw new Error("comp não encontrada: " + args.comp);
       var l = c.layer(args.camada); if (!l) throw new Error("camada não encontrada: " + args.camada);
-      var sx = c.width / args.w, sy = c.height / args.h, pos = l.property("ADBE Transform Group").property("ADBE Position");
+      var sx = c.width / args.w, sy = c.height / args.h;
       app.beginUndoGroup("Gab: seguir trilha");
-      var ts = [], vs = [];
-      for (var i = 0; i < args.pts.length; i++) { ts.push(args.pts[i][0]); vs.push([args.pts[i][1] * sx + args.d[0], args.pts[i][2] * sy + args.d[1]]); }
-      pos.setValuesAtTimes(ts, vs);
+      var nome = args.nome || ("RASTREIO " + args.camada), n = c.layer(nome);
+      if (n) n.remove();
+      n = c.layers.addNull(c.duration); n.name = nome; n.label = 13;
+      var ts = [], vs = [], es = [];
+      for (var i = 0; i < args.pts.length; i++) {
+        ts.push(args.pts[i][0]); vs.push([args.pts[i][1] * sx, args.pts[i][2] * sy]);
+        es.push([100 * args.pts[i][3], 100 * args.pts[i][3], 100]);
+      }
+      n.property("ADBE Transform Group").property("ADBE Position").setValuesAtTimes(ts, vs);
+      if (args.escala) n.property("ADBE Transform Group").property("ADBE Scale").setValuesAtTimes(ts, es);   // texto cresce junto
+      // o texto fica onde deve em relação ao ponto e preso ao null (o AE converte para coordenadas do null)
+      l.parent = null;
+      var p0 = [vs[0][0] + args.d[0], vs[0][1] + args.d[1]];
+      l.property("ADBE Transform Group").property("ADBE Position").setValue(p0);
+      var tAntes = c.time; c.time = ts[0];
+      l.parent = n;
+      c.time = tAntes;
+      n.moveToBeginning();
       app.endUndoGroup();
-      return ts.length;""", "seguir", comp=comp, camada=camada, pts=pts, w=tr["w"], h=tr["h"], d=list(deslocamento))
+      return { nulo: n.name, keyframes: ts.length };""", "seguir", comp=comp, camada=camada, pts=pts, w=tr["w"], h=tr["h"],
+               d=list(deslocamento), nome=nome_null, escala=seguir_escala)
 
 
 def fechar():
