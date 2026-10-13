@@ -49,11 +49,12 @@
 
 O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo no começo da conversa. Histórico completo em [`CHANGELOG.md`](CHANGELOG.md). Últimas:
 
-- **Adobe Premiere Pro 2026** como editor (além do DaVinci), com transcrição e Enhance Speech do próprio Premiere e o LUT DO GAB.
-- **Motions no After Effects:** cada motion montado em camadas editáveis (texto, número, check, cor), ou automáticos no HyperFrames. Você escolhe.
-- **Biblioteca de motions:** modelos prontos que crescem a cada vídeo e chegam para todo mundo no update. Também viram **MOGRT** para o Premiere.
-- **Windows:** instalador próprio em PowerShell.
-- **Instalador completo + doctor:** instala tudo (DaVinci, Premiere e After Effects), confere e corrige sozinho o que der.
+- **B-roll real no trecho certo:** o Gab acha onde a pessoa fala o que você pediu (pela legenda, capítulos e descrição do vídeo), olha uma folha de quadros antes de baixar e busca também no acervo da **NASA** e no **Wikimedia Commons** (domínio público, licença anotada). Lista posts de um perfil do **TikTok** sem login e tira **print vertical** de site ou notícia.
+- **Sonorização sem chave de IA:** lê o vídeo (o que entra, bate ou para, e de que lado da tela) e monta o som em camadas, com câmera lenta que se ouve, chão e ação certos e cada som conferido por um classificador de áudio.
+- **3D de verdade no Blender:** logo e texto extrudados em metal, objetos (diploma, troféu, avião) e morph de formas, com fundo transparente.
+- **Tracking:** texto que segue o rosto ou o objeto, no DaVinci, no Premiere e no After Effects.
+- **After Effects:** motions em camadas editáveis com glow lines, letter stretch, texto cinético, morphing e câmera 3D.
+- **Premiere Pro 2026** como editor (além do DaVinci), **biblioteca de motions** que vira MOGRT, instalador do **Windows** e **doctor** que confere e corrige a instalação.
 
 # INSTALAÇÃO
 
@@ -148,7 +149,9 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 | After Effects | 2024+ (só se escolher motions no AE) | Ver [`aftereffects/README.md`](aftereffects/README.md) |
 | Python | 3.10+ | Pillow; `pyobjc-framework-Vision` para o `legenda_ui.py` |
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
-| yt-dlp | qualquer recente (`brew upgrade yt-dlp` se o YouTube mudar) | Baixar trecho de vídeo público do YouTube (reportagem, cena histórica) para b-roll |
+| yt-dlp | qualquer recente (`brew upgrade yt-dlp` se o YouTube mudar) | B-roll de material real: achar e baixar só o trecho de YouTube, TikTok etc. (`baixar_video.py`) |
+| Blender | qualquer recente (o instalador instala) | Logo, texto e objetos em 3D (`tresd/`) |
+| Google Chrome | qualquer recente | Print de site/notícia (`baixar_video.py print`) e downloads pelo Claude in Chrome |
 | Node.js | 18+ | HyperFrames |
 | Docker Desktop | **não precisa** | O `hyperframes doctor` avisa "Docker: not found", mas o HyperFrames só usa Docker no render com `--docker`, que o Gab não usa. Pode ignorar |
 
@@ -183,7 +186,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | 4 | Projeto no DaVinci (`Assunto - Empresa`), Media Pool organizado, Stacked Timelines | - | Scripting API |
 | 5 | Música (pop/remix leve por padrão), -10 dB, fade | Escolhe entre 3-4 | Artlist ou Envato |
 | 6 | Efeitos sonoros (whoosh, pop, impacto) | Liga/desliga | Artlist ou Envato |
-| 7 | Takes: IA, banco ou misto; geração só no modo ilimitado | Origem | Envato, Artlist, Pexels / Magnific |
+| 7 | Takes: IA, banco, material real ou misto; geração só no modo ilimitado | Origem | Envato, Artlist, Pexels / Magnific / YouTube, NASA, Commons (`baixar_video.py`) |
 | 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista | @gabrielxreis_ Text Presets (`.drfx`) |
 | 9 | **Motions** centralizados e medidos, com as cores da marca, CTA animado | Vê a tabela | HyperFrames + `guias.py` |
 | 10 | **Legenda** de uma linha, métrica obrigatória, do início ao fim | - | `legendas.py`, `legenda_ui.py` |
@@ -330,6 +333,33 @@ Todos em `scripts/`, rodando com `python3`.
 ### sonorizar.py
 Sonoriza cena, take ou animação sem chave de IA: `analisar <video>` (momentos de ação, cortes, pan e folha de quadros), `medir` (ataque e pico de cada som), `mixar <plano.json>` (ambiente, foley e pontuais em camadas, pan, ducking sob a voz, -14 LUFS, stems + prévia) e `davinci` (vira `plano_sfx.txt` editável som a som). Guia: `docs/etapas/sonorizacao.md`.
 
+### baixar_video.py
+B-roll de material real, na ordem **buscar > achar > folha > baixar**:
+
+    buscar  "<termos>" [--fonte youtube|commons|nasa] [--tipo video|imagem]   Título, autor, duração, licença e link
+    achar   <url> "<frase>"                          Onde o assunto aparece (legenda, capítulos, descrição), com nota
+    folha   <url|arquivo> <saida.jpg> --de --ate     Grade de quadros com o tempo, para olhar antes (--varrer: vídeo inteiro)
+    baixar  <url> <pasta_brolls> <nome> --de --ate   Só o trecho, H.264 sem áudio, origem e licença no links.txt
+    tiktok  @usuario                                 Posts recentes do perfil sem login
+    print   <url> <saida.png> --vertical             Print 1080x1920 de site ou notícia
+
+### broll.py
+Coloca o b-roll pela frase da transcrição, já convertida para o tempo da timeline cortada, na trilha BROLL (clipe bruto com entrada e saída, editável).
+
+### rastrear.py
+    <video> --caixa X,Y,L,A | --rosto [--de --ate] [--saida trilha.json]   Trajetória para texto que segue o objeto ou o rosto
+
+### sfx_auto.py / sfx_conferir.py
+Efeitos sonoros pelos tempos da timeline (whoosh na entrada dos motions e do b-roll forte, pop no CTA) e conferência sem ouvir (classificador de áudio, densidade, sincronia).
+
+### projeto.py / retrato.py
+    projeto.py status|lote|checklist <pasta>   Barra de progresso, PROJETO.md e checklist obrigatório antes de entregar
+    retrato.py antes|depois "<timeline>" <pasta>   Fotografa a timeline antes de mexer e compara depois
+
+### tresd/tresd.py
+    logo  plano.json saida.mov   Logo ou texto extrudado em metal, MOV ProRes 4444 com alfa (Blender sem janela)
+    cena  cena.py saida.mov      Objeto 3D montado por script; o .blend fica ao lado, editável
+
 ### qc.py
     <pasta_do_video> [--cliente pasta] [--plataforma instagram|meta_ads|youtube_shorts]
     Estrutura, resolução, duração, quadros pretos, loudness, legenda, grafias erradas, green screen, arquivos pesados
@@ -382,12 +412,16 @@ premiere/                plugin Gab Ponte, premiere_lib.py, LUT e MOGRTs
 aftereffects/            extensão Gab Ponte AE, ae_lib.py e gab_ae.jsx (motions editáveis)
 biblioteca_motions/      modelos de motion prontos (modelo.json + previa.png)
 config.example.json      modelo de configuração (copie para config.json)
-scripts/                 resolve_lib, legendas, legenda_ui, guias, cortes, qc, transcrever, marca, midia, pauta,
-                         doctor, novidades, biblioteca_motions, gerar_mogrts, inspiracao
+scripts/                 resolve_lib, legendas, legenda_ui, legenda_auto, legenda_baixa, guias, centro, cortes, qc,
+                         transcrever, marca, midia, pauta, baixar_video, broll, rastrear, sonorizar, sfx_auto,
+                         sfx_conferir, projeto, retrato, doctor, novidades, biblioteca_motions, gerar_mogrts,
+                         inspiracao, morph_logo, svg_texto, movimentos.mjs
+tresd/                   3D no Blender: logo/texto extrudado e objetos (cenas/)
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
+docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado...)
 clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
 assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
 assets/lettering/        @gabrielxreis_ Text Presets.drfx (29 títulos animados do Fusion)
