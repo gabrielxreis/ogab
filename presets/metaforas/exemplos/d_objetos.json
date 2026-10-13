@@ -1,0 +1,30 @@
+{
+ "estilo": "objetos",
+ "cenas": [
+  {
+   "metafora": "empurra",
+   "fala": "Esforço diário",
+   "dur": 2.2
+  },
+  {
+   "metafora": "forma_vira",
+   "fala": "molda o futuro",
+   "dur": 2.3
+  },
+  {
+   "metafora": "identidade",
+   "fala": "Seja você mesmo",
+   "dur": 2.2
+  },
+  {
+   "metafora": "revoada",
+   "fala": "Mude a direção",
+   "dur": 2.3
+  },
+  {
+   "metafora": "porta",
+   "fala": "Abra novas portas",
+   "dur": 2.6
+  }
+ ]
+}

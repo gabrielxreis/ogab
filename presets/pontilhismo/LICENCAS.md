@@ -1,0 +1,1 @@
+- `exemplo/socrates.jpg`: busto de Sócrates, Museu do Louvre, foto em domínio público (Wikimedia Commons, File:Socrates_Louvre.jpg).

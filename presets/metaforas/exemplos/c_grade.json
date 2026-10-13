@@ -1,0 +1,32 @@
+{
+ "estilo": "grade",
+ "cenas": [
+  {
+   "metafora": "caminho",
+   "fala": "Planejar sua rotina",
+   "dur": 2.3
+  },
+  {
+   "metafora": "multidao",
+   "fala": "te coloca à frente da multidão",
+   "dur": 2.3
+  },
+  {
+   "metafora": "calendario",
+   "fala": "Repita todos os dias",
+   "dia": "26",
+   "mes": "MAI",
+   "dur": 2.2
+  },
+  {
+   "metafora": "cartoes",
+   "fala": "suas tarefas com consistência",
+   "dur": 2.3
+  },
+  {
+   "metafora": "heroi",
+   "fala": "e veja sua vida mudar",
+   "dur": 2.6
+  }
+ ]
+}

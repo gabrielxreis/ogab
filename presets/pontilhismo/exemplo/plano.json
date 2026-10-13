@@ -1,0 +1,9 @@
+{ "w": 1080, "h": 1920, "fps": 30, "pontos": 7000, "semente": 7,
+  "fundo": "#050505", "cor": "#f4f1ea", "destaque": "#f4f1ea", "centro_y": 860, "largura": 0.82,
+  "cenas": [
+    {"tipo": "galaxia", "dur": 3.4, "transicao": 1.6, "giro": 50, "inclinacao": 64, "kicker": "o minimalismo", "titulo": "Tudo começa<br>com uma <i>pergunta</i>"},
+    {"tipo": "texto", "valor": "?", "dur": 3.0, "transicao": 1.2, "giro": 40, "profundidade": 0.22},
+    {"tipo": "imagem", "arquivo": "socrates.jpg", "dur": 4.2, "transicao": 1.3, "giro": 22, "relevo": 0.25, "limiar": 0.2,
+     "titulo": "Sócrates não dava<br><i>respostas</i>", "credito": "Busto de Sócrates · Museu do Louvre · foto em domínio público"},
+    {"tipo": "esfera", "dur": 3.0, "transicao": 1.2, "giro": 70, "inclinacao": 15, "titulo": "ele fazia <i>perguntas</i>"}
+  ] }

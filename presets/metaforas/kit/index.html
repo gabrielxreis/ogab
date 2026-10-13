@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=%W%, height=%H%" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Icones"; src: url("fonts/icones.ttf"); }
+@font-face { font-family: "Oswald"; src: url("fonts/Oswald-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-Medium.ttf"); font-weight: 500; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-SemiBold.ttf"); font-weight: 600; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: %W%px; height: %H%px; overflow: hidden; background: #000; }
+#root { position: relative; width: 100%; height: 100%; color: #fff; }
+canvas { position: absolute; inset: 0; }
+.fala { position: absolute; left: 70px; right: 70px; text-align: center; line-height: 1.12; text-shadow: 0 4px 24px rgba(0,0,0,.6); }
+.fala .w, .fala .l { display: inline-block; }
+.destaque .fala { top: 1530px; font-family: "Oswald"; font-weight: 600; font-size: 60px; text-transform: uppercase; letter-spacing: .01em; }
+.destaque .fala.grande { top: 640px; font-size: 150px; line-height: .98; }
+.bolhas .fala { top: 1500px; font-family: "Poppins"; font-weight: 800; font-size: 54px; text-transform: uppercase; }
+.bolhas .fala.grande { top: 760px; font-size: 80px; }
+.grade .fala { top: 290px; font-family: "Poppins"; font-weight: 700; font-size: 66px; }
+.grade .fala.grande { top: 640px; font-size: 100px; }
+.objetos .fala { top: 1230px; font-family: "Poppins"; font-weight: 600; font-size: 64px; }
+.objetos .fala.grande { top: 700px; font-size: 96px; }
+.fala.escuro { color: #111; text-shadow: none; }
+.fala .w { white-space: nowrap; }
+</style></head><body class="%EST%">
+<div id="root" data-composition-id="metaforas" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%">
+<canvas id="cv" width="%W%" height="%H%"></canvas>
+<div id="txt"></div>
+</div>
+<script src="plano.js"></script>
+<script src="metaforas.js"></script>
+</body></html>

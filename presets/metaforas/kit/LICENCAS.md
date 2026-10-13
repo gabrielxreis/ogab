@@ -1,0 +1,2 @@
+- `icones.ttf`: recorte dos Material Symbols Rounded (Google), licença Apache 2.0 (https://github.com/google/material-design-icons). Lista completa de nomes em `MaterialSymbolsRounded.codepoints`.
+- `Oswald-SemiBold.ttf`: Oswald (Vernon Adams e contribuidores), SIL Open Font License 1.1 (https://github.com/google/fonts/tree/main/ofl/oswald).

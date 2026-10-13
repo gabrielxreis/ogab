@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=%W%, height=%H%" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Playfair"; src: url("fonts/PlayfairDisplay-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "Playfair"; src: url("fonts/PlayfairDisplay-Italic.ttf"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "PoppinsL"; src: url("fonts/Poppins-Light.ttf"); font-weight: 300; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: %W%px; height: %H%px; overflow: hidden; background: %FUNDO%; }
+#root { position: relative; width: 100%; height: 100%; background: %FUNDO%; color: %COR%; }
+canvas { position: absolute; inset: 0; }
+.kick { position: absolute; left: 0; width: 100%; top: 250px; text-align: center; font-family: "PoppinsL"; font-weight: 300; font-size: 26px;
+  letter-spacing: .38em; text-transform: uppercase; opacity: 0; color: %COR%; }
+.tit { position: absolute; left: 80px; right: 80px; top: 1400px; text-align: center; font-family: "Playfair"; font-size: 78px; line-height: 1.12; opacity: 0; }
+.tit i { font-style: italic; color: %DESTAQUE%; }
+.cred { position: absolute; left: 0; width: 100%; top: 1770px; text-align: center; font-family: "PoppinsL"; font-size: 20px; letter-spacing: .12em; opacity: 0; }
+</style></head><body>
+<div id="root" data-composition-id="pontilhismo" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%">
+<canvas id="cv" width="%W%" height="%H%"></canvas>
+<div id="txt"></div>
+</div>
+<script src="dados.js"></script>
+<script src="pontilhismo.js"></script>
+</body></html>

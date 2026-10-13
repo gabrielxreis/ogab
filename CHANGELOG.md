@@ -1,7 +1,11 @@
 # Novidades do Gab (/ogab)
 
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
-Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos itens.
+Mais novo em cima. Cada versão é uma linha `## 2026.10.13-2 (13/10/2026)
+- **Preset pontilhismo:** vídeo minimalista em pontos: fotos reais (com crédito), textos com volume e formas se desenham com milhares de pontos que migram de uma cena para a outra, com câmera 3D. Peça "no preset pontilhismo".
+- **Preset metáforas ("1 prompt, 1 vídeo"):** você manda um roteiro curto e cada frase vira uma metáfora visual em preto e branco (um entre muitos, multidão, caminho, porta, calendário, cartões de vidro, herói...), em 4 estilos: destaque, bolhas, grade e objetos. Peça "no preset metáforas, estilo grade".
+
+## <versão> (<data>)` seguida dos itens.
 
 ## 2026.10.13-5 (13/10/2026)
 - **Takes vão brutos para o DaVinci:** o Gab não corta nem renderiza mais nenhum take antes. O vídeo original entra inteiro e o corte é feito na timeline, então você pode puxar a borda do clipe e reajustar. Vídeo horizontal numa timeline vertical é enquadrado pelo zoom do próprio DaVinci.

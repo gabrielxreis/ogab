@@ -1,0 +1,30 @@
+{
+ "estilo": "bolhas",
+ "cenas": [
+  {
+   "metafora": "um_entre_muitos",
+   "fala": "Enquanto todos esperam",
+   "dur": 2.3
+  },
+  {
+   "metafora": "trabalhando",
+   "fala": "Você executa calado",
+   "dur": 2.3
+  },
+  {
+   "metafora": "multidao",
+   "fala": "Enquanto todos reclamam",
+   "dur": 2.3
+  },
+  {
+   "metafora": "frase",
+   "fala": "Você resolve o problema",
+   "dur": 2.2
+  },
+  {
+   "metafora": "sobe_da_pilha",
+   "fala": "Isso te separa do resto",
+   "dur": 2.6
+  }
+ ]
+}

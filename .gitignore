@@ -7,3 +7,13 @@ __pycache__/
 assets/grade/
 biblioteca_sfx/
 biblioteca_motions_local/
+# presets: só código, kit, planos e prévias leves vão para o git
+presets/*/exemplos/proj_*/
+presets/*/exemplo/projeto/
+presets/*/exemplos/*.log
+presets/*/exemplo/*.log
+presets/metaforas/exemplos/a_destaque.mp4
+presets/metaforas/exemplos/b_bolhas.mp4
+presets/metaforas/exemplos/c_grade.mp4
+presets/metaforas/exemplos/d_objetos.mp4
+presets/pontilhismo/exemplo/exemplo.mp4

@@ -93,6 +93,8 @@ Ponto de partida de todo vídeo de pessoa falando (Bora Imigrar + X-Trader): ver
 ## Presets de edição e motion (`presets/<nome>/PRESET.md`)
 Estilos completos (ritmo, transições, visual, som e kit de motions) que o usuário escolhe pelo nome: "no preset vitrine" no pedido ou `preset: <nome>` no `estilo.md` do cliente. Com preset, ler o `PRESET.md` dele ANTES do plano trecho a trecho; ele só troca o que descreve (legenda, V1, música bruta, pastas e QC seguem o Gab).
 - **vitrine**: interface limpa de luxo; cada frase vira um pedaço de interface (conversor, perfil, cartão do canal, caixa de seleção, janela, pílula), fundo branco/preto e uma cor de destaque, tudo entrando com desfoque (`presets/vitrine/`).
+- **pontilhismo**: milhares de pontos desenham fotos reais (com crédito, Wikimedia domínio público/CC0), textos em 3D e formas (galáxia, esfera...) e migram de uma cena para a outra com câmera 3D; fundo preto, serifa itálica (`presets/pontilhismo/`, `gerar.py plano.json`).
+- **metaforas** ("1 prompt, 1 vídeo"): roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões, herói...), preto e branco com o protagonista brilhando; estilos `destaque`, `bolhas`, `grade`, `objetos` (`presets/metaforas/`, `gerar.py plano.json`).
 
 ## Vídeo só motion + música (`docs/etapas/so_motion.md`)
 Sem narração: cenas na batida da música (bpm do Artlist), fonte em cada dado, render MP4 `--workers 1`, foley pelo que a cena mostra, entrega na Área de Trabalho.
