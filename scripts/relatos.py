@@ -21,7 +21,7 @@ RESOLVIDOS = os.path.expanduser("~/.claude/ogab_relatos/resolvidos.json")
 def url(editar=False):
     d = json.load(open(os.path.join(SKILL, "relatos", "destino.json"), encoding="utf-8"))
     base = f"https://docs.google.com/spreadsheets/d/{d['planilha_id']}"
-    return base + ("/edit" if editar else "/htmlview/sheet?headers=true")
+    return base + ("/edit" if editar else f"/htmlview/sheet?headers=true&gid={d.get('aba_gid', '0')}")   # sem gid não abre
 
 
 def resolvidos():
