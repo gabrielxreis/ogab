@@ -57,3 +57,11 @@ Não basta som nos momentos principais: toda entrada, saída, batida, check, bri
 5. Gravar o plano em `<vídeo>/sfx/plano_sfx.txt`.
 6. Download: o Chrome às vezes não entrega SFX do Artlist ("direct download" sem arquivo). Plano B: o `playableUrl` do `search_sfx` é o clipe inteiro (AAC): curl + ffmpeg para WAV 48 kHz. Avisar o usuário e trocar pelo WAV quando liberar.
 `sfx_auto.py` é só o básico (whoosh/pop genéricos): não basta para motion; usar este desenho.
+
+## Desenho em CAMADAS e conferência sem ouvir (regra do usuário, 12/10/2026: "o sfx não tá preenchendo e dando imersão, tem whoosh e efeito que não combina")
+O que deu errado no motion SUNPRIME (v3): sons escolhidos pelo TÍTULO do Artlist (o "shimmer" era impacto de terror, o "impact" era whoosh, o "logo" era coral), whooshes de 0,1-0,3 s cortados em 0,4 s para movimentos de 1 s, e nenhuma camada contínua (som em só 48% do tempo; a REF tinha 96%). Refeito (v4) assim:
+1. **Nunca escolher pelo título.** Baixar candidatos e rodar `scripts/sfx_conferir.py arquivos <pasta>`: o que o CLAP disser é o que o som é. Descartar o que der "horror"/"choir" num vídeo de marca clara, ou rótulo diferente do esperado.
+2. **Camadas, cada uma numa trilha com nome:** BASE (pad CLARO e contínuo o vídeo todo, -11 dB sobre -23 LUFS; drone "dark/space" soa terror), AMBIENTE DA CENA (o som do LUGAR que a imagem mostra: rua, jardim com pássaros, mar, gente conversando, sala/estúdio, lago), TRANSIÇÕES (swell reverso que termina no pico do movimento + whoosh com o tamanho do movimento), IMPACTOS (só corte seco e logo), DETALHES (digitação, obturador, clique, glitch). Ambientes cortam seco junto com o corte da imagem.
+3. **Whoosh do tamanho do movimento:** medir início/pico/fim de cada movimento (diferença entre quadros) e o ataque/corpo de cada whoosh (envelope); pico do whoosh = pico do movimento; não cortar o som antes do movimento acabar.
+4. **Normalizar antes:** camadas contínuas a -23 LUFS (loudnorm), one-shots a -1 dBFS de pico; o volume do clipe fica relativo a isso.
+5. **Conferir antes de entregar:** `densidade` (meta ≥ 95% acima de -40 dB), `trechos` (cada cena soa como o que mostra; nada de "horror" no topo), `sincronia` (erro médio ≤ 0,1 s). Pad tonal: avisar que pode brigar com a música (trilha própria para baixar/mutar).
