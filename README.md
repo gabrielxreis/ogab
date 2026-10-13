@@ -20,9 +20,9 @@
 
 **Motions que o Gab cria** (HyperFrames, 1080x1920, cores e fonte do cliente)
 
-| Contador com barra | Lista com checks | Lettering de impacto | Gráfico | CTA |
+| Contador | Lista | Lettering | Gráfico | CTA |
 |:---:|:---:|:---:|:---:|:---:|
-| <img src=".github/motions/contador.gif" width="150" alt="Contador animado com barra"> | <img src=".github/motions/lista.gif" width="150" alt="Lista com checks animados"> | <img src=".github/motions/frase.gif" width="150" alt="Frase de impacto palavra por palavra"> | <img src=".github/motions/grafico.gif" width="150" alt="Gráfico de barras animado"> | <img src=".github/motions/cta.gif" width="150" alt="Chamada final com botão"> |
+| <img src=".github/motions/contador.gif" width="128" alt="Contador animado com barra"> | <img src=".github/motions/lista.gif" width="128" alt="Lista com checks animados"> | <img src=".github/motions/frase.gif" width="128" alt="Frase de impacto palavra por palavra"> | <img src=".github/motions/grafico.gif" width="128" alt="Gráfico de barras animado"> | <img src=".github/motions/cta.gif" width="128" alt="Chamada final com botão"> |
 
 <sub>Exemplos com dados fictícios, na identidade do próprio Gab. Num vídeo de cliente, as cores, a fonte e a logo vêm do site da marca.</sub>
 
