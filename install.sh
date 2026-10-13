@@ -19,24 +19,43 @@ fi
 info "1/9 Homebrew"
 if ! command -v brew >/dev/null 2>&1; then
   echo "  Instalando o Homebrew (vai pedir a senha do Mac)..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
-  [ -x /usr/local/bin/brew ] && eval "$(/usr/local/bin/brew shellenv)"
+  # no "curl | bash" o stdin é o próprio script: o instalador do Homebrew precisa ler do terminal (senha, Enter)
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/tty || true
+fi
+for B in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+  if [ -x "$B" ]; then
+    eval "$("$B" shellenv)"
+    # sem isto o Terminal e o Claude Code não acham brew, ffmpeg, node... nas próximas vezes
+    grep -qs "brew shellenv" "$HOME/.zprofile" || echo "eval \"\$($B shellenv)\"" >> "$HOME/.zprofile"
+    break
+  fi
+done
+if ! command -v brew >/dev/null 2>&1; then
+  echo "  Não consegui instalar o Homebrew. Instale à mão (https://brew.sh) e rode este instalador de novo."; exit 1
 fi
 ok "Homebrew $(brew --version | head -1 | awk '{print $2}')"
 
 info "2/9 ffmpeg, yt-dlp, Node.js, Python 3 e git"
 for pkg in ffmpeg yt-dlp node python git; do
   bin="$pkg"; [ "$pkg" = "python" ] && bin="python3"
-  if command -v "$bin" >/dev/null 2>&1; then ok "$pkg já instalado"; else brew install "$pkg"; ok "$pkg instalado"; fi
+  if command -v "$bin" >/dev/null 2>&1; then ok "$pkg já instalado"
+  else brew install "$pkg" && ok "$pkg instalado" || warn "não consegui instalar $pkg: brew install $pkg"; fi
 done
+# Python do macOS (Ferramentas de Linha de Comando) é o 3.9: velho para a skill. Garante um 3.10+ do Homebrew.
+if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+  brew install python >/dev/null 2>&1 || brew upgrade python >/dev/null 2>&1 || true   # "python" cria o comando python3 (python@3.x não)
+  hash -r
+  python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null \
+    && ok "Python $(python3 -c 'import platform; print(platform.python_version())') (Homebrew)" \
+    || warn "o python3 continua abaixo do 3.10; rode: brew install python e abra um Terminal novo"
+fi
 
-info "3/9 Pacotes Python (Pillow, numpy, OpenCV para o rastreio; OCR da Apple para a legenda no DaVinci; requests e dotenv para o Instagram)"
-for par in "PIL:pillow" "numpy:numpy" "cv2:opencv-python" "Vision:pyobjc-framework-Vision" "Quartz:pyobjc-framework-Quartz" "requests:requests" "dotenv:python-dotenv"; do
+info "3/9 Pacotes Python (Pillow, numpy, OpenCV para o rastreio; OCR da Apple para a legenda no DaVinci; requests e dotenv para o Instagram; fontTools para morph e sketch)"
+for par in "PIL:pillow" "numpy:numpy" "cv2:opencv-python" "Vision:pyobjc-framework-Vision" "Quartz:pyobjc-framework-Quartz" "requests:requests" "dotenv:python-dotenv" "fontTools:fonttools"; do
   mod="${par%%:*}"; pac="${par#*:}"
   if python3 -c "import $mod" 2>/dev/null; then ok "$pac já instalado"
   else
-    python3 -m pip install --user --quiet "$pac" 2>/dev/null || python3 -m pip install --user --quiet --break-system-packages "$pac" 2>/dev/null
+    python3 -m pip install --user --quiet "$pac" 2>/dev/null || python3 -m pip install --user --quiet --break-system-packages "$pac" 2>/dev/null || true
     python3 -c "import $mod" 2>/dev/null && ok "$pac instalado" || warn "não consegui instalar $pac (o doctor tenta de novo no fim)"
   fi
 done
@@ -47,7 +66,7 @@ else brew install --cask blender >/dev/null 2>&1 && ok "Blender instalado" || wa
 
 info "3c/9 cc-blender-skill (30 skills de Blender: objetos 3D, materiais, luz, câmera; MIT)"
 CCB="$HOME/.claude/referencias/cc-blender-skill"; mkdir -p "$HOME/.claude/referencias" "$HOME/.claude/skills"
-if [ -d "$CCB/.git" ]; then git -C "$CCB" pull -q >/dev/null 2>&1; else git clone -q --depth 1 https://github.com/RobLe3/cc-blender-skill.git "$CCB" >/dev/null 2>&1; fi
+if [ -d "$CCB/.git" ]; then git -C "$CCB" pull -q >/dev/null 2>&1 || true; else git clone -q --depth 1 https://github.com/RobLe3/cc-blender-skill.git "$CCB" >/dev/null 2>&1 || true; fi
 n=0
 for d in "$CCB"/plugin/skills/*/; do
   nome="$(basename "$d")"; [ -f "$d/SKILL.md" ] || continue
@@ -61,10 +80,16 @@ if [ ! -e "$DEST" ] && [ -d "$HOME/.claude/skills/video-redes/.git" ]; then
   mv "$HOME/.claude/skills/video-redes" "$DEST" && ok "pasta antiga video-redes renomeada para ogab"
 fi
 if [ -d "$DEST/.git" ]; then
-  git -C "$DEST" pull --ff-only --quiet && ok "atualizada em $DEST"
+  if git -C "$DEST" pull --ff-only --quiet 2>/dev/null; then ok "atualizada em $DEST"
+  else warn "não consegui atualizar agora (mudança local ou sem internet); o doctor no fim guarda as mudanças e atualiza"; fi
 else
   mkdir -p "$(dirname "$DEST")"
-  git clone --quiet "$REPO" "$DEST" && ok "instalada em $DEST"
+  if [ -e "$DEST" ]; then mv "$DEST" "$DEST.antiga.$(date +%s)" && warn "pasta $DEST sem git renomeada para .antiga"; fi
+  git clone --quiet "$REPO" "$DEST" && ok "instalada em $DEST" \
+    || { echo "  Não consegui baixar a skill do GitHub ($REPO). Confira a internet e rode de novo."; exit 1; }
+fi
+if [ -f "$DEST/config.json" ] && ! python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$DEST/config.json" 2>/dev/null; then
+  mv "$DEST/config.json" "$DEST/config.json.quebrado.$(date +%s)" && warn "config.json estava inválido: guardei uma cópia e criei outro"
 fi
 if [ ! -f "$DEST/config.json" ]; then
   cp "$DEST/config.example.json" "$DEST/config.json"
@@ -108,12 +133,12 @@ ok "motions: $OGAB_MOTION (para trocar: /ogab config motion hyperframes|aftereff
 # Relatos de erro anônimos (pergunta UMA vez; sem resposta "sim" nada sai da máquina). Ver relatos/LEIA.md.
 RELATOS_ATUAL="$(python3 -c "import json;c=json.load(open('$DEST/config.json'));print('' if 'relatos' not in c or (c['relatos'] is True and int(c.get('relatos_v',1))<2) else c['relatos'])" 2>/dev/null || true)"
 if [ -z "$RELATOS_ATUAL" ]; then
-  if [ -n "$OGAB_RELATOS" ]; then rel="$OGAB_RELATOS"
+  if [ -n "${OGAB_RELATOS:-}" ]; then rel="$OGAB_RELATOS"
   elif [ -r /dev/tty ]; then
     printf "\n  Posso mandar ao Gabriel, de forma ANONIMA, os erros da skill que o Gab corrigir e a estrutura\n  dos motions novos que voce salvar, para ele melhorar o Gab e publicar os melhores para todos?\n  (nada de video, roteiro, texto do cliente, cor da marca, nome ou pasta). Enviar? [S/n]: "
     read -r rel < /dev/tty || true
   fi
-  if [ -n "${rel+x}" ] || [ -n "$OGAB_RELATOS" ]; then
+  if [ -n "${rel+x}" ] || [ -n "${OGAB_RELATOS:-}" ]; then
     case "${rel:-s}" in [nN]*) python3 "$DEST/scripts/relatar.py" consentir nao >/dev/null; ok "relatos: não (para ligar: /ogab config relatos sim)";;
       *) python3 "$DEST/scripts/relatar.py" consentir sim >/dev/null; ok "relatos anônimos: sim (para desligar: /ogab config relatos nao)";; esac
   fi
@@ -146,13 +171,13 @@ npx --yes rea-agents setup --client claude_code --yes >/dev/null 2>&1 \
   && ok "REA MCP registrado no Claude Code (backup em ~/.claude.json.rea.backup)" || warn "rode depois: npx rea-agents setup --client claude_code"
 mkdir -p "$HOME/.claude/referencias"
 if [ -d "$HOME/.claude/referencias/awesome-design-md/.git" ]; then
-  git -C "$HOME/.claude/referencias/awesome-design-md" pull -q >/dev/null 2>&1; ok "awesome-design-md atualizado"
+  git -C "$HOME/.claude/referencias/awesome-design-md" pull -q >/dev/null 2>&1 || true; ok "awesome-design-md atualizado"
 else
   git clone --depth 1 -q https://github.com/voltagent/awesome-design-md.git "$HOME/.claude/referencias/awesome-design-md" >/dev/null 2>&1 \
     && ok "awesome-design-md (DESIGN.md de 70+ marcas) em ~/.claude/referencias" || warn "não consegui clonar o awesome-design-md"
 fi
 if [ -d "$HOME/.claude/referencias/awesome-opus5-5-videos/.git" ]; then
-  git -C "$HOME/.claude/referencias/awesome-opus5-5-videos" pull -q >/dev/null 2>&1; ok "awesome-opus5-5-videos atualizado"
+  git -C "$HOME/.claude/referencias/awesome-opus5-5-videos" pull -q >/dev/null 2>&1 || true; ok "awesome-opus5-5-videos atualizado"
 else
   git clone --depth 1 -q https://github.com/yihui-dev/awesome-opus5-5-videos.git "$HOME/.claude/referencias/awesome-opus5-5-videos" >/dev/null 2>&1 \
     && ok "awesome-opus5-5-videos (inspiração de motions, 850+ prompts) em ~/.claude/referencias" || warn "não consegui clonar o awesome-opus5-5-videos"
@@ -207,7 +232,7 @@ if [ "$precisa_whisper" -eq 1 ]; then
   if python3 -c "import $WMOD" 2>/dev/null; then
     ok "Whisper local ($WPKG) já instalado"
   else
-    python3 -m pip install --user --quiet "$WPKG" 2>/dev/null || python3 -m pip install --user --quiet --break-system-packages "$WPKG"
+    python3 -m pip install --user --quiet "$WPKG" 2>/dev/null || python3 -m pip install --user --quiet --break-system-packages "$WPKG" 2>/dev/null || true
     python3 -c "import $WMOD" 2>/dev/null && ok "Whisper local ($WPKG) instalado; o modelo (~1,6 GB) baixa na primeira transcrição" \
       || warn "não consegui instalar o $WPKG; rode: python3 -m pip install --user $WPKG"
   fi

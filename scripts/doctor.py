@@ -129,7 +129,11 @@ def python():
                ("numpy", "numpy", "contas de imagem e rastreio", True),
                ("cv2", "opencv-python", "rastreio de texto/objeto/rosto (rastrear.py)", True),
                ("requests", "requests", "Instagram: publicar e ler dados (instagram/lib)", True),
-               ("dotenv", "python-dotenv", "Instagram: chaves em instagram/.env", True)]
+               ("dotenv", "python-dotenv", "Instagram: chaves em instagram/.env", True),
+               ("fontTools", "fonttools", "texto em contorno: morph de logo e preset sketch", True)]
+    if sys.version_info < (3, 10):
+        item("!", "python", f"Python {sys.version.split()[0]} é antigo (o do macOS); instale um 3.10+: "
+             + ("brew install python e abra um Terminal novo" if MAC else "winget install --id Python.Python.3.12 -e"))
     if MAC and c.get("editor", "davinci") == "davinci":
         pacotes.append(("Vision", "pyobjc-framework-Vision", "OCR da legenda no DaVinci (legenda_ui.py)", False))
         pacotes.append(("Quartz", "pyobjc-framework-Quartz", "cliques da legenda no DaVinci (legenda_ui.py)", False))

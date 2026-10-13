@@ -4,6 +4,7 @@
 # Pode rodar de novo quando quiser: so instala o que faltar e atualiza a skill.
 # A versao Mac (install.sh) nao e tocada; tudo do Windows fica em windows/.
 
+& {
 $ErrorActionPreference = "Continue"   # Stop + stderr de programa externo derruba o PowerShell 5.1
 $REPO = "https://github.com/gabrielxreis/ogab"
 $DEST = Join-Path $HOME ".claude\skills\ogab"
@@ -17,12 +18,12 @@ function AtualizaPath {
 }
 function Py { & py -3 @args }
 
-if ($env:OS -ne "Windows_NT") { Write-Host "Este instalador e para Windows. No Mac use o install.sh."; exit 1 }
+if ($env:OS -ne "Windows_NT") { Write-Host "Este instalador e para Windows. No Mac use o install.sh."; return }
 
 Info "1/10 winget"
 if (-not (Tem winget)) {
   Warn "winget nao encontrado. Instale o 'App Installer' pela Microsoft Store e rode de novo."
-  exit 1
+  return
 }
 Ok "winget disponivel"
 
@@ -41,8 +42,8 @@ foreach ($p in $pacotes) {
   AtualizaPath
   if (Tem $p.bin) { Ok "$($p.bin) instalado" } else { Warn "nao consegui instalar $($p.id); rode: winget install --id $($p.id) -e" }
 }
-Info "3/10 Pacotes Python (Pillow, numpy, OpenCV para o rastreio, requests e dotenv para o Instagram)"
-foreach ($par in @(@("PIL", "pillow"), @("numpy", "numpy"), @("cv2", "opencv-python"), @("requests", "requests"), @("dotenv", "python-dotenv"))) {
+Info "3/10 Pacotes Python (Pillow, numpy, OpenCV para o rastreio, requests e dotenv para o Instagram, fontTools para morph e sketch)"
+foreach ($par in @(@("PIL", "pillow"), @("numpy", "numpy"), @("cv2", "opencv-python"), @("requests", "requests"), @("dotenv", "python-dotenv"), @("fontTools", "fonttools"))) {
   Py -c "import $($par[0])" 2>$null
   if ($LASTEXITCODE -eq 0) { Ok "$($par[1]) ja instalado" }
   else {
@@ -77,9 +78,14 @@ if (Test-Path (Join-Path $DEST ".git")) {
 } else {
   New-Item -ItemType Directory -Force -Path (Split-Path $DEST) | Out-Null
   git clone --quiet $REPO $DEST
+  if (-not (Test-Path (Join-Path $DEST "config.example.json"))) { Warn "nao consegui baixar a skill do GitHub ($REPO). Confira a internet e rode de novo."; return }
   Ok "instalada em $DEST"
 }
 $cfg = Join-Path $DEST "config.json"
+if (Test-Path $cfg) {
+  try { Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json | Out-Null }
+  catch { Move-Item $cfg "$cfg.quebrado" -Force; Warn "config.json estava invalido: guardei como config.json.quebrado e criei outro" }
+}
 if (-not (Test-Path $cfg)) { Copy-Item (Join-Path $DEST "config.example.json") $cfg; Ok "config.json criado (fica so na sua maquina)" }
 else { Ok "config.json mantido" }
 
@@ -157,7 +163,9 @@ Py (Join-Path $DEST "instagram\carrossel\carrossel.py") instalar *> $null
 if ($LASTEXITCODE -eq 0) { Ok "carrossel do Instagram pronto (slides PNG/PDF)" } else { Warn "rode depois: py -3 $DEST\instagram\carrossel\carrossel.py instalar" }
 Npx "taste-skill (design-taste-frontend, image-to-code) instaladas" "npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y"
 Npx "web-design-guidelines instalada" "npx --yes skills add vercel-labs/agent-skills -g -a claude-code -s web-design-guidelines -y"
-if ((Tem playwright-cli) -or ((cmd /c "npm install -g @playwright/cli@latest >nul 2>&1"); $LASTEXITCODE -eq 0)) {
+$temPw = Tem playwright-cli
+if (-not $temPw) { cmd /c "npm install -g @playwright/cli@latest >nul 2>&1"; $temPw = ($LASTEXITCODE -eq 0) }
+if ($temPw) {
   AtualizaPath
   Push-Location $HOME; Npx "playwright-cli + skill instalados" "playwright-cli install --skills"; Pop-Location
 } else { Warn "nao consegui instalar o playwright-cli; rode: npm install -g @playwright/cli@latest" }
@@ -268,3 +276,4 @@ Falta so o que precisa de voce (uma vez), no app que voce usa:
 FECHE e abra de novo o Claude Code (para pegar as variaveis novas) e digite:  /ogab comecar
 Diferencas do Windows: ~/.claude/skills/ogab/windows/README.md
 "@
+}

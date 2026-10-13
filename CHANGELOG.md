@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-15 (13/10/2026)
+- **Instalador corrigido (Mac e Windows):** quem instalou hoje e viu o instalador parar no meio ("unbound variable" no Mac, janela fechando ou nada acontecendo no Windows): rode o instalador de novo, agora ele vai até o fim. Ele também garante um Python atual no Mac, instala o que faltava para o preset sketch e não para mais por falta de internet num item opcional.
+
 ## 2026.10.13-14 (13/10/2026)
 - **Preset novo: SKETCH.** Motion com cara de desenho de marcador sobre fundo preto: os contornos coloridos se desenham na hora, um cursor pisca, os ícones surgem, o texto manuscrito aparece digitado e as setas se traçam, com o traço tremendo como animação feita à mão. Ótimo para tutorial, lista de ferramentas e passo a passo. Peça "no preset sketch".
 
