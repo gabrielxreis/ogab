@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" font-family="Poppins, Inter, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1b2433"/>
+    </linearGradient>
+    <linearGradient id="or" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7a3d"/>
+      <stop offset="1" stop-color="#ffb36b"/>
+    </linearGradient>
+    <marker id="seta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#4a5670"/>
+    </marker>
+    <style>
+      .card { fill: #161e2c; stroke: #34405a; stroke-width: 1.5; }
+      .dec  { fill: #2a1d16; stroke: #ff7a3d; stroke-width: 1.5; }
+      .n    { font-size: 12px; font-weight: 700; fill: #ff9a55; }
+      .t    { font-size: 15px; font-weight: 700; fill: #f3f5f8; }
+      .s    { font-size: 11px; fill: #8b96a8; }
+      .lig  { stroke: #4a5670; stroke-width: 2; fill: none; marker-end: url(#seta); }
+    </style>
+  </defs>
+  <rect width="900" height="400" rx="18" fill="url(#bg)"/>
+  <text x="40" y="48" font-size="22" font-weight="800" fill="url(#or)">Do pedido ao post</text>
+  <text x="40" y="70" font-size="13" fill="#8b96a8">Os cartões laranja são onde o Gab para e espera você decidir</text>
+  <rect x="640" y="36" width="14" height="14" rx="3" class="dec"/><text x="662" y="48" font-size="12" fill="#c9d1d9">você decide</text>
+  <rect x="750" y="36" width="14" height="14" rx="3" class="card"/><text x="772" y="48" font-size="12" fill="#c9d1d9">o Gab faz</text>
+
+  <rect x="40" y="100" width="148" height="100" rx="14" class="dec"/>
+  <text x="56" y="126" class="n">01</text><text x="56" y="150" class="t">Roteiro</text><text x="56" y="170" class="s">gancho em 3 s,</text><text x="56" y="185" class="s">fonte com data</text>
+  <rect x="208" y="100" width="148" height="100" rx="14" class="dec"/>
+  <text x="224" y="126" class="n">02</text><text x="224" y="150" class="t">Voz</text><text x="224" y="170" class="s">3-5 vozes com prévia,</text><text x="224" y="185" class="s">pronúncia certa</text>
+  <rect x="376" y="100" width="148" height="100" rx="14" class="card"/>
+  <text x="392" y="126" class="n">03</text><text x="392" y="150" class="t">Projeto</text><text x="392" y="170" class="s">DaVinci ou Premiere,</text><text x="392" y="185" class="s">cortes e transcrição</text>
+  <rect x="544" y="100" width="148" height="100" rx="14" class="dec"/>
+  <text x="560" y="126" class="n">04</text><text x="560" y="150" class="t">Legenda</text><text x="560" y="170" class="s">uma linha, métrica,</text><text x="560" y="185" class="s">você valida antes</text>
+  <rect x="712" y="100" width="148" height="100" rx="14" class="dec"/>
+  <text x="728" y="126" class="n">05</text><text x="728" y="150" class="t">Música</text><text x="728" y="170" class="s">3-4 opções, termina</text><text x="728" y="185" class="s">junto com o vídeo</text>
+  <rect x="40" y="260" width="148" height="100" rx="14" class="card"/>
+  <text x="56" y="286" class="n">06</text><text x="56" y="310" class="t">SFX</text><text x="56" y="330" class="s">foley do que a cena</text><text x="56" y="345" class="s">mostra, em camadas</text>
+  <rect x="208" y="260" width="148" height="100" rx="14" class="card"/>
+  <text x="224" y="286" class="n">07</text><text x="224" y="310" class="t">Takes e b-roll</text><text x="224" y="330" class="s">banco, IA ou material</text><text x="224" y="345" class="s">real no trecho certo</text>
+  <rect x="376" y="260" width="148" height="100" rx="14" class="card"/>
+  <text x="392" y="286" class="n">08</text><text x="392" y="310" class="t">Motions</text><text x="392" y="330" class="s">lettering, motions,</text><text x="392" y="345" class="s">3D e tracking</text>
+  <rect x="544" y="260" width="148" height="100" rx="14" class="card"/>
+  <text x="560" y="286" class="n">09</text><text x="560" y="310" class="t">QC e master</text><text x="560" y="330" class="s">-14 LUFS, conferência</text><text x="560" y="345" class="s">e capa do vídeo</text>
+  <rect x="712" y="260" width="148" height="100" rx="14" class="dec"/>
+  <text x="728" y="286" class="n">10</text><text x="728" y="310" class="t">Post</text><text x="728" y="330" class="s">legenda e hashtags,</text><text x="728" y="345" class="s">agenda com seu ok</text>
+  <path d="M188 150 H204" class="lig"/>
+  <path d="M356 150 H372" class="lig"/>
+  <path d="M524 150 H540" class="lig"/>
+  <path d="M692 150 H708" class="lig"/>
+  <path d="M188 310 H204" class="lig"/>
+  <path d="M356 310 H372" class="lig"/>
+  <path d="M524 310 H540" class="lig"/>
+  <path d="M692 310 H708" class="lig"/>
+  <path d="M786 200 V230 H114 V256" class="lig"/>
+</svg>

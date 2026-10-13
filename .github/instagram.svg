@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" font-family="Poppins, Inter, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1b2433"/>
+    </linearGradient>
+    <linearGradient id="or" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7a3d"/>
+      <stop offset="1" stop-color="#ffb36b"/>
+    </linearGradient>
+    <linearGradient id="av" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#feda75"/>
+      <stop offset=".5" stop-color="#d62976"/>
+      <stop offset="1" stop-color="#4f5bd5"/>
+    </linearGradient>
+    <style>
+      .cap { font-size: 14px; fill: #e6e9ee; }
+      .b   { font-weight: 700; }
+      .mut { font-size: 13px; fill: #8b96a8; }
+      .hs  { font-size: 14px; fill: #7aa7ff; }
+      .lb  { font-size: 12px; font-weight: 700; fill: #0d1117; }
+      .nt  { font-size: 13px; fill: #c9d1d9; }
+    </style>
+  </defs>
+  <rect width="900" height="420" rx="18" fill="url(#bg)"/>
+  <text x="40" y="48" font-size="22" font-weight="800" fill="url(#or)">A legenda do post sai junto com o vídeo</text>
+  <text x="40" y="70" font-size="13" fill="#8b96a8">Pedido: "escreve a legenda desse Reel"  ·  texto fictício de exemplo</text>
+
+  <!-- cartão do post -->
+  <rect x="40" y="96" width="520" height="290" rx="16" fill="#ffffff" fill-opacity=".04" stroke="#34405a"/>
+  <circle cx="72" cy="128" r="16" fill="url(#av)"/>
+  <circle cx="72" cy="128" r="12.5" fill="#1b2433"/>
+  <text x="96" y="133" class="cap b">seucliente</text>
+  <text x="530" y="133" class="mut" text-anchor="end">Reel</text>
+
+  <text x="62" y="176" class="cap"><tspan class="b">seucliente </tspan>141 mil médicos vão faltar nos EUA até 2038.</text>
+  <text x="62" y="198" class="cap">E 3 caminhos colocam você nessa vaga antes de 2027 👇</text>
+  <line x1="62" y1="212" x2="538" y2="212" stroke="#ff7a3d" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <text x="62" y="236" class="mut">... mais</text>
+  <text x="62" y="262" class="cap">1. Residência: o caminho mais longo, e o mais seguro.</text>
+  <text x="62" y="284" class="cap">2. Licença direta: em alguns estados já é realidade.</text>
+  <text x="62" y="306" class="cap">3. Certificação: rápida para quem já tem experiência.</text>
+  <text x="62" y="334" class="cap">Comenta "PLANO" que eu te mando o passo a passo.</text>
+  <text x="62" y="362" class="hs">#medicinanoseua #revalidacao #imigracao #seucliente</text>
+
+  <!-- notas -->
+  <rect x="590" y="160" width="20" height="20" rx="10" fill="url(#or)"/><text x="600" y="174" class="lb" text-anchor="middle">1</text>
+  <text x="622" y="168" class="nt">Gancho inteiro antes do "mais":</text>
+  <text x="622" y="186" class="nt">os primeiros 125 caracteres</text>
+  <rect x="590" y="240" width="20" height="20" rx="10" fill="url(#or)"/><text x="600" y="254" class="lb" text-anchor="middle">2</text>
+  <text x="622" y="248" class="nt">Corpo curto, uma ideia por linha,</text>
+  <text x="622" y="266" class="nt">na voz do cliente e sem travessão</text>
+  <rect x="590" y="310" width="20" height="20" rx="10" fill="url(#or)"/><text x="600" y="324" class="lb" text-anchor="middle">3</text>
+  <text x="622" y="318" class="nt">Um CTA só e 3-5 hashtags</text>
+  <text x="622" y="336" class="nt">dimensionadas (nicho, média, ampla)</text>
+</svg>

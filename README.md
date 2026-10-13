@@ -16,6 +16,18 @@
 
 **/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve ou no Adobe Premiere Pro** (Mac e Windows), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci e cuida do **Instagram**: legenda do post, carrossel, hashtags, semana de conteúdo e perfil.
 
+<div align="center">
+
+**Motions que o Gab cria** (HyperFrames, 1080x1920, cores e fonte do cliente)
+
+| Contador com barra | Lista com checks | Lettering de impacto | Gráfico | CTA |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src=".github/motions/contador.gif" width="150" alt="Contador animado com barra"> | <img src=".github/motions/lista.gif" width="150" alt="Lista com checks animados"> | <img src=".github/motions/frase.gif" width="150" alt="Frase de impacto palavra por palavra"> | <img src=".github/motions/grafico.gif" width="150" alt="Gráfico de barras animado"> | <img src=".github/motions/cta.gif" width="150" alt="Chamada final com botão"> |
+
+<sub>Exemplos com dados fictícios, na identidade do próprio Gab. Num vídeo de cliente, as cores, a fonte e a logo vêm do site da marca.</sub>
+
+</div>
+
 > **Cada pessoa usa as PRÓPRIAS contas.** A skill não traz conta, chave nem login. Você conecta os seus serviços (ElevenLabs, Artlist, Envato, Magnific...) no seu Claude e faz login nos sites no seu navegador. Nada disso vai para o repositório nem para o `config.json`.
 
 * [NOVIDADES](#novidades)
@@ -181,6 +193,8 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 
 ## O fluxo
 
+<p align="center"><img src=".github/fluxo.svg" alt="Fluxo do /ogab: roteiro, voz, projeto, legenda, música, SFX, takes, motions, QC e post" width="900"></p>
+
 | # | Etapa | Você decide? | Ferramenta |
 |---|---|---|---|
 | 1 | Perfil do cliente + logos e identidade visual baixadas do site | Só na 1ª vez | `competitor-profiling`, `marca.py` |
@@ -255,6 +269,8 @@ Cada empresa tem o seu estilo. Regra que você dá para uma marca vai para o `es
 
 O Gab também é o social media: o vídeo sai pronto e o post sai junto. Basta pedir para o `/ogab`.
 
+<p align="center"><img src=".github/instagram.svg" alt="Exemplo de legenda do Instagram com gancho, corpo, CTA e hashtags" width="900"></p>
+
 | Peça para o Gab | O que ele faz |
 |---|---|
 | "escreve a legenda do post desse vídeo" | Gancho nos primeiros 125 caracteres (antes do "mais"), corpo curto, um CTA, 3-5 hashtags, sem cara de IA. Vai para `videos/legenda_post.txt` |
@@ -308,7 +324,7 @@ No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / 
 
 # MOTIONS
 
-- Feitos no **HyperFrames**, com as cores, a fonte e a logo da marca, numa trilha `MOTIONS`.
+- Feitos no **HyperFrames**, com as cores, a fonte e a logo da marca, numa trilha `MOTIONS` (exemplos animados [no topo](#readme)).
 - **Sempre centralizados**, medidos com `guias.py` (cutaway no centro da tela, imersivo abaixo do queixo). Nada sobre o rosto: se cobriria o rosto, vira tela cheia sobre um BG animado, que fica contínuo entre motions próximos.
 - Acabamento caprichado e variado, sem repetir o mesmo layout.
 - **Inspiração:** antes de um motion novo, o Gab busca referências de movimento numa coleção de 850+ vídeos feitos em código (`scripts/inspiracao.py`).
@@ -364,6 +380,8 @@ B-roll de material real, na ordem **buscar > achar > folha > baixar**:
     baixar  <url> <pasta_brolls> <nome> --de --ate   Só o trecho, H.264 sem áudio, origem e licença no links.txt
     tiktok  @usuario                                 Posts recentes do perfil sem login
     print   <url> <saida.png> --vertical             Print 1080x1920 de site ou notícia
+
+<p align="center"><img src=".github/folha_de_quadros.jpg" alt="Folha de quadros do lançamento da Apollo 11" width="720"><br><sub>Folha de quadros que o Gab confere antes de baixar um b-roll: lançamento da Apollo 11, acervo da NASA (domínio público), achado com <code>buscar --fonte nasa</code>.</sub></p>
 
 ### broll.py
 Coloca o b-roll pela frase da transcrição, já convertida para o tempo da timeline cortada, na trilha BROLL (clipe bruto com entrada e saída, editável).
