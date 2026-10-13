@@ -105,6 +105,20 @@ json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
 ok "motions: $OGAB_MOTION (para trocar: /ogab config motion hyperframes|aftereffects)"
 
+# Relatos de erro anônimos (pergunta UMA vez; sem resposta "sim" nada sai da máquina). Ver relatos/LEIA.md.
+RELATOS_ATUAL="$(python3 -c "import json;c=json.load(open('$DEST/config.json'));print('' if 'relatos' not in c else c['relatos'])" 2>/dev/null || true)"
+if [ -z "$RELATOS_ATUAL" ]; then
+  if [ -n "$OGAB_RELATOS" ]; then rel="$OGAB_RELATOS"
+  elif [ -r /dev/tty ]; then
+    printf "\n  Quando algo da skill quebra e o Gab corrige, ele pode mandar um relato ANONIMO para o Gabriel\n  melhorar o Gab para todo mundo (so o erro e a correcao no codigo da skill; nada de video, roteiro,\n  cliente, nome ou pasta). Enviar relatos anonimos? [S/n]: "
+    read -r rel < /dev/tty || true
+  fi
+  if [ -n "${rel+x}" ] || [ -n "$OGAB_RELATOS" ]; then
+    case "${rel:-s}" in [nN]*) python3 "$DEST/scripts/relatar.py" consentir nao >/dev/null; ok "relatos: não (para ligar: /ogab config relatos sim)";;
+      *) python3 "$DEST/scripts/relatar.py" consentir sim >/dev/null; ok "relatos anônimos: sim (para desligar: /ogab config relatos nao)";; esac
+  fi
+fi
+
 info "5/9 HyperFrames (motions, gráficos, edição dinâmica)"
 npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/null 2>&1 \
   && ok "skills do HyperFrames instaladas" \

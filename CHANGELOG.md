@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-12 (13/10/2026)
+- **Relatos de erro anônimos (opcional):** o Gab pergunta uma única vez se pode mandar ao Gabriel, sem nada pessoal, os erros da skill que ele corrigiu no seu computador. Com "sim", ele envia sozinho em segundo plano e a correção chega para todo mundo nas próximas atualizações. Nada de vídeo, roteiro, cliente, nome ou pasta sai da máquina. Mudar quando quiser: `/ogab config relatos sim` ou `nao`.
+
 ## 2026.10.13-11
 - Trava: o Gab não consegue mais colocar na timeline um take que ele mesmo re-renderizou (acelerado, cortado, foto virada vídeo). Só o arquivo original baixado entra.
 

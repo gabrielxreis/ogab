@@ -17,6 +17,11 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 
 **Novidades (regra do usuário, 12/10/2026):** logo depois do pull, rodar `python3 SKILL_DIR/scripts/novidades.py`. Se imprimir algo, a PRIMEIRA coisa da resposta é mostrar ao usuário essas novidades (curtas, em lista) e só depois seguir com o pedido. Ele marca sozinho o que já foi visto. Se o pull falhou por mudança local, rodar `python3 SKILL_DIR/scripts/doctor.py --corrigir` (guarda as mudanças locais com stash e atualiza).
 
+**Relatos de erro (regra do usuário, 13/10/2026; detalhes em `relatos/LEIA.md`):**
+- Logo depois das novidades: `python3 SKILL_DIR/scripts/relatar.py perguntar`. Se imprimir `PERGUNTAR: ...`, fazer essa pergunta UMA vez (sim/não) junto com a resposta e gravar com `relatar.py consentir sim|nao`; nunca perguntar de novo. Depois, em segundo plano e sem comentar: `python3 SKILL_DIR/scripts/relatar.py enviar` (só envia com `"relatos": true`; na máquina do dono não envia).
+- **Toda vez que algo DA SKILL quebra e você corrige na hora** (script com erro, passo que não funciona, regra que faltou), depois de confirmar que a correção funcionou: `python3 SKILL_DIR/scripts/relatar.py registrar --titulo "<curto>" --erro "<mensagem/sintoma>" --causa "<por quê>" --correcao "<o que mudou>" --arquivo <arquivo da skill alterado> ...`. Não registrar erro de uso, de internet ou do projeto do cliente. O texto é anonimizado sozinho, mas nunca escrever nele nome de cliente, roteiro ou dado pessoal.
+- **Dono (`"dono_biblioteca": true`), `/ogab relatos`:** `python3 SKILL_DIR/scripts/relatos.py listar`, depois `ver <assinatura>` em cada um; reproduzir, aplicar a correção (ou uma melhor) no repo, linha em `docs/PROCESSO.md` e no `CHANGELOG.md`, commit+push e `relatos.py resolver <assinatura> <commit> "nota"`. Os usuários recebem no próximo auto-update.
+
 **Manutenção (quem edita a skill):** toda mudança que o usuário percebe ganha uma linha no topo de `CHANGELOG.md` (nova versão `AAAA.MM.DD-N`), no mesmo commit, em linguagem de usuário (o que mudou e o que ele precisa fazer, se precisar).
 
 ## Editor do usuário: DaVinci OU Premiere (escolhido na instalação)
@@ -50,6 +55,8 @@ Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode p
 
 - `ajuda` ou `help` (o `/help` puro é do Claude Code e não pode ser trocado): mostrar em tabela o que está **habilitado/desabilitado** em `SKILL_DIR/config.json` (se não existir, copiar de `config.example.json`), os provedores escolhidos por etapa e os comandos. Oferecer mudar qualquer item; ao mudar, editar `config.json` e confirmar.
 - `config <chave> <valor>`: muda direto (ex.: `config opcoes.multi_formatos true`, `config provedores.musica ["envato"]`).
+- `relatos` (só o dono): lista e resolve os relatos de erro que chegaram das instalações (ver "Relatos de erro" acima).
+- `config relatos sim|nao`: liga/desliga o envio anônimo de relatos (`relatar.py consentir`).
 - `update`: `git -C SKILL_DIR pull --ff-only` e mostrar o que mudou (`git log -5 --oneline`). Nunca sobrescrever `config.json` nem `clientes/`.
 - `doctor` (também quando algo da instalação falhar, ou o usuário disser que "não funciona"): rodar `python3 SKILL_DIR/scripts/doctor.py --corrigir`. Ele corrige sozinho o que dá; para cada linha com "!" que sobrar, guiar o usuário passo a passo (um passo por vez, esperando ele dizer "feito") e rodar o doctor de novo até ficar "Tudo certo". Itens com "·" são de apps que ele não escolheu: não insistir.
 - `cliente <nome>`: criar/atualizar o perfil do cliente (etapa 1).
