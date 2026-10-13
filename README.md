@@ -14,7 +14,7 @@
 
 </div>
 
-**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve ou no Adobe Premiere Pro** (Mac e Windows), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci.
+**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve ou no Adobe Premiere Pro** (Mac e Windows), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci e cuida do **Instagram**: legenda do post, carrossel, hashtags, semana de conteúdo e perfil.
 
 > **Cada pessoa usa as PRÓPRIAS contas.** A skill não traz conta, chave nem login. Você conecta os seus serviços (ElevenLabs, Artlist, Envato, Magnific...) no seu Claude e faz login nos sites no seu navegador. Nada disso vai para o repositório nem para o `config.json`.
 
@@ -33,6 +33,7 @@
     * [Cor e vídeos de iPhone](#cor-e-videos-de-iphone)
 * [CLIENTES](#clientes)
     * [Perfil, pronúncia e estilo de edição](#perfil-pronuncia-e-estilo-de-edicao)
+* [INSTAGRAM](#instagram)
 * [PASTA DO VÍDEO](#pasta-do-video)
 * [LEGENDA](#legenda)
 * [EDITORES E MOTIONS](#editores-e-motions)
@@ -49,6 +50,7 @@
 
 O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo no começo da conversa. Histórico completo em [`CHANGELOG.md`](CHANGELOG.md). Últimas:
 
+- **Instagram dentro do Gab:** legenda com gancho nos primeiros 125 caracteres, carrossel slide a slide, gancho de Reel viral, 3-5 hashtags dimensionadas, texto sem cara de IA, semana de conteúdo, perfil e dados do nicho. Publica e agenda pela Publora se você quiser.
 - **B-roll real no trecho certo:** o Gab acha onde a pessoa fala o que você pediu (pela legenda, capítulos e descrição do vídeo), olha uma folha de quadros antes de baixar e busca também no acervo da **NASA** e no **Wikimedia Commons** (domínio público, licença anotada). Lista posts de um perfil do **TikTok** sem login e tira **print vertical** de site ou notícia.
 - **Sonorização sem chave de IA:** lê o vídeo (o que entra, bate ou para, e de que lado da tela) e monta o som em camadas, com câmera lenta que se ouve, chão e ação certos e cada som conferido por um classificador de áudio.
 - **3D de verdade no Blender:** logo e texto extrudados em metal, objetos (diploma, troféu, avião) e morph de formas, com fundo transparente.
@@ -168,6 +170,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | `/ogab <edição no DaVinci>` | Edita a timeline aberta (cortes, legenda, música, motions, b-roll...) |
 | `/ogab cliente <nome>` | Cria ou atualiza o perfil do cliente (site, logo, pronúncias, estilo) |
 | `/ogab pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
+| `/ogab instagram <pedido>` | Legenda, carrossel, hashtags, semana de posts, perfil (também funciona só pedindo, sem a palavra) |
 | `/ogab config <chave> <valor>` | Liga ou desliga opções. Ex.: `config opcoes.multi_formatos true` |
 | `/ogab ajuda` | Mostra o que está habilitado e os provedores escolhidos |
 | `/ogab doctor` | Confere a instalação inteira, corrige o que der e guia você no resto |
@@ -246,6 +249,25 @@ Cada empresa tem uma pasta em `clientes/<empresa>/` (local, fora do git), criada
 | `estilo.md` | **O estilo de edição da marca**: formato, camadas, presets de lettering, legenda, motions e CTA, b-roll, música aprovada e rejeitada, export e tom. Lido **antes** de editar qualquer vídeo da empresa |
 
 Cada empresa tem o seu estilo. Regra que você dá para uma marca vai para o `estilo.md` dela; regra geral vai para o `SKILL.md`. O estilo também fica espelhado no perfil da empresa no Desktop (`~/Desktop/<empresa>.md`).
+
+
+# INSTAGRAM
+
+O Gab também é o social media: o vídeo sai pronto e o post sai junto. Basta pedir para o `/ogab`.
+
+| Peça para o Gab | O que ele faz |
+|---|---|
+| "escreve a legenda do post desse vídeo" | Gancho nos primeiros 125 caracteres (antes do "mais"), corpo curto, um CTA, 3-5 hashtags, sem cara de IA. Vai para `videos/legenda_post.txt` |
+| "monta um carrossel sobre X" | Slide a slide, do gancho ao fechamento, com o texto de cada imagem |
+| "por que esse Reel viralizou?" + link | Extrai e classifica o gancho para você reaproveitar |
+| "planeja a semana da Bora Imigrar" | Reels, carrosséis e stories por pilar de conteúdo |
+| "transforma esse post do LinkedIn em carrossel" | Adapta conteúdo de outra rede para o formato do Instagram |
+| "revisa o perfil" | Foto, nome, bio, link, destaques, primeira grade e fixados |
+| "o que está funcionando no meu nicho?" | Lê dados reais de hashtag e de perfis (com token Apify) |
+
+Escreve na língua e na voz do cliente (lê `clientes/<empresa>/empresa.md` e `estilo.md`) e nunca usa travessão.
+
+**Publicar é opcional.** Sem chave nenhuma, tudo funciona em modo rascunho: você copia e posta pelo app. Para o Gab subir a mídia e agendar, copie `instagram/.env.example` para `instagram/.env` (fora do git) e preencha a chave da [Publora](https://publora.com) (conta Business ou Creator). `APIFY_TOKEN` libera a leitura de dados do nicho e `PIXFARO_TOKEN` a geração de imagens. Ele só publica depois do seu "pode postar".
 
 
 # PASTA DO VÍDEO
@@ -421,6 +443,7 @@ navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
+instagram/               parte de Instagram: 9 especialidades (legenda, carrossel, hashtags, humanizer...), referências e lib de publicação
 docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado...)
 clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
 assets/fontes/           Poppins, Playfair Display, Lobster (OFL)

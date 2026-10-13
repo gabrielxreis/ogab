@@ -31,8 +31,8 @@ for pkg in ffmpeg yt-dlp node python git; do
   if command -v "$bin" >/dev/null 2>&1; then ok "$pkg já instalado"; else brew install "$pkg"; ok "$pkg instalado"; fi
 done
 
-info "3/9 Pacotes Python (Pillow, numpy, OpenCV para o rastreio; OCR da Apple para a legenda no DaVinci)"
-for par in "PIL:pillow" "numpy:numpy" "cv2:opencv-python" "Vision:pyobjc-framework-Vision" "Quartz:pyobjc-framework-Quartz"; do
+info "3/9 Pacotes Python (Pillow, numpy, OpenCV para o rastreio; OCR da Apple para a legenda no DaVinci; requests e dotenv para o Instagram)"
+for par in "PIL:pillow" "numpy:numpy" "cv2:opencv-python" "Vision:pyobjc-framework-Vision" "Quartz:pyobjc-framework-Quartz" "requests:requests" "dotenv:python-dotenv"; do
   mod="${par%%:*}"; pac="${par#*:}"
   if python3 -c "import $mod" 2>/dev/null; then ok "$pac já instalado"
   else

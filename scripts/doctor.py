@@ -127,7 +127,9 @@ def python():
     c = cfg()
     pacotes = [("PIL", "pillow", "imagens (prévias, legenda baixa, QC)", True),
                ("numpy", "numpy", "contas de imagem e rastreio", True),
-               ("cv2", "opencv-python", "rastreio de texto/objeto/rosto (rastrear.py)", True)]
+               ("cv2", "opencv-python", "rastreio de texto/objeto/rosto (rastrear.py)", True),
+               ("requests", "requests", "Instagram: publicar e ler dados (instagram/lib)", True),
+               ("dotenv", "python-dotenv", "Instagram: chaves em instagram/.env", True)]
     if MAC and c.get("editor", "davinci") == "davinci":
         pacotes.append(("Vision", "pyobjc-framework-Vision", "OCR da legenda no DaVinci (legenda_ui.py)", False))
         pacotes.append(("Quartz", "pyobjc-framework-Quartz", "cliques da legenda no DaVinci (legenda_ui.py)", False))
