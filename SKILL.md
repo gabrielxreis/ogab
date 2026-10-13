@@ -69,7 +69,8 @@ Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode p
 1e. Nada em cima do rosto (legenda, lettering, motion).
 1f. **Ordem: cortes > legenda > VALIDAÇÃO DA LEGENDA pelo usuário > b-roll/motions** (o tempo dos motions vem da legenda).
 1g. **A timeline é do usuário:** `retrato.py antes "<timeline>" <pasta>` antes de mexer e `retrato.py depois ... --alvo <trilhas/nomes>` depois (sai com erro se algo fora do alvo mudou); mexer só no alvo pelo nome; nunca clicar/digitar/Undo no DaVinci com ele dentro.
-1h. Acabamento aprendido: b-roll já no 0 s, motion com a duração da fala, takes curtos colados, punch-in leve, música termina com o vídeo.
+1h. Acabamento aprendido: b-roll já no 0 s, motion com a duração da fala, takes curtos colados, punch-in leve, música termina com o vídeo. **Ritmo: corte a cada 1,5-3 s, imagem acompanhando cada ideia, nunca vários segundos no mesmo assunto; gancho com o take mais forte e com ação.**
+1h2. **Material bruto, corte no DaVinci (regra do usuário, 13/10/2026):** take entra como arquivo ORIGINAL inteiro e é cortado na timeline (`montar_takes` com `entrada_s`, zoom de preencher do DaVinci). Nunca cortar, recortar, renderizar ou re-encodar take antes (nada de ffmpeg -ss/-t/crop). Música e narração já eram assim.
 1i. **Nunca parado esperando (regra do usuário, reforçada em 12/10/2026):** todo render/geração/download longo roda em SEGUNDO PLANO (`run_in_background`) e, enquanto isso, adiantar outra coisa: montar as timelines dos outros vídeos, legenda, takes, SFX, motions do próximo. Em lote de vários vídeos, nunca fazer um de cada vez esperando: encadear.
 1j. Nunca apagar nem esvaziar a V1.
 1k. Vídeo emocional: b-roll em toda imagem concreta e lettering + b-roll nas frases de efeito.

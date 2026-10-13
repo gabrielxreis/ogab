@@ -204,22 +204,40 @@ def colocar_sfx(t, mp, lista, db=-6):
     return out
 
 
-def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False):
-    """takes = [(arquivo, inicio_s), ...] em ordem. Cada take vai até o início do próximo, sem buraco:
-    encadeia pelo GetEnd() real e usa ceil (fontes 24/25 fps numa timeline 30 deixariam 1-2 quadros pretos).
+def _zoom_preencher(it, t):
+    """Zoom para o take PREENCHER o quadro (ex.: 16:9 numa timeline 9:16 = 3,16x), no lugar de recortar antes."""
+    try:
+        ws, hs = [int(v) for v in str(it.GetClipProperty("Resolution")).lower().split("x")]
+        wt, ht = int(t.GetSetting("timelineResolutionWidth")), int(t.GetSetting("timelineResolutionHeight"))
+        return max(wt / ws, ht / hs) / min(wt / ws, ht / hs)
+    except Exception:
+        return 1.0
+
+
+def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, preencher=True):
+    """takes = [(arquivo, inicio_s), ...] ou [(arquivo, inicio_s, entrada_s), ...] em ordem. Cada take vai até o
+    início do próximo, sem buraco: encadeia pelo GetEnd() real e usa ceil (fontes 24/25 fps numa timeline 30
+    deixariam 1-2 quadros pretos).
+    MATERIAL BRUTO (regra do usuário, 13/10/2026): `arquivo` é o vídeo ORIGINAL inteiro (nunca um trecho cortado ou
+    renderizado antes) e `entrada_s` é o ponto do arquivo onde o take começa; o corte acontece NA TIMELINE, para o
+    usuário conseguir puxar a borda e reajustar no DaVinci. preencher=True aplica o zoom que faz o take ocupar o
+    quadro (16:9 em 9:16) em vez de recortar com ffmpeg.
     respeitar_inicio=True: cada take entra NO SEU TEMPO planejado mesmo que o anterior seja curto (o vão fica sob
     um motion de tela cheia). Sem isso, take curto ADIANTA todos os seguintes (bug do lote Calverstone 04-06)."""
     S, F = t.GetStartFrame(), fps_tl(t)
     cur = S + round(takes[0][1] * F); fim_f = S + round(fim * F); itens = []
-    for k, (arq, ini) in enumerate(takes):
+    for k, tk in enumerate(takes):
+        arq, ini = tk[0], tk[1]; entrada = tk[2] if len(tk) > 2 else 0.0
         if respeitar_inicio: cur = max(cur, S + round(ini * F))
         nxt = S + round(takes[k + 1][1] * F) if k + 1 < len(takes) else fim_f
         it = importar(mp, arq, "BROLLS")
         sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
-        n = min(mx, math.ceil((nxt - cur) * sf / F) + 1)
-        x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": 0, "endFrame": n - 1, "mediaType": 1,
-                                  "trackIndex": 1, "recordFrame": cur}])[0]
-        if zoom != 1.0: x.SetProperty("ZoomX", zoom); x.SetProperty("ZoomY", zoom)
+        e0 = min(int(round(entrada * sf)), mx - 1)
+        n = min(mx - e0, math.ceil((nxt - cur) * sf / F) + 1)
+        x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": e0, "endFrame": e0 + n - 1, "mediaType": 1,
+                                  "trackIndex": trilha, "recordFrame": cur}])[0]
+        z = zoom * (_zoom_preencher(it, t) if preencher else 1.0)
+        if z != 1.0: x.SetProperty("ZoomX", z); x.SetProperty("ZoomY", z)
         itens.append(x); cur = x.GetEnd()
         if x.GetEnd() < nxt: print(f"AVISO: {os.path.basename(arq)} é curto, sobra {nxt - x.GetEnd()} quadros")
     return itens
