@@ -139,3 +139,57 @@ def suavizar_tudo():
                         k.interpolation = "BEZIER"; k.easing = "EASE_IN_OUT"
             except Exception:
                 pass
+
+
+# ---------------- v2 (12/10/2026, pedido do usuário): qualidade de produto ----------------
+# Cycles na GPU + HDRI de estúdio (Poly Haven, CC0) no lugar do EEVEE com luzes fortes (dava "aberração de luz"),
+# render em TELA CHEIA 1080x1920 com alfa (nunca um quadrado colado por cima) e câmera deslocada para o objeto
+# ficar abaixo do texto. Assets: tresd/polyhaven.py.
+
+def gpu_cycles(motion_blur=True):
+    sc = bpy.context.scene; sc.render.engine = "CYCLES"
+    try:
+        pr = bpy.context.preferences.addons["cycles"].preferences
+        pr.compute_device_type = "METAL" if bpy.app.build_platform == b"Darwin" else "CUDA"; pr.get_devices()
+        for d in pr.devices: d.use = True
+        sc.cycles.device = "GPU"
+    except Exception as e:
+        print("Cycles sem GPU:", e)
+    sc.render.use_persistent_data = True   # ~5 s/quadro em 1080x1920 com 24 amostras no M1 Pro (sem isso, ~17 s)
+    sc.cycles.use_denoising = True; sc.render.use_motion_blur = motion_blur; sc.render.motion_blur_shutter = 0.5
+
+
+def hdri(arquivo, forca=1.0, rot=0.0):
+    w = bpy.data.worlds.new("MUNDO"); bpy.context.scene.world = w; w.use_nodes = True; nt = w.node_tree
+    env = nt.nodes.new("ShaderNodeTexEnvironment"); env.image = bpy.data.images.load(arquivo)
+    tc = nt.nodes.new("ShaderNodeTexCoord"); mp = nt.nodes.new("ShaderNodeMapping"); mp.inputs["Rotation"].default_value[2] = math.radians(rot)
+    nt.links.new(tc.outputs["Generated"], mp.inputs["Vector"]); nt.links.new(mp.outputs["Vector"], env.inputs["Vector"])
+    bg = nt.nodes["Background"]; nt.links.new(env.outputs["Color"], bg.inputs["Color"]); bg.inputs["Strength"].default_value = forca
+    return w
+
+
+def torno(nome, perfil, mat, eixo="Z", seg=96):
+    """Sólido de revolução (martelo, taça, troféu, ampulheta): perfil = [(raio, altura)] de baixo para cima."""
+    import bmesh
+    bm = bmesh.new(); aneis = []
+    for r, z in perfil:
+        anel = []
+        for i in range(seg):
+            a = 2 * math.pi * i / seg; x, y = r * math.cos(a), r * math.sin(a)
+            anel.append(bm.verts.new({"Z": (x, y, z), "X": (z, x, y), "Y": (x, z, y)}[eixo]))
+        aneis.append(anel)
+    for a, b in zip(aneis, aneis[1:]):
+        for i in range(seg):
+            bm.faces.new((a[i], a[(i + 1) % seg], b[(i + 1) % seg], b[i]))
+    bm.faces.new(list(reversed(aneis[0]))); bm.faces.new(aneis[-1])
+    me = bpy.data.meshes.new(nome); bm.normal_update(); bm.to_mesh(me); bm.free()
+    o = bpy.data.objects.new(nome, me); bpy.context.collection.objects.link(o)
+    for p in me.polygons: p.use_smooth = True
+    me.materials.append(mat); sd = o.modifiers.new("sub", "SUBSURF"); sd.levels = 1; sd.render_levels = 2
+    return o
+
+
+def deslocar_camera(cam, y_alvo_px, h=1920):
+    """Põe o centro do objeto em y_alvo_px sem mudar a perspectiva. NÃO mexer no sensor_fit (VERTICAL estreita o
+    campo e o objeto sai 1,5x maior e cortado)."""
+    cam.data.shift_y = (y_alvo_px - h / 2) / h

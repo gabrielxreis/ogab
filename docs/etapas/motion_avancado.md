@@ -40,3 +40,19 @@ se formando", "transformar uma forma em outra", "logo em 3D", "texto com volume/
 - **Metal que fica bonito:** `tres_pontos("metal")` já põe o softbox de cima e um rebatedor atrás da câmera; sem eles o
   ouro sai escuro/oliva (o metal reflete o ambiente). Ambiente (`base.mundo`) cinza neutro médio, não navy escuro.
 - Conferir 3 quadros por cima do fundo da marca antes de entregar. Diploma de 4 s: ~2 min de render.
+
+## 3D com qualidade de produto (regras do usuário, 12/10/2026, Bora Imigrar bi10)
+
+- **3D complementa, não substitui:** o vídeo continua sendo o motion 2D aprovado (cards, contadores, carimbos, chips);
+  o 3D entra em 2-3 momentos de impacto com um OBJETO REAL (martelo, green card, troféu, logo). Detalhe gráfico
+  (carimbo, etiqueta, texto pequeno) fica no 2D, que sai nítido; no 3D fica feio.
+- **Objeto real imita o real:** green card com a arte do cartão (fundo guilloche, faixa, foto, campos) numa textura,
+  com dados de EXEMPLO e marca "SPECIMEN" visível (nunca documento que passe por verdadeiro). Modelo pronto quando
+  existir (Poly Haven CC0: `python3 tresd/polyhaven.py buscar <palavra>`); senão modelar por revolução (`torno`) com
+  textura PBR do Poly Haven (`polyhaven.py textura`).
+- **Render:** `gpu_cycles()` + `hdri(<estúdio>.hdr)` (Poly Haven `brown_photostudio_02`) + 1-2 luzes de área médias;
+  EEVEE com luz forte deu "aberração de luz". 24 amostras + denoise + persistent data: ~5 s/quadro em 1080x1920 no
+  M1 Pro. Prévia antes: 3 quadros em 540x960 por cena (rápido) e só então o render final.
+- **Tela cheia, sempre:** 1080x1920 com alfa; `deslocar_camera(cam, y)` põe o objeto onde o layout pede (abaixo do
+  texto: y≈1180; CTA: 960). Nunca renderizar um quadrado e colar: a borda corta o objeto ("sai de um lugar quadrado").
+- Composição: ffmpeg overlay em 0:0 no tempo da cena (fade 0,25 s de alfa), ou a trilha MOTIONS no editor.
