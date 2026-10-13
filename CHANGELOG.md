@@ -11,6 +11,9 @@ Mais novo em cima. Cada versão é uma linha `## 2026.10.13-3 (13/10/2026)
 
 ## <versão> (<data>)` seguida dos itens.
 
+## 2026.10.13-6 (13/10/2026)
+- **Preset tela dividida:** Reels com o motion em cima e você embaixo, legenda em etiqueta branca na emenda e quebras em tela cheia a cada poucos segundos. O Gab enquadra seu rosto na metade de baixo sozinho. Peça "faz em tela dividida".
+
 ## 2026.10.13-5 (13/10/2026)
 - **Takes vão brutos para o DaVinci:** o Gab não corta nem renderiza mais nenhum take antes. O vídeo original entra inteiro e o corte é feito na timeline, então você pode puxar a borda do clipe e reajustar. Vídeo horizontal numa timeline vertical é enquadrado pelo zoom do próprio DaVinci.
 - **Edição mais rápida:** corte a cada 1,5 a 3 s, com a imagem acompanhando cada ideia da fala e o gancho sempre com o take mais forte.

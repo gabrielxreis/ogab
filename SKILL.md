@@ -105,6 +105,7 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 | frase de efeito, motivacional, comportamento, mentalidade, hábito, "enquanto todos... você..." | **vector motion** (`destaque` ou `bolhas`) | a ideia abstrata vira metáfora simples, um protagonista contra o resto |
 | rotina, plano, metas, produtividade, progresso, antes e depois | **vector motion** `grade` | caminho, calendário, cartões e o herói no fim |
 | transformação, escolha, identidade, nova fase | **vector motion** `objetos` | forma que vira outra, digital, aviões, porta |
+| talking head explicativo que cita app, site, número, marca, passo a passo (40-60 s), ou pedido de "tela dividida" | **tela dividida** | painel de motion em cima, apresentador embaixo, legenda-etiqueta na emenda ([guia](presets/tela-dividida/PRESET.md)) |
 | dado com fonte, notícia, número | motion normal do cliente (cards, contadores) | precisão primeiro; preset só se o usuário pedir |
 
 - Num mesmo vídeo dá para MISTURAR: ex. point cloud no gancho (o "?" ou o personagem histórico), vector motion nas frases de efeito e o motion da marca no dado e no CTA. Cada trecho segue a duração da fala.
