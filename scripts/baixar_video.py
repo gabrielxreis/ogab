@@ -455,7 +455,7 @@ def print_pagina(url, saida, largura=1440, altura=900, vertical=False):
     perfil = tempfile.mkdtemp(prefix="ogab_print_")
     try:
         subprocess.run([chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars", f"--user-data-dir={perfil}",
-                        f"--window-size={largura},{altura}", "--force-device-scale-factor=2",
+                        f"--window-size={largura},{altura}", "--force-device-scale-factor=2", "--run-all-compositor-stages-before-draw",
                         "--virtual-time-budget=8000", f"--screenshot={saida}", url],
                        capture_output=True, timeout=90)
     finally:

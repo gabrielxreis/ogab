@@ -110,6 +110,8 @@ npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/nu
   && ok "skills do HyperFrames instaladas" \
   || warn "não consegui instalar o HyperFrames agora; rode depois: npx skills add heygen-com/hyperframes -g -a claude-code -s '*' -y"
 npx --yes hyperframes doctor >/dev/null 2>&1 && ok "hyperframes doctor ok" || warn "rode 'npx hyperframes doctor' para ver o que falta no HyperFrames"
+python3 "$DEST/instagram/carrossel/carrossel.py" instalar >/dev/null 2>&1 && ok "carrossel do Instagram pronto (slides PNG/PDF)" \
+  || warn "rode depois: python3 $DEST/instagram/carrossel/carrossel.py instalar"
 
 info "5b/9 Skills de design, navegador e engenharia reversa (taste, web-design-guidelines, image-to-code, playwright-cli, REA, awesome-design-md)"
 npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y >/dev/null 2>&1 \

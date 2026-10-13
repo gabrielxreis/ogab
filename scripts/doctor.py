@@ -210,6 +210,13 @@ def extras():
         item("⟳", "extras", "skills do HyperFrames instaladas")
     else:
         item("!", "extras", "skills do HyperFrames: npx skills add heygen-com/hyperframes -g -a claude-code -s '*' -y")
+    car = os.path.join(RAIZ, "instagram", "carrossel")
+    if os.path.isdir(os.path.join(car, "template", "node_modules", "next")):
+        item("✓", "extras", "carrossel do Instagram (slides PNG/PDF)")
+    elif CORRIGIR and roda([sys.executable, os.path.join(car, "carrossel.py"), "instalar"]).returncode == 0:
+        item("⟳", "extras", "carrossel do Instagram instalado")
+    else:
+        item("!", "extras", "carrossel do Instagram: python3 instagram/carrossel/carrossel.py instalar")
     for nome, url in (("awesome-design-md", "https://github.com/voltagent/awesome-design-md.git"),
                       ("awesome-opus5-5-videos", "https://github.com/yihui-dev/awesome-opus5-5-videos.git")):
         d = os.path.join(HOME, ".claude", "referencias", nome)

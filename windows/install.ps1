@@ -143,6 +143,8 @@ function Npx($desc, $cmd) {
 }
 Npx "skills do HyperFrames instaladas" "npx --yes skills add heygen-com/hyperframes -g -a claude-code -s * -y"
 Npx "hyperframes doctor ok" "npx --yes hyperframes doctor"
+Py (Join-Path $DEST "instagram\carrossel\carrossel.py") instalar *> $null
+if ($LASTEXITCODE -eq 0) { Ok "carrossel do Instagram pronto (slides PNG/PDF)" } else { Warn "rode depois: py -3 $DEST\instagram\carrossel\carrossel.py instalar" }
 Npx "taste-skill (design-taste-frontend, image-to-code) instaladas" "npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y"
 Npx "web-design-guidelines instalada" "npx --yes skills add vercel-labs/agent-skills -g -a claude-code -s web-design-guidelines -y"
 if ((Tem playwright-cli) -or ((cmd /c "npm install -g @playwright/cli@latest >nul 2>&1"); $LASTEXITCODE -eq 0)) {
