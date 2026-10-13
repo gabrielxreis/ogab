@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Instalador do Gab (/ogab), o editor de vídeo com IA (macOS).
-# Uso:  curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/install.sh | bash
+# Uso:  curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh | bash
 # Pode rodar de novo quando quiser: só instala o que faltar e atualiza a skill.
 set -euo pipefail
 
-REPO="https://github.com/gabrielxreis/video-redes-skill"
+REPO="https://github.com/gabrielxreis/ogab"
 DEST="$HOME/.claude/skills/ogab"
 
 ok()   { printf "  \033[32m✓\033[0m %s\n" "$1"; }

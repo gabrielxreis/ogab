@@ -2,7 +2,7 @@
 
 [![/ogab](.github/banner.svg)](#readme)
 
-[![Último commit](https://img.shields.io/github/last-commit/gabrielxreis/video-redes-skill?color=brightgreen&label=atualizado&style=for-the-badge)](https://github.com/gabrielxreis/video-redes-skill/commits/main "Histórico")
+[![Último commit](https://img.shields.io/github/last-commit/gabrielxreis/ogab?color=brightgreen&label=atualizado&style=for-the-badge)](https://github.com/gabrielxreis/ogab/commits/main "Histórico")
 [![Claude Code](https://img.shields.io/badge/Claude_Code-skill-D97757.svg?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.com/claude-code "Claude Code")
 [![DaVinci Resolve Studio](https://img.shields.io/badge/DaVinci_Resolve-Studio_21.1+-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)](#requisitos "Requisitos")
 [![Premiere Pro](https://img.shields.io/badge/Premiere_Pro-2026+-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)](premiere/README.md "Premiere")
@@ -78,13 +78,13 @@ Guia completo: [`docs/BEM_VINDO.md`](docs/BEM_VINDO.md). O `SKILL.md` é só o m
 Cole no **Terminal** do Mac:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh | bash
 ```
 
 No **Windows**, no PowerShell (usuário normal):
 
 ```powershell
-irm https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/windows/install.ps1 | iex
+irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
 ```
 
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
@@ -112,7 +112,7 @@ Depois falta só o que depende de você: ligar o scripting no DaVinci, conectar 
    ```
 2. **Clonar na pasta de skills do Claude:**
    ```bash
-   git clone https://github.com/gabrielxreis/video-redes-skill ~/.claude/skills/ogab
+   git clone https://github.com/gabrielxreis/ogab ~/.claude/skills/ogab
    ```
 3. **Criar a sua configuração** (fica só na sua máquina):
    ```bash

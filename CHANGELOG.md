@@ -3,6 +3,9 @@
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
 Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos itens.
 
+## 2026.10.12-17 (12/10/2026)
+- **O repositório agora se chama `ogab`:** github.com/gabrielxreis/ogab. Quem já tem instalado não precisa fazer nada (o endereço antigo redireciona e o Gab continua se atualizando sozinho). O instalador de um comando já usa o endereço novo.
+
 ## 2026.10.12-16 (12/10/2026)
 - **Takes do Magnific baixam pelo MCP:** o Gab acha cada vídeo no seu histórico pelo prompt e baixa direto, sem abrir o navegador (muito mais rápido). Ele também confere se o vídeo saiu da imagem certa quando um plano foi refeito.
 

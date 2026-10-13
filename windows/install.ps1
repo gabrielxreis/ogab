@@ -1,11 +1,11 @@
 # Instalador do Gab (/ogab), o editor de video com IA (Windows 10/11).
 # Uso (PowerShell, usuario normal):
-#   irm https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/windows/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
 # Pode rodar de novo quando quiser: so instala o que faltar e atualiza a skill.
 # A versao Mac (install.sh) nao e tocada; tudo do Windows fica em windows/.
 
 $ErrorActionPreference = "Continue"   # Stop + stderr de programa externo derruba o PowerShell 5.1
-$REPO = "https://github.com/gabrielxreis/video-redes-skill"
+$REPO = "https://github.com/gabrielxreis/ogab"
 $DEST = Join-Path $HOME ".claude\skills\ogab"
 
 function Ok($m)   { Write-Host "  [ok] $m" -ForegroundColor Green }

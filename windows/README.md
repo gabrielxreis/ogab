@@ -7,7 +7,7 @@ Esta pasta é a camada Windows da skill. **Nenhum arquivo da versão Mac foi alt
 No PowerShell (usuário normal, não precisa ser administrador):
 
 ```powershell
-irm https://raw.githubusercontent.com/gabrielxreis/video-redes-skill/main/windows/install.ps1 | iex
+irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
 ```
 
 Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Git), Pillow, as skills do HyperFrames e de design, as fontes, e confere o DaVinci Resolve Studio. Pode rodar de novo quando quiser.
