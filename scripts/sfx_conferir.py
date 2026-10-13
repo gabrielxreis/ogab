@@ -17,7 +17,8 @@ ROTULOS = ["air whoosh swoosh", "glitch digital distortion", "keyboard typing", 
            "birds chirping outdoors", "crowd of people chatting", "quiet room tone", "city street traffic ambience",
            "old tv turning on static", "fabric bag rustling", "book pages flipping", "stick swinging", "stamp thud hit",
            "tires squealing on asphalt", "car skidding on gravel and dirt", "car engine revving", "footsteps on gravel",
-           "footsteps on wood floor", "splashing water", "wind blowing"]
+           "footsteps on wood floor", "splashing water", "wind blowing",
+           "airplane flying overhead", "jet engine roar"]
 
 
 def _pcm(f, ini=None, fim=None, sr=48000):

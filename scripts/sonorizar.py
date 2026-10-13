@@ -21,6 +21,7 @@ plano.json (o Gab escreve; tempos em segundos do vídeo):
    "superficie": "terra", "proibidos": ["..."]}
   superficie (asfalto, terra, areia, grama, agua, madeira, neve): o chão da cena; com ela (ou proibidos) o mixar roda
   `conferir` antes e PARA se algum som for do chão errado (ex.: pneu cantando no asfalto numa estrada de terra).
+  Sempre proibido (salvo "permitidos": [...]): avião e jato, que o vento grave imita. O mixar sempre confere.
   camera_lenta: o mundo ABAFA na janela (grave + reverb, entra em `entrada` s e volta SECO em `saida` s, no impacto).
   Evento com "velocidade": 0.4 = som lento e grave (motor/impacto em câmera lenta); "reverso": true = som ao contrário
   que CRESCE e termina em t (sucção antes do impacto); "livre": true = não abafa na câmera lenta (o som do slow-mo);
@@ -272,10 +273,16 @@ def _abafar(arq, lentas):
 
 def mixar(plano_arq, com_voz=True):
     plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq))
-    if plano.get("superficie") or plano.get("proibidos"):   # trava: som do chão errado não entra
+    try:                       # trava: som do chão errado ou de algo que não está na cena (avião, jato) não entra
+        import transformers  # noqa: F401
+        tem_clap = True
+    except ImportError:
+        tem_clap = False
+        print("aviso: sem transformers (CLAP), a conferência de coerência não rodou: pip install --user transformers")
+    if tem_clap and not plano.get("sem_conferir"):
         ruins = [r for r in conferir(plano_arq) if r[3]]
         if ruins:
-            raise SystemExit("PAROU: som que não combina com a cena (superfície " + str(plano.get("superficie")) + "):\n" +
+            raise SystemExit("PAROU: som que não combina com a cena (superfície " + str(plano.get("superficie")) + "; avião/jato só com 'permitidos'):\n" +
                              "\n".join(f"  {n} ({a}): {p}" for n, a, _, p in ruins) + "\nTrocar o som (sfx_conferir/conferir) e rodar de novo.")
     video = _caminho(base, plano["video"]); out = _caminho(base, plano.get("saida", "sonorizacao")); os.makedirs(out, exist_ok=True)
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video], capture_output=True, text=True).stdout)
@@ -370,12 +377,16 @@ SUPERFICIE = {  # o que NÃO pode tocar em cada chão (rótulos do CLAP em sfx_c
 }
 
 
+FORA_DE_CENA = ["airplane flying overhead", "jet engine roar"]   # proibidos por padrão: só com "permitidos" no plano
+
+
 def conferir(plano_arq, limite=0.38):
     """Classifica cada som do plano com o CLAP (scripts/sfx_conferir.py) e devolve [(nota, arquivo, top3, problema)].
     Problema = rótulo proibido (pela superfície ou pela lista do plano) em 1º lugar ou acima de `limite`."""
     import sfx_conferir as C
     plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq))
-    proib = set(plano.get("proibidos", [])) | set(SUPERFICIE.get(plano.get("superficie", ""), []))
+    proib = (set(plano.get("proibidos", [])) | set(SUPERFICIE.get(plano.get("superficie", ""), [])) |
+             set(FORA_DE_CENA)) - set(plano.get("permitidos", []))
     faltam = proib - set(C.ROTULOS)
     if faltam:
         C.ROTULOS += sorted(faltam)

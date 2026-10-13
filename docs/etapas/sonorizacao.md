@@ -24,6 +24,11 @@ pelo OpenCV, o som vem do Artlist (`search_sfx`, assinatura) e das bibliotecas l
 - Pôr `"superficie": "<chão>"` no plano: o `mixar` roda `sonorizar.py conferir` (CLAP) antes e PARA se algum som for do
   chão errado (barra pneu no asfalto na terra, passo em madeira na grama...). `"proibidos": [...]` acrescenta rótulos.
   Gravação de "carro passando" traz pneu no asfalto junto: para motor puro, usar trecho só de motor (`de_arquivo`).
+- **Nada que não está na cena** (regra do usuário, 12/10/2026: "só tem um som de avião no fundo sem necessidade"): vento
+  grave imita turbina (o "Desolate Desert: Harsh Wind" deu "jet engine roar" em 1º). Avião e jato são proibidos por
+  padrão no `conferir`/`mixar` (liberar com `"permitidos": [...]` só se aparece avião). Ambiente bom = o lugar em 1º
+  lugar no CLAP ("wind blowing", "birds"...), sem fonte estranha no top 3; vento de campo/deserto que passou: Felix Blume
+  "Road Trip: Desert Strong Wind" (wind in a tree, Mojave).
 - `sonorizar.py conferir <plano>` sempre antes de mostrar: a coluna do meio é o que o som É; tem que bater com a nota.
 
 ## 2. Lista de som em 3 camadas (antes de buscar qualquer arquivo)
