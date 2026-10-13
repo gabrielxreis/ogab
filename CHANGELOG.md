@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-8
+- Efeitos sonoros caem no tempo do movimento: o plano agora é escrito pelo instante do evento e o Gab corta o silêncio do começo de cada som (`plano_sfx_eventos.py`). Nada para você fazer.
+
 
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
 Mais novo em cima. Cada versão é uma linha `## 2026.10.13-8 (13/10/2026)

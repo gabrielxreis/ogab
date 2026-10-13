@@ -56,7 +56,7 @@ Não basta som nos momentos principais: toda entrada, saída, batida, check, bri
 2. Medir cada som (ffmpeg -> envelope): `onset50` (primeiro ponto a 50% do máximo) e pico. Início na timeline = tempo do evento - onset (impacto de logo tem build-up antes do golpe).
 3. Normalizar todos a -1 dBFS antes; volume no clipe: -12 (impacto/boom/logo), -14 a -16 (whoosh/swell), -16 a -20 (UI, HUD, brilho). Fade out no clipe.
 4. Uma trilha livre por som: A3 "SFX", A4..A6 "SFX 2..4"; escolher a primeira trilha cujo último clipe termina antes (AppendToTimeline em cima de outro clipe corta/empurra).
-5. Gravar o plano em `<vídeo>/sfx/plano_sfx.txt`.
+5. Gravar o plano em `<vídeo>/sfx/plano_sfx.txt` SEMPRE pelo instante do evento: `scripts/plano_sfx_eventos.py <pasta_sfx> eventos.txt` (o ataque ou o pico cai no quadro do movimento; o script corta o respiro do começo do arquivo). Nunca escrever o início do arquivo à mão: porta, splash, riser e camas com silêncio no começo caem segundos atrasados (13/10/2026). Conferir com `sfx_conferir.py sincronia`.
 6. Download: o Chrome às vezes não entrega SFX do Artlist ("direct download" sem arquivo). Plano B: o `playableUrl` do `search_sfx` é o clipe inteiro (AAC): curl + ffmpeg para WAV 48 kHz. Avisar o usuário e trocar pelo WAV quando liberar.
 `sfx_auto.py` é só o básico (whoosh/pop genéricos): não basta para motion; usar este desenho.
 
