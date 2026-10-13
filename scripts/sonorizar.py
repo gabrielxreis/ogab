@@ -15,7 +15,11 @@ plano.json (o Gab escreve; tempos em segundos do vídeo):
   {"video": "cena.mp4", "saida": "sonorizacao", "voz": true,
    "ambiente": [{"arquivo": "parque.wav", "de": 0, "ate": 12, "db": -24, "fade": 1.0, "pan": 0}],
    "eventos":  [{"t": 3.2, "arquivo": "passo.wav", "db": -14, "pan": -0.4, "dur": 0.8, "alinhar": "onset", "nota": "pé esq."}],
-   "musica":   {"arquivo": "trilha.wav", "db": -18, "de": 0, "inicio_arquivo": 0, "duck": true}}
+   "musica":   {"arquivo": "trilha.wav", "db": -18, "de": 0, "inicio_arquivo": 0, "duck": true},
+   "camera_lenta": [{"de": 3.55, "ate": 5.85, "entrada": 0.3, "saida": 0.05}]}
+  camera_lenta: o mundo ABAFA na janela (grave + reverb, entra em `entrada` s e volta SECO em `saida` s, no impacto).
+  Evento com "velocidade": 0.4 = som lento e grave (motor/impacto em câmera lenta); "reverso": true = som ao contrário
+  que CRESCE e termina em t (sucção antes do impacto); "livre": true = não abafa na câmera lenta (o som do slow-mo).
   alinhar: "onset" (padrão: o ATAQUE do som cai em t), "pico" (o pico cai em t; impacto com subida) ou "inicio".
   dur = quanto o som continua DEPOIS de t (a subida antes de t entra sozinha); sem dur, até o fim do arquivo.
   Camadas de um som importante = vários eventos no MESMO t (ataque, corpo, cauda) com db e dur diferentes.
@@ -63,13 +67,31 @@ def medir(arq):
     return m
 
 
+def preparar(arq, ev):
+    """Som com velocidade (asetrate: mais lento = mais grave) e/ou reverso vira um WAV processado (cache ao lado)."""
+    v = float(ev.get("velocidade") or 1.0); rev = bool(ev.get("reverso"))
+    if v == 1.0 and not rev:
+        return arq
+    pasta = os.path.join(os.path.dirname(os.path.abspath(arq)), "_processados"); os.makedirs(pasta, exist_ok=True)
+    nome = os.path.splitext(os.path.basename(arq))[0] + (f"_v{int(v * 100)}" if v != 1.0 else "") + ("_rev" if rev else "") + ".wav"
+    dst = os.path.join(pasta, nome)
+    if not os.path.exists(dst):
+        f = (f"asetrate={int(SR * v)},aresample={SR}" if v != 1.0 else "anull") + (",areverse" if rev else "")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", arq, "-ar", str(SR), "-af", f, "-c:a", "pcm_s24le", dst], check=True)
+    return dst
+
+
+def _alinhar_padrao(ev):
+    return ev.get("alinhar") or ("pico" if ev.get("reverso") else "onset")
+
+
 # ------------------------------------------------------------------ analisar vídeo
 def analisar(video, pasta=None):
     import cv2, numpy as np
     video = os.path.abspath(video); pasta = os.path.abspath(pasta or os.path.splitext(video)[0] + "_som")
     os.makedirs(pasta, exist_ok=True)
     cap = cv2.VideoCapture(video); fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
-    W = 160; ant = None; hant = None; en, cx, cortes, quadros = [], [], [], []
+    W = 160; ant = None; hant = None; en, cx, cortes, quadros, fluxo = [], [], [], [], []
     i = 0
     while True:
         ok, q = cap.read()
@@ -85,6 +107,9 @@ def analisar(video, pasta=None):
                 cortes.append(round(i / fps, 3)); en.append(0.0); cx.append(0.0)
             else:
                 d = cv2.absdiff(g, ant); m = d > 14; e = float(m.mean()); en.append(e)
+                if i % 2 == 0:   # velocidade real do movimento (px/quadro): cai muito na câmera lenta
+                    fl = cv2.calcOpticalFlowFarneback(ant, g, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+                    fluxo.append((i, float(np.percentile(np.linalg.norm(fl, axis=2), 95))))
                 if m.any():
                     xs = np.nonzero(m)[1]; cx.append(float(xs.mean() / m.shape[1] * 2 - 1))
                 else:
@@ -119,20 +144,42 @@ def analisar(video, pasta=None):
     for x in final:
         x["forca"] = round(x["forca"] / mxf, 2); x["pan"] = round(max(-1, min(1, x["pan"])) * 0.8, 2)
     dur = t(n)
+    lentas = _camera_lenta(fluxo, fps, cortes)
     cenas = [{"de": a, "ate": b} for a, b in zip([0.0] + cortes, cortes + [dur])]
     audio = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=codec_name", "-of", "csv=p=0", video],
                            capture_output=True, text=True).stdout.strip()
     res = {"video": video, "fps": round(fps, 3), "dur": dur, "tem_audio": bool(audio), "cortes": cortes, "cenas": cenas, "eventos": final,
+           "camera_lenta": lentas,
            "energia": [round(float(v), 4) for v in e[::max(1, int(fps / 10))]]}
     json.dump(res, open(os.path.join(pasta, "analise.json"), "w"), indent=1, ensure_ascii=False)
     _folha(video, res, os.path.join(pasta, "folha.png"))
     return res, pasta
 
 
+def _camera_lenta(fluxo, fps, cortes, minimo=0.7):
+    """Janela de câmera lenta provável: logo depois de um movimento forte, a velocidade cai para < 30% por >= `minimo` s
+    sem corte de cena, e volta forte no fim (ex.: carro salta, flutua lento, aterrissa). O Gab confirma na folha."""
+    if len(fluxo) < 6:
+        return []
+    ks = [k for k, _ in fluxo]; vs = [v for _, v in fluxo]; jan = int(fps * 0.6) // 2 or 1; res = []; j = 0
+    while j < len(vs):
+        antes = max(vs[max(0, j - jan):j] or [0])
+        if antes > 3.0 and vs[j] < antes * 0.3:
+            k = j
+            while k < len(vs) and vs[k] < antes * 0.3:
+                k += 1
+            depois = max(vs[k:k + jan] or [0]); de, ate = ks[j] / fps, ks[min(k, len(ks) - 1)] / fps
+            if ate - de >= minimo and depois > antes * 0.5 and not any(de < c < ate for c in cortes):
+                res.append({"de": round(de, 2), "ate": round(ate, 2), "antes": round(antes, 1), "durante": round(max(vs[j:k]), 1), "depois": round(depois, 1)})
+            j = k
+        j += 1
+    return res
+
+
 def _folha(video, res, saida, colunas=4, larg=270):
     """Folha de quadros: início de cada cena + cada evento, com tempo/tipo/pan escritos (para o Gab olhar)."""
     import cv2, numpy as np
-    alvos = [(c["de"] + 0.05, "cena") for c in res["cenas"]] + [(x["t"], f'{x["tipo"]} {x["forca"]:.1f} pan {x["pan"]:+.1f}') for x in res["eventos"]]
+    alvos = [(c["de"] + 0.05, "cena") for c in res["cenas"]] + [((l["de"] + l["ate"]) / 2, "CAMERA LENTA?") for l in res.get("camera_lenta", [])] + [(x["t"], f'{x["tipo"]} {x["forca"]:.1f} pan {x["pan"]:+.1f}') for x in res["eventos"]]
     alvos = sorted(alvos)[:32]
     cap = cv2.VideoCapture(video); tiles = []
     for tt, rot in alvos:
@@ -169,7 +216,7 @@ def _caminho(base, arq):
 def _segmento(ev, med, dur_video=1e9):
     """(início na timeline, ponto de entrada no arquivo, duração). O ataque/pico do som cai em t; `dur` = quanto o som
     continua DEPOIS de t (sem dur: até o fim do arquivo)."""
-    al = ev.get("alinhar", "onset"); hit = med["onset"] if al == "onset" else med["pico"] if al == "pico" else 0.0
+    al = _alinhar_padrao(ev); hit = med["onset"] if al == "onset" else med["pico"] if al == "pico" else 0.0
     t = float(ev["t"]); ini = t - hit; corte = max(0.0, -ini); ini = max(0.0, ini)
     fim_arq = med["dur"] - corte
     d = min((t - ini) + float(ev["dur"]), fim_arq) if ev.get("dur") else fim_arq
@@ -197,23 +244,54 @@ def _render(entradas, cadeias, rotulos, saida, dur):
     os.remove(fcf)
 
 
+def _abafar(arq, lentas):
+    """Câmera lenta: troca suave do som normal pelo som abafado (grave + reverb) dentro de cada janela e volta SECO no fim
+    (o impacto que encerra o slow-mo soa cheio). Edita o stem no lugar."""
+    if not lentas:
+        return
+    ks = []
+    for l in lentas:
+        de, ate = float(l["de"]), float(l["ate"]); ent, sai = float(l.get("entrada", 0.3)), float(l.get("saida", 0.05))
+        ks.append(f"max(0,min(1,(t-{de})/{ent}))*max(0,min(1,({ate}-t)/{sai}))")
+    k = "min(1," + "+".join(ks) + ")"
+    fc = (f"[0:a]asplit=2[s][m];[s]volume='1-{k}':eval=frame[seco];"
+          f"[m]lowpass=f=420,lowpass=f=420,aecho=0.8:0.55:110|230:0.4|0.25,volume='{k}*1.15':eval=frame[abaf];"
+          f"[seco][abaf]amix=inputs=2:normalize=0[o]")
+    tmp = arq + ".tmp.wav"
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", arq, "-filter_complex", fc, "-map", "[o]", "-c:a", "pcm_s24le", tmp], check=True)
+    os.replace(tmp, arq)
+
+
 def mixar(plano_arq, com_voz=True):
     plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq))
     video = _caminho(base, plano["video"]); out = _caminho(base, plano.get("saida", "sonorizacao")); os.makedirs(out, exist_ok=True)
     dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video], capture_output=True, text=True).stdout)
     fmt = f"aformat=sample_rates={SR}:channel_layouts=stereo"
-    # --- SFX / foley (camadas = vários eventos no mesmo t)
-    ent, cad, rot = [], [], []
-    for i, ev in enumerate(plano.get("eventos", [])):
-        arq = _caminho(base, ev["arquivo"]); ini, corte, d = _segmento(ev, medir(arq), dur)
-        if d <= 0.02:
-            continue
-        gl, gr = _ganhos_pan(ev.get("pan")); f = min(float(ev.get("fade", 0.12)), d / 2); ms = int(ini * 1000)
-        ent.append(["-i", arq])
-        cad.append(f"[{len(ent)-1}:a]{fmt},atrim={corte}:{corte + d},asetpts=PTS-STARTPTS,afade=t=out:st={d - f}:d={f},"
-                   f"volume={ev.get('db', -14)}dB,pan=stereo|c0={gl}*c0|c1={gr}*c1,adelay={ms}|{ms}[e{i}]")
-        rot.append(f"e{i}")
-    _render(ent, cad, rot, os.path.join(out, "sfx.wav"), dur)
+    lentas = plano.get("camera_lenta") or []
+    # --- SFX / foley (camadas = vários eventos no mesmo t); "livre" = som do slow-mo, não abafa
+    def eventos(livres):
+        ent, cad, rot = [], [], []
+        for i, ev in enumerate(plano.get("eventos", [])):
+            if bool(ev.get("livre")) != livres:
+                continue
+            arq = preparar(_caminho(base, ev["arquivo"]), ev); ini, corte, d = _segmento(ev, medir(arq), dur)
+            if d <= 0.02:
+                continue
+            gl, gr = _ganhos_pan(ev.get("pan")); f = min(float(ev.get("fade", 0.12)), d / 2); ms = int(ini * 1000)
+            fi = min(float(ev.get("fade_in", 0)), d / 2)
+            ent.append(["-i", arq])
+            cad.append(f"[{len(ent)-1}:a]{fmt},atrim={corte}:{corte + d},asetpts=PTS-STARTPTS," + (f"afade=t=in:d={fi}," if fi else "") +
+                       f"afade=t=out:st={d - f}:d={f},volume={ev.get('db', -14)}dB,pan=stereo|c0={gl}*c0|c1={gr}*c1,adelay={ms}|{ms}[e{i}]")
+            rot.append(f"e{i}")
+        return ent, cad, rot
+    sfx = os.path.join(out, "sfx.wav")
+    _render(*eventos(False), sfx, dur)
+    _abafar(sfx, lentas)
+    livres = [e for e in plano.get("eventos", []) if e.get("livre")]
+    if livres:
+        sl = os.path.join(out, "_sfx_livre.wav"); _render(*eventos(True), sl, dur); tmp = sfx + ".tmp.wav"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", sfx, "-i", sl, "-filter_complex", "amix=inputs=2:normalize=0", "-c:a", "pcm_s24le", tmp], check=True)
+        os.replace(tmp, sfx); os.remove(sl)
     # --- ambiente (loop, fade nas pontas)
     ent, cad, rot = [], [], []
     for i, a in enumerate(plano.get("ambiente", [])):
@@ -224,6 +302,7 @@ def mixar(plano_arq, com_voz=True):
                    f"volume={a.get('db', -24)}dB,pan=stereo|c0={gl}*c0|c1={gr}*c1,adelay={ms}|{ms}[a{i}]")
         rot.append(f"a{i}")
     _render(ent, cad, rot, os.path.join(out, "ambiente.wav"), dur)
+    _abafar(os.path.join(out, "ambiente.wav"), lentas)
     # --- música
     mus = plano.get("musica"); mus_arq = os.path.join(out, "musica.wav")
     if mus:
@@ -231,6 +310,7 @@ def mixar(plano_arq, com_voz=True):
         _render([["-ss", str(mus.get("inicio_arquivo", 0)), "-i", _caminho(base, mus["arquivo"])]],
                 [f"[0:a]{fmt},atrim=0:{d},asetpts=PTS-STARTPTS,afade=t=in:d=0.5,afade=t=out:st={max(0, d - 1.5)}:d=1.5,volume={mus.get('db', -18)}dB,adelay={ms}|{ms}[m]"],
                 ["m"], mus_arq, dur)
+        _abafar(mus_arq, lentas)
     # --- voz (áudio do próprio vídeo) e ducking de ambiente + música sob a voz
     tem_voz = com_voz and plano.get("voz", True) and bool(subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", video], capture_output=True, text=True).stdout.strip())
@@ -282,7 +362,7 @@ def davinci(plano_arq, pasta_sfx):
         de, ate = float(a.get("de", 0)), float(a["ate"]); nome = wav(_caminho(base, a["arquivo"]))
         linhas.append((de, f"{de:.2f}s A3 {nome} {int(a.get('db', -24))}dB {ate - de:.1f}s: ambiente"))
     for ev in plano.get("eventos", []):
-        arq = _caminho(base, ev["arquivo"]); ini, corte, d = _segmento(ev, medir(arq)); nome = wav(arq, corte)
+        arq = preparar(_caminho(base, ev["arquivo"]), ev); ini, corte, d = _segmento(ev, medir(arq)); nome = wav(arq, corte)
         linhas.append((ini, f"{ini:.2f}s A3 {nome} {int(ev.get('db', -14))}dB {d:.1f}s: {ev.get('nota', '')} (pan {ev.get('pan', 0)})"))
     open(os.path.join(pasta_sfx, "plano_sfx.txt"), "w").write("\n".join(l for _, l in sorted(linhas)) + "\n")
     return os.path.join(pasta_sfx, "plano_sfx.txt"), len(linhas)
@@ -295,6 +375,8 @@ if __name__ == "__main__":
     if a[0] == "analisar" and len(a) >= 2:
         res, pasta = analisar(a[1], a[a.index("--pasta") + 1] if "--pasta" in a else None)
         print(f"{len(res['eventos'])} eventos, {len(res['cenas'])} cena(s), {res['dur']} s, áudio no vídeo: {res['tem_audio']}")
+        for l in res["camera_lenta"]:
+            print(f"  CÂMERA LENTA provável {l['de']:.2f}-{l['ate']:.2f}s (movimento {l['antes']} -> {l['durante']} -> {l['depois']}): usar camera_lenta no plano")
         for x in res["eventos"]:
             print(f"  {x['t']:6.2f}s  {x['tipo']:8s} força {x['forca']:.2f}  pan {x['pan']:+.2f}")
         print("folha:", os.path.join(pasta, "folha.png"))

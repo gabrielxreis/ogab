@@ -28,6 +28,16 @@ silêncio absoluto: sem ambiente, a cena soa falsa (meta de `sfx_conferir.py den
 ataque (o golpe seco, curto, ex. stone_hit) + corpo (o material/peso, ex. thud grave, motor) + cauda (o ar, o lugar,
 o que sobra: cascalho, poeira, reverb). Cada parte é um evento do plano com db e dur próprios.
 
+## 2b. Câmera lenta (regra do usuário, 12/10/2026: "quando o carro pula fica em slow e o áudio não passa essa sensação")
+O `analisar` avisa "CÂMERA LENTA provável de-até" (o movimento na imagem cai para < 30% logo depois de um movimento forte
+e volta forte no fim) e marca na folha. Confirmar olhando e montar o slow-mo assim:
+- `"camera_lenta": [{"de", "ate", "entrada": 0.25, "saida": 0.04}]` no plano: ambiente, música e SFX normais ABAFAM
+  (grave + reverb, como debaixo d'água) e voltam SECOS de uma vez no impacto que encerra o slow-mo.
+- Sons do slow-mo com `"livre": true` (não abafam): boom grave de entrada (impacto com `"velocidade": 0.3`), o som do
+  objeto lento e grave (motor com `"velocidade": 0.45`), um batimento, e uma **sucção reversa** (`"reverso": true`) que
+  cresce e termina exatamente no impacto. O impacto real (fora da janela) vem cheio, em 3 partes.
+- Velocidade real logo antes (decolagem): som normal e curto, cortado na entrada do slow-mo.
+
 ## 3. Achar os sons
 - Artlist `search_sfx` em inglês, pelo OBJETO + ação + perspectiva ("porsche engine idle exterior", "car tires skid stop
   on dirt"). Baixar pelo `playableUrl` (curl + `ffmpeg -ar 48000 x.wav`). Bibliotecas locais: `~/Desktop/<Empresa>/_sfx_artlist/`
