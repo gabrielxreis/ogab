@@ -188,8 +188,13 @@ GAB.texto = function (comp, e) {
   }
   var tr = l.property("ADBE Transform Group");
   // âncora no centro do texto (continua certa se o usuário trocar o texto no AE)
-  tr.property("ADBE Anchor Point").expression = "var r = sourceRectAtTime(time, false); [r.left + r.width/2, r.top + r.height/2]";
-  if (e.alinhar === "esquerda") tr.property("ADBE Anchor Point").expression = "var r = sourceRectAtTime(time, false); [r.left, r.top + r.height/2]";
+  // Âncora como o navegador: centro da LINHA da fonte (não do desenho das letras), para "g", "p", acentos não
+  // deslocarem o texto. k = (ascendente - descendente) / 2 da fonte, em ems; à esquerda a âncora é a origem do texto.
+  var k = { Inter: 0.3635, Cardo: 0.333, Poppins: 0.35, PlayfairDisplay: 0.4155, Lobster: 0.36 }[String(td.font).split("-")[0]] || 0.36;
+  var ky = "-text.sourceText.style.fontSize * " + k;
+  tr.property("ADBE Anchor Point").expression = "var r = sourceRectAtTime(time, false); [r.left + r.width/2, " + ky + "]";
+  if (e.alinhar === "esquerda") tr.property("ADBE Anchor Point").expression = "[0, " + ky + "]";
+  if (e.alinhar === "direita") tr.property("ADBE Anchor Point").expression = "var r = sourceRectAtTime(time, false); [r.left + r.width, " + ky + "]";
   tr.property("ADBE Position").setValue([e.x, e.y]);
   return l;
 };
@@ -520,7 +525,7 @@ GAB.fundoRico = function (comp, e) {
   if (e.vinheta !== false) {
     var vi = comp.layers.addSolid([0, 0, 0], "BG vinheta", W, H, 1, comp.duration);
     var m = vi.property("ADBE Mask Parade").addProperty("ADBE Mask Atom");
-    var sh = new Shape(), rx = 700, ry = 700, k = 0.5523, cx = W / 2, cy = H / 2;
+    var sh = new Shape(), rx = 975, ry = 975, k = 0.5523, cx = W / 2, cy = H / 2;
     sh.vertices = [[cx, cy - ry], [cx + rx, cy], [cx, cy + ry], [cx - rx, cy]];
     sh.inTangents = [[-rx * k, 0], [0, -ry * k], [rx * k, 0], [0, ry * k]];
     sh.outTangents = [[rx * k, 0], [0, ry * k], [-rx * k, 0], [0, -ry * k]];
@@ -663,4 +668,113 @@ GAB.criar = function (comp, e) {
     }
   }
   return ls;
+};
+
+// ------------------------------------------------------------------ acabamento fino (2ª passada, 12/10/2026)
+// Máscara de retângulo arredondado (para sólidos com degradê: vidro, círculo do check).
+GAB.mascaraArredondada = function (layer, w, h, r) {
+  var k = 0.5523 * r, x0 = 0, y0 = 0, x1 = w, y1 = h, sh = new Shape();
+  sh.vertices = [[x0 + r, y0], [x1 - r, y0], [x1, y0 + r], [x1, y1 - r], [x1 - r, y1], [x0 + r, y1], [x0, y1 - r], [x0, y0 + r]];
+  sh.inTangents = [[-k, 0], [0, 0], [0, -k], [0, 0], [k, 0], [0, 0], [0, k], [0, 0]];
+  sh.outTangents = [[0, 0], [k, 0], [0, 0], [0, k], [0, 0], [-k, 0], [0, 0], [0, -k]];
+  sh.closed = true;
+  layer.property("ADBE Mask Parade").addProperty("ADBE Mask Atom");
+  layer.property("ADBE Mask Parade").property(1).property("ADBE Mask Shape").setValue(sh);
+};
+
+// Sólido com degradê linear (cores em hex ou expressão) e máscara arredondada.
+GAB.solidoDegrade = function (comp, nome, w, h, r, x, y, c0, c1, p0, p1, expr0, expr1) {
+  var l = comp.layers.addSolid([0, 0, 0], nome, Math.round(w), Math.round(h), 1, comp.duration);
+  GAB.mascaraArredondada(l, w, h, r);
+  l.property("ADBE Effect Parade").addProperty("ADBE Ramp");
+  var rp = l.property("ADBE Effect Parade").property(1);
+  rp.property("ADBE Ramp-0001").setValue(p0); rp.property("ADBE Ramp-0003").setValue(p1);
+  try { rp.property("ADBE Ramp-0005").setValue(1); } catch (x0) {}
+  if (expr0) rp.property("ADBE Ramp-0002").expression = expr0; else rp.property("ADBE Ramp-0002").setValue(GAB.rgb(c0));
+  if (expr1) rp.property("ADBE Ramp-0004").expression = expr1; else rp.property("ADBE Ramp-0004").setValue(GAB.rgb(c1));
+  l.property("ADBE Transform Group").property("ADBE Position").setValue([x, y]);
+  return l;
+};
+
+// Vidro do HyperFrames: linear-gradient(160deg, rgba(18,48,90,.92), rgba(11,31,58,.94)) + borda rgba(201,166,87,.45)
+// + sombra 0 30px 70px rgba(0,0,0,.55). Preenchimento = sólido com degradê; borda = forma só com traço por cima.
+GAB.cartao = function (comp, e) {
+  var w = e.w, h = e.h, r = e.raio === undefined ? 26 : e.raio, nome = e.nome || "CARTAO";
+  var dx = Math.tan(20 * Math.PI / 180) * h / 2;   // 160deg = quase vertical, puxado 20° para a direita
+  var fill = GAB.solidoDegrade(comp, nome + " vidro", w, h, r, e.x, e.y, e.cor_topo || "#12305A", e.cor_base || "#0B1F3A",
+                               [w / 2 - dx, 0], [w / 2 + dx, h]);
+  fill.property("ADBE Transform Group").property("ADBE Opacity").setValue(e.opacidade_fill === undefined ? 93 : e.opacidade_fill);
+  var ds = fill.property("ADBE Effect Parade").addProperty("ADBE Drop Shadow");
+  ds = fill.property("ADBE Effect Parade").property(2);
+  ds.property("ADBE Drop Shadow-0002").setValue(140); ds.property("ADBE Drop Shadow-0003").setValue(180);
+  ds.property("ADBE Drop Shadow-0004").setValue(30); ds.property("ADBE Drop Shadow-0005").setValue(70);
+  var borda = comp.layers.addShape(); borda.name = nome + " borda";
+  borda.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Borda";
+  var v = borda.property("ADBE Root Vectors Group").property("Borda").property("ADBE Vectors Group");
+  var rr = v.addProperty("ADBE Vector Shape - Rect");
+  rr.property("ADBE Vector Rect Size").setValue([w - 1.5, h - 1.5]); rr.property("ADBE Vector Rect Roundness").setValue(r);
+  var s = borda.property("ADBE Root Vectors Group").property("Borda").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Stroke");
+  GAB.corDe(s.property("ADBE Vector Stroke Color"), e.borda || "destaque");
+  s.property("ADBE Vector Stroke Width").setValue(e.borda_largura || 1.5);
+  s.property("ADBE Vector Stroke Opacity").setValue(e.borda_opacidade === undefined ? 45 : e.borda_opacidade);
+  // filete de luz no topo (inset 0 1px rgba(255,255,255,.08))
+  borda.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Luz";
+  var vl = borda.property("ADBE Root Vectors Group").property("Luz").property("ADBE Vectors Group");
+  vl.addProperty("ADBE Vector Shape - Rect").property("ADBE Vector Rect Size").setValue([w - 2 * r, 1]);
+  var fl = borda.property("ADBE Root Vectors Group").property("Luz").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+  fl.property("ADBE Vector Fill Color").setValue([1, 1, 1]); fl.property("ADBE Vector Fill Opacity").setValue(8);
+  borda.property("ADBE Root Vectors Group").property("Luz").property("ADBE Vector Transform Group").property("ADBE Vector Position").setValue([0, -h / 2 + 2]);
+  borda.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
+  var out = [fill, borda];
+  if (e.brilho) {
+    var matte = fill.duplicate(); matte.name = nome + " (máscara do brilho)";
+    try { matte.property("ADBE Effect Parade").property(2).remove(); } catch (x2) {}
+    matte.enabled = false;
+    var sh = comp.layers.addShape(); sh.name = nome + " brilho";
+    sh.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Faixa";
+    var vf = sh.property("ADBE Root Vectors Group").property("Faixa").property("ADBE Vectors Group");
+    vf.addProperty("ADBE Vector Shape - Rect").property("ADBE Vector Rect Size").setValue([e.brilho.largura || 48, h * 1.4]);
+    var ff = sh.property("ADBE Root Vectors Group").property("Faixa").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+    ff.property("ADBE Vector Fill Color").setValue(GAB.rgb("#FFF0C8"));
+    ff.property("ADBE Vector Fill Opacity").setValue(e.brilho.opacidade || 36);
+    try { sh.property("ADBE Root Vectors Group").property("Faixa").property("ADBE Vector Transform Group").property("ADBE Vector Skew").setValue(20); } catch (x3) {}
+    sh.property("ADBE Effect Parade").addProperty("ADBE Gaussian Blur 2");
+    sh.property("ADBE Effect Parade").property(1).property(1).setValue(38);
+    try { sh.property("ADBE Effect Parade").property(1).property("ADBE Gaussian Blur 2-0002").setValue(2); } catch (x4) {}
+    var x0 = e.x - w / 2 - 160, x1 = x0 + 1500, pos = sh.property("ADBE Transform Group").property("ADBE Position");
+    pos.setValue([x0, e.y]);
+    GAB.tween(pos, e.brilho.t, e.brilho.dur || 1.0, [x0, e.y], [x1, e.y], "inout");
+    try { sh.setTrackMatte(matte, TrackMatteType.ALPHA); } catch (x5) { GAB.avisos.push("track matte do brilho: " + x5); }
+    out.push(matte); out.push(sh);
+  }
+  return out;
+};
+
+// Check: círculo em degradê dourado (linear-gradient 135deg #f1dfa6 -> #c9a657 -> #a8853a) + visto.
+// estilo_visto: "cunha" (preenchido, como sai no HyperFrames dos motions da Calverstone) ou "traco".
+GAB.checkRico = function (comp, e) {
+  var t = e.tamanho || 54, pad = e.pad === undefined ? 12 : e.pad, k = (t - 2 * pad) / 24;
+  var c = GAB.solidoDegrade(comp, (e.nome || "CHECK") + " círculo", t, t, t / 2, e.x, e.y, null, null, [0, 0], [t, t],
+    'var c = thisComp.layer("CONTROLES").effect("Cor de destaque")(1); [Math.min(1, c[0]*1.2), Math.min(1, c[1]*1.33), Math.min(1, c[2]*1.88), 1]',
+    'var c = thisComp.layer("CONTROLES").effect("Cor de destaque")(1); [c[0]*0.84, c[1]*0.80, c[2]*0.67, 1]');
+  var l = comp.layers.addShape(); l.name = e.nome || "CHECK";
+  l.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Visto";
+  var vv = l.property("ADBE Root Vectors Group").property("Visto").property("ADBE Vectors Group");
+  var pth = vv.addProperty("ADBE Vector Shape - Group");
+  var sh = new Shape(), pts = [[5, 12.5], [9.5, 17], [19, 7.5]];
+  for (var i = 0; i < pts.length; i++) pts[i] = [(pts[i][0] - 12) * k, (pts[i][1] - 12) * k];
+  sh.vertices = pts;
+  if ((e.estilo_visto || "cunha") === "cunha") {
+    sh.closed = true; pth.property("ADBE Vector Shape").setValue(sh);
+    var f = l.property("ADBE Root Vectors Group").property("Visto").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+    f.property("ADBE Vector Fill Color").setValue(GAB.rgb(e.cor_visto || "#000000"));
+  } else {
+    sh.closed = false; pth.property("ADBE Vector Shape").setValue(sh);
+    var stk = l.property("ADBE Root Vectors Group").property("Visto").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Stroke");
+    GAB.corDe(stk.property("ADBE Vector Stroke Color"), e.cor_visto || "principal");
+    stk.property("ADBE Vector Stroke Width").setValue(3 * k);
+    stk.property("ADBE Vector Stroke Line Cap").setValue(2); stk.property("ADBE Vector Stroke Line Join").setValue(2);
+  }
+  l.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
+  return [c, l];
 };
