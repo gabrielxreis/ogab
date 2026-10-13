@@ -241,9 +241,15 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     if not a: print(__doc__); sys.exit()
     opt = lambda k, d=None: a[a.index(k) + 1] if k in a else d
-    if a[0] == 'rascunho': rascunho(a[1], a[2], opt('--cliente'), int(opt('--max', 25)))
-    elif a[0] == 'sincronizar': sincronizar(a[1], a[2], a[3])
-    elif a[0] == 'reflow': reflow(a[1], a[2], opt('--cliente'), int(opt('--max', 25)))
+    # fps da transcrição do DaVinci (timecode HH:MM:SS:QQ): o da timeline. Sem --fps, lê o 'fps' do json ou usa 30.
+    # Bug 13/10/2026: timeline 24 fps lida como 30 atrasava/adiantava a legenda até 0,2 s.
+    def _fps(tr):
+        if opt('--fps'): return float(opt('--fps'))
+        try: import json; return float(json.load(open(tr)).get('fps', 30))
+        except Exception: return 30
+    if a[0] == 'rascunho': rascunho(a[1], a[2], opt('--cliente'), int(opt('--max', 25)), fps=_fps(a[1]))
+    elif a[0] == 'sincronizar': sincronizar(a[1], a[2], a[3], fps=_fps(a[1]))
+    elif a[0] == 'reflow': reflow(a[1], a[2], opt('--cliente'), int(opt('--max', 25)), fps=_fps(a[1]))
     elif a[0] == 'metrica': sys.exit(1 if metrica(a[1], int(opt('--max', 25))) else 0)
     else: print(__doc__)
 

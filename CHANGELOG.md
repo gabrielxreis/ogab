@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-9
+- Takes de IA: toda imagem vira vídeo (nada de foto parada) e os cortes seguem a legenda, um por frase, contando a história.
+- Legenda em timeline 24 fps: `legendas.py ... --fps 24` (antes lia sempre a 30 e a legenda podia sair até 0,2 s fora).
+
 ## 2026.10.13-8
 - Efeitos sonoros caem no tempo do movimento: o plano agora é escrito pelo instante do evento e o Gab corta o silêncio do começo de cada som (`plano_sfx_eventos.py`). Nada para você fazer.
 
