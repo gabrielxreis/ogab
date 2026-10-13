@@ -27,6 +27,9 @@ se formando", "transformar uma forma em outra", "logo em 3D", "texto com volume/
 
 ## Objetos 3D de verdade (diploma, troféu, avião, prédio...)
 
+- Cenas prontas em `tresd/cenas/`: `diploma.py` (diploma com selo de ouro) e `claquete.py` (claquete que cai, abre e bate, com o nome
+  da marca em metal; params `texto`, `linha`, `cor`, `fonte`; serve de abertura de vídeo, horizontal ou vertical).
+
 - **Conhecimento:** pacote **cc-blender-skill** (MIT, github.com/RobLe3/cc-blender-skill), instalado pelo instalador em
   `~/.claude/skills/` (30 skills: `text-to-blender` orquestra; `blender-modeling`, `blender-materials`, `blender-lighting`,
   `blender-cameras`, `blender-animation`...). Ler a skill do domínio antes de modelar (receitas de material por tipo:

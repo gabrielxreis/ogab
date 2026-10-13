@@ -18,6 +18,12 @@
 
 <div align="center">
 
+<img src=".github/claquete_3d.gif" width="640" alt="Claquete 3D com /ogab renderizada no Blender">
+
+<sub><b>3D de verdade no Blender:</b> claquete com a marca em metal, chão espelhado e câmera em movimento (<code>tresd/cenas/claquete.py</code>).</sub>
+
+<br>
+
 **Motions que o Gab cria** (HyperFrames, 1080x1920, cores e fonte do cliente)
 
 | Contador | Lista | Lettering | Gráfico | CTA |
@@ -269,12 +275,14 @@ Cada empresa tem o seu estilo. Regra que você dá para uma marca vai para o `es
 
 O Gab também é o social media: o vídeo sai pronto e o post sai junto. Basta pedir para o `/ogab`.
 
+<p align="center"><img src=".github/carrossel.jpg" alt="Carrossel de 7 slides gerado pelo Gab na marca do cliente" width="900"><br><sub>Carrossel gerado e exportado sem clique: 7 slides 1080x1350 nas cores e na fonte da marca (aqui, a do próprio Gab).</sub></p>
+
 <p align="center"><img src=".github/instagram.svg" alt="Exemplo de legenda do Instagram com gancho, corpo, CTA e hashtags" width="900"></p>
 
 | Peça para o Gab | O que ele faz |
 |---|---|
 | "escreve a legenda do post desse vídeo" | Gancho nos primeiros 125 caracteres (antes do "mais"), corpo curto, um CTA, 3-5 hashtags, sem cara de IA. Vai para `videos/legenda_post.txt` |
-| "monta um carrossel sobre X" | Slide a slide, do gancho ao fechamento, com o texto de cada imagem |
+| "monta um carrossel sobre X" | Planeja slide a slide e **gera as imagens prontas** (PNG por slide e PDF para LinkedIn) nas cores e na fonte do cliente: 12 tipos de slide (gancho, lista, números, antes x depois, citação, CTA...) e formatos 4:5, quadrado, Stories e 16:9 |
 | "por que esse Reel viralizou?" + link | Extrai e classifica o gancho para você reaproveitar |
 | "planeja a semana da Bora Imigrar" | Reels, carrosséis e stories por pilar de conteúdo |
 | "transforma esse post do LinkedIn em carrossel" | Adapta conteúdo de outra rede para o formato do Instagram |
@@ -462,6 +470,7 @@ docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
 instagram/               parte de Instagram: 9 especialidades (legenda, carrossel, hashtags, humanizer...), referências e lib de publicação
+instagram/carrossel/     gerador de carrossel em imagem (Next.js): carrossel.py novo | previa | exportar
 docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado...)
 clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
 assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
