@@ -74,6 +74,7 @@ Anotar no `marca/identidade.md`. A imagem de compartilhamento (og:image) pode se
 
 ## Higgsfield (imagem ilimitada) + Magnific (vídeo)
 
+- **Vídeo IA nunca parado (usuário, 13/10/2026: "animações muito paradas e lentas"):** prompt do Kling com movimento forte desde o 1º quadro (fast dolly-in, whip pan, crash zoom, fast orbit, handheld, ação já começando) + "dynamic, energetic, fast-paced camera movement, no slow motion". Na edição: só o trecho mais vivo (1-2 s), 150-200% de velocidade, speed ramp e punch-in.
 - **Até 4 imagens em paralelo no ilimitado (usuário, 13/10/2026).** Disparar os prompts em sequência com uma pausa curta entre eles (dois colados rápido falham e são reembolsados). **Fluxo: gerar SÓ as imagens, mostrar para o usuário aprovar e só depois animar no Magnific.**
 - Plano do usuário: Ultimate, com Nano Banana Pro, Seedream 4.5, Seedream 5.0 Lite/Pro e outros ilimitados (conferir `supports_unlim` no `models_list` do MCP e o ∞ no site).
 - O MCP gera, mas o ilimitado não vale por ele (cobra crédito: NB Pro 2K = 2, Seedream 4.5 = 1). Gerar pelo site higgsfield.ai no navegador (ilimitado); depois `show_generations(type="image")` devolve a URL direta (d8j0ntlcm91z4.cloudfront.net/...png) do resultado: baixar com `curl -L -o <pasta>/brolls/ia_XX.png <url>`.
