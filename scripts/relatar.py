@@ -4,6 +4,7 @@
   python3 relatar.py perguntar             # imprime PERGUNTAR se esta instalação ainda não respondeu (o Gab pergunta 1 vez)
   python3 relatar.py registrar --titulo "..." --erro "..." --causa "..." --correcao "..." [--arquivo scripts/x.py ...]
   python3 relatar.py preset <pasta do modelo | modelo.json>   # motion novo da biblioteca local (biblioteca_motions salvar chama sozinho)
+  python3 relatar.py parecido <pasta do modelo | modelo.json>  # quão diferente é da biblioteca (e dos já enviados)
   python3 relatar.py enviar                # manda os pendentes (ao abrir o Gab, em segundo plano) SÓ se "relatos": true
   python3 relatar.py status                # consentimento, pendentes e enviados
 
@@ -166,9 +167,86 @@ def _limpar_spec(x):
     return x
 
 
+# ------------------------------------------------------------ motion "bem diferente" do que já existe?
+LIMIAR_PARECIDO = 0.70   # similaridade >= isto = variação de um motion que já existe: não manda
+BASICAS = {"w", "h", "fps", "nome", "texto", "fonte", "tamanho", "cor", "x", "y", "inicio", "dur", "dur_entrada", "saida_em",
+           "elementos", "tipo", "de", "para", "t", "ate", "sufixo", "vars", "passo", "lista", "anim", "entrada", "saida",
+           "ease", "repetir", "centralizar"}
+VISTOS = os.path.join(PASTA, "presets_vistos.json")
+
+
+def tracos_motion(modelo):
+    """Marcas da ESTRUTURA do motion (elementos, quantidades, animações, técnicas), com peso. Textos, cores, tempos e
+    posições não contam: mudar só isso não faz um motion novo."""
+    t, cont = {}, {}
+
+    def add(k, w):
+        t[k] = max(t.get(k, 0), w)
+
+    def walk(x):
+        if isinstance(x, dict):
+            if isinstance(x.get("tipo"), str):
+                tp = x["tipo"]; cont[tp] = cont.get(tp, 0) + 1
+                add(f"el:{tp}", 3.0); add(f"el:{tp}#{min(cont[tp], 4)}", 1.0)
+            if "repetir" in x:
+                add("repetir", 2.0)
+            for k in ("entrada", "saida"):
+                if isinstance(x.get(k), str):
+                    add(f"{k}:{x[k]}", 2.0)
+            if isinstance(x.get("ease"), str):
+                add(f"ease:{x['ease'].split('.')[0]}", 0.5)
+            for a in (x.get("anim") or []) if isinstance(x.get("anim"), list) else [x.get("anim")] if isinstance(x.get("anim"), dict) else []:
+                if isinstance(a, dict):
+                    for k in a:
+                        if k not in ("t", "dur", "ease", "de", "para", "inicio"):
+                            add(f"anima:{k}", 1.5)
+            for k, v in x.items():
+                if k not in BASICAS:
+                    add(f"usa:{k}", 1.0)
+                walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                walk(v)
+    walk(modelo.get("spec", {}))
+    return t
+
+
+def similaridade(a, b):
+    ks = set(a) | set(b)
+    if not ks:
+        return 1.0
+    return sum(min(a.get(k, 0), b.get(k, 0)) for k in ks) / sum(max(a.get(k, 0), b.get(k, 0)) for k in ks)
+
+
+def _referencias():
+    refs = {}
+    for f in glob.glob(os.path.join(SKILL, "biblioteca_motions", "*", "modelo.json")):
+        try:
+            refs["biblioteca:" + os.path.basename(os.path.dirname(f))] = tracos_motion(json.load(open(f, encoding="utf-8")))
+        except Exception:
+            pass
+    try:
+        for nome, tr in json.load(open(VISTOS, encoding="utf-8")).items():
+            refs["enviado:" + nome] = tr
+    except Exception:
+        pass
+    return refs
+
+
+def parecido(modelo, ignorar=""):
+    """[(similaridade, referência)] do mais parecido ao menos parecido."""
+    tr = tracos_motion(modelo)
+    return sorted(((round(similaridade(tr, r), 2), n) for n, r in _referencias().items() if n.split(":", 1)[1] != ignorar),
+                  reverse=True)
+
+
 def registrar_preset(caminho):
     arq = os.path.join(caminho, "modelo.json") if os.path.isdir(caminho) else caminho
     m = json.load(open(arq, encoding="utf-8"))
+    ranking = parecido(m, ignorar=m.get("nome", ""))
+    if ranking and ranking[0][0] >= LIMIAR_PARECIDO:
+        return None   # variação de um motion que já existe (mesma estrutura com outros textos/tempos): não manda
+    tracos = tracos_motion(m)
     m.pop("autor", None)
     for i, (k, c) in enumerate((m.get("campos") or {}).items(), 1):
         if isinstance(c, dict) and "exemplo" in c:
@@ -179,7 +257,9 @@ def registrar_preset(caminho):
     estrutura = json.dumps(m.get("spec", {}), sort_keys=True)
     rel = {"chave_envio": CHAVE_ENVIO, "tipo": "preset", "titulo": anonimizar(m.get("nome", "motion"), nomes)[:200],
            "erro": anonimizar(m.get("descricao", ""), nomes)[:3000], "causa": ", ".join(m.get("tags", []))[:2000],
-           "correcao": f"dur {m.get('dur', '?')} s; campos: {', '.join(m.get('campos', {}))}"[:3000], "diff": corpo,
+           "correcao": (f"novidade {1 - (ranking[0][0] if ranking else 0):.0%} (mais parecido: "
+                        f"{ranking[0][1] if ranking else 'nenhum'} {ranking[0][0] if ranking else 0:.0%}); "
+                        f"dur {m.get('dur', '?')} s; campos: {', '.join(m.get('campos', {}))}")[:3000], "diff": corpo,
            "assinatura": hashlib.sha1(estrutura.encode()).hexdigest()[:10], "versao": _versao(),
            "sistema": f"{platform.system()} {platform.release()} {platform.machine()}", "python": platform.python_version(),
            "editor": cfg.get("editor", ""), "motion": cfg.get("motion", ""), "instalacao": _instalacao(),
@@ -187,6 +267,12 @@ def registrar_preset(caminho):
     if any(rel["assinatura"] in os.path.basename(f) for f in glob.glob(os.path.join(PASTA, "*", "*.json"))):
         return None   # este motion (mesma estrutura) já foi registrado
     os.makedirs(PEND, exist_ok=True)
+    try:
+        vistos = json.load(open(VISTOS, encoding="utf-8"))
+    except Exception:
+        vistos = {}
+    vistos[rel["titulo"]] = tracos
+    json.dump(vistos, open(VISTOS, "w", encoding="utf-8"), ensure_ascii=False)
     saida = os.path.join(PEND, f"{time.strftime('%Y%m%d-%H%M%S')}-preset-{rel['assinatura']}.json")
     json.dump(rel, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return saida
@@ -244,7 +330,12 @@ if __name__ == "__main__":
         arqs = [a[i + 1] for i, x in enumerate(a) if x == "--arquivo" and i + 1 < len(a)]
         print(registrar(arg("--titulo"), arg("--erro"), arg("--causa"), arg("--correcao"), arqs))
     elif a[0] == "preset" and len(a) >= 2:
-        print(registrar_preset(a[1]) or "já registrado antes")
+        print(registrar_preset(a[1]) or "não registrado: igual ou parecido demais com um motion que já existe")
+    elif a[0] == "parecido" and len(a) >= 2:
+        arq = os.path.join(a[1], "modelo.json") if os.path.isdir(a[1]) else a[1]
+        m = json.load(open(arq, encoding="utf-8"))
+        for sim, n in parecido(m, ignorar=m.get("nome", ""))[:5]:
+            print(f"  {sim:.0%}  {n}" + ("  <- parecido demais, não seria enviado" if sim >= LIMIAR_PARECIDO else ""))
     elif a[0] == "enviar":
         enviar()
     elif a[0] == "status":

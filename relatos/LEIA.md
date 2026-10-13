@@ -10,6 +10,11 @@ no repositório e todo mundo recebe no próximo auto-update.
 - **Motions novos** (`tipo` preset): quando alguém salva um motion na biblioteca local (`biblioteca_motions.py salvar`),
   vai a ESTRUTURA do modelo (elementos, tempos, animações, campos), com textos de exemplo genéricos e sem autor; as
   cores nem ficam no modelo. Só com o consentimento novo (`relatos_v` 2, a pergunta cita erros e motions).
+  **Só vai motion BEM diferente** (regra do usuário, 13/10/2026): `relatar.py` compara a estrutura (elementos e
+  quantidades, animações de entrada/saída, propriedades animadas, repetição, técnicas como câmera, 3D, glow, morph)
+  com a biblioteca e com o que já foi enviado; semelhança >= 70% (`LIMIAR_PARECIDO`) não manda. Trocar texto, fonte,
+  cor, tempo, posição, uma animação ou o número de linhas não conta como motion novo. A coluna `correcao` traz
+  "novidade X% (mais parecido: ...)". Conferir à mão: `relatar.py parecido <pasta do modelo>`.
 
 **Dono: ler tudo antes de qualquer commit na skill** (o pre-commit trava; `relatos.py hook`, `relatos.py lido`).
 
