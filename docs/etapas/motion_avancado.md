@@ -24,3 +24,19 @@ se formando", "transformar uma forma em outra", "logo em 3D", "texto com volume/
 - Precisa do Blender (o instalador instala; o doctor confere). Coordenadas: logo de pé no plano XZ, câmera no -Y.
 - No After Effects, o mesmo MOV entra como camada; para 3D dentro do AE dá para importar `.glb` (exportar do
   Blender) com o renderizador Advanced 3D, mas o caminho padrão é o MOV.
+
+## Objetos 3D de verdade (diploma, troféu, avião, prédio...)
+
+- **Conhecimento:** pacote **cc-blender-skill** (MIT, github.com/RobLe3/cc-blender-skill), instalado pelo instalador em
+  `~/.claude/skills/` (30 skills: `text-to-blender` orquestra; `blender-modeling`, `blender-materials`, `blender-lighting`,
+  `blender-cameras`, `blender-animation`...). Ler a skill do domínio antes de modelar (receitas de material por tipo:
+  ouro, cromo, vidro, madeira, tecido; luz por tipo de material).
+- **Execução (do jeito do Gab, sem janela):** as skills dele mandam o Python para o Blender ABERTO via MCP; aqui o
+  mesmo Python vira um **script de cena** e roda sem janela: `python3 tresd/tresd.py cena <cena.py> saida.mov --dur 4`.
+  O script recebe `base` (`tresd/cena_base.py`: material, `ouro()`, `tres_pontos(classe)`, `camera()`, `chave()`) e `P`
+  (parâmetros) e não renderiza (o runner renderiza com alfa e salva o `.blend`). Exemplo completo: `tresd/cenas/diploma.py`.
+- **Convenções:** objetos do assunto com nome `GEO-...` (entram no enquadramento e na luz); objeto de pé no plano XZ,
+  câmera no -Y. `base.camera()` enquadra pela LARGURA (no 9:16 objeto horizontal cortava).
+- **Metal que fica bonito:** `tres_pontos("metal")` já põe o softbox de cima e um rebatedor atrás da câmera; sem eles o
+  ouro sai escuro/oliva (o metal reflete o ambiente). Ambiente (`base.mundo`) cinza neutro médio, não navy escuro.
+- Conferir 3 quadros por cima do fundo da marca antes de entregar. Diploma de 4 s: ~2 min de render.

@@ -193,6 +193,11 @@ def blender():
         item("⟳", "extras", "Blender instalado")
     else:
         item("·", "extras", "Blender não instalado (só para motion 3D): " + ("brew install --cask blender" if MAC else "winget install --id BlenderFoundation.Blender -e"))
+    ccb = glob.glob(os.path.join(HOME, ".claude", "skills", "*", ".cc-blender"))
+    if len(ccb) >= 25:
+        item("✓", "extras", f"cc-blender-skill ({len(ccb)} skills de Blender)")
+    else:
+        item("!", "extras", "cc-blender-skill não instalado (objetos 3D): rode o instalador do Gab de novo")
 
 
 def extras():

@@ -56,6 +56,20 @@ Info "3b/10 Blender (3D de verdade nos motions)"
 if (Get-ChildItem (Join-Path $env:ProgramFiles "Blender Foundation") -Directory -ErrorAction SilentlyContinue) { Ok "Blender ja instalado" }
 else { winget install --id BlenderFoundation.Blender -e --silent --accept-package-agreements --accept-source-agreements | Out-Null; if ($LASTEXITCODE -eq 0) { Ok "Blender instalado" } else { Warn "nao consegui instalar o Blender: winget install --id BlenderFoundation.Blender -e" } }
 
+Info "3c/10 cc-blender-skill (30 skills de Blender: objetos 3D, materiais, luz, camera; MIT)"
+$ccb = Join-Path $HOME ".claude\referencias\cc-blender-skill"; $sk = Join-Path $HOME ".claude\skills"
+New-Item -ItemType Directory -Force -Path (Split-Path $ccb), $sk | Out-Null
+if (Test-Path (Join-Path $ccb ".git")) { git -C $ccb pull -q 2>$null | Out-Null } else { git clone -q --depth 1 https://github.com/RobLe3/cc-blender-skill.git $ccb 2>$null | Out-Null }
+$n = 0
+Get-ChildItem (Join-Path $ccb "plugin\skills") -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+  if (-not (Test-Path (Join-Path $_.FullName "SKILL.md"))) { return }
+  $dst = Join-Path $sk $_.Name
+  if ((Test-Path $dst) -and -not (Test-Path (Join-Path $dst ".cc-blender"))) { return }
+  if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
+  Copy-Item $_.FullName $dst -Recurse; New-Item -ItemType File -Path (Join-Path $dst ".cc-blender") -Force | Out-Null; $n++
+}
+if ($n -gt 0) { Ok "$n skills de Blender instaladas" } else { Warn "nao consegui instalar o cc-blender-skill (rode o instalador de novo)" }
+
 Info "4/10 Gab (/ogab)"
 if (Test-Path (Join-Path $DEST ".git")) {
   git -C $DEST pull --ff-only --quiet

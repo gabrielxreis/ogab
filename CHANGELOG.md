@@ -8,6 +8,9 @@ Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos
 - **Folha de quadros antes de baixar:** o Gab olha uma grade com os quadros do trecho (e o tempo de cada um) antes de pôr na timeline; pega marca d'água, legenda queimada e cena errada.
 - **Novas fontes de b-roll:** acervo da NASA e Wikimedia Commons (domínio público, seguro para anúncio, com a licença anotada no links.txt), posts recentes de um perfil do TikTok sem login e print vertical de site ou notícia.
 
+## 2026.10.12-11 (12/10/2026)
+- **Objetos 3D de verdade:** além de logo e texto, o Gab monta objetos em 3D (diploma com selo de ouro, troféu, avião...) no Blender, com luz de estúdio para metal e fundo transparente. Vem junto o pacote **cc-blender-skill** (30 skills de Blender), instalado pelo instalador.
+
 ## 2026.10.12-10 (12/10/2026)
 - **Logo em 3D de verdade:** a logo ou um texto com volume, metal na cor da marca, luz e câmera, renderizado no Blender com fundo transparente (o instalador agora instala o Blender).
 - **Morph de formas complexas:** a logo se formando, com uma forma virando a letra e a letra virando a palavra da marca.
