@@ -10,7 +10,8 @@ Consentimento: sem "relatos": true no config.json nada sai da máquina (relatos 
 O relato é ANONIMIZADO antes de ser gravado: caminhos viram ~/..., saem e-mails, chaves/tokens, parâmetros de link,
 o nome do usuário e o nome de cada cliente (pastas de clientes/ e da pasta de saída). Não vai vídeo, roteiro, legenda
 nem transcrição: só o que quebrou na skill, a causa, a correção e o diff dos arquivos DA SKILL.
-Na máquina do dono ("dono_biblioteca": true) não envia (ele corrige direto). Destino: relatos/destino.json.
+Na máquina do dono ("dono_biblioteca": true) não envia (ele corrige direto). Destino: relatos/destino.json
+(Formulário Google do dono: quem envia só responde; não vê, não edita e não apaga nada).
 """
 import glob, hashlib, json, os, platform, re, subprocess, sys, time, urllib.request
 
@@ -145,18 +146,20 @@ def _log(msg):
 
 
 def enviar():
-    cfg = _config(); url = _destino().get("url", "")
-    if cfg.get("relatos") is not True or cfg.get("dono_biblioteca") or not url:   # só com consentimento explícito
+    cfg = _config(); dest = _destino()
+    if cfg.get("relatos") is not True or cfg.get("dono_biblioteca") or not dest.get("action"):   # só com consentimento
         return 0
+    import urllib.parse
     os.makedirs(ENV, exist_ok=True); n = 0
     for arq in sorted(glob.glob(os.path.join(PEND, "*.json")))[:20]:
         try:
-            req = urllib.request.Request(url, data=open(arq, "rb").read(), headers={"Content-Type": "application/json"}, method="POST")
-            resp = json.loads(urllib.request.urlopen(req, timeout=15).read().decode("utf-8") or "{}")
-            if resp.get("ok"):
+            rel = json.load(open(arq, encoding="utf-8"))
+            dados = urllib.parse.urlencode({f"entry.{eid}": str(rel.get(nome, ""))
+                                            for nome, eid in dest["campos"].items()}).encode()
+            req = urllib.request.Request(dest["action"], data=dados, method="POST",
+                                         headers={"Content-Type": "application/x-www-form-urlencoded"})
+            if urllib.request.urlopen(req, timeout=20).status == 200:   # Formulário Google: 200 = resposta gravada
                 os.replace(arq, os.path.join(ENV, os.path.basename(arq))); n += 1
-            else:
-                _log(f"recusado {os.path.basename(arq)}: {resp}")
         except Exception as e:
             _log(f"falhou {os.path.basename(arq)}: {e}"); break   # sem internet: tenta de novo na próxima abertura
     if n:
@@ -165,7 +168,7 @@ def enviar():
 
 
 def status():
-    cfg = _config(); url = _destino().get("url", "")
+    cfg = _config(); url = _destino().get("action", "")
     cons = "sim" if cfg.get("relatos") is True else "não" if cfg.get("relatos") is False else "ainda não respondeu"
     return {"consentimento": cons, "maquina_do_dono": bool(cfg.get("dono_biblioteca")), "destino": bool(url),
             "pendentes": len(glob.glob(os.path.join(PEND, "*.json"))), "enviados": len(glob.glob(os.path.join(ENV, "*.json")))}

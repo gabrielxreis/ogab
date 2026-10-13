@@ -1,1 +1,18 @@
-{"url": "", "_leia": "URL do app da Web (Google Apps Script) que recebe os relatos. Preenchida pelo dono ao publicar (relatos/LEIA.md)."}
+{
+ "_leia": "Destino dos relatos: Formulário Google do dono (quem envia só responde; não vê nem edita nada). Ver relatos/LEIA.md.",
+ "tipo": "google_form",
+ "action": "https://docs.google.com/forms/d/e/1FAIpQLSfiXnylCOIRc_-T_8phBXdu_idXv_14uqF2_4GTmhWxnISI2A/formResponse",
+ "campos": {
+  "titulo": 637740033,
+  "erro": 2087032094,
+  "causa": 466628665,
+  "correcao": 757037402,
+  "diff": 901580051,
+  "assinatura": 414325935,
+  "versao": 620962491,
+  "sistema": 161315765,
+  "editor": 51079438,
+  "instalacao": 1129402695
+ },
+ "planilha_id": "1OmdKBZx4P-LQ7dgOcmLF2P-07riDvxD0YVKvV2lYMP4"
+}
