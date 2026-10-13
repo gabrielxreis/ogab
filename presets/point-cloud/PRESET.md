@@ -30,3 +30,11 @@ Narração: a do usuário (voz clonada ou gravada); cada frase da fala troca a f
 - Uma figura por vez, centralizada (centro_y 860, abaixo fica o título); nunca texto em cima da figura.
 - Transição dos pontos 1,1-1,6 s; segurar a figura pelo menos 1,5 s depois de formada.
 - Poucos pontos borram a foto (mínimo 5000); muitos pesam o render (máximo ~12000).
+
+## Imagem clara/pastel (aprendido em 13/10/2026, vídeo "O Estrangeiro")
+Foto com fundo claro (pastel, estilo Wes Anderson) vira uma mancha de pontos. Antes de usar, transformar em CONTORNOS:
+`cv2.Canny` (blur 5x5, 40/110, dilatar 2x2) num PNG preto e branco e usar esse PNG na cena com `limiar` 0.3 e `mascara`
+oval. Silhueta, prédio, claquete, lente e mãos ficam legíveis; cena com muitos objetos pequenos (relógio + poltrona)
+embola: preferir texto. Texto largo ("ESTRANGEIRO", "+3 SEMANAS"): `largura` 0.70 e `giro` 12 para não cortar a ponta.
+Título de cada cena entra NA PALAVRA (início da cena) em 0,4 s e só sai quando a próxima cena começa; a última cena não
+sai (o fade final é no DaVinci). Corrigido no kit: em cena curta o título ficava preso por cima do seguinte.

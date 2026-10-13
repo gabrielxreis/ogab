@@ -49,12 +49,15 @@
   tl.to(est, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(est.t) }, 0); draw(0);
   const box = document.getElementById("txt");
   C.forEach((c, k) => {
-    const ent = S[k] + c.transicao * .55, sai = S[k] + c.dur - .4;
+    // Texto entra NA PALAVRA (início da cena) e rápido; sai só depois de entrar inteiro; a última cena não sai
+    // (fade final é no DaVinci). Antes: entrava em transicao*.55 com .7 s e, em cena curta, a saída vinha antes do
+    // fim da entrada e o título ficava preso por cima do seguinte (13/10/2026).
+    const ent = S[k] + Math.min(.12, c.transicao * .25), ultima = k === C.length - 1, sai = Math.max(ent + .45, S[k] + c.dur - .22);
     for (const [cls, html] of [["kick", c.kicker], ["tit", c.titulo], ["cred", c.credito]]) {
       if (!html) continue;
       const el = document.createElement("div"); el.className = cls; el.innerHTML = html; box.appendChild(el);
-      tl.fromTo(el, { opacity: 0, y: 18, filter: "blur(10px)" }, { opacity: cls === "cred" ? .5 : (cls === "kick" ? .72 : 1), y: 0, filter: "blur(0px)", duration: .7, ease: "power3.out" }, ent + (cls === "tit" ? .15 : 0));
-      tl.to(el, { opacity: 0, filter: "blur(8px)", duration: .35, ease: "power2.in" }, sai);
+      tl.fromTo(el, { opacity: 0, y: 18, filter: "blur(10px)" }, { opacity: cls === "cred" ? .5 : (cls === "kick" ? .72 : 1), y: 0, filter: "blur(0px)", duration: .4, ease: "power3.out" }, ent + (cls === "tit" ? .06 : 0));
+      if (!ultima) tl.to(el, { opacity: 0, filter: "blur(8px)", duration: .2, ease: "power2.in" }, sai);
     }
   });
   window.__timelines = window.__timelines || {}; window.__timelines["point-cloud"] = tl;
