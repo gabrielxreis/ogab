@@ -146,7 +146,27 @@ def suavizar_tudo():
 # render em TELA CHEIA 1080x1920 com alfa (nunca um quadrado colado por cima) e câmera deslocada para o objeto
 # ficar abaixo do texto. Assets: tresd/polyhaven.py.
 
+def eevee_qualidade(amostras=64, motion_blur=True):
+    """PADRÃO (regra do usuário, 13/10/2026: "nunca usar Cycles, usa o outro que é mais rápido"): EEVEE com ray tracing,
+    sombras suaves e motion blur. Junto com hdri() + 1-2 luzes de área MÉDIAS (luz forte no EEVEE deu "aberração")."""
+    sc = bpy.context.scene
+    ids = [e.identifier for e in bpy.types.RenderSettings.bl_rna.properties["engine"].enum_items]
+    sc.render.engine = "BLENDER_EEVEE_NEXT" if "BLENDER_EEVEE_NEXT" in ids else "BLENDER_EEVEE"
+    ee = sc.eevee
+    for attr, val in (("taa_render_samples", amostras), ("use_raytracing", True), ("use_shadows", True), ("shadow_ray_count", 3),
+                      ("shadow_step_count", 12), ("use_gtao", True), ("use_soft_shadows", True), ("use_bloom", False)):
+        try: setattr(ee, attr, val)
+        except Exception: pass
+    try: ee.ray_tracing_options.resolution_scale = "1"
+    except Exception: pass
+    try: sc.render.use_motion_blur = motion_blur
+    except Exception: pass
+    try: ee.use_motion_blur = motion_blur
+    except Exception: pass
+
+
 def gpu_cycles(motion_blur=True):
+    """SÓ quando o usuário pedir Cycles/abrir a interface do Blender (lento: ~5-10 s por quadro em 1080x1920)."""
     sc = bpy.context.scene; sc.render.engine = "CYCLES"
     try:
         pr = bpy.context.preferences.addons["cycles"].preferences

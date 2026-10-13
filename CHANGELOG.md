@@ -3,6 +3,10 @@
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
 Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos itens.
 
+## 2026.10.13-1 (13/10/2026)
+- **Render 3D com barra de progresso:** o Gab mostra quantos quadros já foram, a porcentagem e quanto tempo falta. Peça "como está o render?" a qualquer momento.
+- **3D mais rápido:** o padrão volta a ser o motor rápido do Blender (EEVEE), agora com ray tracing e luz de estúdio. O Cycles (lento) só se você quiser abrir a cena na interface do Blender.
+
 ## 2026.10.12-18 (12/10/2026)
 - **3D com cara de produto:** o Gab renderiza objetos 3D no Cycles com luz de estúdio real (HDRI) e texturas do Poly Haven, em tela cheia (nada de quadrado aparecendo), e usa o 3D só para complementar o motion 2D nos momentos de impacto. Objetos reais imitam o real (ex.: green card com a arte do cartão, marcado SPECIMEN).
 

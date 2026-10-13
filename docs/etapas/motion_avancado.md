@@ -50,9 +50,13 @@ se formando", "transformar uma forma em outra", "logo em 3D", "texto com volume/
   com dados de EXEMPLO e marca "SPECIMEN" visível (nunca documento que passe por verdadeiro). Modelo pronto quando
   existir (Poly Haven CC0: `python3 tresd/polyhaven.py buscar <palavra>`); senão modelar por revolução (`torno`) com
   textura PBR do Poly Haven (`polyhaven.py textura`).
-- **Render:** `gpu_cycles()` + `hdri(<estúdio>.hdr)` (Poly Haven `brown_photostudio_02`) + 1-2 luzes de área médias;
-  EEVEE com luz forte deu "aberração de luz". 24 amostras + denoise + persistent data: ~5 s/quadro em 1080x1920 no
-  M1 Pro. Prévia antes: 3 quadros em 540x960 por cena (rápido) e só então o render final.
+- **Render: EEVEE SEMPRE** (regra do usuário, 13/10/2026: "nunca usar Cycles, usa o outro que é mais rápido, a não
+  ser que o usuário queira abrir a interface"): `eevee_qualidade()` + `hdri(<estúdio>.hdr)` (Poly Haven
+  `brown_photostudio_02`) + 1-2 luzes de área MÉDIAS (a "aberração de luz" do 1º teste veio de luz forte, não do
+  EEVEE). Cycles (`gpu_cycles()`) só a pedido: ~5-10 s/quadro em 1080x1920 no M1 Pro, 3 objetos levaram ~50 min.
+  Prévia antes: 3 quadros em 540x960 por cena e só então o render final.
+- **Barra de progresso SEMPRE (mesma regra):** o `tresd.cena` mostra a barra a cada 5% e grava `<saida>.progresso`;
+  durante o render, responder ao usuário com `python3 tresd/tresd.py progresso <pasta>` (quadros, %, tempo restante).
 - **Tela cheia, sempre:** 1080x1920 com alfa; `deslocar_camera(cam, y)` põe o objeto onde o layout pede (abaixo do
   texto: y≈1180; CTA: 960). Nunca renderizar um quadrado e colar: a borda corta o objeto ("sai de um lugar quadrado").
 - Composição: ffmpeg overlay em 0:0 no tempo da cena (fade 0,25 s de alfa), ou a trilha MOTIONS no editor.
