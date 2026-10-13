@@ -1,7 +1,11 @@
 # Novidades do Gab (/ogab)
 
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
-Mais novo em cima. Cada versão é uma linha `## 2026.10.13-6 (13/10/2026)
+Mais novo em cima. Cada versão é uma linha `## 2026.10.13-7 (13/10/2026)
+- **Motion sem fade embutido:** o motion sai do render sem fade de entrada e saída; a transição fica no DaVinci, onde você ajusta.
+- **Motion com fundo próprio:** motion de tela cheia tem o fundo na identidade do assunto (nunca por cima do vídeo cru); foto ou take entra dentro do motion, em moldura.
+
+## 2026.10.13-6 (13/10/2026)
 - **Motion no tempo da fala:** cada elemento do motion (número, frase, selo, título) entra junto com a palavra falada, medido na transcrição palavra a palavra. Nada aparece antes de ser dito.
 
 ## 2026.10.13-3 (13/10/2026)
