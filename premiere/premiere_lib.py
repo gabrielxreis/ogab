@@ -522,28 +522,59 @@ def lettering(seq, mogrt, texto, inicio, dur, trilha=2):
     return js("""
       const p = await proj(); const s = await seqPorNome(p, args.seq);
       const ed = P.SequenceEditor.getEditor(s);
-      let itens = [];
-      p.lockedAccess(() => { itens = ed.insertMogrtFromPath(args.mogrt, tt(args.inicio), args.trilha, -1); });
-      const v = itens.find(i => i.getComponentChain && i.createSetEndAction);
+      let inseridos = [];     // (não chamar de "itens": é uma função do prelúdio)
+      p.lockedAccess(() => { inseridos = ed.insertMogrtFromPath(args.mogrt, tt(args.inicio), args.trilha, -1); });
+      const v = inseridos.find(i => i.getComponentChain && i.createSetEndAction);
       if (!v) throw new Error("o Premiere não inseriu o MOGRT");
       await tx(p, "Gab: duração do lettering", () => [v.createSetEndAction(tt(args.inicio + args.dur))]);
-      const cadeia = await v.getComponentChain(); const params = []; let trocado = false;
-      for (let i = 0; i < cadeia.getComponentCount(); i++) {
-        const comp = cadeia.getComponentAtIndex(i);
-        for (let j = 0; j < comp.getParamCount(); j++) {
-          const pr = comp.getParam(j); let val = null;
-          try { val = (await pr.getStartValue()).value.value; } catch (e) {}
-          params.push([await comp.getDisplayName(), pr.displayName, typeof val === "string" ? val.slice(0, 60) : val]);
-          if (!trocado && typeof val === "string" && args.texto) {
-            let novo = args.texto;
-            try { const o = JSON.parse(val); if (o && typeof o === "object" && "textEditValue" in o) { o.textEditValue = args.texto; novo = JSON.stringify(o); } } catch (e) {}
-            await tx(p, "Gab: texto do lettering", () => [pr.createSetValueAction(pr.createKeyframe(novo), true)]);
-            trocado = true;
-          }
+      // Campos do MOGRT: componente depois de Opacidade e Movimento. Os de texto são os que não começam com "Cor".
+      // Texto com quebra de linha preenche os campos de texto em ordem (LINHA 1, LINHA 2...). Valor: texto puro; se o
+      // Premiere não aceitar, tenta o formato JSON de texto (textEditValue).
+      // logo depois de inserir, o componente com os campos do MOGRT ainda não existe: reler o clipe na trilha
+      let real = v;
+      for (let tentativa = 0; tentativa < 10; tentativa++) {
+        await new Promise((r) => setTimeout(r, 300));
+        for (const x of (await s.getVideoTrack(args.trilha)).getTrackItems(CLIPE, false))
+          if (Math.abs((await x.getStartTime()).seconds - args.inicio) < 0.05) real = x;
+        const ch = await real.getComponentChain(); let n = 0; p.lockedAccess(() => { n = ch.getComponentCount(); });
+        if (n > 2) break;
+      }
+      const cadeia = await real.getComponentChain(); const campos = [];
+      p.lockedAccess(() => { for (let i = 2; i < cadeia.getComponentCount(); i++) { const c = cadeia.getComponentAtIndex(i);
+        for (let j = 0; j < c.getParamCount(); j++) campos.push(c.getParam(j)); } });
+      const deTexto = campos.filter((pr) => pr.displayName && !/^(cor|color)/i.test(pr.displayName.trim()));
+      const linhas = args.texto ? String(args.texto).split("\\n") : [];
+      const params = campos.map((pr) => pr.displayName); let trocado = 0;
+      for (let k = 0; k < Math.min(linhas.length, deTexto.length); k++) {
+        const pr = deTexto[k];
+        for (const valor of [linhas[k], JSON.stringify({ textEditValue: linhas[k] })]) {
+          try { p.lockedAccess(() => { p.executeTransaction((cc) => cc.addAction(pr.createSetValueAction(pr.createKeyframe(valor), true)), "Gab: texto do lettering"); }); } catch (e) { continue; }
+          let agora = null; try { agora = String(await pr.getValueAtTime(tt(0))); } catch (e) {}
+          if (agora === null || agora.indexOf(linhas[k]) >= 0) { trocado++; break; }
         }
       }
-      return { mogrt: args.mogrt, texto_trocado: trocado, parametros: params };
+      return { mogrt: args.mogrt, texto_trocado: trocado, campos_texto: deTexto.map((x) => x.displayName), parametros: params };
     """, "lettering", seq=seq, mogrt=_abs(mogrt), texto=texto, inicio=inicio, dur=dur, trilha=trilha)
+
+
+def lettering_ae(seq, modelo, valores, inicio, trilha=1, pasta=None, cores=None, nome=None):
+    """Lettering com o TEXTO DO VÍDEO no Premiere 26.x: a API só troca texto de MOGRT a partir do Premiere 27
+    (MogrtText). Então o Gab monta o modelo da biblioteca no After Effects com os valores do vídeo, exporta um
+    .mogrt só deste vídeo (texto e cores continuam editáveis no Essential Graphics) e insere na trilha.
+    valores = campos do modelo (ex.: {"linha1": "SEM ATALHO.", "linha2": "COM PROCESSO."}). pasta = <vídeo>/motions."""
+    raiz = os.path.dirname(AQUI)
+    sys.path.insert(0, os.path.join(raiz, "scripts")); sys.path.insert(0, os.path.join(raiz, "aftereffects"))
+    import biblioteca_motions as B, ae_lib as AE
+    nome = nome or f"{modelo} {int(inicio * 100):06d}"
+    spec = B.aplicar(modelo, valores, cores, nome_comp=nome)
+    spec["elementos"] = [e for e in spec["elementos"] if e.get("tipo") not in ("fundo", "fundo_rico")]
+    pasta = _abs(pasta or os.path.join(os.path.expanduser("~"), "Desktop", "ogab_mogrts"))
+    AE.abrir_projeto(os.path.join(pasta, "letterings.aep"))
+    AE.motion(spec)
+    arq = AE.mogrt(nome, os.path.join(pasta, "mogrt"))
+    r = lettering(seq, arq, None, inicio, spec["dur"], trilha=trilha)
+    r["mogrt"] = arq
+    return r
 
 
 def efeitos_audio():
@@ -568,6 +599,76 @@ def isolar_voz(seq, trilha_audio=0):
       }
       return { efeito: nome, clipes: n };
     """, "isolar voz", seq=seq, trilha=trilha_audio)
+
+
+_JS_ANIMAR = """
+// Keyframes no clipe da trilha `trilha` (0 = V1) que começa em `tempo`: Movimento (posição em fração do quadro,
+// escala %, rotação °) e Opacidade (%). chaves = [[t, {x, y, escala, giro, opacidade}], ...] com t em segundos
+// a partir do INÍCIO DO CLIPE na sequência.
+const p = await proj(); const s = await seqPorNome(p, args.seq);
+let alvo = null;
+for (const it of (await s.getVideoTrack(args.trilha)).getTrackItems(CLIPE, false))
+  if (Math.abs((await it.getStartTime()).seconds - args.tempo) < 0.05) alvo = it;
+if (!alvo) throw new Error("clipe não encontrado na V" + (args.trilha + 1) + " em " + args.tempo + " s");
+const entrada = (await alvo.getInPoint()).seconds;          // keyframe conta no tempo da mídia do clipe
+const cadeia = await alvo.getComponentChain();
+const prm = {};
+p.lockedAccess(() => {
+  for (let i = 0; i < cadeia.getComponentCount(); i++) {
+    const c = cadeia.getComponentAtIndex(i);
+    for (let j = 0; j < c.getParamCount(); j++) {
+      const n = c.getParam(j).displayName;
+      if (/^(posição|position)$/i.test(n)) prm.pos = c.getParam(j);
+      else if (/^(escala|scale)$/i.test(n)) prm.esc = c.getParam(j);
+      else if (/^(rotação|rotation)$/i.test(n)) prm.rot = c.getParam(j);
+      else if (/^(opacidade|opacity)$/i.test(n) && !prm.op) prm.op = c.getParam(j);
+    }
+  }
+});
+const usar = { x: "pos", y: "pos", escala: "esc", giro: "rot", opacidade: "op" };
+const usados = new Set(); for (const [, c] of args.chaves) for (const k in c) usados.add(usar[k]);
+let ok = true, n = 0;
+p.lockedAccess(() => {
+  ok = p.executeTransaction((cc) => {
+    for (const u of usados) if (prm[u]) cc.addAction(prm[u].createSetTimeVaryingAction(true));
+    for (const [t, c] of args.chaves) {
+      const quando = tt(entrada + t);
+      const add = (pr, v) => { const kf = pr.createKeyframe(v); kf.position = quando; cc.addAction(pr.createAddKeyframeAction(kf)); n++; };
+      if (("x" in c || "y" in c) && prm.pos) add(prm.pos, new P.PointF("x" in c ? c.x : 0.5, "y" in c ? c.y : 0.5));
+      if ("escala" in c && prm.esc) add(prm.esc, c.escala);
+      if ("giro" in c && prm.rot) add(prm.rot, c.giro);
+      if ("opacidade" in c && prm.op) add(prm.op, c.opacidade);
+    }
+  }, "Gab: animar");
+});
+return { keyframes: n, ok: ok, entrada: entrada };
+"""
+
+
+def animar(seq, trilha, tempo, chaves):
+    """Animação com keyframes num clipe/gráfico do Premiere (posição, escala, giro, opacidade).
+    trilha: 0 = V1. tempo: onde o clipe começa na sequência (s). chaves: [(t_desde_o_inicio_do_clipe, {...}), ...]
+    com x/y em fração do quadro (0.5, 0.5 = centro), escala em %, giro em graus, opacidade 0-100.
+    Ex. punch-in: animar(s, 0, 9.6, [(1.0, {"escala": 100}), (1.6, {"escala": 112})])."""
+    return js(_JS_ANIMAR, "animar", seq=seq, trilha=trilha, tempo=tempo,
+              chaves=[[float(t), c] for t, c in chaves])
+
+
+def animar_rastreado(seq, trilha, tempo, trilha_json, inicio_no_arquivo, deslocamento=(0.0, -0.10), margem=0.06):
+    """Faz um gráfico/texto (MOGRT, título, PNG) na `trilha` acompanhar a trajetória de scripts/rastrear.py.
+    inicio_no_arquivo: segundo do ARQUIVO rastreado que corresponde ao início do gráfico na sequência (em geral o
+    ponto de entrada do take por baixo + o atraso do gráfico). deslocamento em fração do quadro (dy < 0 = acima)."""
+    tr = json.load(open(trilha_json)) if isinstance(trilha_json, str) else trilha_json
+    W, H = tr["w"], tr["h"]
+    chaves = []
+    for t, x, y, e in tr["pontos"]:
+        rel = t - inicio_no_arquivo
+        if rel < 0:
+            continue
+        cx = min(max(x / W + deslocamento[0], margem), 1 - margem)
+        cy = min(max(y / H + deslocamento[1], margem), 1 - margem)
+        chaves.append((round(rel, 4), {"x": round(cx, 4), "y": round(cy, 4)}))
+    return animar(seq, trilha, tempo, chaves)
 
 
 def marcador(seq, tempo, nome, comentario=""):

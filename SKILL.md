@@ -131,6 +131,9 @@ Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usu�
 **Biblioteca primeiro (economiza tokens):** antes de criar um motion do zero, `python3 SKILL_DIR/scripts/biblioteca_motions.py listar`; se um modelo serve, preencher os campos (`aplicar`) em vez de escrever o motion inteiro. Motion novo aprovado vira modelo (ver `aftereffects/README.md`).
 Presets de lettering do usuário; motions no centro (540, 960), visual do site do cliente, calmos, duração medida na legenda validada; motions em sequência COLADOS (`colar_motions`, sem fade de fundo quando um emenda no outro); edição dinâmica e recursos extras do HyperFrames. Legenda atrás da pessoa e pacote de entrevista: `docs/etapas/extras.md` (quando usar e como).
 
+## 8b. Tracking de texto e animação no editor (`docs/etapas/tracking_animacao.md`)
+Texto que segue rosto/objeto (`scripts/rastrear.py` + aplicar no DaVinci, Premiere ou AE) e animação de clipe com keyframes (punch-in, zoom, pan, giro, opacidade), sempre no editor escolhido e conferido por quadros.
+
 ## 9. Render, formatos e conferência (`docs/etapas/render.md`)
 Só exporta se o usuário pedir; -14 LUFS; `qc.py <pasta> --cliente ... --timeline "<nome>"` (inclui legenda picotada e motion fora do tempo da fala); capa e legenda do post.
 

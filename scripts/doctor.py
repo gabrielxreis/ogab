@@ -101,15 +101,72 @@ def ferramentas():
             item("⟳", "ferramentas", f"{b} instalado")
         else:
             item("!", "ferramentas", f"{b} não encontrado: " + (f"brew install {brew}" if MAC else f"winget install --id {wg} -e"))
-    v = sys.version_info
-    item("✓" if v >= (3, 10) else "!", "ferramentas", f"Python {v.major}.{v.minor}" + ("" if v >= (3, 10) else ": instale o 3.10 ou mais novo"))
-    try:
-        import PIL  # noqa
-        item("✓", "ferramentas", "Pillow")
-    except ImportError:
-        ok = CORRIGIR and roda([sys.executable, "-m", "pip", "install", "--user", "--quiet", "pillow"]).returncode == 0
-        item("⟳" if ok else "!", "ferramentas", "Pillow instalado" if ok else "Pillow: python3 -m pip install --user pillow")
     docker()
+
+
+def pip_instalar(pacote):
+    """pip --user no Python que roda a skill (no Mac com Python do Homebrew precisa de --break-system-packages)."""
+    base = [sys.executable, "-m", "pip", "install", "--user", "--quiet", pacote]
+    return roda(base).returncode == 0 or roda(base + ["--break-system-packages"]).returncode == 0
+
+
+def python():
+    """O Python que a skill usa e cada pacote de que algum recurso depende."""
+    v = sys.version_info
+    py3 = shutil.which("python3") or (shutil.which("py") if WIN else None)
+    item("✓" if v >= (3, 10) else "!", "python", f"Python {v.major}.{v.minor}.{v.micro} em {sys.executable}"
+         + ("" if v >= (3, 10) else ": precisa do 3.10 ou mais novo (" + ("brew install python" if MAC else "winget install Python.Python.3.12") + ")"))
+    if not py3:
+        item("!", "python", "o comando python3 não existe no terminal: " + ("brew install python" if MAC else "rode o windows\\install.ps1 (cria o atalho python3)"))
+    elif MAC and os.path.realpath(py3) != os.path.realpath(sys.executable):
+        r = roda([py3, "-c", "import sys; print(sys.version.split()[0])"]).stdout.strip()
+        item("·", "python", f"python3 do terminal é outro ({py3}, {r}); a skill usa o que roda os scripts")
+    if roda([sys.executable, "-m", "pip", "--version"]).returncode != 0:
+        ok = CORRIGIR and roda([sys.executable, "-m", "ensurepip", "--user"]).returncode == 0
+        item("⟳" if ok else "!", "python", "pip instalado" if ok else "pip não existe: " + sys.executable + " -m ensurepip --user")
+    c = cfg()
+    pacotes = [("PIL", "pillow", "imagens (prévias, legenda baixa, QC)", True),
+               ("numpy", "numpy", "contas de imagem e rastreio", True),
+               ("cv2", "opencv-python", "rastreio de texto/objeto/rosto (rastrear.py)", True)]
+    if MAC and c.get("editor", "davinci") == "davinci":
+        pacotes.append(("Vision", "pyobjc-framework-Vision", "OCR da legenda no DaVinci (legenda_ui.py)", False))
+        pacotes.append(("Quartz", "pyobjc-framework-Quartz", "cliques da legenda no DaVinci (legenda_ui.py)", False))
+    for mod, pac, uso, obrig in pacotes:
+        try:
+            __import__(mod)
+            item("✓", "python", f"{pac} ({uso})")
+        except Exception:
+            ok = CORRIGIR and pip_instalar(pac)
+            item("⟳" if ok else ("!" if obrig else "·"), "python",
+                 f"{pac} instalado ({uso})" if ok else f"{pac} faltando ({uso}): {sys.executable} -m pip install --user {pac}")
+
+
+def ffmpeg_detalhes():
+    if not shutil.which("ffmpeg"):
+        return
+    enc = roda(["ffmpeg", "-hide_banner", "-encoders"]).stdout
+    fil = roda(["ffmpeg", "-hide_banner", "-filters"]).stdout
+    faltam = [n for n, txt in (("prores_ks (MOV com alfa)", "prores_ks"), ("libx264 (MP4)", "libx264"), ("aac", " aac "))
+              if txt not in enc] + [n for n, txt in (("loudnorm", "loudnorm"), ("ebur128", "ebur128")) if txt not in fil]
+    item("✓" if not faltam else "!", "ferramentas", "ffmpeg com ProRes 4444, H.264, AAC, loudnorm e ebur128" if not faltam
+         else "ffmpeg sem " + ", ".join(faltam) + ": reinstale o ffmpeg completo (" + ("brew reinstall ffmpeg" if MAC else "winget install Gyan.FFmpeg") + ")")
+    if shutil.which("node"):
+        nv = roda(["node", "--version"]).stdout.strip().lstrip("v")
+        maior = int(nv.split(".")[0]) if nv[:1].isdigit() else 0
+        item("✓" if maior >= 18 else "!", "ferramentas", f"Node {nv}" + ("" if maior >= 18 else ": precisa do 18+ (HyperFrames)"))
+    livre = shutil.disk_usage(HOME).free / 1e9
+    item("✓" if livre >= 20 else "!", "ferramentas", f"{livre:.0f} GB livres no disco" + ("" if livre >= 20 else ": render e takes precisam de 20 GB+; libere espaço"))
+
+
+def _versao_app(caminho_app):
+    if MAC:
+        v = roda(["defaults", "read", os.path.join(caminho_app, "Contents", "Info"), "CFBundleShortVersionString"]).stdout.strip()
+    else:
+        v = roda(["powershell", "-NoProfile", "-Command", f"(Get-Item '{caminho_app}').VersionInfo.ProductVersion"]).stdout.strip()
+    try:
+        return tuple(int(x) for x in re.findall(r"\d+", v)[:3]), v
+    except Exception:
+        return (0,), v
 
 
 def docker():
@@ -171,6 +228,16 @@ def davinci(usa):
         return
     item("✓" if os.path.exists(lib) else _rel(usa), "DaVinci",
          "scripting do Resolve" if os.path.exists(lib) else "sem scripting: precisa do DaVinci Resolve STUDIO")
+    ver, vtxt = _versao_app(app if MAC else os.path.join(app, "Resolve.exe"))
+    if ver >= (21, 1):
+        item("✓", "DaVinci", f"DaVinci {vtxt} (transcreve pela API)")
+    else:
+        mod, pac = ("mlx_whisper", "mlx-whisper") if (MAC and platform.machine() == "arm64") else ("faster_whisper", "faster-whisper")
+        try:
+            __import__(mod); item("✓", "DaVinci", f"DaVinci {vtxt}: transcrição pelo Whisper local ({pac})")
+        except Exception:
+            ok = CORRIGIR and usa and pip_instalar(pac)
+            item("⟳" if ok else _rel(usa), "DaVinci", f"DaVinci {vtxt} é anterior à 21.1: " + (f"{pac} instalado para a transcrição" if ok else f"falta o Whisper local ({pac}) ou atualizar para a 21.1+"))
     pac = glob.glob(os.path.join(RAIZ, "assets", "lettering", "*.drfx"))
     if pac and not all(os.path.exists(os.path.join(tpl, os.path.basename(p))) for p in pac):
         if CORRIGIR:
@@ -221,6 +288,17 @@ def premiere(usa):
     else:
         item("✓" if uxp else _rel(usa), "Premiere", "plugin Gab Ponte" if uxp else "plugin Gab Ponte não instalado (rode com --corrigir)")
         item("✓" if lut_ok else _rel(usa), "Premiere", "LUT DO GAB" if lut_ok else "LUT DO GAB não instalado (rode com --corrigir)")
+    ver, vtxt = _versao_app(apps[-1] if MAC else os.path.join(apps[-1], "Adobe Premiere Pro.exe"))
+    item("✓" if ver >= (26,) else _rel(usa), "Premiere", f"Premiere {vtxt}" + ("" if ver >= (26,) else ": a ponte precisa do 26 (2026) ou mais novo"))
+    mg = os.path.join(HOME, "Library/Application Support/Adobe/Common/Motion Graphics Templates") if MAC else \
+         os.path.join(os.environ.get("APPDATA", ""), "Adobe", "Common", "Motion Graphics Templates")
+    faltam = [f for f in glob.glob(os.path.join(RAIZ, "premiere", "assets", "mogrt", "*.mogrt")) if not os.path.exists(os.path.join(mg, os.path.basename(f)))]
+    if faltam and CORRIGIR:
+        os.makedirs(mg, exist_ok=True)
+        for f in faltam: shutil.copy(f, mg)
+        item("⟳", "Premiere", f"{len(faltam)} MOGRT(s) da biblioteca instalados")
+    else:
+        item("✓" if not faltam else _rel(usa), "Premiere", "MOGRTs da biblioteca" if not faltam else f"{len(faltam)} MOGRT(s) da biblioteca faltando (rode com --corrigir)")
     if usa:
         item("·", "Premiere", "no Premiere, uma vez: Window > UXP Plugins > Gab Ponte (painel encaixado)")
 
@@ -235,17 +313,25 @@ def aftereffects(usa):
     if not apps:
         item(_rel(usa), "After Effects", "After Effects não instalado (Creative Cloud)")
         return
+    app_ae = glob.glob(os.path.join(apps[-1], "Adobe After Effects 20*.app"))[0] if MAC else os.path.join(apps[-1], "Support Files", "AfterFX.exe")
+    ver, vtxt = _versao_app(app_ae)
+    item("✓" if ver >= (24,) else _rel(usa), "After Effects", f"After Effects {vtxt}" + ("" if ver >= (24,) else ": precisa do 2024 ou mais novo"))
+    debug = roda(["defaults", "read", "com.adobe.CSXS.12", "PlayerDebugMode"]).stdout.strip() == "1" if MAC else \
+            "0x1" in roda(["reg", "query", r"HKCU\Software\Adobe\CSXS.12", "/v", "PlayerDebugMode"]).stdout or \
+            "1" in roda(["reg", "query", r"HKCU\Software\Adobe\CSXS.12", "/v", "PlayerDebugMode"]).stdout
+    item("✓" if debug else _rel(usa), "After Effects", "extensões sem assinatura liberadas (CEP)" if debug else "extensões sem assinatura bloqueadas (rode com --corrigir com o AE fechado)")
     h = lambda p: hashlib.md5(open(p, "rb").read()).hexdigest() if os.path.exists(p) else None
     atual = h(os.path.join(ext, "main.js")) == h(os.path.join(RAIZ, "aftereffects", "cep", "main.js"))
     aberto = roda(["pgrep", "-f", "After Effects.app/Contents/MacOS/After Effects"] if MAC else ["tasklist", "/FI", "IMAGENAME eq AfterFX.exe"]).stdout
     aberto = bool(aberto.strip()) and ("AfterFX" in aberto or MAC)
-    if not atual:
+    if not atual or not debug:
         if CORRIGIR and not aberto:
             inst = os.path.join(RAIZ, "aftereffects", "instalar.sh" if MAC else "instalar.ps1")
             roda(["bash", inst] if MAC else ["powershell", "-ExecutionPolicy", "Bypass", "-File", inst], env=dict(os.environ, OGAB_SEM_CONFIG="1"))
-            item("⟳", "After Effects", "extensão Gab Ponte AE instalada/atualizada")
+            item("⟳", "After Effects", "extensão Gab Ponte AE e liberação de extensões corrigidas")
         else:
-            item(_rel(usa), "After Effects", "extensão Gab Ponte AE desatualizada ou ausente" + (": feche o AE e rode com --corrigir" if aberto else ": rode com --corrigir"))
+            falta = [x for x, ok in (("extensão Gab Ponte AE desatualizada ou ausente", atual), ("liberação de extensões", debug)) if not ok]
+            item(_rel(usa), "After Effects", "; ".join(falta) + (": feche o AE e rode com --corrigir" if aberto else ": rode com --corrigir"))
     else:
         item("✓", "After Effects", "extensão Gab Ponte AE")
     if aberto and usa:
@@ -253,6 +339,17 @@ def aftereffects(usa):
             ok = urllib.request.urlopen("http://127.0.0.1:8766/ping", timeout=3).read() == b"ok"
         except Exception:
             ok = False
+        if ok:   # o que importa: a ponte gravar arquivo (quadros, render, MOGRT); a preferência do menu não vale para ela
+            try:
+                teste = os.path.join(HOME, ".ogab_teste_ae.txt")
+                req = urllib.request.Request("http://127.0.0.1:8766/jsx", method="POST",
+                    data=('var f = new File(' + json.dumps(teste) + '); f.open("w"); f.write("ok"); f.close(); f.exists;').encode())
+                grava = urllib.request.urlopen(req, timeout=15).read().decode().strip() == "true" and os.path.exists(teste)
+                if os.path.exists(teste): os.remove(teste)
+            except Exception:
+                grava = False
+            item("✓" if grava else "!", "After Effects", "a ponte grava arquivos (quadros, render, MOGRT)" if grava else
+                 "a ponte não consegue gravar arquivos: AE > Ajustes > Scripts e expressões > permitir que scripts gravem arquivos")
         item("✓" if ok else "!", "After Effects", "o Gab conecta no AE aberto" if ok else
              "o AE está aberto mas a ponte não responde: veja se há um aviso aberto no AE; se não, feche e abra o AE")
 
@@ -266,7 +363,7 @@ def windows():
 
 
 def main():
-    skill(); ferramentas(); extras(); windows()
+    skill(); python(); ferramentas(); ffmpeg_detalhes(); extras(); windows()
     c = cfg()
     davinci(c.get("editor", "davinci") == "davinci")
     premiere(c.get("editor") == "premiere")

@@ -41,9 +41,16 @@ foreach ($p in $pacotes) {
   AtualizaPath
   if (Tem $p.bin) { Ok "$($p.bin) instalado" } else { Warn "nao consegui instalar $($p.id); rode: winget install --id $($p.id) -e" }
 }
-Info "3/10 Pillow (Python)"
-Py -c "import PIL" 2>$null
-if ($LASTEXITCODE -eq 0) { Ok "Pillow ja instalado" } else { Py -m pip install --user --quiet pillow; Ok "Pillow instalado" }
+Info "3/10 Pacotes Python (Pillow, numpy, OpenCV para o rastreio)"
+foreach ($par in @(@("PIL", "pillow"), @("numpy", "numpy"), @("cv2", "opencv-python"))) {
+  Py -c "import $($par[0])" 2>$null
+  if ($LASTEXITCODE -eq 0) { Ok "$($par[1]) ja instalado" }
+  else {
+    Py -m pip install --user --quiet $par[1]
+    Py -c "import $($par[0])" 2>$null
+    if ($LASTEXITCODE -eq 0) { Ok "$($par[1]) instalado" } else { Warn "nao consegui instalar $($par[1]) (o doctor tenta de novo no fim)" }
+  }
+}
 
 Info "4/10 Gab (/ogab)"
 if (Test-Path (Join-Path $DEST ".git")) {

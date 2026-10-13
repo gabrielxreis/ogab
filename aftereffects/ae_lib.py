@@ -188,6 +188,24 @@ def renderizar(comp, saida, motor="quadros", limite=1800):
     return saida
 
 
+def seguir(comp, camada, trilha_json, inicio_no_arquivo=0.0, deslocamento=(0, -120), comp_inicio=0.0):
+    """Faz a camada (texto, forma, grupo) acompanhar a trajetória de scripts/rastrear.py: keyframes de posição.
+    deslocamento em pixels da comp (dy < 0 = acima). inicio_no_arquivo: segundo do arquivo rastreado que cai em
+    comp_inicio na comp. As posições são convertidas da resolução do vídeo para a da comp."""
+    tr = json.load(open(trilha_json)) if isinstance(trilha_json, str) else trilha_json
+    pts = [[round(t - inicio_no_arquivo + comp_inicio, 4), x, y] for t, x, y, e in tr["pontos"] if t >= inicio_no_arquivo]
+    return jsx("""
+      var c = GAB.comp(args.comp); if (!c) throw new Error("comp não encontrada: " + args.comp);
+      var l = c.layer(args.camada); if (!l) throw new Error("camada não encontrada: " + args.camada);
+      var sx = c.width / args.w, sy = c.height / args.h, pos = l.property("ADBE Transform Group").property("ADBE Position");
+      app.beginUndoGroup("Gab: seguir trilha");
+      var ts = [], vs = [];
+      for (var i = 0; i < args.pts.length; i++) { ts.push(args.pts[i][0]); vs.push([args.pts[i][1] * sx + args.d[0], args.pts[i][2] * sy + args.d[1]]); }
+      pos.setValuesAtTimes(ts, vs);
+      app.endUndoGroup();
+      return ts.length;""", "seguir", comp=comp, camada=camada, pts=pts, w=tr["w"], h=tr["h"], d=list(deslocamento))
+
+
 def fechar():
     """Salva e fecha o AE sem perguntas (nunca usar Cmd+Q: a pergunta de salvar trava tudo)."""
     try:

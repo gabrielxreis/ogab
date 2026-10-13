@@ -859,3 +859,81 @@ def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
         if not x: print("SFX falhou:", nome, ini); continue
         x[0].SetProperty("AudioVolume", db); x[0].SetFades({"FadeOut": min(8, round(dur * F / 4))}); fim[k] = x[0].GetEnd(); ok += 1
     return ok, len(ev)
+
+
+# ------------------------------------------------------------------ tracking e animação (12/10/2026)
+
+def _comp_do_clipe(item):
+    comp = item.GetFusionCompByIndex(1) if item.GetFusionCompCount() else item.AddFusionComp()
+    if not comp:
+        raise RuntimeError(f"não consegui abrir o Fusion do clipe {item.GetName()}")
+    return comp
+
+
+def _quadro_comp(comp, t_arquivo, fps_arquivo):
+    """Quadro da composição do Fusion de um clipe: conta na taxa do ARQUIVO, a partir do início da mídia
+    (COMPN_GlobalStart é negativo = quadros antes do ponto de entrada)."""
+    return round(t_arquivo * fps_arquivo + comp.GetAttrs()["COMPN_GlobalStart"])
+
+
+def texto_rastreado(item, trilha, texto, deslocamento=(0.0, -0.10), tamanho=0.06, fonte="Inter", estilo="Bold",
+                    cor=(1.0, 1.0, 1.0), margem=0.06, seguir_escala=False):
+    """Texto que ACOMPANHA um objeto/rosto (trilha de scripts/rastrear.py) dentro do Fusion do próprio clipe.
+    deslocamento = (dx, dy) em fração do quadro em relação ao centro rastreado (dy negativo = acima).
+    Fica dentro da área segura (margem). Nós criados: TextoRastreado (Text+) + MergeTexto, editáveis no Fusion.
+    Devolve quantos keyframes de posição foram gravados."""
+    import json as _json
+    tr = _json.load(open(trilha)) if isinstance(trilha, str) else trilha
+    comp = _comp_do_clipe(item)
+    mi, mo = comp.FindTool("MediaIn1"), comp.FindTool("MediaOut1")
+    comp.Lock()
+    txt = comp.AddTool("TextPlus", -32768, -32768); txt.SetAttrs({"TOOLS_Name": "TextoRastreado"})
+    mg = comp.AddTool("Merge", -32768, -32768); mg.SetAttrs({"TOOLS_Name": "MergeTexto"})
+    comp.Unlock()
+    txt.SetInput("StyledText", texto); txt.SetInput("Font", fonte); txt.SetInput("Style", estilo); txt.SetInput("Size", tamanho)
+    txt.SetInput("Red1", cor[0]); txt.SetInput("Green1", cor[1]); txt.SetInput("Blue1", cor[2])
+    origem = mo.Input.GetConnectedOutput() or mi.Output
+    mg.Background = origem; mg.Foreground = txt.Output; mo.Input = mg.Output
+    txt.AddModifier("Center", "XYPath")
+    W, H, fps = tr["w"], tr["h"], tr["fps"]
+    meia = min(0.45, len(texto) * tamanho * 0.29)          # meia largura aproximada do texto (fração do quadro)
+    n = 0
+    for t, x, y, e in tr["pontos"]:
+        cx = x / W + deslocamento[0] * (e if seguir_escala else 1)
+        cy = 1 - y / H - deslocamento[1] * (e if seguir_escala else 1)
+        cx = min(max(cx, margem + meia), 1 - margem - meia)
+        cy = min(max(cy, margem), 1 - margem)
+        txt.SetInput("Center", {1: cx, 2: cy}, _quadro_comp(comp, t, fps)); n += 1
+    if seguir_escala:
+        txt.AddModifier("Size", "BezierSpline")
+        for t, x, y, e in tr["pontos"]:
+            txt.SetInput("Size", tamanho * e, _quadro_comp(comp, t, fps))
+    return n
+
+
+def animar_clipe(item, chaves, fps_arquivo=None, nome="AnimGab"):
+    """Animação com keyframes no clipe (zoom, pan, giro), por um nó Transform no Fusion do clipe (a API da
+    timeline não grava keyframes). chaves = [(t_arquivo_s, {"zoom": 1.0, "x": 0.5, "y": 0.5, "giro": 0}), ...]
+    em segundos do ARQUIVO; x/y = centro (0-1, y para cima). Ex. punch-in: [(2.0, {"zoom": 1.0}), (2.4, {"zoom": 1.15})]."""
+    comp = _comp_do_clipe(item)
+    mi, mo = comp.FindTool("MediaIn1"), comp.FindTool("MediaOut1")
+    fps = fps_arquivo or float(item.GetMediaPoolItem().GetClipProperty("FPS") or 30)
+    tf = comp.FindTool(nome)
+    if not tf:
+        comp.Lock(); tf = comp.AddTool("Transform", -32768, -32768); tf.SetAttrs({"TOOLS_Name": nome}); comp.Unlock()
+        tf.Input = mi.Output
+        seguinte = [x for x in comp.GetToolList(False).values() if x.ID == "Merge" and x.Background.GetConnectedOutput() and x.Background.GetConnectedOutput().GetTool().Name == "MediaIn1"]
+        if seguinte:
+            seguinte[0].Background = tf.Output
+        else:
+            mo.Input = tf.Output
+    usados = set(k for _, c in chaves for k in c)
+    if "zoom" in usados: tf.AddModifier("Size", "BezierSpline")
+    if "giro" in usados: tf.AddModifier("Angle", "BezierSpline")
+    if "x" in usados or "y" in usados: tf.AddModifier("Center", "XYPath")
+    for t, c in chaves:
+        f = _quadro_comp(comp, t, fps)
+        if "zoom" in c: tf.SetInput("Size", c["zoom"], f)
+        if "giro" in c: tf.SetInput("Angle", c["giro"], f)
+        if "x" in c or "y" in c: tf.SetInput("Center", {1: c.get("x", 0.5), 2: c.get("y", 0.5)}, f)
+    return tf.Name
