@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-10
+- Vídeo baixado entra ORIGINAL na timeline: o Gab não re-renderiza nem muda a velocidade, só se você pedir.
+
 ## 2026.10.13-9
 - Takes de IA: toda imagem vira vídeo (nada de foto parada) e os cortes seguem a legenda, um por frase, contando a história.
 - Legenda em timeline 24 fps: `legendas.py ... --fps 24` (antes lia sempre a 30 e a legenda podia sair até 0,2 s fora).
