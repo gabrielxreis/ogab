@@ -1,190 +1,191 @@
 {
-  "_leia": "Copie para config.json (fica só na sua máquina). Edite à mão ou peça: '/ogab config' para ver e mudar.",
-  "pasta_saida": "~/Desktop",
-  "provedores": {
-    "voz": [
-      "elevenlabs",
-      "artlist"
-    ],
-    "musica": [
-      "artlist",
-      "envato"
-    ],
-    "efeitos_sonoros": [
-      "artlist",
-      "envato"
-    ],
-    "takes_banco": [
-      "envato",
-      "artlist",
-      "storyblocks",
-      "pexels"
-    ],
-    "geracao_takes": [
-      "magnific_site_ilimitado"
-    ],
-    "geracao_takes_obs": "ordem de preferência; qualquer IA que o usuário use: magnific_site_ilimitado, higgsfield, kling_site, runway... A skill pergunta na 1a vez e salva aqui.",
-    "download": "navegador",
-    "editor": "davinci_resolve"
+ "_leia": "Copie para config.json (fica só na sua máquina). Edite à mão ou peça: '/ogab config' para ver e mudar.",
+ "pasta_saida": "~/Desktop",
+ "provedores": {
+  "voz": [
+   "elevenlabs",
+   "artlist"
+  ],
+  "musica": [
+   "artlist",
+   "envato"
+  ],
+  "efeitos_sonoros": [
+   "artlist",
+   "envato"
+  ],
+  "takes_banco": [
+   "envato",
+   "artlist",
+   "storyblocks",
+   "pexels"
+  ],
+  "geracao_takes": [
+   "magnific_site_ilimitado"
+  ],
+  "geracao_takes_obs": "ordem de preferência; qualquer IA que o usuário use: magnific_site_ilimitado, higgsfield, kling_site, runway... A skill pergunta na 1a vez e salva aqui.",
+  "download": "navegador",
+  "editor": "davinci_resolve"
+ },
+ "opcoes": {
+  "efeitos_sonoros": true,
+  "movimentos_nos_takes": "perguntar",
+  "lettering_no_gancho": "perguntar",
+  "multi_formatos": false,
+  "formatos_extras": [
+   "4:5",
+   "16:9"
+  ],
+  "versoes_ads": [
+   15,
+   30,
+   60
+  ],
+  "conferencia_automatica": true,
+  "pauta_automatica": {
+   "ativo": false,
+   "fonte": "gratis",
+   "_fontes_possiveis": "gratis (Google News RSS) | newsapi (precisa NEWSAPI_KEY) | gnews (precisa GNEWS_KEY)",
+   "temas_por_cliente": true,
+   "quantas_sugestoes": 3
   },
-  "opcoes": {
-    "efeitos_sonoros": true,
-    "movimentos_nos_takes": "perguntar",
-    "lettering_no_gancho": "perguntar",
-    "multi_formatos": false,
-    "formatos_extras": [
-      "4:5",
-      "16:9"
-    ],
-    "versoes_ads": [
-      15,
-      30,
-      60
-    ],
-    "conferencia_automatica": true,
-    "pauta_automatica": {
-      "ativo": false,
-      "fonte": "gratis",
-      "_fontes_possiveis": "gratis (Google News RSS) | newsapi (precisa NEWSAPI_KEY) | gnews (precisa GNEWS_KEY)",
-      "temas_por_cliente": true,
-      "quantas_sugestoes": 3
-    },
-    "renderizar_video": false,
-    "palavras_chave_lettering": true,
-    "capa_e_legenda_post": true,
-    "_renderizar_video": "false = deixa a timeline pronta no DaVinci e NÃO exporta o MP4 (o usuário exporta). A capa (PNG) e a legenda do post são geradas mesmo assim.",
-    "origem_takes": "perguntar",
-    "_origem_takes": "perguntar | ia (tudo gerado no Magnific ilimitado) | banco (Envato etc.) | misto (banco no real, IA no conceitual)",
-    "legenda_atras_da_pessoa": true,
-    "pacote_entrevista": "perguntar"
+  "renderizar_video": false,
+  "palavras_chave_lettering": true,
+  "capa_e_legenda_post": true,
+  "_renderizar_video": "false = deixa a timeline pronta no DaVinci e NÃO exporta o MP4 (o usuário exporta). A capa (PNG) e a legenda do post são geradas mesmo assim.",
+  "origem_takes": "perguntar",
+  "_origem_takes": "perguntar | ia (tudo gerado no Magnific ilimitado) | banco (Envato etc.) | misto (banco no real, IA no conceitual)",
+  "legenda_atras_da_pessoa": true,
+  "pacote_entrevista": "perguntar"
+ },
+ "regras": {
+  "duracao_segundos": {
+   "instagram": [
+    30,
+    90
+   ],
+   "youtube_shorts": [
+    15,
+    60
+   ],
+   "youtube_longo": [
+    180,
+    900
+   ],
+   "meta_ads": [
+    15,
+    30,
+    60
+   ]
   },
-  "regras": {
-    "duracao_segundos": {
-      "instagram": [
-        30,
-        90
-      ],
-      "youtube_shorts": [
-        15,
-        60
-      ],
-      "youtube_longo": [
-        180,
-        900
-      ],
-      "meta_ads": [
-        15,
-        30,
-        60
-      ]
-    },
-    "palavras_por_minuto": 150,
-    "fps": 30,
-    "volume_db": {
-      "narracao": 5,
-      "musica": -10
-    },
-    "fade_out_musica_s": 2.5,
-    "audio_hz": 48000,
-    "loudness_alvo_lufs": -14,
-    "legenda": {
-      "uma_linha": true,
-      "max_caracteres": 25,
-      "preset_trilha": {
-        "fonte": "Poppins",
-        "estilo": "Bold",
-        "tamanho": 40,
-        "caixa_alta": true,
-        "cor": "branco",
-        "posicao": "baixo centro"
-      }
-    },
-    "evitar_green_screen": true,
-    "converter_takes_pesados_para_1080": true,
-    "geracao_so_ilimitada": true
+  "palavras_por_minuto": 150,
+  "fps": 30,
+  "volume_db": {
+   "narracao": 5,
+   "musica": -10
   },
-  "lettering": {
-    "_leia": "Pacote de títulos animados do Fusion (.drfx) instalado em ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/. O nome do template é o nome do arquivo .setting dentro do pacote. O pacote @gabrielxreis_ Text Presets vem em assets/lettering/ e o instalador já copia; para usar outro pacote, instale e liste os nomes aqui.",
-    "pacote": "@gabrielxreis_ Text Presets.drfx",
-    "template_gancho": "@gabrielxreis_ Cinematic",
-    "templates_disponiveis": [
-      "@gabrielxreis_ Abaixo (Rápido)",
-      "@gabrielxreis_ Abaixo",
-      "@gabrielxreis_ Acima (Rápido)",
-      "@gabrielxreis_ Acima",
-      "@gabrielxreis_ Blur",
-      "@gabrielxreis_ Blur Up",
-      "@gabrielxreis_ Brilho",
-      "@gabrielxreis_ Brilho 2",
-      "@gabrielxreis_ Cinematic",
-      "@gabrielxreis_ Corte",
-      "@gabrielxreis_ Corte Linha",
-      "@gabrielxreis_ Destacado",
-      "@gabrielxreis_ Direita (Rápido)",
-      "@gabrielxreis_ Direita",
-      "@gabrielxreis_ Esquerda (Rápido)",
-      "@gabrielxreis_ Esquerda",
-      "@gabrielxreis_ Flicker",
-      "@gabrielxreis_ Flicking",
-      "@gabrielxreis_ Girando",
-      "@gabrielxreis_ Gold Design",
-      "@gabrielxreis_ Moderno",
-      "@gabrielxreis_ Palavra Por Palavra",
-      "@gabrielxreis_ Palavra Por Palavra 2",
-      "@gabrielxreis_ Reveal",
-      "@gabrielxreis_ Silver Design",
-      "@gabrielxreis_ Slide",
-      "@gabrielxreis_ Sublinhado",
-      "@gabrielxreis_ Surgir",
-      "@gabrielxreis_ Zoom Out"
-    ],
-    "template_palavras_chave": "@gabrielxreis_ Cinematic",
-    "favoritos": [
-      "@gabrielxreis_ Palavra Por Palavra",
-      "@gabrielxreis_ Palavra Por Palavra 2"
-    ],
-    "rodizio": [
-      "@gabrielxreis_ Zoom Out",
-      "@gabrielxreis_ Destacado",
-      "@gabrielxreis_ Blur Up",
-      "@gabrielxreis_ Surgir",
-      "@gabrielxreis_ Reveal",
-      "@gabrielxreis_ Slide",
-      "@gabrielxreis_ Acima",
-      "@gabrielxreis_ Abaixo",
-      "@gabrielxreis_ Brilho",
-      "@gabrielxreis_ Cinematic"
-    ],
-    "evitar_2_linhas": [
-      "@gabrielxreis_ Sublinhado",
-      "@gabrielxreis_ Moderno",
-      "@gabrielxreis_ Corte"
-    ],
-    "_variar": "Favoritos em ~metade dos letterings, o resto alternando o rodízio; nunca a mesma animação duas vezes seguidas."
+  "fade_out_musica_s": 2.5,
+  "audio_hz": 48000,
+  "loudness_alvo_lufs": -14,
+  "legenda": {
+   "uma_linha": true,
+   "max_caracteres": 25,
+   "preset_trilha": {
+    "fonte": "Poppins",
+    "estilo": "Bold",
+    "tamanho": 40,
+    "caixa_alta": true,
+    "cor": "branco",
+    "posicao": "baixo centro"
+   }
   },
-  "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome.",
-  "cor": {
-    "_leia": "PowerGrade (.drx) aplicado em TODOS os takes que entram na timeline. Exporte do DaVinci: Color > Gallery > botão direito no still > Export (gera .dpx + .drx). Coloque os arquivos em assets/grade/ (fica fora do git).",
-    "aplicar_power_grade": false,
-    "drx": "assets/grade/<seu PowerGrade>.drx",
-    "drx_iphone": "assets/grade/<conversor do iPhone + seu LUT>.drx",
-    "_iphone": "Takes de iPhone (detectados pelo metadado Apple ou HEVC HLG/Dolby Vision) recebem drx_iphone: um PowerGrade COMBINADO com o nó conversor do iPhone ANTES dos nós do seu LUT. Crie uma vez no DaVinci: aplique o conversor num clipe de iPhone, adicione depois os nós do seu LUT (ou aplique o LUT e insira o conversor como primeiro nó), grave o still na Gallery e exporte (.drx). Se não existir, o iPhone recebe só o drx normal e a skill avisa."
-  },
-  "backgrounds": {
-    "_leia": "BGs animados (loops) que ficam atrás de gráficos de dados. Ficam só na sua máquina, nunca no repositório. Sem pasta, a skill cria o BG em código no HyperFrames (sem crédito).",
-    "pasta": "<pasta dos seus BGs animados verticais, ex.: /Volumes/SSD/BACKGROUND/VERTICAL>",
-    "resolucao": "HD",
-    "preferidos_para_dados": [
-      "1 Shadow Grid",
-      "2 Vibrant Flow",
-      "3 Jitter"
-    ],
-    "com_variacao_de_cor": [
-      "4 Flames",
-      "5 Explosion",
-      "6 Vortex"
-    ]
-  },
-  "ficha_layout_exemplo": "caminho de uma ficha já aprovada (só para o layout; o rosto dela nunca é usado)",
-  "boas_vindas_mostrada": false
+  "evitar_green_screen": true,
+  "converter_takes_pesados_para_1080": true,
+  "geracao_so_ilimitada": true
+ },
+ "lettering": {
+  "_leia": "Pacote de títulos animados do Fusion (.drfx) instalado em ~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/. O nome do template é o nome do arquivo .setting dentro do pacote. O pacote @gabrielxreis_ Text Presets vem em assets/lettering/ e o instalador já copia; para usar outro pacote, instale e liste os nomes aqui.",
+  "pacote": "@gabrielxreis_ Text Presets.drfx",
+  "template_gancho": "@gabrielxreis_ Cinematic",
+  "templates_disponiveis": [
+   "@gabrielxreis_ Abaixo (Rápido)",
+   "@gabrielxreis_ Abaixo",
+   "@gabrielxreis_ Acima (Rápido)",
+   "@gabrielxreis_ Acima",
+   "@gabrielxreis_ Blur",
+   "@gabrielxreis_ Blur Up",
+   "@gabrielxreis_ Brilho",
+   "@gabrielxreis_ Brilho 2",
+   "@gabrielxreis_ Cinematic",
+   "@gabrielxreis_ Corte",
+   "@gabrielxreis_ Corte Linha",
+   "@gabrielxreis_ Destacado",
+   "@gabrielxreis_ Direita (Rápido)",
+   "@gabrielxreis_ Direita",
+   "@gabrielxreis_ Esquerda (Rápido)",
+   "@gabrielxreis_ Esquerda",
+   "@gabrielxreis_ Flicker",
+   "@gabrielxreis_ Flicking",
+   "@gabrielxreis_ Girando",
+   "@gabrielxreis_ Gold Design",
+   "@gabrielxreis_ Moderno",
+   "@gabrielxreis_ Palavra Por Palavra",
+   "@gabrielxreis_ Palavra Por Palavra 2",
+   "@gabrielxreis_ Reveal",
+   "@gabrielxreis_ Silver Design",
+   "@gabrielxreis_ Slide",
+   "@gabrielxreis_ Sublinhado",
+   "@gabrielxreis_ Surgir",
+   "@gabrielxreis_ Zoom Out"
+  ],
+  "template_palavras_chave": "@gabrielxreis_ Cinematic",
+  "favoritos": [
+   "@gabrielxreis_ Palavra Por Palavra",
+   "@gabrielxreis_ Palavra Por Palavra 2"
+  ],
+  "rodizio": [
+   "@gabrielxreis_ Zoom Out",
+   "@gabrielxreis_ Destacado",
+   "@gabrielxreis_ Blur Up",
+   "@gabrielxreis_ Surgir",
+   "@gabrielxreis_ Reveal",
+   "@gabrielxreis_ Slide",
+   "@gabrielxreis_ Acima",
+   "@gabrielxreis_ Abaixo",
+   "@gabrielxreis_ Brilho",
+   "@gabrielxreis_ Cinematic"
+  ],
+  "evitar_2_linhas": [
+   "@gabrielxreis_ Sublinhado",
+   "@gabrielxreis_ Moderno",
+   "@gabrielxreis_ Corte"
+  ],
+  "_variar": "Favoritos em ~metade dos letterings, o resto alternando o rodízio; nunca a mesma animação duas vezes seguidas."
+ },
+ "_contas": "Este arquivo NÃO guarda contas, senhas nem chaves. Cada pessoa conecta as PRÓPRIAS contas no Claude (Configurações > Conectores) e faz login nos sites no próprio Chrome.",
+ "cor": {
+  "_leia": "Cor dos takes no DaVinci. Padrão: a LUT DO GAB (o instalador põe na pasta de LUTs do DaVinci) aplicada no nó 1 de cada take. Quem tem PowerGrade próprio: exporte do DaVinci (Color > Gallery > botão direito no still > Export, gera .dpx + .drx), coloque em assets/grade/ (fora do git) e aponte em drx: o PowerGrade passa a valer no lugar da LUT.",
+  "aplicar_power_grade": true,
+  "drx": "",
+  "drx_iphone": "",
+  "_iphone": "Takes de iPhone (detectados pelo metadado Apple ou HEVC HLG/Dolby Vision) recebem drx_iphone: um PowerGrade COMBINADO com o nó conversor do iPhone ANTES dos nós do seu LUT. Crie uma vez no DaVinci: aplique o conversor num clipe de iPhone, adicione depois os nós do seu LUT (ou aplique o LUT e insira o conversor como primeiro nó), grave o still na Gallery e exporte (.drx). Se não existir, o iPhone recebe só o drx normal e a skill avisa.",
+  "lut": "LUT DO GAB/LUT DO GAB.cube"
+ },
+ "backgrounds": {
+  "_leia": "BGs animados (loops) que ficam atrás de gráficos de dados. Ficam só na sua máquina, nunca no repositório. Sem pasta, a skill cria o BG em código no HyperFrames (sem crédito).",
+  "pasta": "<pasta dos seus BGs animados verticais, ex.: /Volumes/SSD/BACKGROUND/VERTICAL>",
+  "resolucao": "HD",
+  "preferidos_para_dados": [
+   "1 Shadow Grid",
+   "2 Vibrant Flow",
+   "3 Jitter"
+  ],
+  "com_variacao_de_cor": [
+   "4 Flames",
+   "5 Explosion",
+   "6 Vortex"
+  ]
+ },
+ "ficha_layout_exemplo": "caminho de uma ficha já aprovada (só para o layout; o rosto dela nunca é usado)",
+ "boas_vindas_mostrada": false
 }

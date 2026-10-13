@@ -215,6 +215,14 @@ Get-ChildItem -Path (Join-Path $DEST "assets\lettering") -Filter *.drfx -ErrorAc
   Ok "lettering $($_.Name) instalado (reinicie o DaVinci)"
 }
 
+# LUT DO GAB na pasta de LUTs do DaVinci (ProgramData)
+$lutD = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\LUT\LUT DO GAB"
+$lutS = Join-Path $DEST "premiere\assets\lut\LUT DO GAB.cube"
+if (Test-Path $lutS) {
+  try { New-Item -ItemType Directory -Force -Path $lutD -ErrorAction Stop | Out-Null; Copy-Item $lutS $lutD -Force -ErrorAction Stop; Ok "LUT DO GAB na pasta de LUTs do DaVinci" }
+  catch { Warn "nao consegui copiar a LUT para o DaVinci (sem permissao em ProgramData); copie '$lutS' para '$lutD' como administrador" }
+}
+
 Info "8/10 DaVinci Resolve e transcricao"
 $exe = Join-Path $appd "Resolve.exe"
 $precisaWhisper = $true

@@ -8,6 +8,7 @@ Saída: uma linha por item.  ✓ ok  |  ⟳ corrigido agora  |  ! falta algo que
 Os apps que o usuário NÃO escolheu (config.json editor/motion) aparecem como "·" quando faltam: tudo é instalado,
 mas só o app escolhido é obrigatório. Sai com código 1 se faltar algo obrigatório.
 """
+from pathlib import Path
 import glob, hashlib, json, os, platform, re, shutil, subprocess, sys, urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -282,6 +283,36 @@ def davinci(usa):
             item(_rel(usa), "DaVinci", "pacote de lettering não instalado")
     elif pac:
         item("✓", "DaVinci", "pacote de lettering")
+    # LUT DO GAB na pasta de LUTs do DaVinci (a cor padrão dos takes) + config de quem ficou sem cor nenhuma
+    lutd = (Path("/Library/Application Support/Blackmagic Design/DaVinci Resolve/LUT/LUT DO GAB") if MAC else
+            Path(os.environ.get("PROGRAMDATA", r"C:\ProgramData")) / "Blackmagic Design" / "DaVinci Resolve" / "Support" / "LUT" / "LUT DO GAB")
+    luts = os.path.join(RAIZ, "premiere", "assets", "lut", "LUT DO GAB.cube")
+    if os.path.exists(luts):
+        if (lutd / "LUT DO GAB.cube").exists():
+            item("✓", "DaVinci", "LUT DO GAB na pasta de LUTs")
+        else:
+            ok = False
+            if CORRIGIR:
+                try:
+                    lutd.mkdir(parents=True, exist_ok=True); shutil.copy(luts, lutd); ok = True
+                except Exception:
+                    ok = False
+            item("⟳" if ok else _rel(usa), "DaVinci", "LUT DO GAB copiada para a pasta de LUTs" if ok else
+                 f"LUT DO GAB fora da pasta de LUTs do DaVinci: rode o instalador de novo (ou copie {luts} para {lutd} como administrador)")
+    c = cfg(); cor = c.get("cor") or {}
+    sem_cor = (not cor.get("lut")) and (not cor.get("drx") or "<" in str(cor.get("drx")) or not os.path.exists(os.path.join(RAIZ, str(cor.get("drx")))))
+    if usa and sem_cor:
+        if CORRIGIR:
+            cor.update(aplicar_power_grade=True, lut="LUT DO GAB/LUT DO GAB.cube")
+            if "<" in str(cor.get("drx", "")):
+                cor["drx"] = ""
+            if "<" in str(cor.get("drx_iphone", "")):
+                cor["drx_iphone"] = ""
+            c["cor"] = cor
+            json.dump(c, open(os.path.join(RAIZ, "config.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+            item("⟳", "DaVinci", "cor dos takes ligada com a LUT DO GAB (não havia PowerGrade configurado)")
+        else:
+            item("!", "DaVinci", "cor dos takes desligada (sem PowerGrade e sem LUT no config): rode com --corrigir")
     aberto = roda(["pgrep", "-f", "DaVinci Resolve.app/Contents/MacOS/Resolve"] if MAC else ["tasklist", "/FI", "IMAGENAME eq Resolve.exe"]).stdout
     aberto = bool(aberto.strip()) and (MAC or "Resolve.exe" in aberto)
     if usa and aberto:

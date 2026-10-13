@@ -199,6 +199,17 @@ for f in "$DEST"/assets/lettering/*.drfx; do
   [ -f "$f" ] && cp -f "$f" "$TPL/" && ok "lettering $(basename "$f") instalado (reinicie o DaVinci)"
 done
 
+# LUT DO GAB na pasta de LUTs do DaVinci (é do sistema: normalmente gravável; senão pede a senha do Mac uma vez)
+LUTD="/Library/Application Support/Blackmagic Design/DaVinci Resolve/LUT/LUT DO GAB"
+LUTS="$DEST/premiere/assets/lut/LUT DO GAB.cube"
+if [ -f "$LUTS" ]; then
+  if { mkdir -p "$LUTD" && cp -f "$LUTS" "$LUTD/"; } 2>/dev/null; then ok "LUT DO GAB na pasta de LUTs do DaVinci"
+  elif [ -r /dev/tty ] && echo "  A pasta de LUTs do DaVinci é do sistema: digite a senha do Mac para copiar a LUT DO GAB." \
+       && sudo mkdir -p "$LUTD" < /dev/tty && sudo cp -f "$LUTS" "$LUTD/" < /dev/tty && sudo chmod -R a+rwX "$LUTD" < /dev/tty; then
+    ok "LUT DO GAB na pasta de LUTs do DaVinci"
+  else warn "não consegui copiar a LUT para o DaVinci; rode: sudo mkdir -p \"$LUTD\" && sudo cp \"$LUTS\" \"$LUTD/\""; fi
+fi
+
 info "7/9 DaVinci Resolve e transcrição"
 APP="/Applications/DaVinci Resolve/DaVinci Resolve.app"
 precisa_whisper=1

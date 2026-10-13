@@ -6,7 +6,7 @@
   python3 projeto.py checklist <pasta_do_video>|<pasta_da_empresa>   (OBRIGATÓRIO antes de dizer "pronto"/entregar)
 
 Etapas (edição): cortes, legenda, legenda_validada, broll, cor, letterings, motions, musica, sfx, abas, qc, export.
-cor = todos os takes da V1 com PowerGrade (nó > 1, detectado); letterings = título Fusion acima da V1 (detectado);
+cor = todos os takes da V1 com PowerGrade (nó > 1) ou LUT no nó 1 (detectado); letterings = título Fusion acima da V1 (detectado);
 motions = item na trilha MOTIONS ou nome de motion (detectado); abas = timelines abertas em abas (marcar depois de abrir_em_abas).
 Na criação (existe roteiro.txt) entram antes: roteiro, voz.
 O que dá para ver na timeline é detectado sozinho; o que depende do usuário (legenda_validada, roteiro, voz, qc, export
@@ -55,7 +55,7 @@ def detectar(nome_tl):
     if any(eh_titulo(x) for k, x in acima): ok.add("letterings")
     if any(eh_motion(k, x) and not eh_titulo(x) for k, x in acima): ok.add("motions")
     try:
-        if v1 and all(x.GetNodeGraph().GetNumNodes() > 1 for x in v1): ok.add("cor")
+        if v1 and all(x.GetNodeGraph().GetNumNodes() > 1 or x.GetNodeGraph().GetLUT(1) for x in v1): ok.add("cor")   # PowerGrade (nós) ou LUT DO GAB no nó 1
     except Exception:
         pass
     if t.GetTrackCount("audio") >= 2 and itens("audio", 2): ok.add("musica")

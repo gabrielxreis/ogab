@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-16 (13/10/2026)
+- **LUT DO GAB no DaVinci:** o instalador agora coloca a LUT na pasta de LUTs do DaVinci (no Mac pode pedir a senha uma vez) e o Gab aplica a LUT em todos os takes sozinho. Se você tem um PowerGrade próprio, ele continua valendo no lugar. Rode o instalador de novo para receber a LUT e o lettering.
+
 ## 2026.10.13-15 (13/10/2026)
 - **Instalador corrigido (Mac e Windows):** quem instalou hoje e viu o instalador parar no meio ("unbound variable" no Mac, janela fechando ou nada acontecendo no Windows): rode o instalador de novo, agora ele vai até o fim. Ele também garante um Python atual no Mac, instala o que faltava para o preset sketch e não para mais por falta de internet num item opcional.
 

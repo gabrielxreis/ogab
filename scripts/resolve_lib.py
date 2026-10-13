@@ -294,9 +294,15 @@ def movimento(item, tipo="zoom_in", intensidade=0.08):
     return z
 
 
-def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1):
+LUT_PASTA = ("/Library/Application Support/Blackmagic Design/DaVinci Resolve/LUT" if sys.platform == "darwin" else
+             os.path.join(os.environ.get("PROGRAMDATA", r"C:\ProgramData"), "Blackmagic Design", "DaVinci Resolve", "Support", "LUT"))
+
+
+def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1, lut=None):
     """Aplica o PowerGrade (.drx) em todos os takes da trilha. Takes de iPhone recebem `drx_iphone`
     (PowerGrade combinado: conversor do iPhone ANTES + LUT/look depois), se configurado.
+    Sem .drx (o PowerGrade é de cada um e não vai no git): aplica a LUT `lut` (padrão do instalador:
+    "LUT DO GAB/LUT DO GAB.cube", relativo à pasta de LUTs do DaVinci) no nó 1 de cada take (Graph.SetLUT).
     Notas da API: Timeline.ApplyGradeFromDRX não funciona; usar TimelineItem.GetNodeGraph().ApplyGradeFromDRX(path, 0).
     Os grafos de grupo (pre/post-clip) NÃO aceitam .drx (só SetLUT), por isso a ordem conversor -> LUT
     precisa vir pronta num único PowerGrade combinado. Sempre pegar o grafo de novo a cada chamada (grafo velho derruba o Resolve)."""
@@ -304,13 +310,25 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1):
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     absol = lambda p: p if (not p or os.path.isabs(p)) else os.path.join(base, p)
     drx, drx_iphone = absol(drx), absol(drx_iphone)
+    usa_lut = not (drx and os.path.exists(drx))
+    if usa_lut:
+        lut = lut or "LUT DO GAB/LUT DO GAB.cube"
+        if not os.path.exists(lut if os.path.isabs(lut) else os.path.join(LUT_PASTA, lut)):
+            raise RuntimeError(f"sem PowerGrade e sem a LUT {lut} na pasta de LUTs do DaVinci ({LUT_PASTA}): "
+                               "rode o instalador do Gab de novo (ou doctor.py --corrigir)")
+        r.GetProjectManager().GetCurrentProject().RefreshLUTList()
     r.OpenPage("color"); res = []
     for x in t.GetItemListInTrack("video", trilha) or []:
         arq = x.GetMediaPoolItem().GetClipProperty("File Path")
         iph = bool(arq and os.path.exists(arq) and eh_iphone(arq))
-        usar = drx_iphone if (iph and drx_iphone and os.path.exists(drx_iphone)) else drx
-        if iph and usar == drx: print(f"AVISO: {x.GetName()} é de iPhone mas não há PowerGrade combinado (cor.drx_iphone); aplicado só o LUT")
-        res.append((x.GetName(), "iphone" if iph else "padrao", bool(x.GetNodeGraph().ApplyGradeFromDRX(usar, 0))))
+        if iph and drx_iphone and os.path.exists(drx_iphone):
+            res.append((x.GetName(), "iphone", bool(x.GetNodeGraph().ApplyGradeFromDRX(drx_iphone, 0)))); continue
+        if iph:
+            print(f"AVISO: {x.GetName()} é de iPhone mas não há PowerGrade combinado (cor.drx_iphone); aplicado só o LUT")
+        if usa_lut:
+            res.append((x.GetName(), "lut", bool(x.GetNodeGraph().SetLUT(1, lut))))
+        else:
+            res.append((x.GetName(), "iphone" if iph else "padrao", bool(x.GetNodeGraph().ApplyGradeFromDRX(drx, 0))))
     r.OpenPage("edit")
     return res
 
