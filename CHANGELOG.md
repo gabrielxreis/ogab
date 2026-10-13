@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-17 (13/10/2026)
+- **Takes de IA sem câmera lenta:** o Gab agora pede velocidade real em todo vídeo do Kling e confere a velocidade antes de pôr na timeline; cena com uma ação só sai em 5 s.
+
 ## 2026.10.13-16 (13/10/2026)
 - **LUT DO GAB no DaVinci:** o instalador agora coloca a LUT na pasta de LUTs do DaVinci (no Mac pode pedir a senha uma vez) e o Gab aplica a LUT em todos os takes sozinho. Se você tem um PowerGrade próprio, ele continua valendo no lugar. Rode o instalador de novo para receber a LUT e o lettering.
 
