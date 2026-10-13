@@ -330,6 +330,8 @@ GAB.motion = function (spec) {
   if (spec.saida_geral) {      // saída do motion inteiro (como o out() do HyperFrames)
     for (var q = 0; q < criados.length; q++) if (!criados[q].parent && criados[q].enabled && criados[q].name.indexOf("BG ") !== 0) GAB.animar(criados[q], [spec.saida_geral]);
   }
+  if (spec.camera) GAB.camera(comp, spec.camera).moveToBeginning();
+  if (spec.desfoque_movimento) { comp.motionBlur = true; for (var mb = 0; mb < criados.length; mb++) try { criados[mb].motionBlur = true; } catch (x4) {} }
   GAB.controles(comp, spec.cores || {}).moveToBeginning();
   app.endUndoGroup();
   var nomes = []; for (var z = 0; z < criados.length; z++) nomes.push(criados[z].name);
@@ -465,8 +467,9 @@ GAB.animar = function (layer, anims, alvoOpacidade) {
   for (var i = 0; i < anims.length; i++) {
     var a = anims[i], d = a.de || a.para, ida = !!a.de, t = a.t || 0, dur = a.dur || 0.5, tipo = a.ease || "calmo";
     var par = function (alt, normal) { return ida ? [alt, normal] : [normal, alt]; };
-    if (d.x !== undefined || d.y !== undefined) {
+    if (d.x !== undefined || d.y !== undefined || d.z !== undefined) {
       var p2 = [base.pos[0] + (d.x || 0), base.pos[1] + (d.y || 0)];
+      if (base.pos.length > 2) p2.push(base.pos[2] + (d.z || 0));       // camada 3D
       var pp = par(p2, base.pos); GAB.tween(pos, t, dur, pp[0], pp[1], tipo === "back" ? "out" : tipo);
     }
     if (d.escala !== undefined || d.escalaX !== undefined || d.escalaY !== undefined) {
@@ -654,9 +657,22 @@ GAB.criar = function (comp, e) {
   if (e.y === undefined) e.y = comp.height / 2;
   var fn = { texto: GAB.texto, caixa: GAB.caixa, check: GAB.check, barra: GAB.barra, contador: GAB.contador, imagem: GAB.imagem,
              fundo: GAB.fundo, fundo_rico: GAB.fundoRico, cartao: GAB.cartao, divisor: GAB.divisor, check_rico: GAB.checkRico,
-             grupo: GAB.grupo }[e.tipo];
+             grupo: GAB.grupo, linha_glow: GAB.linhaGlow, texto_esticar: GAB.textoEsticar, forma_morph: GAB.formaMorph }[e.tipo];
   if (!fn) throw new Error("tipo de elemento desconhecido: " + e.tipo);
   var r = fn(comp, e), ls = r instanceof Array ? r : [r];
+  if (e.z !== undefined || e.rot3d) {        // camada 3D: profundidade e giros em X/Y (para a câmera e o parallax)
+    for (var z = 0; z < ls.length; z++) {
+      if (ls[z].nullLayer && e.tipo !== "grupo") continue;
+      if (e.tipo === "grupo" && z > 0) { try { ls[z].threeDLayer = true; } catch (xg) {} continue; }   // filhos: 3D, z herdado do null
+      try {
+        ls[z].threeDLayer = true;
+        var pz = ls[z].property("ADBE Transform Group").property("ADBE Position"), v0 = pz.value;
+        if (!pz.numKeys) pz.setValue([v0[0], v0[1], e.z || 0]);
+        if (e.rot3d) { ls[z].property("ADBE Transform Group").property("ADBE Rotate Y").setValue(e.rot3d[1] || 0);
+                       ls[z].property("ADBE Transform Group").property("ADBE Rotate X").setValue(e.rot3d[0] || 0); }
+      } catch (x3) {}
+    }
+  }
   if (e.tipo !== "grupo") {
     for (var k = 0; k < ls.length; k++) {
       if (!ls[k].enabled && !ls[k].hasVideo) continue;
@@ -777,4 +793,128 @@ GAB.checkRico = function (comp, e) {
   }
   l.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
   return [c, l];
+};
+
+// ==================================================================================================================
+// TÉCNICAS DE MOTION (12/10/2026): glow lines, letter stretch, kinetic type, morphing shapes, 3D e câmera fluida.
+// ==================================================================================================================
+
+// Linha de luz: caminho que se desenha (Trim Paths) com brilho (Glow). "cometa": a cauda some atrás da ponta.
+// e = {tipo:"linha_glow", pontos:[[x,y],...], curva:true, cor, largura, t, dur, cometa:true, glow:{raio, intensidade}}
+GAB.linhaGlow = function (comp, e) {
+  var l = comp.layers.addShape(); l.name = e.nome || "LINHA GLOW";
+  l.property("ADBE Transform Group").property("ADBE Position").setValue([0, 0]);   // pontos em coordenadas da comp (a forma conta a partir da posição da camada)
+  l.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Linha";
+  var v = l.property("ADBE Root Vectors Group").property("Linha").property("ADBE Vectors Group");
+  var pth = v.addProperty("ADBE Vector Shape - Group"), sh = new Shape(), pts = e.pontos, tin = [], tout = [];
+  for (var i = 0; i < pts.length; i++) {
+    if (e.curva !== false && i > 0 && i < pts.length - 1) {
+      var dx = (pts[i + 1][0] - pts[i - 1][0]) / 4, dy = (pts[i + 1][1] - pts[i - 1][1]) / 4;
+      tin.push([-dx, -dy]); tout.push([dx, dy]);
+    } else { tin.push([0, 0]); tout.push([0, 0]); }
+  }
+  sh.vertices = pts; sh.inTangents = tin; sh.outTangents = tout; sh.closed = false;
+  pth.property("ADBE Vector Shape").setValue(sh);
+  var stk = l.property("ADBE Root Vectors Group").property("Linha").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Stroke");
+  GAB.corDe(stk.property("ADBE Vector Stroke Color"), e.cor || "destaque");
+  stk.property("ADBE Vector Stroke Width").setValue(e.largura || 6);
+  stk.property("ADBE Vector Stroke Line Cap").setValue(2);
+  l.property("ADBE Root Vectors Group").property("Linha").property("ADBE Vectors Group").addProperty("ADBE Vector Filter - Trim");
+  var trim = l.property("ADBE Root Vectors Group").property("Linha").property("ADBE Vectors Group").property("ADBE Vector Filter - Trim");
+  var t = e.t || 0, dur = e.dur || 1.2;
+  GAB.tween(trim.property("ADBE Vector Trim End"), t, dur, 0, 100, e.ease || "inout");
+  if (e.cometa) GAB.tween(trim.property("ADBE Vector Trim Start"), t + dur * 0.35, dur, 0, 100, e.ease || "inout");
+  l.property("ADBE Effect Parade").addProperty("ADBE Glo2");
+  var g = l.property("ADBE Effect Parade").property(1), gl = e.glow || {};
+  try { g.property("ADBE Glo2-0002").setValue(gl.limiar === undefined ? 55 : gl.limiar); } catch (x1) {}   // limite
+  try { g.property("ADBE Glo2-0003").setValue(gl.raio || 28); } catch (x2) {}                              // raio
+  try { g.property("ADBE Glo2-0004").setValue(gl.intensidade || 1.3); } catch (x3) {}                      // intensidade (alto estoura para branco)
+  return l;
+};
+
+// Letter stretch: a palavra estica (escala horizontal por letra) numa onda que atravessa as letras e assenta.
+// e = {tipo:"texto_esticar", texto, ..., t, dur, esticar: 320 (% de largura no pico), base: 1 letras | 3 palavras}
+GAB.textoEsticar = function (comp, e) {
+  var l = GAB.texto(comp, e);
+  var anims = l.property("ADBE Text Properties").property("ADBE Text Animators");
+  anims.addProperty("ADBE Text Animator").name = "Esticar";
+  var an = function () { return l.property("ADBE Text Properties").property("ADBE Text Animators").property("Esticar"); };
+  an().property("ADBE Text Animator Properties").addProperty("ADBE Text Scale 3D");
+  an().property("ADBE Text Animator Properties").property("ADBE Text Scale 3D").setValue([e.esticar || 320, e.achatar || 70, 100]);
+  an().property("ADBE Text Animator Properties").addProperty("ADBE Text Opacity");
+  an().property("ADBE Text Animator Properties").property("ADBE Text Opacity").setValue(0);
+  an().property("ADBE Text Selectors").addProperty("ADBE Text Selector");
+  var sel = an().property("ADBE Text Selectors").property(1);
+  try { sel.property("ADBE Text Range Advanced").property("ADBE Text Range Type2").setValue(e.base || 1); } catch (x) {}
+  try { sel.property("ADBE Text Range Advanced").property("ADBE Text Range Shape").setValue(2); } catch (x2) {}   // rampa: letras já passadas assentam
+  try { sel.property("ADBE Text Range Advanced").property("ADBE Text Levels Max Ease").setValue(60); } catch (x3) {}
+  var t = e.t || 0, dur = e.dur || 0.9;
+  GAB.tween(sel.property("ADBE Text Percent Offset"), t, dur, -100, 100, e.ease || "out");
+  return l;
+};
+
+// Morphing shape: uma forma que vira outra (círculo, quadrado, losango, estrela, triângulo), mesma contagem de pontos.
+// e = {tipo:"forma_morph", formas:["circulo","quadrado","losango","estrela"], tempos:[0,0.8,1.6,2.4], raio, cor, girar}
+GAB.verticesForma = function (forma, r, n) {
+  var pts = [], i, a;
+  for (i = 0; i < n; i++) {
+    a = -Math.PI / 2 + 2 * Math.PI * i / n;
+    var c = Math.cos(a), s = Math.sin(a), k = 1;
+    if (forma === "quadrado") k = 1 / Math.max(Math.abs(c), Math.abs(s)) * 0.86;
+    else if (forma === "losango") k = 1 / (Math.abs(c) + Math.abs(s)) * 1.15;
+    else if (forma === "estrela") k = (i % 2 === 0) ? 1.15 : 0.5;
+    else if (forma === "triangulo") { var seg = 2 * Math.PI / 3, ang = ((a + Math.PI / 2) % seg + seg) % seg - seg / 2; k = 0.62 / Math.cos(ang); }
+    pts.push([c * r * k, s * r * k]);
+  }
+  return pts;
+};
+GAB.formaMorph = function (comp, e) {
+  var n = 40, r = e.raio || 160;
+  var l = comp.layers.addShape(); l.name = e.nome || "FORMA MORPH";
+  l.property("ADBE Root Vectors Group").addProperty("ADBE Vector Group").name = "Forma";
+  var v = l.property("ADBE Root Vectors Group").property("Forma").property("ADBE Vectors Group");
+  var pth = v.addProperty("ADBE Vector Shape - Group").property("ADBE Vector Shape");
+  for (var i = 0; i < e.formas.length; i++) {
+    var sh = new Shape(); sh.vertices = GAB.verticesForma(e.formas[i], r, n); sh.closed = true;
+    pth.setValueAtTime(e.tempos[i], sh);
+  }
+  for (var k = 1; k < pth.numKeys; k++) GAB.easeEntre(pth, k, k + 1, e.ease || "inout");
+  var f = l.property("ADBE Root Vectors Group").property("Forma").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Fill");
+  GAB.corDe(f.property("ADBE Vector Fill Color"), e.cor || "destaque");
+  if (e.contorno) {
+    var st = l.property("ADBE Root Vectors Group").property("Forma").property("ADBE Vectors Group").addProperty("ADBE Vector Graphic - Stroke");
+    GAB.corDe(st.property("ADBE Vector Stroke Color"), e.contorno); st.property("ADBE Vector Stroke Width").setValue(4);
+  }
+  l.property("ADBE Transform Group").property("ADBE Position").setValue([e.x, e.y]);
+  if (e.girar) {
+    var rot = l.property("ADBE Transform Group").property("ADBE Rotate Z");
+    GAB.tween(rot, e.tempos[0], e.tempos[e.tempos.length - 1] - e.tempos[0], 0, e.girar, "inout");
+  }
+  return l;
+};
+
+// 3D + câmera: elementos com "z" viram camadas 3D; a câmera desliza/orbita com curva suave (fluid camera / glide).
+// spec.camera = {de: {x, y, z, ax, ay, az}, para: {...}, t, dur, ease, foco: true}  (a = ponto de interesse)
+GAB.camera = function (comp, cam) {
+  var W = comp.width, H = comp.height;
+  var c = comp.layers.addCamera("CAMERA", [W / 2, H / 2]); c.label = 14;
+  var zoom = cam.zoom || 1800;     // com a câmera em z = -zoom, o que está em z = 0 aparece em tamanho real
+  try { c.property("ADBE Camera Options Group").property("ADBE Camera Zoom").setValue(zoom); } catch (xz) {}
+  var de = cam.de || {}, para = cam.para || {};
+  var p0 = [de.x === undefined ? W / 2 : de.x, de.y === undefined ? H / 2 : de.y, de.z === undefined ? -zoom : de.z];
+  var p1 = [para.x === undefined ? p0[0] : para.x, para.y === undefined ? p0[1] : para.y, para.z === undefined ? p0[2] : para.z];
+  var a0 = [de.ax === undefined ? W / 2 : de.ax, de.ay === undefined ? H / 2 : de.ay, de.az || 0];
+  var a1 = [para.ax === undefined ? a0[0] : para.ax, para.ay === undefined ? a0[1] : para.ay, para.az === undefined ? a0[2] : para.az];
+  var tr = c.property("ADBE Transform Group");
+  GAB.tween(tr.property("ADBE Position"), cam.t || 0, cam.dur || comp.duration, p0, p1, cam.ease || "inout");
+  GAB.tween(tr.property("ADBE Anchor Point"), cam.t || 0, cam.dur || comp.duration, a0, a1, cam.ease || "inout");
+  if (cam.foco) {
+    try {
+      var op = c.property("ADBE Camera Options Group");
+      op.property("ADBE Camera Depth of Field").setValue(1);
+      op.property("ADBE Camera Focus Distance").expression = "length(transform.position, transform.pointOfInterest)";
+      op.property("ADBE Camera Aperture").setValue(cam.abertura || 60);
+    } catch (x) {}
+  }
+  return c;
 };
