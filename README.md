@@ -327,6 +327,9 @@ Todos em `scripts/`, rodando com `python3`.
 ### cortes.py
     plano  <transcricao.json> <saida.json> [--tirar "frase"] [--pausa 0.35]   Tira retakes e encurta pausas pela transcrição
 
+### sonorizar.py
+Sonoriza cena, take ou animação sem chave de IA: `analisar <video>` (momentos de ação, cortes, pan e folha de quadros), `medir` (ataque e pico de cada som), `mixar <plano.json>` (ambiente, foley e pontuais em camadas, pan, ducking sob a voz, -14 LUFS, stems + prévia) e `davinci` (vira `plano_sfx.txt` editável som a som). Guia: `docs/etapas/sonorizacao.md`.
+
 ### qc.py
     <pasta_do_video> [--cliente pasta] [--plataforma instagram|meta_ads|youtube_shorts]
     Estrutura, resolução, duração, quadros pretos, loudness, legenda, grafias erradas, green screen, arquivos pesados

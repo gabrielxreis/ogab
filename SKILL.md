@@ -119,6 +119,7 @@ Clima padrão: **emotiva, que faz sonhar**, instrumental, priorizando as mais ba
 
 ## 6. Efeitos sonoros (se `opcoes.efeitos_sonoros`) (`docs/etapas/sfx.md`)
 Desenho de som que dá vida à cena: **primeiro o que o motion REPRESENTA (gaveta = gaveta de madeira, diploma = papel, carimbo, martelo do juiz, avião, relógio, batimento; foley real), HUD/UI só para interface de verdade**; depois cada elemento que se mexe ganha o som do SEU tipo de animação (blur = swell/ar, slide = whoosh, HUD = blip, check = UI select, palavra de impacto = boom, logo = impacto alinhado pelo onset, brilho = chime; pop só em pop). Pico no instante do movimento, várias trilhas SFX, plano em `sfx/plano_sfx.txt`.
+**Cena, take ou animação sem som (ou para sonorizar bem): `docs/etapas/sonorizacao.md`** (sem chave de IA: `scripts/sonorizar.py analisar` acha os momentos e o pan, o Gab olha a folha de quadros, monta ambiente + foley + pontuais em 3 partes, `mixar` faz pan, ducking e -14 LUFS).
 
 ## 7. Takes e ficha de personagem (`docs/etapas/takes.md`)
 Plano trecho a trecho; banco, vídeo público (yt-dlp) ou IA escolhida pelo usuário (imagem Higgsfield ilimitado no site + vídeo Magnific Kling 2.5 720p ∞ 10 s). Pessoa real: ficha de personagem primeiro (7a).

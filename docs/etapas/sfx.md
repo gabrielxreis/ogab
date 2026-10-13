@@ -2,6 +2,8 @@
 
 ## 6. Efeitos sonoros: desenho de som que DÁ VIDA À CENA
 
+> Take, cena ou animação inteira para sonorizar (ambiente, foley, pan, mixagem): ver `sonorizacao.md` (`scripts/sonorizar.py`).
+
 Não é "um whoosh por motion". Cada elemento que se mexe na tela ganha o som que combina com o TIPO de movimento, e o pico do som cai no instante do movimento. Coerência acima de tudo (o usuário reclamou de "pop em lettering que começa com blur").
 
 

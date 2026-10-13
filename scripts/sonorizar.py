@@ -1,0 +1,312 @@
+"""Sonorização de cenas e animações SEM chave de IA (desenho de som em camadas: ambiente + foley + SFX + música).
+
+  python3 sonorizar.py analisar <video> [--pasta <saida>]      # momentos de ação, cortes, pan e folha de quadros
+  python3 sonorizar.py medir <som.wav|pasta> ...                # ataque (onset), pico e duração de cada som
+  python3 sonorizar.py mixar <plano.json> [--sem-voz]           # camadas, pan, ducking, -14 LUFS: stems + prévia
+  python3 sonorizar.py davinci <plano.json> <pasta_sfx>         # vira plano_sfx.txt (colocar_plano_sfx no DaVinci)
+
+analisar: OpenCV mede o movimento quadro a quadro e devolve, por evento, o tempo, o tipo (entrada = algo começa a
+se mexer depois de calma; batida = movimento forte que PARA de repente, ex. pé no chão, porta, objeto pousando;
+pico = auge de um movimento contínuo), a força (0-1) e o pan (-1 esquerda a 1 direita, pela posição do movimento).
+Gera <pasta>/analise.json e <pasta>/folha.png (quadros com o tempo e o tipo escritos): o Gab OLHA a folha para
+saber O QUE acontece em cada evento e escolhe o som pelo objeto (docs/etapas/sonorizacao.md).
+
+plano.json (o Gab escreve; tempos em segundos do vídeo):
+  {"video": "cena.mp4", "saida": "sonorizacao", "voz": true,
+   "ambiente": [{"arquivo": "parque.wav", "de": 0, "ate": 12, "db": -24, "fade": 1.0, "pan": 0}],
+   "eventos":  [{"t": 3.2, "arquivo": "passo.wav", "db": -14, "pan": -0.4, "dur": 0.8, "alinhar": "onset", "nota": "pé esq."}],
+   "musica":   {"arquivo": "trilha.wav", "db": -18, "de": 0, "inicio_arquivo": 0, "duck": true}}
+  alinhar: "onset" (padrão: o ATAQUE do som cai em t), "pico" (o pico cai em t; impacto com subida) ou "inicio".
+  dur = quanto o som continua DEPOIS de t (a subida antes de t entra sozinha); sem dur, até o fim do arquivo.
+  Camadas de um som importante = vários eventos no MESMO t (ataque, corpo, cauda) com db e dur diferentes.
+Saída em <pasta do plano>/<saida>/: ambiente.wav, sfx.wav, musica.wav (já com ducking), mix.wav (-14 LUFS) e
+previa.mp4 (vídeo + mix). Os stems entram no editor; o plano também vira clipes soltos no DaVinci (subcomando davinci).
+"""
+import json, math, os, shutil, subprocess, sys
+
+SR = 48000
+CACHE = ".medidas_sfx.json"
+
+
+# ------------------------------------------------------------------ medir sons
+def _amostras(arq, sr=8000):
+    import numpy as np
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", arq, "-ac", "1", "-ar", str(sr), "-f", "f32le", "-"],
+                         capture_output=True, check=True).stdout
+    return np.frombuffer(raw, dtype=np.float32), sr
+
+
+def medir(arq):
+    """onset = 1º ponto a 50% do máximo do envelope (ataque); pico = ponto máximo; dur = duração total (s)."""
+    pasta = os.path.dirname(os.path.abspath(arq)); cache_arq = os.path.join(pasta, CACHE)
+    try:
+        cache = json.load(open(cache_arq))
+    except Exception:
+        cache = {}
+    chave = f"{os.path.basename(arq)}|{os.path.getsize(arq)}"
+    if chave in cache:
+        return cache[chave]
+    import numpy as np
+    x, sr = _amostras(arq); jan = int(sr * 0.005)
+    n = max(1, len(x) // jan); env = np.abs(x[:n * jan]).reshape(n, jan).max(axis=1) if len(x) >= jan else np.abs(x)
+    mx = float(env.max()) if len(env) else 0.0
+    if mx <= 0:
+        m = {"onset": 0.0, "pico": 0.0, "dur": round(len(x) / sr, 3)}
+    else:
+        m = {"onset": round(int(np.argmax(env >= 0.5 * mx)) * jan / sr, 3), "pico": round(int(np.argmax(env)) * jan / sr, 3),
+             "dur": round(len(x) / sr, 3)}
+    cache[chave] = m
+    try:
+        json.dump(cache, open(cache_arq, "w"), indent=1)
+    except Exception:
+        pass
+    return m
+
+
+# ------------------------------------------------------------------ analisar vídeo
+def analisar(video, pasta=None):
+    import cv2, numpy as np
+    video = os.path.abspath(video); pasta = os.path.abspath(pasta or os.path.splitext(video)[0] + "_som")
+    os.makedirs(pasta, exist_ok=True)
+    cap = cv2.VideoCapture(video); fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    W = 160; ant = None; hant = None; en, cx, cortes, quadros = [], [], [], []
+    i = 0
+    while True:
+        ok, q = cap.read()
+        if not ok:
+            break
+        h, w = q.shape[:2]; p = cv2.resize(q, (W, int(W * h / w)))
+        g = cv2.GaussianBlur(cv2.cvtColor(p, cv2.COLOR_BGR2GRAY), (5, 5), 0)
+        hist = cv2.calcHist([cv2.cvtColor(p, cv2.COLOR_BGR2HSV)], [0, 1], None, [16, 8], [0, 180, 0, 256]); cv2.normalize(hist, hist)
+        if ant is None:
+            en.append(0.0); cx.append(0.0)
+        else:
+            if cv2.compareHist(hist, hant, cv2.HISTCMP_CORREL) < 0.55:
+                cortes.append(round(i / fps, 3)); en.append(0.0); cx.append(0.0)
+            else:
+                d = cv2.absdiff(g, ant); m = d > 14; e = float(m.mean()); en.append(e)
+                if m.any():
+                    xs = np.nonzero(m)[1]; cx.append(float(xs.mean() / m.shape[1] * 2 - 1))
+                else:
+                    cx.append(0.0)
+        ant, hant = g, hist
+        quadros.append(i); i += 1
+    cap.release()
+    n = len(en); t = lambda k: round(k / fps, 3)
+    e = np.convolve(np.array(en), np.ones(3) / 3, mode="same") if n >= 3 else np.array(en)
+    ref = float(np.percentile(e, 95)) if n else 0.0
+    alto, baixo = max(0.012, ref * 0.35), max(0.006, ref * 0.15)
+    ev = []
+    calma = 0
+    jan = max(2, int(fps * 0.15))
+    for k in range(1, n - 1):
+        calma = calma + 1 if e[k - 1] < baixo else 0
+        if e[k] >= alto and e[k - 1] < alto and calma >= int(fps * 0.25):
+            ev.append({"t": t(k), "tipo": "entrada", "forca": e[k], "pan": cx[k]})
+        eh = e[k] >= e[k - 1] and e[k] >= e[k + 1] and e[k] >= alto
+        if eh:
+            depois = e[k + 1:k + 1 + jan]
+            if len(depois) and depois.min() < e[k] * 0.4:
+                ev.append({"t": t(k), "tipo": "batida", "forca": e[k], "pan": cx[k]})
+            elif e[k] >= ref * 0.8:
+                ev.append({"t": t(k), "tipo": "pico", "forca": e[k], "pan": cx[k]})
+    # um evento por 0,25 s (batida > entrada > pico)
+    prio = {"batida": 0, "entrada": 1, "pico": 2}; final = []
+    for x in sorted(ev, key=lambda x: (prio[x["tipo"]], -x["forca"])):
+        if all(abs(x["t"] - y["t"]) >= 0.25 for y in final) and all(abs(x["t"] - c) >= 0.1 for c in cortes):
+            final.append(x)
+    final.sort(key=lambda x: x["t"]); mxf = max([x["forca"] for x in final] or [1])
+    for x in final:
+        x["forca"] = round(x["forca"] / mxf, 2); x["pan"] = round(max(-1, min(1, x["pan"])) * 0.8, 2)
+    dur = t(n)
+    cenas = [{"de": a, "ate": b} for a, b in zip([0.0] + cortes, cortes + [dur])]
+    audio = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=codec_name", "-of", "csv=p=0", video],
+                           capture_output=True, text=True).stdout.strip()
+    res = {"video": video, "fps": round(fps, 3), "dur": dur, "tem_audio": bool(audio), "cortes": cortes, "cenas": cenas, "eventos": final,
+           "energia": [round(float(v), 4) for v in e[::max(1, int(fps / 10))]]}
+    json.dump(res, open(os.path.join(pasta, "analise.json"), "w"), indent=1, ensure_ascii=False)
+    _folha(video, res, os.path.join(pasta, "folha.png"))
+    return res, pasta
+
+
+def _folha(video, res, saida, colunas=4, larg=270):
+    """Folha de quadros: início de cada cena + cada evento, com tempo/tipo/pan escritos (para o Gab olhar)."""
+    import cv2, numpy as np
+    alvos = [(c["de"] + 0.05, "cena") for c in res["cenas"]] + [(x["t"], f'{x["tipo"]} {x["forca"]:.1f} pan {x["pan"]:+.1f}') for x in res["eventos"]]
+    alvos = sorted(alvos)[:32]
+    cap = cv2.VideoCapture(video); tiles = []
+    for tt, rot in alvos:
+        cap.set(cv2.CAP_PROP_POS_MSEC, tt * 1000); ok, q = cap.read()
+        if not ok:
+            continue
+        h, w = q.shape[:2]; q = cv2.resize(q, (larg, int(larg * h / w)))
+        cv2.rectangle(q, (0, 0), (larg, 44), (0, 0, 0), -1)
+        cv2.putText(q, f"{tt:.2f}s", (6, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1, cv2.LINE_AA)
+        cv2.putText(q, rot, (6, 38), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (80, 220, 255), 1, cv2.LINE_AA)
+        tiles.append(q)
+    cap.release()
+    if not tiles:
+        return
+    hmax = max(t.shape[0] for t in tiles)
+    tiles = [cv2.copyMakeBorder(t, 0, hmax - t.shape[0], 0, 0, cv2.BORDER_CONSTANT) for t in tiles]
+    while len(tiles) % colunas:
+        tiles.append(np.zeros_like(tiles[0]))
+    linhas = [np.hstack(tiles[i:i + colunas]) for i in range(0, len(tiles), colunas)]
+    cv2.imwrite(saida, np.vstack(linhas))
+
+
+# ------------------------------------------------------------------ mixar
+def _ganhos_pan(p):
+    p = max(-1.0, min(1.0, float(p or 0))); a = (p + 1) * math.pi / 4
+    return round(math.cos(a) * math.sqrt(2), 4), round(math.sin(a) * math.sqrt(2), 4)
+
+
+def _caminho(base, arq):
+    arq = os.path.expanduser(arq)
+    return arq if os.path.isabs(arq) else os.path.join(base, arq)
+
+
+def _segmento(ev, med, dur_video=1e9):
+    """(início na timeline, ponto de entrada no arquivo, duração). O ataque/pico do som cai em t; `dur` = quanto o som
+    continua DEPOIS de t (sem dur: até o fim do arquivo)."""
+    al = ev.get("alinhar", "onset"); hit = med["onset"] if al == "onset" else med["pico"] if al == "pico" else 0.0
+    t = float(ev["t"]); ini = t - hit; corte = max(0.0, -ini); ini = max(0.0, ini)
+    fim_arq = med["dur"] - corte
+    d = min((t - ini) + float(ev["dur"]), fim_arq) if ev.get("dur") else fim_arq
+    return ini, corte, min(d, dur_video - ini)
+
+
+def _loudness(arq):
+    r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", arq, "-af", "ebur128=peak=true", "-f", "null", "-"], capture_output=True, text=True).stderr
+    li = [l for l in r.splitlines() if l.strip().startswith("I:")]; pk = [l for l in r.splitlines() if l.strip().startswith("Peak:")]
+    return (li[-1].split()[1] if li else "?") + " LUFS", (pk[-1].split()[1] if pk else "?") + " dBTP"
+
+
+def _render(entradas, cadeias, rotulos, saida, dur):
+    """entradas: lista de listas de args -i; cadeias: filtros por entrada terminando em [rotulo]. Soma tudo em `saida`."""
+    if not rotulos:
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", f"anullsrc=r={SR}:cl=stereo", "-t", str(dur), saida], check=True)
+        return
+    fc = ";".join(cadeias) + ";" + "".join(f"[{r}]" for r in rotulos) + \
+        f"amix=inputs={len(rotulos)}:normalize=0:duration=longest,apad=whole_dur={dur},atrim=0:{dur}[o]"
+    args = ["ffmpeg", "-v", "error", "-y"]
+    for e in entradas:
+        args += e
+    fcf = saida + ".filtro.txt"; open(fcf, "w").write(fc)
+    subprocess.run(args + ["-filter_complex_script", fcf, "-map", "[o]", "-ar", str(SR), "-c:a", "pcm_s24le", saida], check=True)
+    os.remove(fcf)
+
+
+def mixar(plano_arq, com_voz=True):
+    plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq))
+    video = _caminho(base, plano["video"]); out = _caminho(base, plano.get("saida", "sonorizacao")); os.makedirs(out, exist_ok=True)
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video], capture_output=True, text=True).stdout)
+    fmt = f"aformat=sample_rates={SR}:channel_layouts=stereo"
+    # --- SFX / foley (camadas = vários eventos no mesmo t)
+    ent, cad, rot = [], [], []
+    for i, ev in enumerate(plano.get("eventos", [])):
+        arq = _caminho(base, ev["arquivo"]); ini, corte, d = _segmento(ev, medir(arq), dur)
+        if d <= 0.02:
+            continue
+        gl, gr = _ganhos_pan(ev.get("pan")); f = min(float(ev.get("fade", 0.12)), d / 2); ms = int(ini * 1000)
+        ent.append(["-i", arq])
+        cad.append(f"[{len(ent)-1}:a]{fmt},atrim={corte}:{corte + d},asetpts=PTS-STARTPTS,afade=t=out:st={d - f}:d={f},"
+                   f"volume={ev.get('db', -14)}dB,pan=stereo|c0={gl}*c0|c1={gr}*c1,adelay={ms}|{ms}[e{i}]")
+        rot.append(f"e{i}")
+    _render(ent, cad, rot, os.path.join(out, "sfx.wav"), dur)
+    # --- ambiente (loop, fade nas pontas)
+    ent, cad, rot = [], [], []
+    for i, a in enumerate(plano.get("ambiente", [])):
+        de, ate = float(a.get("de", 0)), float(a.get("ate", dur)); d = max(0.1, min(ate, dur) - de); f = min(float(a.get("fade", 1.0)), d / 2)
+        gl, gr = _ganhos_pan(a.get("pan")); ms = int(de * 1000)
+        ent.append(["-stream_loop", "-1", "-i", _caminho(base, a["arquivo"])])
+        cad.append(f"[{len(ent)-1}:a]{fmt},atrim=0:{d},asetpts=PTS-STARTPTS,afade=t=in:d={f},afade=t=out:st={d - f}:d={f},"
+                   f"volume={a.get('db', -24)}dB,pan=stereo|c0={gl}*c0|c1={gr}*c1,adelay={ms}|{ms}[a{i}]")
+        rot.append(f"a{i}")
+    _render(ent, cad, rot, os.path.join(out, "ambiente.wav"), dur)
+    # --- música
+    mus = plano.get("musica"); mus_arq = os.path.join(out, "musica.wav")
+    if mus:
+        de = float(mus.get("de", 0)); ms = int(de * 1000); d = dur - de
+        _render([["-ss", str(mus.get("inicio_arquivo", 0)), "-i", _caminho(base, mus["arquivo"])]],
+                [f"[0:a]{fmt},atrim=0:{d},asetpts=PTS-STARTPTS,afade=t=in:d=0.5,afade=t=out:st={max(0, d - 1.5)}:d=1.5,volume={mus.get('db', -18)}dB,adelay={ms}|{ms}[m]"],
+                ["m"], mus_arq, dur)
+    # --- voz (áudio do próprio vídeo) e ducking de ambiente + música sob a voz
+    tem_voz = com_voz and plano.get("voz", True) and bool(subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", video], capture_output=True, text=True).stdout.strip())
+    cama = [os.path.join(out, "ambiente.wav")] + ([mus_arq] if mus else [])
+    args = ["ffmpeg", "-v", "error", "-y"]
+    for c in cama:
+        args += ["-i", c]
+    args += ["-i", os.path.join(out, "sfx.wav")]
+    n = len(cama)
+    fc = "".join(f"[{k}:a]" for k in range(n)) + (f"amix=inputs={n}:normalize=0[cama];" if n > 1 else "anull[cama];")
+    if tem_voz:
+        args += ["-i", video]; v = n + 1
+        fc += f"[{v}:a]{fmt},asplit=2[voz][chave];[cama][chave]sidechaincompress=threshold=0.02:ratio=8:attack=30:release=450:makeup=1[camad];"
+        fc += f"[voz][camad][{n}:a]amix=inputs=3:normalize=0"
+    else:
+        fc += f"[cama][{n}:a]amix=inputs=2:normalize=0"
+    fc += f",atrim=0:{dur},aresample={SR}[o]"
+    mix = os.path.join(out, "mix.wav"); bruto = os.path.join(out, "_mix_bruto.wav")
+    subprocess.run(args + ["-filter_complex", fc, "-map", "[o]", "-c:a", "pcm_f32le", bruto], check=True)
+    # -14 LUFS em duas passadas: mede, corrige o ganho e segura o pico em -1,5 dBTP (o loudnorm de uma passada erra ~1,5 dB)
+    try:
+        ganho = -14.0 - float(_loudness(bruto)[0].split()[0])
+    except ValueError:
+        ganho = 0.0
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", bruto, "-af", f"volume={ganho:.2f}dB,alimiter=limit=0.84:attack=2:release=60:level=disabled",
+                    "-ar", str(SR), "-c:a", "pcm_s24le", mix], check=True)
+    os.remove(bruto)
+    previa = os.path.join(out, "previa.mp4")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video, "-i", mix, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-shortest", previa], check=True)
+    li, pk = _loudness(mix)
+    return {"pasta": out, "stems": ["ambiente.wav", "sfx.wav"] + (["musica.wav"] if mus else []), "mix": mix, "previa": previa,
+            "voz": tem_voz, "loudness": li, "pico": pk, "eventos": len(plano.get("eventos", []))}
+
+
+# ------------------------------------------------------------------ DaVinci
+def davinci(plano_arq, pasta_sfx):
+    """Escreve <pasta_sfx>/plano_sfx.txt (formato de resolve_lib.colocar_plano_sfx) e copia os sons como WAV 48 kHz.
+    O tempo de cada linha já desconta o ataque (onset/pico) do som. O pan fica no Inspector (a API não define pan)."""
+    plano = json.load(open(plano_arq)); base = os.path.dirname(os.path.abspath(plano_arq)); os.makedirs(pasta_sfx, exist_ok=True)
+    linhas = []
+
+    def wav(arq, corte=0.0):
+        nome = os.path.splitext(os.path.basename(arq))[0].replace(" ", "_") + (f"_a{int(corte * 1000)}" if corte > 0 else "")
+        dst = os.path.join(pasta_sfx, nome + ".wav")
+        if not os.path.exists(dst):   # som que entra no meio: arquivo já recortado (o DaVinci coloca do início do arquivo)
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(corte), "-i", arq, "-ar", str(SR), "-c:a", "pcm_s24le", dst], check=True)
+        return nome
+    for a in plano.get("ambiente", []):
+        de, ate = float(a.get("de", 0)), float(a["ate"]); nome = wav(_caminho(base, a["arquivo"]))
+        linhas.append((de, f"{de:.2f}s A3 {nome} {int(a.get('db', -24))}dB {ate - de:.1f}s: ambiente"))
+    for ev in plano.get("eventos", []):
+        arq = _caminho(base, ev["arquivo"]); ini, corte, d = _segmento(ev, medir(arq)); nome = wav(arq, corte)
+        linhas.append((ini, f"{ini:.2f}s A3 {nome} {int(ev.get('db', -14))}dB {d:.1f}s: {ev.get('nota', '')} (pan {ev.get('pan', 0)})"))
+    open(os.path.join(pasta_sfx, "plano_sfx.txt"), "w").write("\n".join(l for _, l in sorted(linhas)) + "\n")
+    return os.path.join(pasta_sfx, "plano_sfx.txt"), len(linhas)
+
+
+if __name__ == "__main__":
+    a = sys.argv[1:]
+    if not a:
+        raise SystemExit(__doc__)
+    if a[0] == "analisar" and len(a) >= 2:
+        res, pasta = analisar(a[1], a[a.index("--pasta") + 1] if "--pasta" in a else None)
+        print(f"{len(res['eventos'])} eventos, {len(res['cenas'])} cena(s), {res['dur']} s, áudio no vídeo: {res['tem_audio']}")
+        for x in res["eventos"]:
+            print(f"  {x['t']:6.2f}s  {x['tipo']:8s} força {x['forca']:.2f}  pan {x['pan']:+.2f}")
+        print("folha:", os.path.join(pasta, "folha.png"))
+    elif a[0] == "medir" and len(a) >= 2:
+        arqs = []
+        for p in a[1:]:
+            arqs += sorted(os.path.join(p, f) for f in os.listdir(p) if f.lower().endswith((".wav", ".mp3", ".aif", ".aiff", ".m4a"))) if os.path.isdir(p) else [p]
+        for f in arqs:
+            m = medir(f); print(f"  {os.path.basename(f):40s} ataque {m['onset']:5.2f}s  pico {m['pico']:5.2f}s  dur {m['dur']:6.2f}s")
+    elif a[0] == "mixar" and len(a) >= 2:
+        print(json.dumps(mixar(a[1], "--sem-voz" not in a), indent=1, ensure_ascii=False))
+    elif a[0] == "davinci" and len(a) >= 3:
+        print(*davinci(a[1], a[2]))
+    else:
+        raise SystemExit(__doc__)
