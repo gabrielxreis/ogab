@@ -225,6 +225,7 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 
 | Data | Bug | Causa | Correção |
 |---|---|---|---|
+| 12/10/2026 | Projeto 23,976 fps (Sunprime) ficou com playback 24 e `SetSetting('timelinePlaybackFrameRate','23.976')` devolve False até em projeto novo, sem timeline | a API não aceita playback fracionado (só inteiros) | `criar_projeto`/`criar_timeline` avisam; corrigir pela interface (File > Project Settings > Master Settings > Playback frame rate = 23.976) e avisar o usuário logo na criação |
 | 11/10/2026 | `transcrever.py` (motor davinci) devolveu a MESMA transcrição para 3 vídeos | buscava o item do Media Pool só pelo nome (`narracoes/audio.wav` em todos) | compara o caminho completo; gravação de apresentador: `transcrever.py saida.json --clipe "<clipe>"` lê a transcrição que o usuário já fez no DaVinci |
 | 11/10/2026 | Whisper perdeu retakes e bagunçou tempos em gravação de rua | Whisper funde palavras e pula repetições | usar a transcrição do DaVinci (`--clipe`); Whisper só como último recurso |
 | 11/10/2026 | `cortes.py` comeu palavras curtas ("não", "quanto") e inverteu o sentido de uma frase | o detector de silêncio corta palavra falada baixo | silêncio só é cortado fora das palavras da transcrição; o plano avisa "palavras fora dos cortes" |
