@@ -3,6 +3,9 @@
 O Gab mostra aqui o que mudou desde a última vez que você usou (ele se atualiza sozinho ao abrir).
 Mais novo em cima. Cada versão é uma linha `## <versão> (<data>)` seguida dos itens.
 
+## 2026.10.12-16 (12/10/2026)
+- **Takes do Magnific baixam pelo MCP:** o Gab acha cada vídeo no seu histórico pelo prompt e baixa direto, sem abrir o navegador (muito mais rápido). Ele também confere se o vídeo saiu da imagem certa quando um plano foi refeito.
+
 ## 2026.10.12-15 (12/10/2026)
 - **Som que combina com o chão e com a ação:** o Gab diz o que a cena mostra (queda não é freada; terra não é asfalto) e confere cada som com um classificador de áudio antes de mixar. Som do chão errado (pneu cantando numa estrada de terra) trava a mixagem até ser trocado.
 
