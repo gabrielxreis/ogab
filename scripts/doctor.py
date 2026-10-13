@@ -179,11 +179,17 @@ def docker():
         item("·", "ferramentas", "Docker não instalado: opcional, o Gab não usa (ignore o aviso do hyperframes doctor)")
 
 
+def _instalar_blender():
+    if WIN:
+        return instalar_pacote("", "BlenderFoundation.Blender")
+    return sys.stdin.isatty() and roda(["brew", "install", "--cask", "blender"]).returncode == 0   # pede senha: só com alguém no terminal
+
+
 def blender():
     cands = ["/Applications/Blender.app"] if MAC else glob.glob(os.path.join(os.environ.get("ProgramFiles", ""), "Blender Foundation", "Blender*"))
     if any(os.path.exists(c) for c in cands):
         item("✓", "extras", "Blender (3D de verdade: tresd/tresd.py)")
-    elif CORRIGIR and (sys.stdin.isatty() or WIN) and instalar_pacote("--cask blender" if False else "blender", "BlenderFoundation.Blender") if WIN else (CORRIGIR and sys.stdin.isatty() and roda(["brew", "install", "--cask", "blender"]).returncode == 0):
+    elif CORRIGIR and _instalar_blender():
         item("⟳", "extras", "Blender instalado")
     else:
         item("·", "extras", "Blender não instalado (só para motion 3D): " + ("brew install --cask blender" if MAC else "winget install --id BlenderFoundation.Blender -e"))
