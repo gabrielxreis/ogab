@@ -106,11 +106,11 @@ PY
 ok "motions: $OGAB_MOTION (para trocar: /ogab config motion hyperframes|aftereffects)"
 
 # Relatos de erro anônimos (pergunta UMA vez; sem resposta "sim" nada sai da máquina). Ver relatos/LEIA.md.
-RELATOS_ATUAL="$(python3 -c "import json;c=json.load(open('$DEST/config.json'));print('' if 'relatos' not in c else c['relatos'])" 2>/dev/null || true)"
+RELATOS_ATUAL="$(python3 -c "import json;c=json.load(open('$DEST/config.json'));print('' if 'relatos' not in c or (c['relatos'] is True and int(c.get('relatos_v',1))<2) else c['relatos'])" 2>/dev/null || true)"
 if [ -z "$RELATOS_ATUAL" ]; then
   if [ -n "$OGAB_RELATOS" ]; then rel="$OGAB_RELATOS"
   elif [ -r /dev/tty ]; then
-    printf "\n  Quando algo da skill quebra e o Gab corrige, ele pode mandar um relato ANONIMO para o Gabriel\n  melhorar o Gab para todo mundo (so o erro e a correcao no codigo da skill; nada de video, roteiro,\n  cliente, nome ou pasta). Enviar relatos anonimos? [S/n]: "
+    printf "\n  Posso mandar ao Gabriel, de forma ANONIMA, os erros da skill que o Gab corrigir e a estrutura\n  dos motions novos que voce salvar, para ele melhorar o Gab e publicar os melhores para todos?\n  (nada de video, roteiro, texto do cliente, cor da marca, nome ou pasta). Enviar? [S/n]: "
     read -r rel < /dev/tty || true
   fi
   if [ -n "${rel+x}" ] || [ -n "$OGAB_RELATOS" ]; then

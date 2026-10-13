@@ -4,6 +4,15 @@ Quem instalou o Gab e respondeu **sim** à pergunta única (no instalador ou na 
 anônimo, cada erro da skill que o Gab corrigiu na máquina dele. O dono (Gabriel) recebe numa planilha privada, corrige
 no repositório e todo mundo recebe no próximo auto-update.
 
+## O que chega
+
+- **Erros** (`tipo` bug): o que quebrou, a causa, a correção e o diff dos arquivos da skill.
+- **Motions novos** (`tipo` preset): quando alguém salva um motion na biblioteca local (`biblioteca_motions.py salvar`),
+  vai a ESTRUTURA do modelo (elementos, tempos, animações, campos), com textos de exemplo genéricos e sem autor; as
+  cores nem ficam no modelo. Só com o consentimento novo (`relatos_v` 2, a pergunta cita erros e motions).
+
+**Dono: ler tudo antes de qualquer commit na skill** (o pre-commit trava; `relatos.py hook`, `relatos.py lido`).
+
 ## Como funciona
 
 1. **Na máquina de quem usa** (`scripts/relatar.py`):

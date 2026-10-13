@@ -147,6 +147,12 @@ def salvar(modelo, previa=None):
                             "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"], check=True)
         ok = subprocess.run(g + ["push", "-q"]).returncode == 0
         return f"{pasta} (publicado{'' if ok else ': push falhou, publicar depois'})"
+    try:   # relato anônimo do motion novo (só sai da máquina com consentimento; ver scripts/relatar.py)
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import relatar
+        relatar.registrar_preset(pasta)
+    except Exception:
+        pass
     return f"{pasta} (só nesta máquina)"
 
 

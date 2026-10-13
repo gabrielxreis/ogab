@@ -3,10 +3,14 @@
   python3 relatar.py consentir sim|nao     # resposta da pergunta única (instalador ou 1ª abertura); grava "relatos" no config
   python3 relatar.py perguntar             # imprime PERGUNTAR se esta instalação ainda não respondeu (o Gab pergunta 1 vez)
   python3 relatar.py registrar --titulo "..." --erro "..." --causa "..." --correcao "..." [--arquivo scripts/x.py ...]
+  python3 relatar.py preset <pasta do modelo | modelo.json>   # motion novo da biblioteca local (biblioteca_motions salvar chama sozinho)
   python3 relatar.py enviar                # manda os pendentes (ao abrir o Gab, em segundo plano) SÓ se "relatos": true
   python3 relatar.py status                # consentimento, pendentes e enviados
 
 Consentimento: sem "relatos": true no config.json nada sai da máquina (relatos ficam só em ~/.claude/ogab_relatos/).
+Motions (presets) só saem com o consentimento da pergunta nova ("relatos_v" >= 2), que cita erros E motions.
+Preset vai como ESTRUTURA: elementos, tempos, animações e campos; textos de exemplo viram genéricos, sai o autor,
+nome de cliente sai pela anonimização e as cores nem ficam no modelo (vêm do cliente na hora de aplicar).
 O relato é ANONIMIZADO antes de ser gravado: caminhos viram ~/..., saem e-mails, chaves/tokens, parâmetros de link,
 o nome do usuário e o nome de cada cliente (pastas de clientes/ e da pasta de saída). Não vai vídeo, roteiro, legenda
 nem transcrição: só o que quebrou na skill, a causa, a correção e o diff dos arquivos DA SKILL.
@@ -21,9 +25,11 @@ PASTA = os.path.expanduser("~/.claude/ogab_relatos")
 PEND, ENV = os.path.join(PASTA, "pendentes"), os.path.join(PASTA, "enviados")
 CHAVE_ENVIO = "ogab-relato-v1"
 LIMITES = {"titulo": 200, "erro": 3000, "causa": 2000, "correcao": 3000, "diff": 15000}
-PERGUNTA = ("Quando algo da skill quebra e o Gab corrige, posso mandar um relato ANÔNIMO para o Gabriel melhorar o Gab "
-            "para todo mundo? (só o erro, a causa e a correção no código da skill; nada de vídeo, roteiro, cliente, nome "
-            "ou caminho de pasta). Dá para mudar depois: /ogab config relatos sim|nao")
+CONSENTIMENTO_V = 2   # 2 = erros + motions novos
+PERGUNTA = ("Posso mandar ao Gabriel, de forma ANÔNIMA, (1) os erros da skill que eu corrigir aqui e (2) a estrutura dos "
+            "motions novos que você salvar na biblioteca, para ele melhorar o Gab e publicar os melhores motions para todo "
+            "mundo? Não vai vídeo, roteiro, texto do cliente, cor da marca, nome nem pasta. Dá para mudar depois: "
+            "/ogab config relatos sim|nao")
 
 
 def _config():
@@ -35,13 +41,16 @@ def _config():
 
 def consentir(sim):
     c = _config(); c["relatos"] = bool(sim); c["relatos_respondido"] = time.strftime("%Y-%m-%d")
+    c["relatos_v"] = CONSENTIMENTO_V
     json.dump(c, open(CONFIG, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     return c["relatos"]
 
 
 def precisa_perguntar():
     c = _config()
-    return "relatos" not in c and not c.get("dono_biblioteca")
+    if c.get("dono_biblioteca"):
+        return False
+    return "relatos" not in c or (c.get("relatos") is True and int(c.get("relatos_v", 1)) < CONSENTIMENTO_V)
 
 
 def _destino():
@@ -126,7 +135,7 @@ def registrar(titulo, erro, causa="", correcao="", arquivos=()):
     cfg = _config(); nomes = _nomes_privados(cfg); diff = ""
     if arquivos:
         diff = subprocess.run(["git", "-C", SKILL, "diff", "--"] + list(arquivos), capture_output=True, text=True).stdout
-    rel = {"chave_envio": CHAVE_ENVIO, "titulo": titulo, "erro": erro, "causa": causa, "correcao": correcao, "diff": diff}
+    rel = {"chave_envio": CHAVE_ENVIO, "tipo": "bug", "titulo": titulo, "erro": erro, "causa": causa, "correcao": correcao, "diff": diff}
     for k, lim in LIMITES.items():
         rel[k] = anonimizar(rel[k], nomes)[:lim]
     rel.update({"assinatura": _assinatura(rel["erro"] or rel["titulo"]), "versao": _versao(),
@@ -137,6 +146,50 @@ def registrar(titulo, erro, causa="", correcao="", arquivos=()):
     arq = os.path.join(PEND, f"{time.strftime('%Y%m%d-%H%M%S')}-{rel['assinatura']}.json")
     json.dump(rel, open(arq, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return arq
+
+
+def _generico(v, i=1):
+    if isinstance(v, list):
+        return [f"Item {k + 1}" for k in range(len(v))]
+    if isinstance(v, (int, float)):
+        return v
+    return f"Texto {i}"
+
+
+def _limpar_spec(x):
+    """Textos literais do spec (sem {{campo}}) viram genéricos; o resto (tempos, animações, posições) fica."""
+    if isinstance(x, dict):
+        return {k: (("Texto" if isinstance(v, str) and "{{" not in v else v) if k in ("texto", "text", "rotulo", "legenda")
+                    else _limpar_spec(v)) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_limpar_spec(v) for v in x]
+    return x
+
+
+def registrar_preset(caminho):
+    arq = os.path.join(caminho, "modelo.json") if os.path.isdir(caminho) else caminho
+    m = json.load(open(arq, encoding="utf-8"))
+    m.pop("autor", None)
+    for i, (k, c) in enumerate((m.get("campos") or {}).items(), 1):
+        if isinstance(c, dict) and "exemplo" in c:
+            c["exemplo"] = _generico(c["exemplo"], i)
+    m["spec"] = _limpar_spec(m.get("spec", {}))
+    cfg = _config(); nomes = _nomes_privados(cfg)
+    corpo = anonimizar(json.dumps(m, ensure_ascii=False, indent=1), nomes)[:40000]
+    estrutura = json.dumps(m.get("spec", {}), sort_keys=True)
+    rel = {"chave_envio": CHAVE_ENVIO, "tipo": "preset", "titulo": anonimizar(m.get("nome", "motion"), nomes)[:200],
+           "erro": anonimizar(m.get("descricao", ""), nomes)[:3000], "causa": ", ".join(m.get("tags", []))[:2000],
+           "correcao": f"dur {m.get('dur', '?')} s; campos: {', '.join(m.get('campos', {}))}"[:3000], "diff": corpo,
+           "assinatura": hashlib.sha1(estrutura.encode()).hexdigest()[:10], "versao": _versao(),
+           "sistema": f"{platform.system()} {platform.release()} {platform.machine()}", "python": platform.python_version(),
+           "editor": cfg.get("editor", ""), "motion": cfg.get("motion", ""), "instalacao": _instalacao(),
+           "quando": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    if any(rel["assinatura"] in os.path.basename(f) for f in glob.glob(os.path.join(PASTA, "*", "*.json"))):
+        return None   # este motion (mesma estrutura) já foi registrado
+    os.makedirs(PEND, exist_ok=True)
+    saida = os.path.join(PEND, f"{time.strftime('%Y%m%d-%H%M%S')}-preset-{rel['assinatura']}.json")
+    json.dump(rel, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    return saida
 
 
 def _log(msg):
@@ -154,6 +207,8 @@ def enviar():
     for arq in sorted(glob.glob(os.path.join(PEND, "*.json")))[:20]:
         try:
             rel = json.load(open(arq, encoding="utf-8"))
+            if rel.get("tipo") == "preset" and int(cfg.get("relatos_v", 1)) < CONSENTIMENTO_V:
+                continue   # motion só com o consentimento novo
             dados = urllib.parse.urlencode({f"entry.{eid}": str(rel.get(nome, ""))
                                             for nome, eid in dest["campos"].items()}).encode()
             req = urllib.request.Request(dest["action"], data=dados, method="POST",
@@ -188,6 +243,8 @@ if __name__ == "__main__":
             return a[a.index(n) + 1] if n in a else pad
         arqs = [a[i + 1] for i, x in enumerate(a) if x == "--arquivo" and i + 1 < len(a)]
         print(registrar(arg("--titulo"), arg("--erro"), arg("--causa"), arg("--correcao"), arqs))
+    elif a[0] == "preset" and len(a) >= 2:
+        print(registrar_preset(a[1]) or "já registrado antes")
     elif a[0] == "enviar":
         enviar()
     elif a[0] == "status":

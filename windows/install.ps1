@@ -108,10 +108,10 @@ Ok "motions: $motion (para trocar: /ogab config motion hyperframes|aftereffects)
 
 # Relatos de erro anonimos (pergunta UMA vez; sem resposta "sim" nada sai da maquina). Ver relatos/LEIA.md.
 $cfgJ = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($null -eq $cfgJ.relatos) {
+if (($null -eq $cfgJ.relatos) -or (($cfgJ.relatos -eq $true) -and ([int]($cfgJ.relatos_v) -lt 2))) {
   $rel = if ($env:OGAB_RELATOS) { $env:OGAB_RELATOS } else {
-    Write-Host "`n  Quando algo da skill quebra e o Gab corrige, ele pode mandar um relato ANONIMO para o Gabriel`n  melhorar o Gab para todo mundo (so o erro e a correcao no codigo da skill; nada de video, roteiro,`n  cliente, nome ou pasta)."
-    Read-Host "  Enviar relatos anonimos? [S/n]" }
+    Write-Host "`n  Posso mandar ao Gabriel, de forma ANONIMA, os erros da skill que o Gab corrigir e a estrutura`n  dos motions novos que voce salvar, para ele melhorar o Gab e publicar os melhores para todos?`n  (nada de video, roteiro, texto do cliente, cor da marca, nome ou pasta)."
+    Read-Host "  Enviar? [S/n]" }
   if ($rel -match "^[nN]") { Py (Join-Path $DEST "scripts\relatar.py") consentir nao | Out-Null; Ok "relatos: nao (para ligar: /ogab config relatos sim)" }
   else { Py (Join-Path $DEST "scripts\relatar.py") consentir sim | Out-Null; Ok "relatos anonimos: sim (para desligar: /ogab config relatos nao)" }
 }

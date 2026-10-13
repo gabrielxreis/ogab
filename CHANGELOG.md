@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-13 (13/10/2026)
+- **Seus motions podem virar motions de todo mundo:** quando você salva um motion novo na biblioteca, o Gab pode mandar a estrutura dele (sem textos, cores da marca, nomes ou pastas) para o Gabriel, que publica os melhores para todos. O Gab vai perguntar uma vez se pode, junto com os relatos de erro.
+
 ## 2026.10.13-12 (13/10/2026)
 - **Relatos de erro anônimos (opcional):** o Gab pergunta uma única vez se pode mandar ao Gabriel, sem nada pessoal, os erros da skill que ele corrigiu no seu computador. Com "sim", ele envia sozinho em segundo plano e a correção chega para todo mundo nas próximas atualizações. Nada de vídeo, roteiro, cliente, nome ou pasta sai da máquina. Mudar quando quiser: `/ogab config relatos sim` ou `nao`.
 
