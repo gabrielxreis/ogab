@@ -29,3 +29,8 @@
    4. Salvar em `clientes/<empresa>/personagens/<nome>/` (fora do git): `ficha.png`, recortes `ref_rosto.jpg` (frontal) e `ref_corpo.jpg` (corpo inteiro), e `descricao.md` escrita a partir da ficha (rosto, cabelo, barba, óculos, pele, corpo, roupa, calçado, acessórios, estampa) para colar nos prompts.
    5. Em todo take com a pessoa: refs @img1 = ref_corpo, @img2 = ref_rosto (ou a ficha inteira) + trechos da `descricao.md` no prompt. Personagem criado (sem foto real) segue o mesmo formato de ficha, para ficar igual em todos os vídeos.
 
+
+## Só vídeo e um corte por legenda (regra do usuário, 13/10/2026: "você só colocou foto, tem que ser vídeo... os takes têm que condizer com a legenda e contar uma história")
+- Imagem de IA NUNCA entra parada (nem com zoom/push-in feito no ffmpeg): toda imagem aprovada vira vídeo no Magnific (Kling 2.5, ilimitado) com uma AÇÃO que ilustra a frase daquele trecho (mala sendo levantada, letreiro acendendo, porta abrindo, fachada tombando).
+- O plano de cortes é feito PELA LEGENDA: cada corte começa no início de uma legenda (ou de um par de legendas curtas), e a sequência conta a história em ordem (chegada, ascensão, virada, queda, lição). Gravar em `plano_takes_vN.txt` com a legenda de cada corte.
+- API do DaVinci: imagem parada (Still) entra sempre com a duração padrão de 5 s e não aceita endFrame nem corte; mais um motivo para trabalhar só com vídeo.
