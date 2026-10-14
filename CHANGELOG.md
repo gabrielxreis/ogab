@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.13-18 (13/10/2026)
+- **Preset novo KINETIC (tipografia cinética):** cada batida da fala vira palavras enormes trocando no ritmo da voz, fundo preto/vermelho/branco e entradas variadas. Peça `/ogab faz um motion no preset kinetic com <frase>`.
+
 ## 2026.10.13-17 (13/10/2026)
 - **Takes de IA sem câmera lenta:** o Gab agora pede velocidade real em todo vídeo do Kling e confere a velocidade antes de pôr na timeline; cena com uma ação só sai em 5 s.
 

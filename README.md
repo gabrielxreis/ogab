@@ -273,7 +273,8 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/vector-motion/exemplos/c_grade.gif" width="150" alt="Vector motion grade">&nbsp;
 <img src="presets/vector-motion/exemplos/d_objetos.gif" width="150" alt="Vector motion objetos">&nbsp;
 <img src="presets/vitrine/exemplo.gif" width="150" alt="Vitrine">&nbsp;
-<img src="presets/sketch/exemplo.gif" width="150" alt="Sketch">
+<img src="presets/sketch/exemplo.gif" width="150" alt="Sketch">&nbsp;
+<img src="presets/kinetic/exemplo.gif" width="150" alt="Kinetic">
 
 <sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch</sub>
 
@@ -286,6 +287,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **VECTOR MOTION** ([guia](presets/vector-motion/PRESET.md)) | "1 prompt, 1 vídeo": roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões de vidro, herói), preto e branco com o protagonista brilhando. 4 estilos: **destaque**, **bolhas**, **grade**, **objetos**. Para frase de efeito, mentalidade, hábito e rotina | <img src="presets/vector-motion/exemplos/c_grade.gif" width="160" alt="Exemplo do preset Vector motion"> |
 | **SKETCH** ([guia](presets/sketch/PRESET.md)) | Desenho de marcador sobre fundo preto: contornos coloridos que se traçam na hora, cursor piscando, ícones desenhados, texto manuscrito digitado letra a letra, setas que se desenham e o traço "tremendo" como animação feita à mão. Blocos prontos: "A → B", grade de apps com botão, número de capítulo, ferramenta → painel (editor de vídeo, gráfico, lista, chat), frase sublinhada e checklist. Vertical e horizontal. Para tutorial, "X ferramentas que...", passo a passo, tecnologia e IA | <img src="presets/sketch/exemplo.gif" width="160" alt="Exemplo do preset Sketch"> |
 | **TELA DIVIDIDA** ([guia](presets/tela-dividida/PRESET.md)) | Reels de talking head com o painel de motion em cima (46,5 %) e você embaixo, legenda em etiqueta branca na emenda e quebras em tela cheia a cada 3-5 s. O Gab enquadra o rosto sozinho no DaVinci. Para vídeo explicativo que cita app, site, número ou passo a passo | <img src="presets/tela-dividida/guia.png" width="120" alt="Guia do layout tela dividida"> |
+| **KINETIC** ([guia](presets/kinetic/PRESET.md)) | Tipografia cinética: cada batida da fala vira 1-3 palavras enormes, fundo alternando preto (brilho vermelho), vermelho e branco, entradas variadas (zoom, chicote, pilha, queda, digitando, esticada, glitch), ponto final vermelho, etiqueta "HA" e tremor no impacto. Para gancho, reação, frase de efeito e novidade | <img src="presets/kinetic/exemplo.gif" width="160" alt="Exemplo do preset Kinetic"> |
 
 
 # CLIENTES
