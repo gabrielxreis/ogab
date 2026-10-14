@@ -1,4 +1,3 @@
-import json
 """Funções para montar o vídeo no DaVinci Resolve Studio pela scripting API.
 
 Uso típico (python3 com as variáveis de ambiente do Resolve, ver ambiente()):
@@ -12,7 +11,7 @@ Uso típico (python3 com as variáveis de ambiente do Resolve, ver ambiente()):
     lettering(t, "@gabrielxreis_ Cinematic", "TEXTO DO GANCHO", inicio=0.0, dur=2.5)
     renderizar(p, ".../videos", "Assunto - Empresa", 1080, 1920)
 """
-import math, os, re, subprocess, sys, time
+import json, math, os, re, subprocess, sys, time
 
 RESOLVE_API = "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting"
 RESOLVE_LIB = "/Applications/DaVinci Resolve/DaVinci Resolve.app/Contents/Libraries/Fusion/fusionscript.so"
