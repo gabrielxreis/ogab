@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.14-3 (14/10/2026)
+- **SFX conferidos e no tempo:** cada som passa pelo classificador antes de entrar, nada começa antes da própria ação, e cenas grandes (prédio caindo) ganham som em camadas. O Gab procura primeiro nas suas pastas de SFX.
+
 ## 2026.10.14-2 (14/10/2026)
 - **Efeitos sonoros no tempo da imagem:** antes de pôr som, o Gab olha os quadros de cada corte; passo cai na pisada, carimbo no contato, e só entra som do que a imagem mostra.
 

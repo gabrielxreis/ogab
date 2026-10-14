@@ -10,6 +10,10 @@ pelo OpenCV, o som vem do Artlist (`search_sfx`, assinatura) e das bibliotecas l
 - Listar o corte VISÍVEL em cada instante (trilha mais alta ligada) com o ponto de entrada de cada clipe, e tirar uma tira de quadros de cada corte a 6 qps com o TEMPO DA TIMELINE escrito; nas ações (pé, carimbo, mão, porta) tirar 12 qps recortado na ação.
 - Som só do que a imagem MOSTRA acontecendo: carimbo que só levanta não bate; refletor já aceso não faz clunk; porta já aberta não range; drone na mão parado não zune; mesa vazia não tem xícara. Na dúvida, só ambiente.
 - Pisada no quadro em que o pé ENCOSTA no chão (calcanhar), não no meio do passo; impacto no quadro do contato; som contínuo (porta girando, cartas caindo, estrutura tombando) cobre o tempo todo em que a ação acontece.
+- **Conferir CADA arquivo antes de pôr** (regra do usuário, 14/10/2026: "sempre confira, tem som como do banco quebrando que não tem nada a ver"): `sfx_conferir.py arquivos <pasta>` e só usa o som cujo 1º rótulo bate com a ação (no Estrangeiro: "vidro_quebra" era prédio desabando 100%, "cartas" eram moedas 82%, "drone" era riser, "hd_ligando" eram cliques de mouse). Limite conhecido: zumbido com tom (drone, motor) sai como "riser"/"music"; aí confirmar pelo título/pacote da gravação real e dizer isso ao usuário.
+- **Ação grande = desenho em camadas** (prédio quebrando: ronco grave crescendo + estrutura cedendo + detritos + poeira + vidro + impacto final, cada um no quadro da fase que aparece), nunca um som só.
+- **Bibliotecas do usuário primeiro:** pastas em `config.sfx_pastas` (Gabriel: SSD "GAB - ESSENTIAL/SFX": Ocular Sounds, Film Score Collection, EXCLUSIVO). Buscar pelo nome do arquivo (find + grep) antes do Artlist.
+- Nada de som começando antes da sua cena: o `_segmento` corta a sobra antes do ataque (0,03 s no onset, 0,25 s no pico; `"subida": s` para riser).
 - Motion: os tempos vêm do próprio GSAP (tempo local + início do clipe), não do olho.
 
 ## 1. Ler a cena (o que se mexe, quando e onde)

@@ -226,7 +226,11 @@ def _segmento(ev, med, dur_video=1e9):
     """(início na timeline, ponto de entrada no arquivo, duração). O ataque/pico do som cai em t; `dur` = quanto o som
     continua DEPOIS de t (sem dur: até o fim do arquivo)."""
     al = _alinhar_padrao(ev); hit = med["onset"] if al == "onset" else med["pico"] if al == "pico" else 0.0
-    t = float(ev["t"]); ini = t - hit; corte = max(0.0, -ini); ini = max(0.0, ini)
+    # Sobra antes do ataque é CORTADA (bug 14/10/2026: passo entrava 2,7 s antes da pisada tocando o começo do arquivo,
+    # riser de 6 s vazava por 3 cenas). Só fica a subida curta: 0,03 s no onset, 0,25 s no pico, ou "subida" no evento.
+    pre = float(ev.get("subida", 0.03 if al == "onset" else 0.25 if al == "pico" else 0.0))
+    lead = min(hit, pre)
+    t = float(ev["t"]); ini = t - lead; corte = hit - lead + max(0.0, -ini); ini = max(0.0, ini)
     fim_arq = med["dur"] - corte
     d = min((t - ini) + float(ev["dur"]), fim_arq) if ev.get("dur") else fim_arq
     return ini, corte, min(d, dur_video - ini)
