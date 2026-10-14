@@ -59,10 +59,10 @@ GAB.pasta = function (nome) {
 GAB.projeto = function (caminho) {
   var f = new File(caminho);
   if (app.project && app.project.file && app.project.file.fsName === f.fsName) return app.project.file.fsName;
-  // salva o projeto aberto antes de trocar (senão o AE pergunta "salvar alterações?" e trava)
-  if (app.project && app.project.file && app.project.file.parent.exists) {
-    try { app.project.close(CloseOptions.SAVE_CHANGES); } catch (x) { app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES); }
-  } else if (app.project) app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
+  // Projeto do usuário é intocável: com alteração não salva, PARA e o Gab pergunta (o AE só tem um projeto aberto,
+  // e fechar sem salvar já jogou fora o trabalho de um usuário). Sem alteração, fechar não perde nada.
+  if (app.project && app.project.dirty) throw new Error("O projeto aberto no AE (" + (app.project.file ? app.project.file.name : "sem nome") + ") tem alterações não salvas. Pergunte ao usuário antes de abrir outro projeto.");
+  if (app.project) app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
   if (f.exists) app.open(f);
   else { app.newProject(); app.project.save(f); }
   return app.project.file ? app.project.file.fsName : null;
@@ -349,7 +349,11 @@ GAB.quadro = function (nome, t, arquivo) {
 GAB.salvar = function () { app.project.save(); return app.project.file ? app.project.file.fsName : null; };
 
 // Salva e fecha o AE sem nenhuma pergunta.
-GAB.fechar = function () { if (app.project && app.project.file) app.project.save(); app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES); app.quit(); return true; };
+GAB.fechar = function () {
+  if (app.project && app.project.dirty && !app.project.file) throw new Error("Projeto sem nome com alterações não salvas no AE: pergunte ao usuário antes de fechar.");
+  if (app.project && app.project.file) app.project.save();
+  app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES); app.quit(); return true;
+};
 
 // Nome do modelo de saída com alfa (os nomes mudam com o idioma do AE).
 GAB.modeloAlfa = function () {

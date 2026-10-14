@@ -170,6 +170,8 @@ Presets de lettering do usuário; motions no centro (540, 960), visual do site d
 
 **Morph de formas complexas e 3D de verdade** (logo se formando, logo em metal 3D): `docs/etapas/motion_avancado.md` (`scripts/morph_logo.py` e `tresd/tresd.py`); **objeto 3D** como diploma/troféu: `tresd/tresd.py cena tresd/cenas/<cena>.py`, consultando as skills `blender-*` do cc-blender-skill).
 
+**Princípios (todo motion, HyperFrames ou AE):** 12 de Disney + 12 de UX, ritmo pela música, tokens de motion por cliente, referência = linguagem e recriação fiel: `docs/etapas/principios_animacao.md` (ler ao planejar motions ou receber referência).
+
 ## 8b. Tracking de texto e animação no editor (`docs/etapas/tracking_animacao.md`)
 Texto que segue rosto/objeto (`scripts/rastrear.py` + aplicar no DaVinci, Premiere ou AE) e animação de clipe com keyframes (punch-in, zoom, pan, giro, opacidade), sempre no editor escolhido e conferido por quadros.
 

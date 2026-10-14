@@ -228,7 +228,9 @@ def fechar():
     """Salva e fecha o AE sem perguntas (nunca usar Cmd+Q: a pergunta de salvar trava tudo)."""
     try:
         jsx("return GAB.fechar();", "fechar", espera=30)
-    except Exception:
+    except Exception as e:
+        if "não salvas" in str(e):
+            raise  # projeto do usuário: perguntar antes, nunca descartar
         pass
 
 

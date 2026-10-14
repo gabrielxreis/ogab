@@ -98,3 +98,29 @@ Antes de montar um motion do zero, ver se já existe modelo: `python3 SKILL_DIR/
 - **Salvar logo depois de `quadro()`** uma vez gerou erro de salvamento (arquivo temporário `.aep` pela metade). Conferir quadros e só depois salvar, ou salvar pelo `motion()`.
 - **Fonte:** o AE aceita qualquer nome calado; a conferência usa `app.fonts` (`isSubstitute`).
 - A extensão também sobe dentro do `aerender`; ela detecta e não abre o servidor lá.
+
+## Projeto do usuário é intocável (14/10/2026, aprendido com o Rick no Windows)
+
+O AE só tem um projeto aberto por vez. Um script que fechou com `DO_NOT_SAVE_CHANGES` jogou fora o trabalho de um
+usuário. Agora `GAB.projeto` (`AE.abrir_projeto`) e `AE.fechar()` **param com erro** se o projeto aberto tiver
+alteração não salva: o Gab pergunta ao usuário, nunca salva nem descarta por ele. Cada peça ou teste em projeto e
+pasta próprios; scripts de montagem não fecham projeto.
+
+## Armadilhas do ExtendScript (AE 25.4 no Windows, Rick, 12-14/10/2026)
+
+- `OR` é palavra reservada (`var OR=` dá erro).
+- Grupo de forma criado por último fica POR CIMA. Referências a propriedades ficam inválidas depois de adicionar
+  outra: buscar de novo pelo nome.
+- Propriedade ESPACIAL (posição) pede array de **1** `KeyframeEase`; mandar 2 ou 3 dá erro engolido e fica sem
+  ease (`GAB.dims` já devolve 1 para `TwoD_SPATIAL`/`ThreeD_SPATIAL`).
+- `layer.parent = x` não compensou a posição no 25.4 (no 26.5 do Mac funcionou). Se o filho pular: setar a posição
+  local na mão, ou usar null com âncora = posição = centro do quadro.
+- `addCamera` nasce em [0,0,-1500]: sempre setar posição e ponto de interesse.
+- `setTrackMatte` esconde a camada usada como matte.
+- `TextDocument.fauxItalic` não pega: inclinar com animador de texto com **Skew**.
+- `valueAtTime` em null às vezes dá "invalid numeric result": não depender disso para diagnóstico.
+- **Cache de disco cheio = MP4 cortado sem erro.** Antes do render `app.purge(PurgeTarget.ALL_CACHES)`; depois
+  contar quadros (`ffprobe -count_frames`). Mover o cache: `app.preferences.savePrefAsString("Disk Cache Controls","Folder 7",...)`.
+- Envato pelo Chrome: escolher 1080p (o 4K ProRes tem ~650 MB).
+
+Princípios de animação, ritmo, tokens de motion e o método de recriar referência: `docs/etapas/principios_animacao.md`.
