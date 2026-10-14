@@ -925,15 +925,20 @@ def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
     ev = [(m[2], float(m[1]), int(m[3]), float(m[4]) if m[4] else None) for m in (_re.match(r"\s*([\d.]+)s A\d (\S+) (-?\d+)dB(?: ([\d.]+)s)?", l)
           for l in open(os.path.join(pasta_sfx, "plano_sfx.txt")).read().splitlines()) if m]
     garantir_trilhas_audio(t, max(trilhas))
-    for k in trilhas:
-        its = t.GetItemListInTrack("audio", k) or []
+    pasta_abs = os.path.abspath(pasta_sfx)
+    for k in trilhas:   # só apaga o que veio DESTA pasta (bug 14/10/2026: AddTrack muda a numeração e apagava SFX do usuário)
+        its = [x for x in (t.GetItemListInTrack("audio", k) or []) if x.GetMediaPoolItem() and
+               os.path.dirname(os.path.abspath(x.GetMediaPoolItem().GetClipProperty("File Path") or "")) == pasta_abs]
         if its: t.DeleteClips(its)
-        t.SetTrackName("audio", k, "SFX" if k == trilhas[0] else f"SFX {k - trilhas[0] + 1}")
+        if not [x for x in (t.GetItemListInTrack("audio", k) or [])]:
+            t.SetTrackName("audio", k, "SFX" if k == trilhas[0] else f"SFX {k - trilhas[0] + 1}")
     S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0
     for nome, ini, db, dmax in sorted(ev, key=lambda e: e[1]):
         it = importar(mp, os.path.join(pasta_sfx, nome + ".wav"), "SFX"); fc = float(it.GetClipProperty("FPS") or F)
         dur = min(dmax or SFX_DMAX.get(nome, 2.0), fim_s - ini); rf = S + round(ini * F)   # 'NN dB D.Ds' na linha = duração própria
-        k = next(k for k in trilhas if fim[k] < rf)
+        livres = [k for k in trilhas if fim[k] < rf and not [y for y in (t.GetItemListInTrack("audio", k) or []) if y.GetStart() < rf + round(dur * F) and y.GetEnd() > rf]]
+        if not livres: print("SFX sem trilha livre:", nome, ini); continue
+        k = livres[0]
         x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": k, "recordFrame": rf, "startFrame": 0, "endFrame": round(dur * fc)}])
         if not x: print("SFX falhou:", nome, ini); continue
         x[0].SetProperty("AudioVolume", db); x[0].SetFades({"FadeOut": min(8, round(dur * F / 4))}); fim[k] = x[0].GetEnd(); ok += 1
