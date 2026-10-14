@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.14-1 (14/10/2026)
+- **Montagem no seu estilo:** o Gab agora monta em escada de trilhas, guarda o take antigo desligado por baixo do novo, entra no take já na ação, corta 1 quadro antes da palavra e casa o take com o verbo da frase.
+
 ## 2026.10.13-18 (13/10/2026)
 - **Preset novo KINETIC (tipografia cinética):** cada batida da fala vira palavras enormes trocando no ritmo da voz, fundo preto/vermelho/branco e entradas variadas. Peça `/ogab faz um motion no preset kinetic com <frase>`.
 
