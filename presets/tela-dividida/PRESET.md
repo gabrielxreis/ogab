@@ -1,6 +1,6 @@
 # Preset TELA DIVIDIDA (Reels de talking head com painel de motion)
 
-Estudado em 13/10/2026 a partir das aulas "Edição Braba com IA" (Edições 01 a 04 e os dois antes/depois). Os vídeos de referência ficam só na máquina (`~/Documents/videos/referencias/edicao-braba/`), nunca no repo.
+Estudado em 13/10/2026 a partir das aulas "Edição Braba com IA" (Edições 01 a 04 e os dois antes/depois). Os vídeos de referência ficam só na máquina (`~/Documents/CLAUDE BRAIN/_motions/referencias/edicao-braba/`), nunca no repo.
 
 ## Quando usar
 - Talking head explicativo ou de opinião, de 40 a 60 s, que cita muita coisa concreta: app, site, número, marca, passo a passo, ferramenta.

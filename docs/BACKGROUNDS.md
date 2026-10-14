@@ -62,7 +62,7 @@ Se o `config.json` tiver `backgrounds.pasta` apontando para uma biblioteca local
 
 ## Como montar (HyperFrames)
 
-1. Projeto próprio (ex.: `~/Documents/videos/<assunto>-motions/bg-<estilo>/`), composição 1080x1920, `data-duration="10"`.
+1. Projeto próprio (ex.: `~/Documents/CLAUDE BRAIN/_motions/<assunto>-motions/bg-<estilo>/`), composição 1080x1920, `data-duration="10"`.
 2. Desenhar em `<canvas>` (partículas, faíscas, estilhaços) ou SVG (circuito, grade, linhas de seda), com uma timeline GSAP pausada que controla um `progress` de 0 a 1 e redesenha a cena por tempo (seek-safe). Glow com `filter: blur()` numa cópia por baixo ou `shadowBlur` no canvas.
 3. `npx hyperframes check` e `snapshot --at 0,5,9.9` (conferir que 0 e 9,9 casam para o loop), render `--format mp4`.
 4. Na timeline: BG na trilha acima dos takes durante o trecho do dado, gráfico (motion com alfa) por cima, **centralizado** (centro x=540, y=960, ver regra de centralização na seção 8c do SKILL.md). Trecho maior que 10 s: repetir o loop.
