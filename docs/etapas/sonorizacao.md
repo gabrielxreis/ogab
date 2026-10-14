@@ -6,6 +6,12 @@ Vale para take gerado por IA, animação 2D/3D, cena de banco sem som e motion. 
 objeto, sons de motion) e usa `scripts/sfx_conferir.py` para conferir. Nada aqui precisa de chave de IA: o vídeo é lido
 pelo OpenCV, o som vem do Artlist (`search_sfx`, assinatura) e das bibliotecas locais, a mixagem é ffmpeg.
 
+## 0. Na timeline: quadro a quadro ANTES de escolher som (regra do usuário, 14/10/2026: "veja as imagens e o tempo delas para encaixar cada efeito sonoro antes, porque você colocou muita coisa estranha e coisas fora de tempo, se um carimbo vai bater o som tem que acompanhar o movimento")
+- Listar o corte VISÍVEL em cada instante (trilha mais alta ligada) com o ponto de entrada de cada clipe, e tirar uma tira de quadros de cada corte a 6 qps com o TEMPO DA TIMELINE escrito; nas ações (pé, carimbo, mão, porta) tirar 12 qps recortado na ação.
+- Som só do que a imagem MOSTRA acontecendo: carimbo que só levanta não bate; refletor já aceso não faz clunk; porta já aberta não range; drone na mão parado não zune; mesa vazia não tem xícara. Na dúvida, só ambiente.
+- Pisada no quadro em que o pé ENCOSTA no chão (calcanhar), não no meio do passo; impacto no quadro do contato; som contínuo (porta girando, cartas caindo, estrutura tombando) cobre o tempo todo em que a ação acontece.
+- Motion: os tempos vêm do próprio GSAP (tempo local + início do clipe), não do olho.
+
 ## 1. Ler a cena (o que se mexe, quando e onde)
 `python3 SKILL_DIR/scripts/sonorizar.py analisar <video> --pasta <video>/som`
 - Devolve cortes de cena e eventos: **entrada** (algo começa a se mexer depois de calma), **batida** (movimento forte

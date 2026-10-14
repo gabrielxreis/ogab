@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.14-2 (14/10/2026)
+- **Efeitos sonoros no tempo da imagem:** antes de pôr som, o Gab olha os quadros de cada corte; passo cai na pisada, carimbo no contato, e só entra som do que a imagem mostra.
+
 ## 2026.10.14-1 (14/10/2026)
 - **Montagem no seu estilo:** o Gab agora monta em escada de trilhas, guarda o take antigo desligado por baixo do novo, entra no take já na ação, corta 1 quadro antes da palavra e casa o take com o verbo da frase.
 
