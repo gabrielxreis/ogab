@@ -1,37 +1,12 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=1080, height=1920" />
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,800..900&family=Inter:wght@700;900&display=block" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
-#root { position: relative; width: 100%; height: 100%; overflow: hidden; }
-.cena { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
-.fundo { position: absolute; inset: -40px; }
-.preto .fundo { background: radial-gradient(60% 40% at 50% 50%, var(--brilho) 0%, rgba(0,0,0,0) 70%), #050505; }
-.vermelho .fundo { background: var(--cor); }
-.branco .fundo { background: radial-gradient(80% 60% at 50% 50%, #ffffff, #e9e9e9); }
-.grade { position: absolute; inset: 0; opacity: .08; background-image: repeating-linear-gradient(90deg, #fff 0 1px, transparent 1px 120px); }
-.branco .grade { background-image: repeating-linear-gradient(90deg, #000 0 1px, transparent 1px 120px); }
-.bloco { position: absolute; left: 0; right: 0; top: 960px; transform: translateY(-50%); text-align: center; }
-.linha { position: relative; display: block; white-space: nowrap; font-family: "Archivo", "Inter", sans-serif; font-weight: 900;
-  font-stretch: 125%; font-variation-settings: "wdth" 125; text-transform: uppercase; line-height: .9; letter-spacing: -.01em; }
-.preto .linha { color: #f4f4f4; } .vermelho .linha { color: #0a0a0a; } .branco .linha { color: #0a0a0a; }
-.linha.dest { color: var(--cor); } .vermelho .linha.dest { color: #fff; }
-.linha .l { display: inline-block; }
-.ponto { color: var(--cor); } .vermelho .ponto { color: #fff; }
-.tag { position: absolute; font-family: "Inter"; font-weight: 900; font-size: 64px; color: var(--cor); opacity: 0; }
-.vermelho .tag { color: #fff; }
-.circ { position: absolute; border-radius: 50%; background: var(--cor); opacity: 0; }
-.vermelho .circ { background: #fff; }
-.cursor { display: inline-block; width: .08em; height: .8em; background: var(--cor); margin-left: .06em; vertical-align: -.05em; }
-.rgb { position: absolute; inset: 0; mix-blend-mode: screen; opacity: 0; }
-#flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
-#grao { position: absolute; inset: -50%; opacity: .07; pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
-</style></head><body>
-<div id="root" data-composition-id="kinetic" data-start="0" data-duration="6.55" data-width="1080" data-height="1920" data-fps="30">
-<div id="cenas"></div><div id="flash"></div><div id="grao"></div>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="kinetic.css">
+</head><body>
+<div id="root" data-composition-id="kinetic" data-start="0" data-duration="16.95" data-width="1080" data-height="1920" data-fps="30">
+<div id="cam"><div id="cenas"></div></div>
+<div id="barras"></div><div id="risco"></div><div id="flash"></div><div id="grao"></div><div id="vinheta"></div>
 </div>
 <script src="plano.js"></script>
 <script src="kinetic.js"></script>

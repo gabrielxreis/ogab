@@ -1,0 +1,60 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; --cor: #E8202A; --cor2: #C8FF3D; }
+#cam, #cenas { position: absolute; inset: 0; }
+.cena { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+.fundo { position: absolute; inset: -80px; }
+.preto .fundo { background: radial-gradient(55% 32% at 50% 50%, var(--brilho) 0%, rgba(0,0,0,0) 72%), #050405; }
+.vermelho .fundo { background: radial-gradient(90% 60% at 50% 50%, var(--cor) 40%, #a5101a 100%); }
+.branco .fundo { background: radial-gradient(90% 60% at 50% 45%, #fafafa, #dcdcdc); }
+.carvao .fundo { background: radial-gradient(70% 45% at 50% 45%, #4a4d52, #1b1c1f 80%); }
+.pontos { position: absolute; inset: -80px; opacity: .22; background-image: radial-gradient(rgba(255,255,255,.55) 1.6px, transparent 1.8px); background-size: 46px 46px; }
+.branco .pontos { background-image: linear-gradient(rgba(0,0,0,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.06) 1px, transparent 1px); background-size: 135px 135px; opacity: 1; }
+.carvao .pontos { background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); background-size: 135px 135px; opacity: 1; }
+.vermelho .pontos { background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 2px, transparent 2px 7px); opacity: 1; }
+.bokeh { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,70,70,.95), rgba(232,32,42,0) 70%); }
+.palco { position: absolute; left: 70px; right: 70px; top: var(--cy); transform: translateY(-50%); }
+.L { position: relative; display: block; white-space: nowrap; font-family: "Archivo", sans-serif; font-weight: 900; font-stretch: 125%;
+  font-variation-settings: "wdth" 125; text-transform: uppercase; line-height: .92; letter-spacing: -.005em; text-align: center; }
+.esq .L { text-align: left; }
+.preto .L, .carvao .L { color: #f5f5f5; } .vermelho .L, .branco .L { color: #0b0b0b; }
+.L.cor { color: var(--cor); } .vermelho .L.cor { color: #fff; }
+.L.contorno { color: transparent !important; -webkit-text-stroke: 3px rgba(255,255,255,.75); }
+.branco .L.contorno, .vermelho .L.contorno { -webkit-text-stroke: 3px rgba(0,0,0,.7); }
+.preto .L.brilho { text-shadow: 0 0 30px rgba(255,255,255,.35), 0 0 80px var(--brilho); }
+.L .c { display: inline-block; }
+.pt { color: var(--cor); } .vermelho .pt { color: #fff; }
+.caixa { display: inline-block; background: var(--cor); color: #fff !important; padding: 0 .12em; margin: 0 .04em; }
+.vermelho .caixa { background: #0b0b0b; }
+.verm { color: var(--cor) !important; }
+.mono { font-family: "JetBrains Mono", monospace; font-weight: 700; text-transform: none; font-stretch: 100%; font-variation-settings: normal; }
+.faixa { position: absolute; left: -120px; right: -120px; height: 300px; top: calc(var(--cy) - 150px); background: var(--cor); transform: rotate(-9deg);
+  clip-path: polygon(0 8%, 100% 0, 100% 92%, 0 100%); box-shadow: 0 0 80px rgba(232,32,42,.6); }
+.ital { font-style: italic; }
+.input { position: absolute; left: 80px; right: 80px; top: calc(var(--cy) - 170px); min-height: 340px; border-radius: 34px; padding: 50px 54px 90px;
+  background: linear-gradient(180deg, rgba(120,130,190,.55), rgba(70,78,140,.55)); border: 2px solid rgba(255,255,255,.35); backdrop-filter: blur(10px);
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 60px rgba(232,32,42,.25); color: #fff; font-size: 58px; line-height: 1.35; }
+.input .tok { background: var(--cor); color: #fff; padding: 0 8px; border-radius: 6px; }
+.input .enter { position: absolute; right: 34px; bottom: 30px; width: 78px; height: 64px; border-radius: 14px; border: 2px solid rgba(255,255,255,.6);
+  display: flex; align-items: center; justify-content: center; font-size: 38px; }
+.cur { display: inline-block; width: .09em; height: .9em; background: #fff; margin-left: .05em; vertical-align: -.1em; }
+.barra { position: absolute; left: 90px; right: 90px; height: 16px; background: rgba(255,255,255,.12); border-radius: 8px; overflow: hidden; }
+.barra i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #f5f5f5; box-shadow: 0 0 20px #fff; }
+.eta { position: absolute; left: 90px; font-family: "JetBrains Mono"; font-weight: 700; color: #f5f5f5; }
+.anel { position: absolute; border-radius: 50%; border: 6px dashed rgba(255,255,255,.75); }
+.dot { position: absolute; border-radius: 50%; background: var(--cor); box-shadow: 0 0 60px var(--cor), 0 0 160px var(--cor); }
+.canto { position: absolute; width: 90px; height: 90px; border-color: var(--cor); border-style: solid; border-width: 0; }
+.estrela { position: absolute; background: var(--cor);
+  clip-path: polygon(50% 0,58% 30%,80% 6%,72% 36%,100% 26%,78% 50%,100% 72%,70% 64%,78% 96%,56% 72%,46% 100%,40% 70%,14% 92%,26% 62%,0 58%,24% 44%,4% 18%,34% 30%,30% 2%,44% 28%); }
+.forma { position: absolute; background: var(--cor); }
+.cubo { position: absolute; transform-style: preserve-3d; }
+.cubo div { position: absolute; inset: 0; background: var(--cor); border: 2px solid rgba(0,0,0,.15); }
+.ui { position: absolute; border-radius: 22px; background: #f2f2f2; box-shadow: 0 20px 60px rgba(0,0,0,.5); overflow: hidden; }
+#barras { position: absolute; inset: 0; pointer-events: none; }
+#barras b { position: absolute; left: 0; right: 0; opacity: 0; }
+#risco { position: absolute; left: -200px; width: 1480px; height: 8px; top: 960px; background: linear-gradient(90deg, transparent, #ff5a5a 20%, #fff 50%, #ff5a5a 80%, transparent);
+  box-shadow: 0 0 30px #ff2a2a, 0 0 90px #ff2a2a; opacity: 0; }
+#flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+#vinheta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 80% at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,.45)); }
+#grao { position: absolute; inset: -50%; opacity: .08; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
