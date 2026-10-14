@@ -104,6 +104,7 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 - **point cloud** (antes "pontilhismo"): milhares de pontos desenham fotos reais (com crédito, Wikimedia domínio público/CC0), textos em 3D e formas (galáxia, esfera...) e migram de uma cena para a outra com câmera 3D; fundo preto, serifa itálica (`presets/point-cloud/`, `gerar.py plano.json`).
 - **sketch** ("esboço", desenho de marcador): fundo preto, contornos coloridos que se traçam, cursor piscando, ícones desenhados, texto manuscrito digitado, setas que se desenham e traço tremido de animação feita à mão; cabeçalho "A → B", grade de apps com botão, número de capítulo, fluxo ferramenta → painel, lista com check (`presets/sketch/`, `gerar.py plano.json`).
 - **vector motion** (antes "metáforas", "1 prompt, 1 vídeo"): roteiro de 4-6 frases, cada frase vira uma metáfora visual (um entre muitos, multidão, caminho, porta, calendário, cartões, herói...), preto e branco com o protagonista brilhando; estilos `destaque`, `bolhas`, `grade`, `objetos` (`presets/vector-motion/`, `gerar.py plano.json`).
+- **kinetic** (tipografia cinética): cada batida da fala vira 1-3 palavras enormes, fundo preto/vermelho/branco alternando, 7 entradas (zoom, chicote, pilha, queda, digita, estica, glitch) (`presets/kinetic/`, `gerar.py plano.json`).
 
 **Quando usar cada preset (o Gab escolhe sozinho no plano trecho a trecho e diz qual escolheu e por quê; o usuário pode trocar):**
 
@@ -114,6 +115,7 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 | frase de efeito, motivacional, comportamento, mentalidade, hábito, "enquanto todos... você..." | **vector motion** (`destaque` ou `bolhas`) | a ideia abstrata vira metáfora simples, um protagonista contra o resto |
 | rotina, plano, metas, produtividade, progresso, antes e depois | **vector motion** `grade` | caminho, calendário, cartões e o herói no fim |
 | transformação, escolha, identidade, nova fase | **vector motion** `objetos` | forma que vira outra, digital, aviões, porta |
+| gancho agressivo, reação ("não acredito", "okay"), novidade/lançamento, lista rápida, tecnologia e negócio | **kinetic** | palavra gigante trocando na batida da voz segura o polegar nos 3 primeiros segundos |
 | talking head explicativo que cita app, site, número, marca, passo a passo (40-60 s), ou pedido de "tela dividida" | **tela dividida** | painel de motion em cima, apresentador embaixo, legenda-etiqueta na emenda ([guia](presets/tela-dividida/PRESET.md)) |
 | tutorial, "X apps/ferramentas que...", passo a passo, fluxo ferramenta → resultado, tecnologia/IA/produtividade | **sketch** | tudo vira esboço de marcador se desenhando, didático e leve ([guia](presets/sketch/PRESET.md)) |
 | dado com fonte, notícia, número | motion normal do cliente (cards, contadores) | precisão primeiro; preset só se o usuário pedir |
