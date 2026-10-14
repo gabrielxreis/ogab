@@ -67,3 +67,12 @@ O que deu errado no motion SUNPRIME (v3): sons escolhidos pelo TÍTULO do Artlis
 3. **Whoosh do tamanho do movimento:** medir início/pico/fim de cada movimento (diferença entre quadros) e o ataque/corpo de cada whoosh (envelope); pico do whoosh = pico do movimento; não cortar o som antes do movimento acabar.
 4. **Normalizar antes:** camadas contínuas a -23 LUFS (loudnorm), one-shots a -1 dBFS de pico; o volume do clipe fica relativo a isso.
 5. **Conferir antes de entregar:** `densidade` (meta ≥ 95% acima de -40 dB), `trechos` (cada cena soa como o que mostra; nada de "horror" no topo), `sincronia` (erro médio ≤ 0,1 s). Pad tonal: avisar que pode brigar com a música (trilha própria para baixar/mutar).
+
+## SFX tonal no tom da música (14/10/2026, método da trilha cinematográfica do @iamjeff.ia)
+Riser, drone, pad, impacto com nota, ping de piano e swell têm altura: fora do tom, desafinam por cima da música.
+1. `python3 SKILL_DIR/scripts/musica.py medir <musica.wav> --bumbo INI FIM`: tom, relativo, afinação e o segundo da entrada da batida. Tom e relativo empatados ("CONFERIR") = confirmar no tunebat/songbpm antes de escolher.
+2. Pacotes tonais vêm nos 12 tons (nome ou subpasta com a nota): pegar o do tom. Música **menor** aceita som menor no tom, som **maior no relativo maior** (3 semitons acima: Lá menor -> Dó maior) e som neutro. **Nunca** som maior na mesma tônica de música menor (Lá maior sobre Lá menor) nem o contrário: as terças brigam.
+3. Afinação fora de +-20 cents: SFX tonal desafina; usar só som sem nota (whoosh, ar, ruído) ou outra música.
+4. **Riser com o pico exato no corte ou na entrada da batida** (`alinhar: "pico"`); dois risers que começam ~5 s e ~3,7 s antes dão a subida. **Impacto tonal com passa-altas 60 Hz** para não brigar com o bumbo. Golpe de piano só no médio (passa-altas 150 Hz, passa-baixas 2,2 kHz): com sub embola.
+5. **Entrada da batida seca:** tudo que vinha subindo corta no bumbo (fade de 20-60 ms), sem respiro antes; a força vem do contraste.
+6. Menos é mais: cada camada tonal precisa de função; na dúvida, tira.

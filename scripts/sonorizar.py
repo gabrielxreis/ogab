@@ -18,6 +18,9 @@ plano.json (o Gab escreve; tempos em segundos do vídeo):
    "eventos":  [{"t": 3.2, "arquivo": "passo.wav", "db": -14, "pan": -0.4, "dur": 0.8, "alinhar": "onset", "nota": "pé esq."}],
    "musica":   {"arquivo": "trilha.wav", "db": -18, "de": 0, "inicio_arquivo": 0, "duck": true},
    "camera_lenta": [{"de": 3.55, "ate": 5.85, "entrada": 0.3, "saida": 0.05}],
+   "duck": {"folga": 12, "max": 12, "max_grave": 3},
+  duck (opcional, esses são os padrões): com voz, o médio/agudo de ambiente + música fica `folga` dB abaixo da voz
+  (redução de até `max` dB) e o grave desce no máximo `max_grave` dB (a música não perde o corpo).
    "superficie": "terra", "proibidos": ["..."]}
   superficie (asfalto, terra, areia, grama, agua, madeira, neve): o chão da cena; com ela (ou proibidos) o mixar roda
   `conferir` antes e PARA se algum som for do chão errado (ex.: pneu cantando no asfalto numa estrada de terra).
@@ -257,6 +260,47 @@ def _render(entradas, cadeias, rotulos, saida, dur):
     os.remove(fcf)
 
 
+def _ler_audio(arq):
+    """Áudio (ou o áudio de um vídeo) como array float32 (amostras, 2) a 48 kHz."""
+    import numpy as np
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", arq, "-map", "0:a:0", "-f", "f32le", "-ac", "2", "-ar", str(SR), "-"],
+                         capture_output=True, check=True).stdout
+    return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2).copy()
+
+
+def _gravar_audio(x, saida):
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-", "-c:a", "pcm_f32le", saida],
+                   input=x.astype("float32").tobytes(), check=True)
+
+
+def _duck_por_faixa(cama_arq, voz_arq, saida, folga=12.0, maximo=12.0, max_grave=3.0, corte_hz=250.0):
+    """Ducking por faixa (14/10/2026, método da trilha cinematográfica do @iamjeff.ia): a cama (ambiente + música) se
+    divide em grave (< corte_hz) e médio/agudo (onde a voz mora). Enquanto a voz fala, o médio/agudo fica pelo menos
+    `folga` dB abaixo da voz (até `maximo` dB de redução) e o grave desce no máximo `max_grave` dB, então a música não
+    perde o corpo. Ganho por janela de 10 ms (RMS de 50 ms), ataque 15 ms, soltura 300 ms. Só numpy."""
+    import numpy as np
+    cama, voz = _ler_audio(cama_arq), _ler_audio(voz_arq)
+    n = len(cama); voz = np.pad(voz, ((0, max(0, n - len(voz))), (0, 0)))[:n]
+    # divisão grave/agudo no domínio da frequência com rampa de 200 a 300 Hz; agudo = cama - grave (soma exata)
+    f = np.fft.rfftfreq(n, 1 / SR); k = np.clip((corte_hz * 1.2 - f) / (corte_hz * 0.4), 0, 1)
+    grave = np.fft.irfft(np.fft.rfft(cama, axis=0) * k[:, None], n=n, axis=0).astype(np.float32); agudo = cama - grave
+    hop, win = SR // 100, SR // 20
+
+    def db(x):
+        e = np.convolve((x ** 2).mean(axis=1), np.ones(win) / win, mode="same")[::hop]
+        return 10 * np.log10(e + 1e-12)
+    vd, ad = db(voz), db(agudo)
+    fala = vd > max(vd.max() - 35, -50)                      # janelas com voz (ignora respiro e ruído de fundo)
+    alvo = np.where(fala, np.clip((vd - folga) - ad, -maximo, 0), 0.0)
+    g = np.zeros_like(alvo); a, r = 1 - np.exp(-1 / 1.5), 1 - np.exp(-1 / 30)   # 15 ms / 300 ms em passos de 10 ms
+    for i in range(1, len(alvo)):
+        g[i] = g[i - 1] + (a if alvo[i] < g[i - 1] else r) * (alvo[i] - g[i - 1])
+    t = np.arange(n) / hop
+    ga = 10 ** (np.interp(t, np.arange(len(g)), g) / 20); gg = 10 ** (np.interp(t, np.arange(len(g)), np.maximum(g, -max_grave)) / 20)
+    _gravar_audio(agudo * ga[:, None] + grave * gg[:, None], saida)
+    return round(float(g.min()), 1)
+
+
 def _abafar(arq, lentas):
     """Câmera lenta: troca suave do som normal pelo som abafado (grave + reverb) dentro de cada janela e volta SECO no fim
     (o impacto que encerra o slow-mo soa cheio). Edita o stem no lugar."""
@@ -339,18 +383,19 @@ def mixar(plano_arq, com_voz=True):
     tem_voz = com_voz and plano.get("voz", True) and bool(subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", video], capture_output=True, text=True).stdout.strip())
     cama = [os.path.join(out, "ambiente.wav")] + ([mus_arq] if mus else [])
-    args = ["ffmpeg", "-v", "error", "-y"]
-    for c in cama:
-        args += ["-i", c]
-    args += ["-i", os.path.join(out, "sfx.wav")]
-    n = len(cama)
-    fc = "".join(f"[{k}:a]" for k in range(n)) + (f"amix=inputs={n}:normalize=0[cama];" if n > 1 else "anull[cama];")
+    cama_arq = os.path.join(out, "_cama.wav"); reducao = None
+    _render([["-i", c] for c in cama], [f"[{k}:a]anull[c{k}]" for k in range(len(cama))], [f"c{k}" for k in range(len(cama))], cama_arq, dur)
+    if tem_voz:   # ducking por faixa: abaixa o médio/agudo da cama sob a voz, o grave quase não mexe
+        d = plano.get("duck") if isinstance(plano.get("duck"), dict) else {}
+        camad = os.path.join(out, "_cama_duck.wav")
+        reducao = _duck_por_faixa(cama_arq, video, camad, d.get("folga", 12.0), d.get("max", 12.0), d.get("max_grave", 3.0))
+        os.replace(camad, cama_arq)
+    args = ["ffmpeg", "-v", "error", "-y", "-i", cama_arq, "-i", os.path.join(out, "sfx.wav")]
     if tem_voz:
-        args += ["-i", video]; v = n + 1
-        fc += f"[{v}:a]{fmt},asplit=2[voz][chave];[cama][chave]sidechaincompress=threshold=0.02:ratio=8:attack=30:release=450:makeup=1[camad];"
-        fc += f"[voz][camad][{n}:a]amix=inputs=3:normalize=0"
+        args += ["-i", video]
+        fc = f"[2:a]{fmt}[voz];[voz][0:a][1:a]amix=inputs=3:normalize=0"
     else:
-        fc += f"[cama][{n}:a]amix=inputs=2:normalize=0"
+        fc = "[0:a][1:a]amix=inputs=2:normalize=0"
     fc += f",atrim=0:{dur},aresample={SR}[o]"
     mix = os.path.join(out, "mix.wav"); bruto = os.path.join(out, "_mix_bruto.wav")
     subprocess.run(args + ["-filter_complex", fc, "-map", "[o]", "-c:a", "pcm_f32le", bruto], check=True)
@@ -361,12 +406,12 @@ def mixar(plano_arq, com_voz=True):
         ganho = 0.0
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", bruto, "-af", f"volume={ganho:.2f}dB,alimiter=limit=0.84:attack=2:release=60:level=disabled",
                     "-ar", str(SR), "-c:a", "pcm_s24le", mix], check=True)
-    os.remove(bruto)
+    os.remove(bruto); os.remove(cama_arq)
     previa = os.path.join(out, "previa.mp4")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video, "-i", mix, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-shortest", previa], check=True)
     li, pk = _loudness(mix)
     return {"pasta": out, "stems": ["ambiente.wav", "sfx.wav"] + (["musica.wav"] if mus else []), "mix": mix, "previa": previa,
-            "voz": tem_voz, "loudness": li, "pico": pk, "eventos": len(plano.get("eventos", []))}
+            "voz": tem_voz, "duck_max_db": reducao, "loudness": li, "pico": pk, "eventos": len(plano.get("eventos", []))}
 
 
 # ------------------------------------------------------------------ conferir (o som combina com a cena?)

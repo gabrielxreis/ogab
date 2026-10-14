@@ -81,7 +81,8 @@ e volta forte no fim) e marca na folha. Confirmar olhando e montar o slow-mo ass
 - **Pan pela tela:** usar o pan da análise (personagem à esquerda soa à esquerda). Ambiente e voz no centro.
 - `python3 SKILL_DIR/scripts/sonorizar.py mixar <plano.json>` gera `ambiente.wav`, `sfx.wav`, `musica.wav` (stems),
   `mix.wav` (-14 LUFS em duas passadas, pico <= -1,5 dBTP) e `previa.mp4`. Com voz, ambiente e música abaixam sozinhos
-  embaixo da fala (sidechain). `--sem-voz` descarta o áudio original do vídeo (take de IA com som ruim).
+  embaixo da fala POR FAIXA: o médio/agudo fica 12 dB abaixo da voz e o grave desce no máximo 3 dB (a música não perde
+  o corpo; ajustar com `"duck": {"folga", "max", "max_grave"}` no plano). `--sem-voz` descarta o áudio original do vídeo (take de IA com som ruim).
 - **No editor:** os stems entram em trilhas com nome (AMBIENTE, SFX, MÚSICA) ou, para ficar editável som a som no DaVinci,
   `sonorizar.py davinci <plano.json> <video>/sfx` escreve o `plano_sfx.txt` (já descontando o ataque e recortando o som
   que entra no meio) para `resolve_lib.colocar_plano_sfx(..., trilhas=tuple(range(3, 11)))`. Pan no Inspector.

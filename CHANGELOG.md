@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.14-5 (14/10/2026)
+- **Música mais limpa sob a voz:** quando alguém fala, o Gab abaixa só a parte da música que disputa com a voz e mantém o grave, então a música não some nem fica magra.
+- **Música medida de verdade:** o Gab mede o BPM, as batidas, o tom e o segundo em que a batida entra, em vez de confiar no número do catálogo. Cortes e motions caem na batida, e riser, drone e impacto com nota saem no tom da música.
 ## 2026.10.14-4 (14/10/2026)
 - **Export trava se faltar cor:** se algum take ligado (em qualquer trilha) estiver sem o PowerGrade/LUT, o Gab não exporta e avisa quais são.
 

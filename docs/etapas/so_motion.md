@@ -6,7 +6,7 @@ Quando o usuário pede "só motion e música": o texto anima na tela no ritmo da
 
 **Roteiro:** 5 a 6 cenas + CTA, ~30 s (Reels/Ads). Assunto quente ou viral com FONTE e data em letra pequena em cada cena com dado. Famosos: só fato público com fonte (onde mora, obra conhecida), nunca citação inventada, imagem ou insinuação de vínculo; marcar "exemplo público, sem relação com a marca" quando o famoso ilustrar o serviço.
 
-**Batida:** escolher a música pelo Artlist (bpm e hookStartSeconds vêm no search_music). Cenas definidas em BATIDAS (tempo = batidas × 60/BPM). A música entra em `hookStart - início do CTA` (clímax no CTA) e, como o hook começa no tempo forte, todas as trocas de cena caem na batida.
+**Batida:** escolher a música pelo Artlist (bpm e hookStartSeconds vêm no search_music) e, com o WAV baixado, **medir** com `python3 SKILL_DIR/scripts/musica.py medir <wav> --de <hookStart> --ate <hookStart+40>`: o bpm do catálogo é ponto de partida e erra (134 informado x 136 medido derrapa uma cena inteira em 30 s). Cenas definidas em BATIDAS da grade medida (a lista `batidas` dá o segundo de cada uma); a entrada da batida (`--bumbo INI FIM`) é onde cai o corte forte, o impacto e o pico do riser. A música entra em `hookStart - início do CTA` (clímax no CTA) e, como o hook começa no tempo forte, todas as trocas de cena caem na batida.
 
 **Motion:** uma composição por vídeo com cenas (`.sc` com entrada/saída de 0,3 s), gerador em `~/Documents/videos/motion-only/build_mo.py` (temas por cliente: Bora Comunicação navy/laranja Poppins, Bora Imigrar verde-petróleo/laranja Inter) e `~/Documents/videos/calverstone-motions/lote3.py` (Calverstone). Fundo opaco do primeiro ao último quadro (`bgfade` desligado: nada de fade do preto).
 
