@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.14-4 (14/10/2026)
+- **Export trava se faltar cor:** se algum take ligado (em qualquer trilha) estiver sem o PowerGrade/LUT, o Gab não exporta e avisa quais são.
+
 ## 2026.10.14-3 (14/10/2026)
 - **SFX conferidos e no tempo:** cada som passa pelo classificador antes de entrar, nada começa antes da própria ação, e cenas grandes (prédio caindo) ganham som em camadas. O Gab procura primeiro nas suas pastas de SFX.
 

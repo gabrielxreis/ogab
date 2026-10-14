@@ -1,3 +1,4 @@
+import json
 """Funções para montar o vídeo no DaVinci Resolve Studio pela scripting API.
 
 Uso típico (python3 com as variáveis de ambiente do Resolve, ver ambiente()):
@@ -573,9 +574,28 @@ def masterizar(arq, lufs=-14, tp=-1.5, fade_s=0.4):
     return i, pk
 
 
+def takes_sem_cor(t):
+    """Takes LIGADOS (qualquer trilha) que não têm grade: 1 nó só e sem LUT. Motions (.mov, /motions/) ficam de fora."""
+    faltam = []
+    for k in range(1, t.GetTrackCount("video") + 1):
+        for x in t.GetItemListInTrack("video", k) or []:
+            m = x.GetMediaPoolItem(); fp = (m.GetClipProperty("File Path") if m else "") or ""
+            if not x.GetClipEnabled() or "/motions/" in fp or fp.lower().endswith(".mov"):
+                continue
+            g = x.GetNodeGraph()
+            if g and g.GetNumNodes() <= 1 and not g.GetLUT(1):
+                faltam.append(x.GetName())
+    return faltam
+
+
 def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True):
     """ate_fim_do_video: corta no último quadro de vídeo (música que passa do fim dava quadros pretos no final).
     master: masteriza o áudio do MP4 (masterizar)."""
+    _cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"))) if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")) else {}
+    if (_cfg.get("cor") or {}).get("aplicar_power_grade"):
+        faltam = takes_sem_cor(p.GetCurrentTimeline())   # bug 14/10/2026: 10 takes trocados depois da cor saíram sem grade e o vídeo foi postado
+        if faltam:
+            raise RuntimeError(f"takes sem cor: {faltam}. Rode aplicar_grade (ou ApplyGradeFromDRX nesses) antes de exportar.")
     for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
     # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False
