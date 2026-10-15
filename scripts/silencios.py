@@ -92,6 +92,17 @@ def main():
     clipes = [x for x in (t.GetItemListInTrack("video", 1) or []) if x.GetMediaPoolItem() and x.GetClipEnabled()]
     if not clipes:
         raise SystemExit("V1 sem clipe ligado com mídia")
+    # velocidade alterada (speed ramp, 50%, 200%): o AppendToTimeline remonta a 100% e o trecho cairia fora da fala.
+    # A API não expõe a velocidade; trecho usado do arquivo diferente da duração na timeline = velocidade mexida.
+    lentos = []
+    for x in clipes:
+        it = x.GetMediaPoolItem(); fps = float(it.GetClipProperty("FPS") or fps_tl)
+        src = (x.GetSourceEndFrame() - x.GetSourceStartFrame()) / fps; tl = x.GetDuration() / fps_tl
+        if tl > 0 and abs(src / tl - 1) > 0.03:
+            lentos.append(f"{x.GetName()} ({100 * src / tl:.0f}%)")
+    if lentos:
+        raise SystemExit("PAROU: clipe com velocidade alterada na V1: " + ", ".join(lentos) +
+                         ". Tirar os silêncios ANTES de mexer na velocidade (nada foi alterado).")
     infos, antes, depois, cortes = [], 0.0, 0.0, 0
     cache = {}
     for x in clipes:
@@ -110,6 +121,7 @@ def main():
     if a.simular:
         return
     w, h = t.GetSetting("timelineResolutionWidth"), t.GetSetting("timelineResolutionHeight")
+    vi = t.GetVoiceIsolationState(1) or {}
     t.SetName(backup)
     nova = R.timeline_do_modelo(p, mp, a.timeline, w, h, t.GetSetting("timelineFrameRate")) or mp.CreateEmptyTimeline(a.timeline)
     p.SetCurrentTimeline(nova)
@@ -120,6 +132,10 @@ def main():
     dur = (nova.GetEndFrame() - nova.GetStartFrame()) / fps_tl
     if len(res) != len(infos):
         print(f"AVISO: entraram {len(res)} de {len(infos)} trechos; conferir a timeline")
+    # regra 1d: Voice Isolation na A1 (timeline nova nasce sem); mantém a intensidade que a original tinha
+    alvo_vi = vi if vi.get("isEnabled") else {"isEnabled": True, "amount": 100}
+    nova.SetVoiceIsolationState(1, alvo_vi)
+    print("Voice Isolation A1:", nova.GetVoiceIsolationState(1))
     print(f"timeline {a.timeline!r}: {len(res)} clipes, {dur:.1f} s; original guardada em {backup!r}")
     R.salvar(r)
 

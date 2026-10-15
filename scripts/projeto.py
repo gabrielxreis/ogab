@@ -142,6 +142,10 @@ def pastas_do_lote(base):
 
 def checklist(alvo):
     ps = pastas_do_lote(alvo) or [alvo]; falta_algo = False
+    marca = os.path.abspath(alvo if pastas_do_lote(alvo) else os.path.dirname(os.path.abspath(alvo)))
+    if not os.path.exists(os.path.join(marca, os.path.basename(marca) + ".md")):
+        falta_algo = True
+        print(f"PENDENTE: memória da marca {os.path.basename(marca)}.md não existe (regra 1-0): projeto.py memoria {marca}\n")
     for d in ps:
         print(status(d)); st = estado(d); E = etapas(d)
         feitas = set(st["feitas"]) | detectar(st["timeline"]) if st.get("timeline") else set(st["feitas"])
