@@ -2,7 +2,9 @@
 
 Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando o usuário pedir CapCut (ou `"editor": "capcut"` no config), usar `capcut/capcut_lib.py` onde o `SKILL.md` manda usar `resolve_lib.py`.
 
-> **Status: experimental.** Rascunhos de teste gerados em 14/10/2026 (`GAB TESTE API` e `GAB TESTE API 2`, este com transição, animações, efeito, máscara, fundo e corte de silêncio); falta conferir dentro do CapCut que tudo abre certo. Até essa conferência, avisar o usuário que é beta.
+> **Status: beta, aberto no CapCut em 15/10/2026:** `NBA - TIMELINE` (36 itens vindos do DaVinci) carregou com toda a mídia, áudio com forma de onda, legendas e tempos certos. Ainda não conferidos no app: transição, animações, efeitos, filtros, adesivos, voz e modelos de texto (`GAB TESTE API 2` e `3`).
+>
+> **Antes:** Rascunhos de teste gerados em 14/10/2026 (`GAB TESTE API` e `GAB TESTE API 2`, este com transição, animações, efeito, máscara, fundo e corte de silêncio); falta conferir dentro do CapCut que tudo abre certo. Até essa conferência, avisar o usuário que é beta.
 
 ## Como o Gab fala com o CapCut (engenharia reversa, CapCut 9.4.0, 14/10/2026)
 
@@ -13,6 +15,7 @@ Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando 
 - **Fluxo obrigatório:** o PROJETO fechado (o CapCut pode ficar na tela inicial ou em outro projeto) → `salvar(projeto_fechado=True)` → clicar no projeto. Com o projeto aberto, o CapCut sobrescreve tudo; por isso `salvar()` recusa com o app aberto até o Gab confirmar com o usuário que o projeto está fechado.
 - **Proteção da edição manual:** `abrir()` guarda a impressão digital (sha256) do JSON; se ele mudar até o `salvar()` (o usuário mexeu no CapCut), a gravação é recusada. Reabrir e refazer. Gravação atômica (arquivo temporário + troca), nunca deixa JSON pela metade.
 - **Efeitos da loja sem caminho:** transição, animação, efeito e máscara vão só com `resource_id`/`effect_id` (`catalogo.json`); o CapCut baixa o arquivo sozinho quando o projeto abre (precisa de internet na 1a vez).
+- **Ímã da trilha principal:** a V1 do CapCut é magnética e, ao abrir, gruda os clipes e some com os buracos. `novo()` grava `config.maintrack_adsorb = false` para a V1 manter os tempos do DaVinci.
 - Tempo em microssegundos no JSON (a lib recebe segundos). Posição `clip.transform` em meia-tela (-1 a 1, y para cima); a lib recebe pixels com y a partir de baixo (mesma convenção da legenda Y 724 do DaVinci).
 
 ```python
@@ -66,7 +69,7 @@ Transformação: `KFTypePositionX/Y`, `KFTypeScaleX/Y`, `KFTypeRotation`, `KFTyp
 O CapCut guarda as respostas da API dos painéis em `~/Movies/CapCut/User Data/Cache/ressdk_db/*/rp.db` (SQLite, tabela `http_cache`, rotas `/artist/v1/panel/get_panel_info` e `/artist/v1/effect/get_resources_by_category_id`). O `effect_type` diz o que é: 12 filtro, 2 adesivo, 48 modelo de texto, 18 animação de texto (categorias Entrada/Saída/Loop/Legenda), 13 animação de vídeo, 26 efeito de voz, 7/19 efeito, 10 fonte. `atualizar_loja()` lê isso (só leitura) e grava nome, `resource_id`, `effect_id`, Pro e tipo. Em 15/10/2026: 50 filtros, 2.148 adesivos, 4.316 modelos de texto, 1.839 animações de texto, 4.701 de vídeo, 361 vozes, 100 efeitos, 5.985 fontes. Só aparecem os painéis que o usuário já abriu no CapCut: abrir o painel de Filtros inteiro e rodar `atualizar_loja()` traz o resto. "(pro)" precisa do CapCut Pro para exportar.
 
 ## DaVinci → CapCut (`davinci_para_capcut.py`)
-Só LÊ o DaVinci. Leva: clipes de todas as trilhas de vídeo (trecho exato pelo fps real do arquivo, zoom, pan/tilt, rotação, opacidade, desligado), Cross Dissolve (vira Dissolve), áudio (o que casa com o clipe fica no clipe, o resto vira trilha de áudio; Cross Fade vira fade) e legendas (texto na Y 724). Zoom: projeto vertical que preenche o quadro vira escala `zoom x fator de preenchimento` (16:9 em 9:16 = 3,16). Não leva: compound clip, Fusion/lettering, cor/LUT, efeitos do DaVinci (vão listados em `relatorio_capcut.json`). Mídia fora de `~/Movies` é copiada inteira (12 GB no teste NBA); nunca re-renderizar take.
+Só LÊ o DaVinci. Leva: clipes de todas as trilhas de vídeo (trecho exato pelo fps real do arquivo, zoom, pan/tilt, rotação, opacidade, desligado), Cross Dissolve (vira Dissolve), áudio (o que casa com o clipe fica no clipe, o resto vira trilha de áudio; Cross Fade vira fade) e legendas (texto na Y 724). Zoom: o 1.0 do DaVinci (encaixar no quadro) é igual ao 1.0 do CapCut, então o zoom passa direto. Vídeo de câmera/celular gravado em pé (16:9 com rotação 90 nos metadados) é lido como vertical. Rotação feita no DaVinci em Clip Attributes (Image Orientation) NÃO vem pela API: conferir no CapCut e girar com `d.transformar(id, rotacao=-90, escala=zoom*1.778)` (teste NBA, clipes do Dieguinho). Não leva: compound clip, Fusion/lettering, cor/LUT, efeitos do DaVinci (vão listados em `relatorio_capcut.json`). Mídia fora de `~/Movies` é copiada inteira (12 GB no teste NBA); nunca re-renderizar take.
 
 ## O que ainda não tem
 Chroma key, fontes da loja no `texto()` (os ids já estão em `loja.json`) e conferência visual: modelos de texto e legendas animadas foram gravados mas ainda não abertos no CapCut. O caminho para incluir: aplicar uma vez à mão num rascunho, ler o JSON e copiar `resource_id`/`effect_id` para o `catalogo.json`. Os ids vêm do VectCutAPI (github.com/sun-guannan/VectCutAPI, Apache 2.0, catálogos `pyJianYingDraft/metadata/capcut_*.py` de 12/10/2026), convertidos lendo o código como texto (sem executar).

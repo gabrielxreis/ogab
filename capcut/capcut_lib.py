@@ -125,13 +125,16 @@ def _novo(chave, **campos):
 def _sonda(arq):
     """Duração (s), largura, altura e se tem áudio, via ffprobe."""
     r = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
-                        "format=duration:stream=codec_type,width,height", "-of", "json", arq],
+                        "format=duration:stream=codec_type,width,height:stream_side_data=rotation", "-of", "json", arq],
                        capture_output=True, text=True)
     j = json.loads(r.stdout or "{}")
     vid = [s for s in j.get("streams", []) if s.get("codec_type") == "video"]
     aud = any(s.get("codec_type") == "audio" for s in j.get("streams", []))
     dur = float(j.get("format", {}).get("duration") or 0)
     w, h = (vid[0].get("width", 0), vid[0].get("height", 0)) if vid else (0, 0)
+    rot = next((abs(int(x.get("rotation", 0))) for x in (vid[0].get("side_data_list") or []) if "rotation" in x), 0) if vid else 0
+    if rot in (90, 270):   # celular/câmera na vertical: o arquivo é 16:9 com rotação nos metadados
+        w, h = h, w
     return dur, w, h, aud
 
 
@@ -198,6 +201,8 @@ def novo(nome, w=1080, h=1920, fps=30, substituir=False):
             open(f, "w", encoding="utf-8").write(t)
     d = Rascunho(nome)
     d.j.update(fps=float(fps), duration=0, tracks=[])
+    # ímã da trilha principal desligado: senão o CapCut gruda os clipes da V1 ao abrir e some com os buracos
+    d.j["config"]["maintrack_adsorb"] = False
     d.j["canvas_config"].update(width=w, height=h, ratio="original")
     m = d.meta
     m.update(draft_name=nome, draft_fold_path=pasta, draft_root_path=RAIZ, draft_cover="",

@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-3 (15/10/2026)
+- **CapCut: zoom e buracos certos.** Vídeo gravado em pé não entra mais com zoom gigante, e a trilha principal do CapCut não gruda mais os clipes: os espaços vazios da timeline do DaVinci ficam onde estavam.
 ## 2026.10.15-2 (15/10/2026)
 - **CapCut: filtros, adesivos, vozes e modelos de texto.** O Gab agora usa a loja do seu próprio CapCut (o que você já abriu nos painéis): filtros de cor, adesivos, efeitos de voz, modelos de texto e animações de legenda palavra a palavra.
 - **Do DaVinci para o CapCut:** peça "recria essa timeline no CapCut" e o Gab monta no CapCut a timeline aberta no DaVinci (cortes, zoom, posição, áudio, transições e legendas), sem mexer no DaVinci.

@@ -105,12 +105,11 @@ for t in [t for t in d["trilhas"] if t["tipo"] == "video"]:
         if not x.get("arq"):
             rel["pulado"].append(f'V{t["n"]} {x["ini"]:.2f}s "{x["nome"]}" ({x.get("tipo_clip")}): sem arquivo, o CapCut não abre compound clip')
             continue
-        fps, sw, sh = info(x["arq"])
-        preencher = max(W / sw, H / sh) / min(W / sw, H / sh) if sw else 1.0
+        # zoom 1.0 no DaVinci = encaixar no quadro, igual ao 1.0 do CapCut: o zoom passa direto
         com_som = audio_do_video(x)
         de = src_seg(x)
         sid = dr.video(x["arq"], x["ini"], de=de, ate=de + x["dur"], trilha=t["n"] - 1,
-                       mudo=not com_som, escala=(x.get("ZoomX") or 1.0) * preencher,
+                       mudo=not com_som, escala=x.get("ZoomX") or 1.0,
                        x=W / 2 + (x.get("Pan") or 0), y=H / 2 + (x.get("Tilt") or 0),
                        rotacao=x.get("RotationAngle") or 0.0, opacidade=(x.get("Opacity") or 100) / 100)
         if x.get("on") is False:
