@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-1 (15/10/2026)
+- **Preset de legenda GAB USA incluído:** o arquivo vem com a skill (instalação e update). Na primeira legenda, se o preset não existir no seu DaVinci, o Gab importa sozinho. Não precisa criar nem baixar nada.
+
 ## 2026.10.15-3 (15/10/2026)
 - **CapCut: zoom e buracos certos.** Vídeo gravado em pé não entra mais com zoom gigante, e a trilha principal do CapCut não gruda mais os clipes: os espaços vazios da timeline do DaVinci ficam onde estavam.
 ## 2026.10.15-2 (15/10/2026)

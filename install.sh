@@ -268,6 +268,7 @@ Pronto. Seu Gab vai editar no: $OGAB_EDITOR   |   motions: $OGAB_MOTION
 Falta só o que precisa de você (uma vez), no app que você usa:
   DaVinci:        Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
                   Reinicie o DaVinci para carregar o lettering (@gabrielxreis_ Text Presets, já instalado em Fusion/Templates).
+                  Preset de legenda GAB USA: vem junto (assets/davinci/GAB USA Subtitle.preset); o Gab importa no DaVinci na 1ª legenda.
   Premiere:       Window > UXP Plugins > Gab Ponte (deixe o painel encaixado).
   After Effects:  nada: a ponte sobe sozinha (se o AE estava aberto durante a instalação, feche e rode o instalador de novo).
   Todos:          conecte as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific...

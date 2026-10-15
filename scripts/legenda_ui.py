@@ -177,7 +177,8 @@ def setar_y(valor, rolagem=True):
         time.sleep(0.3); obs = ocr(INSPECTOR)
         c = _campo_y(obs)
         if c is None and rolagem:
-            rolar(INSPECTOR[0] + 200, INSPECTOR[1] + 350, 8); continue
+            # 1ª tentativa sobe até o topo (o painel pode ter ficado rolado até o fim); depois desce aos poucos
+            rolar(INSPECTOR[0] + 200, INSPECTOR[1] + 350, -40 if tentativa == 0 else 8); continue
         if c is None: raise RuntimeError("campo Position Y não encontrado")
         x, y, txt, lab = c
         if txt.startswith(str(valor)): return True
@@ -257,7 +258,7 @@ def y_legenda():
     b, g, r_ = a[..., 0], a[..., 1], a[..., 2]
     bege = (r_ > 160) & (r_ < 235) & (g > 140) & (g < 215) & (b > 90) & (b < 175) & (r_ > g) & (g > b) & ((r_ - b) > 22)
     linhas = np.where(bege.sum(axis=1) > W * 0.15)[0]
-    if len(linhas) == 0: return None
+    if len(linhas) == 0: return None   # cinza = trilha de legenda DESLIGADA: religar antes de rodar
     ini = linhas[0]; fim = ini
     for l in linhas[1:]:
         if l - fim > 2: break
@@ -312,6 +313,10 @@ def _menu_ocr():
     return ocr((900, 40, 828, 900))
 
 
+# Preset de legenda que vai junto com a skill (instalação e update): o Gab importa no DaVinci do usuário na 1ª legenda.
+PRESET_GAB_USA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "davinci", "GAB USA Subtitle.preset")
+
+
 def carregar_preset(nome_preset="GAB USA", arquivo=None):
     """Inspector > Track > menu ⋯ > <preset> > Load Preset. Se o preset não existir, Import Preset... do arquivo.
     Confere pela fonte mostrada no Inspector (Poppins) no fim."""
@@ -321,6 +326,7 @@ def carregar_preset(nome_preset="GAB USA", arquivo=None):
     y = cab[0][2]; x = INSPECTOR[0] + INSPECTOR[2] - 18
     clicar(x, y); time.sleep(0.6)
     m = _menu_ocr(); item = achar(m, nome_preset, exato=False)
+    arquivo = arquivo or (PRESET_GAB_USA if nome_preset == "GAB USA" else None)
     if not item:
         imp = achar(m, "Import Preset", exato=False)
         if not imp or not arquivo: raise RuntimeError(f"preset {nome_preset!r} não está no menu e não há arquivo p/ importar")
@@ -392,10 +398,11 @@ def main():
     frente()
     selecionar_alguma(caps)
     if "--preset" in a:
-        arq = a[a.index("--arquivo") + 1] if "--arquivo" in a else os.path.expanduser("~/Desktop/GAB USA Subtitle.preset")
+        arq = a[a.index("--arquivo") + 1] if "--arquivo" in a else PRESET_GAB_USA
         carregar_preset(a[a.index("--preset") + 1], arq)
-    aba("Track")
-    if not setar_y(Y_PADRAO, rolagem=True): raise RuntimeError("trilha não ficou em 724")
+    if "--sem-trilha" not in a:   # --sem-trilha: a trilha já está em 724 (timeline do modelo GAB USA); só desce as legendas
+        aba("Track")
+        if not setar_y(Y_PADRAO, rolagem=True): raise RuntimeError("trilha não ficou em 724")
     aba("Caption")
     feitos = []
     if descer and "--uma-a-uma" not in a:     # padrão: todas de uma vez (seleção múltipla)
