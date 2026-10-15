@@ -309,3 +309,4 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 | 15/10/2026 | `movimentos.mjs` quebrava em kit com `const tl` dentro de função | Só lia o `tl` global | Cai para `window.__timelines` |
 | 15/10/2026 | `plano_sfx_eventos.py` lia 0 sons | Regex exigia "dB" colado no volume | "dB" opcional |
 | 15/10/2026 | Barra de progresso marcava motions como faltando | Detecção só pela trilha "MOTIONS" ou pelo nome | Também pela pasta `motions/` e trilha "MOTIONS ..." |
+| 15/10/2026 | Instalador do Windows travado em 100% de CPU depois dos pré-requisitos (usuário Windows) | `function Py { & py -3 @args }`: PowerShell não diferencia maiúscula em nome de comando, então `py` chamava a própria função em loop | `& py.exe -3 @args`; README com `-ExecutionPolicy Bypass -File` para quem roda o arquivo baixado |

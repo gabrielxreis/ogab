@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-10 (15/10/2026)
+- **Windows: instalador não trava mais** depois de instalar ffmpeg, Python e Node (ficava parado com o processador em 100%). Se a instalação travou, feche o PowerShell e rode o comando de instalação de novo.
+
 ## 2026.10.15-9 (15/10/2026)
 - **Nada sai sem efeito sonoro:** o Gab não exporta mais uma timeline sem SFX (a não ser que você peça) e roda o checklist antes de exportar ou agendar.
 - **Sem quadro preto ao trocar trecho de trailer:** cortes de vídeos com outro fps (25, 23,976) agora fecham sem buraco entre eles; fades do próprio trailer são conferidos antes de exportar.

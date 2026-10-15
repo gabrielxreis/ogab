@@ -117,6 +117,8 @@ No **Windows**, no PowerShell (usuário normal):
 irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
 ```
 
+Se baixou o arquivo `install.ps1` em vez de usar o comando acima, rode com `powershell -ExecutionPolicy Bypass -File install.ps1` (o Windows bloqueia script baixado; o Bypass vale só para essa execução, não muda nada no sistema).
+
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
 1. **Editor:** DaVinci Resolve ou Adobe Premiere Pro.
 2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).

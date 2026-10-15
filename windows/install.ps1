@@ -16,7 +16,9 @@ function Tem($c)  { [bool](Get-Command $c -ErrorAction SilentlyContinue) }
 function AtualizaPath {
   $env:Path = [Environment]::GetEnvironmentVariable("Path", "User") + ";" + [Environment]::GetEnvironmentVariable("Path", "Machine")
 }
-function Py { & py -3 @args }
+# py.exe com extensao: no PowerShell nome de comando nao diferencia maiuscula, e "& py" dentro de "function Py"
+# chamava a propria funcao para sempre (instalador travado em 100% de CPU, relato de 15/10/2026)
+function Py { & py.exe -3 @args }
 
 if ($env:OS -ne "Windows_NT") { Write-Host "Este instalador e para Windows. No Mac use o install.sh."; return }
 
