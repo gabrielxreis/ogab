@@ -1,0 +1,105 @@
+/* SERIF AZUL: preset de motion do Gab (talking head escuro + cenas off-white, legenda sans + serifada itálica azul).
+   Copiar serif.css e serif.js para a pasta do projeto HyperFrames e trocar só as variáveis abaixo pelo cliente. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,700;1,800&display=block");
+
+:root {
+  --s-papel: #f2f1ee;          /* fundo off-white das cenas */
+  --s-grade: rgba(0,0,0,.045); /* grade fina do papel (90 px) */
+  --s-sombra-janela: rgba(0,0,0,.07); /* faixas de luz de janela no papel */
+  --s-texto: #141416;          /* texto sobre o papel */
+  --s-texto-inv: #f7f6f3;      /* texto sobre o vídeo escuro */
+  --s-mudo: #8d8c89;
+  --s-destaque: #3d6ff2;       /* A cor da serifada: troque pela cor do cliente */
+  --s-alerta: #ff4a4a;         /* passos em vermelho (o "erro") */
+  --s-cartao: #fbfbfa;         /* cartões e pílulas brancas */
+  --s-vidro: rgba(22,22,24,.82); /* trilho dos passos sobre o vídeo */
+  --s-sans: "Inter", -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  --s-serif: "Playfair Display", "Times New Roman", serif;
+}
+
+.s-cena { position: absolute; inset: 0; overflow: hidden; font-family: var(--s-sans); -webkit-font-smoothing: antialiased; }
+.s-centro { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+/* papel: off-white + grade + faixas de luz de janela (sem imagem) */
+.s-papel { background: var(--s-papel); color: var(--s-texto); }
+.s-papel::before { content: ""; position: absolute; inset: 0;
+  background-image: linear-gradient(var(--s-grade) 1.5px, transparent 1.5px), linear-gradient(90deg, var(--s-grade) 1.5px, transparent 1.5px);
+  background-size: 90px 90px; background-position: -1px -1px; }
+.s-papel::after { content: ""; position: absolute; inset: -20%;
+  background: repeating-linear-gradient(100deg, transparent 0 120px, var(--s-sombra-janela) 160px 200px, transparent 240px 300px);
+  filter: blur(26px); -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.6) 45%, transparent 75%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.6) 45%, transparent 75%); }
+.s-papel > * { z-index: 1; }
+
+/* anéis finos no centro do papel (um contínuo azulado, um pontilhado) */
+.s-aneis { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.s-aneis i { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); }
+.s-aneis i:nth-child(1) { width: 450px; height: 450px; border: 1.5px solid rgba(61,111,242,.16); }
+.s-aneis i:nth-child(2) { width: 740px; height: 740px; border: 1.5px dashed rgba(0,0,0,.07); }
+
+/* vinheta escura embaixo do talking head (onde moram legenda e passos) */
+.s-vinheta { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 38%, rgba(0,0,0,.55) 62%, rgba(0,0,0,.92) 100%); }
+
+/* LEGENDA: sans pequena + palavra-chave serifada itálica azul (2,2x) */
+.s-leg { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; line-height: 1.05; font-size: 46px; }
+.s-leg .l { display: block; }
+.s-leg .w { display: inline-block; font-weight: 500; letter-spacing: -.015em; }
+.s-leg .w.sf { font-family: var(--s-serif); font-style: italic; font-weight: 800; font-size: 2.25em; letter-spacing: -.01em;
+  color: var(--s-destaque); vertical-align: -.06em; }
+.s-leg .w.fina { font-family: var(--s-serif); font-weight: 400; letter-spacing: -.01em; }
+.s-leg.inv { color: var(--s-texto-inv); text-shadow: 0 2px 18px rgba(0,0,0,.45); }
+.s-leg.inv .w.sf { color: #6f97ff; }
+
+/* PASSOS 1-2-3 sobre o vídeo */
+.s-passos { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center;
+  padding: 30px 40px; border-radius: 34px; background: var(--s-vidro); border: 1px solid rgba(255,255,255,.06);
+  box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+.s-passos .p { width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 30px; color: rgba(255,255,255,.55); border: 2.5px solid rgba(255,255,255,.28); box-sizing: border-box; }
+.s-passos .p.erro { color: var(--s-alerta); border-color: var(--s-alerta); box-shadow: 0 0 18px rgba(255,74,74,.55), inset 0 0 12px rgba(255,74,74,.25); }
+.s-passos .p.on { background: #f5f4f1; color: #111; border-color: #f5f4f1; box-shadow: 0 0 24px rgba(255,255,255,.35); }
+.s-passos .f { width: 84px; height: 0; border-top: 2.5px dotted rgba(255,255,255,.3); }
+.s-passos .f.on { border-top-style: solid; border-color: rgba(255,255,255,.75); }
+.s-passos .f.erro { border-top-style: solid; border-color: var(--s-alerta); }
+.s-rotulo { position: absolute; left: 0; right: 0; text-align: center; color: var(--s-texto-inv); font-size: 50px; font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
+
+/* SLIDER Iniciante -> Profissional */
+.s-slider { position: absolute; left: 50%; transform: translateX(-50%); width: 560px; }
+.s-slider .tit { display: flex; justify-content: space-between; font-size: 22px; color: rgba(255,255,255,.65); margin-bottom: 20px; font-weight: 500; }
+.s-slider .trilho { position: relative; height: 10px; border-radius: 6px; background: rgba(255,255,255,.18); }
+.s-slider .cheio { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 6px; background: linear-gradient(90deg, #284fbf, var(--s-destaque)); }
+.s-slider .bola { position: absolute; top: 50%; left: 0; width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 0 8px rgba(255,255,255,.15), 0 6px 18px rgba(0,0,0,.4); }
+
+/* CARTÕES: celular, ícone de app, pílula de marca, amostra de cor, cartão de UI */
+.s-cel { position: absolute; width: 330px; height: 590px; border-radius: 26px; overflow: hidden; background: #c9a68a center/cover;
+  border: 8px solid #fff; box-shadow: 0 40px 80px rgba(0,0,0,.22), 0 8px 20px rgba(0,0,0,.12); }
+.s-icone { position: absolute; width: 400px; height: 400px; border-radius: 88px; background: linear-gradient(180deg, #fff, #f0efec);
+  box-shadow: 0 50px 90px rgba(0,0,0,.14), 0 10px 24px rgba(0,0,0,.08), inset 0 -6px 14px rgba(0,0,0,.04);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; }
+.s-icone .play { width: 200px; height: 200px; border-radius: 48px; background: linear-gradient(160deg, #6f97ff, #2557e6);
+  box-shadow: 0 16px 34px rgba(37,87,230,.4), inset 0 3px 8px rgba(255,255,255,.35); position: relative; }
+.s-icone .play::after { content: ""; position: absolute; left: 78px; top: 58px; border-left: 70px solid #fff; border-top: 42px solid transparent; border-bottom: 42px solid transparent; }
+.s-icone .barras { width: 230px; height: 12px; border-radius: 6px; background: #e4e3e0; box-shadow: 0 22px 0 -2px #ecebe8; }
+.s-caixa { position: absolute; border: 2px dashed rgba(61,111,242,.45); border-radius: 30px; opacity: 0; }
+.s-selo { position: absolute; padding: 8px 16px; border-radius: 16px; background: var(--s-destaque); color: #fff; font-size: 24px; font-weight: 600; }
+.s-ponto { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--s-destaque); }
+.s-ponto.esc { background: #18181a; width: 6px; height: 6px; }
+.s-marca { position: absolute; padding: 30px 40px; border-radius: 26px; background: var(--s-cartao); font-size: 34px; letter-spacing: .06em;
+  box-shadow: 0 22px 44px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,.05); white-space: nowrap; }
+.s-amostra { position: absolute; width: 150px; text-align: center; }
+.s-amostra .cor { width: 150px; height: 150px; border-radius: 34px; box-shadow: 0 22px 44px rgba(0,0,0,.14), inset 0 0 0 1px rgba(0,0,0,.06); }
+.s-amostra .nome { white-space: nowrap; margin-left: -40px; margin-right: -40px; margin-top: 18px; font-size: 18px; font-weight: 600; letter-spacing: .08em; color: #555; }
+.s-amostra .hex { font-size: 15px; color: #999; letter-spacing: .06em; }
+.s-ui { position: absolute; padding: 22px 26px; border-radius: 22px; background: var(--s-cartao);
+  box-shadow: 0 22px 44px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.05); font-size: 18px; color: #777; }
+.s-graus { position: absolute; left: 50%; transform: translateX(-50%); width: 820px; padding: 26px; border-radius: 30px; background: var(--s-cartao);
+  box-shadow: 0 26px 50px rgba(0,0,0,.12); display: flex; gap: 14px; }
+.s-graus i { flex: 1; height: 110px; border-radius: 20px; background: #dcdbd8; }
+.s-graus i.on { background: linear-gradient(180deg, #6f97ff, #2557e6); box-shadow: 0 10px 22px rgba(37,87,230,.35); }
+
+/* painel off-white que entra por cima do vídeo (tela cheia ou metade de cima). Começa fora da tela pelo S.painel/tl.set,
+   nunca por transform no CSS (o GSAP lê o translate em px e soma). */
+.s-painel { position: absolute; left: 0; right: 0; top: 0; height: 1920px; overflow: hidden; border-radius: 0; }
+.s-painel.metade { height: 890px; }

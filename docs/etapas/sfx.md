@@ -51,7 +51,7 @@ Não basta som nos momentos principais: toda entrada, saída, batida, check, bri
 | Estrelas, brilho, shine | chime/sparkle | Practical Magic - Stardust Chimes; Sparkly Logos |
 | Pop/scale com back.out | pop (SÓ aqui) | biblioteca_sfx/pop.wav |
 
-**Como fazer**
+**Como fazer** (ordem de trabalho: ver "3 passadas" no fim deste arquivo)
 1. Listar os eventos do motion pelo próprio código (tempos do GSAP no build.py) e do lettering pelo template (Cinematic = blur, Palavra Por Palavra = letra a letra). Tabela: tempo | elemento | animação | som.
 2. Medir cada som (ffmpeg -> envelope): `onset50` (primeiro ponto a 50% do máximo) e pico. Início na timeline = tempo do evento - onset (impacto de logo tem build-up antes do golpe).
 3. Normalizar todos a -1 dBFS antes; volume no clipe: -12 (impacto/boom/logo), -14 a -16 (whoosh/swell), -16 a -20 (UI, HUD, brilho). Fade out no clipe.
@@ -76,3 +76,30 @@ Riser, drone, pad, impacto com nota, ping de piano e swell têm altura: fora do 
 4. **Riser com o pico exato no corte ou na entrada da batida** (`alinhar: "pico"`); dois risers que começam ~5 s e ~3,7 s antes dão a subida. **Impacto tonal com passa-altas 60 Hz** para não brigar com o bumbo. Golpe de piano só no médio (passa-altas 150 Hz, passa-baixas 2,2 kHz): com sub embola.
 5. **Entrada da batida seca:** tudo que vinha subindo corta no bumbo (fade de 20-60 ms), sem respiro antes; a força vem do contraste.
 6. Menos é mais: cada camada tonal precisa de função; na dúvida, tira.
+
+## Ordem de trabalho em 3 passadas + risers de antecipação (15/10/2026, método da Ultimate Editors no curso "How to Edit VIRAL Reels with AI")
+Complementa tudo acima (foley por objeto, camadas, conferência); não troca nada. Serve sobretudo para talking head com motion.
+1. **Folha de eventos antes de qualquer som.** Percorrer o vídeo e classificar cada momento em uma de três famílias:
+   **MOVIMENTO** (algo desliza, sobe, cai, câmera anda, painel entra, troca de cena) -> whoosh;
+   **EVENTO** (algo acontece sem deslizar: pop, clique, revelação, cor mudando, letra a letra, número contando) -> textura;
+   **VIRADA** (fim do gancho, troca de bloco/passo, A-roll -> B-roll, revelação grande) -> riser + hit.
+   Whoosh para o que desliza e pop para o que estoura: nunca o contrário.
+2. **Passada 1, whooshes** do começo ao fim: um por movimento, do tamanho e peso do movimento (lento = ar/vento, padrão =
+   oco/sci-fi, rápido e pequeno = curto), pico no quadro mais rápido.
+3. **Passada 2, texturas** do começo ao fim: pop (texto/elemento inteiro estourando), clique de UI (elemento de interface,
+   passo acendendo, slider), clique sci-fi (algo muda dentro da animação, cor), engrenagem/tique (palavra por palavra,
+   letra a letra; um toque por elemento), digitação (teclado), impacto sci-fi (objeto ou UI novo entrando), clique de
+   câmera (flash, troca de clipe; no quadro exato), "success" curto (conclusão do vídeo), coro curto só na revelação
+   grande. Cada uma no quadro do evento.
+4. **Passada 3, risers e hits** perguntando "onde quero que a pessoa sinta a subida para o próximo trecho?":
+   - **riser ~5 s depois do gancho**, terminando no corte que entra no corpo do vídeo, com um **hit embaixo** no quadro do corte;
+   - um riser + hit em cada virada de bloco/passo e em A-roll -> B-roll que precisa de costura;
+   - **pelo menos 2 risers por vídeo** de 40 s ou mais, alternando um grave seco ("sharp bass") e um metálico; riser
+     de sucção (suck-back) bem baixo ou bem alto, nunca no meio;
+   - riser com nota segue "SFX tonal no tom da música" acima; o que vinha subindo corta seco no hit.
+5. **Uma trilha por família** com nome (WHOOSH, TEXTURA, RISER, HIT, além das camadas BASE/AMBIENTE quando houver).
+   Antes de pôr, ouvir/conferir as variações da mesma pasta e escolher a que tem o tamanho certo (`sfx_conferir.py arquivos`).
+6. **Hierarquia de volume** (relativa, com os one-shots a -1 dBFS): whoosh é o mais baixo (-14 a -16 dB no clipe),
+   textura um pouco acima (-12 a -14), riser + hit é o ponto mais alto de cada virada (-10 a -12), e só UM momento mais
+   alto por cena. Nada passa a voz; se o empilhamento riser + hit estourar, baixar o hit, nunca a voz.
+7. Relatar ao usuário a folha de eventos e o que entrou em cada passada (tempo | família | som | por quê).

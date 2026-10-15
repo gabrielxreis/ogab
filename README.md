@@ -333,7 +333,8 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/vector-motion/exemplos/d_objetos.gif" width="150" alt="Vector motion objetos">&nbsp;
 <img src="presets/vitrine/exemplo.gif" width="150" alt="Vitrine">&nbsp;
 <img src="presets/sketch/exemplo.gif" width="150" alt="Sketch">&nbsp;
-<img src="presets/kinetic/exemplo.gif" width="150" alt="Kinetic">
+<img src="presets/kinetic/exemplo.gif" width="150" alt="Kinetic">&nbsp;
+<img src="presets/serif-azul/exemplo.gif" width="150" alt="Serif azul">
 
 <sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch</sub>
 
@@ -347,6 +348,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **SKETCH** ([guia](presets/sketch/PRESET.md)) | Desenho de marcador sobre fundo preto: contornos coloridos que se traçam na hora, cursor piscando, ícones desenhados, texto manuscrito digitado letra a letra, setas que se desenham e o traço "tremendo" como animação feita à mão. Blocos prontos: "A → B", grade de apps com botão, número de capítulo, ferramenta → painel (editor de vídeo, gráfico, lista, chat), frase sublinhada e checklist. Vertical e horizontal. Para tutorial, "X ferramentas que...", passo a passo, tecnologia e IA | <img src="presets/sketch/exemplo.gif" width="160" alt="Exemplo do preset Sketch"> |
 | **TELA DIVIDIDA** ([guia](presets/tela-dividida/PRESET.md)) | Reels de talking head com o painel de motion em cima (46,5 %) e você embaixo, legenda em etiqueta branca na emenda e quebras em tela cheia a cada 3-5 s. O Gab enquadra o rosto sozinho no DaVinci. Para vídeo explicativo que cita app, site, número ou passo a passo | <img src="presets/tela-dividida/guia.png" width="120" alt="Guia do layout tela dividida"> |
 | **KINETIC** ([guia](presets/kinetic/PRESET.md)) | Tipografia cinética estilo Katana: cada batida da fala vira uma cena com palavras enormes, hierarquia de tamanhos, ecos em contorno, caixa vermelha, faixa inclinada, prompt digitando, barra de render, ponto de gravação, visor de câmera, cubo 3D e estrela de explosão; fundo preto vivo, vermelho, branco ou grafite e transições de chicote, glitch e risco de luz. Para gancho, reação, frase de efeito e novidade | <img src="presets/kinetic/exemplo.gif" width="160" alt="Exemplo do preset Kinetic"> |
+| **SERIF AZUL** ([guia](presets/serif-azul/PRESET.md)) | Editorial: talking head escuro com legenda em duas fontes (sans pequena + palavra-chave em serifada itálica azul, palavra por palavra), passos 1-2-3 que acendem no vídeo todo, slider "iniciante → profissional" e cenas em papel off-white com grade e luz de janela subindo por cima do apresentador (celular caindo, ícone 3D que encolhe 25 %, amostras de cor, nuvem de marcas, cartões em órbita). Para "3 erros", "5 passos", dica de especialista e marca premium | <img src="presets/serif-azul/exemplo.gif" width="160" alt="Exemplo do preset Serif azul"> |
 
 
 # CLIENTES
