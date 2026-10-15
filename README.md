@@ -119,6 +119,17 @@ irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1
 
 Se baixou o arquivo `install.ps1` em vez de usar o comando acima, rode com `powershell -ExecutionPolicy Bypass -File install.ps1` (o Windows bloqueia script baixado; o Bypass vale só para essa execução, não muda nada no sistema).
 
+**Instalando pelo Claude Code (ou outro terminal sem teclado):** as 3 perguntas do instalador não aparecem; responda antes por variável e acompanhe o log ao vivo em outra aba:
+```powershell
+$env:OGAB_EDITOR = 'davinci'      # ou premiere
+$env:OGAB_MOTION = 'hyperframes'  # ou aftereffects
+$env:OGAB_RELATOS = 'sim'         # ou nao
+irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
+```
+```powershell
+Get-Content $env:TEMP\ogab-install.log -Wait
+```
+
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
 1. **Editor:** DaVinci Resolve ou Adobe Premiere Pro.
 2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).

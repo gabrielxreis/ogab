@@ -1,6 +1,8 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.15-10 (15/10/2026)
 - **Windows: instalador não trava mais** depois de instalar ffmpeg, Python e Node (ficava parado com o processador em 100%). Se a instalação travou, feche o PowerShell e rode o comando de instalação de novo.
+- **Windows: o instalador voltou a abrir** (um erro de digitação fazia ele parar logo no começo, com "Referência de variável inválida"). Agora todo instalador do Windows é testado automaticamente no PowerShell do Windows antes de chegar a você.
+- **Log da instalação no Windows:** acompanhe ao vivo com `Get-Content $env:TEMP\ogab-install.log -Wait`. Instalando pelo Claude Code, veja no README como responder as 3 perguntas antes.
 - **Instalador não trava mais no plugin do Premiere** quando o Premiere não está instalado (Windows e Mac): ele pula o plugin e avisa como instalar depois.
 
 ## 2026.10.15-9 (15/10/2026)

@@ -6,6 +6,9 @@
 
 & {
 $ErrorActionPreference = "Continue"   # Stop + stderr de programa externo derruba o PowerShell 5.1
+# Log ao vivo (quem roda pelo Claude Code nao ve a saida ate o fim): Get-Content $env:TEMP\ogab-install.log -Wait
+$LOG = Join-Path $env:TEMP "ogab-install.log"
+try { Start-Transcript -Path $LOG -Force | Out-Null } catch {}
 $REPO = "https://github.com/gabrielxreis/ogab"
 $DEST = Join-Path $HOME ".claude\skills\ogab"
 
@@ -245,7 +248,7 @@ if (Test-Path $exe) {
   if (-not (Test-Path (Join-Path $api "Modules"))) { Warn "pasta da API nao encontrada em $api (reinstale o Resolve Studio)" }
   if ($v[0] -gt 21 -or ($v[0] -eq 21 -and $v[1] -ge 1)) {
     $precisaWhisper = $false; Ok "o DaVinci $ver transcreve sozinho: Whisper nao e necessario"
-  } else { Warn "DaVinci $ver: abaixo da 21.1 a API nao devolve a transcricao; vou instalar o Whisper local (gratis)" }
+  } else { Warn "DaVinci ${ver}: abaixo da 21.1 a API nao devolve a transcricao; vou instalar o Whisper local (gratis)" }
   if ($v[0] -lt 20 -or ($v[0] -eq 20 -and ($v[1] -lt 2 -or ($v[1] -eq 2 -and $v[2] -lt 2)))) {
     Warn "abaixo da 20.2.2 o DaVinci pode errar a trilha ao colocar narracao e musica; o ideal e a 21.1+"
   }
@@ -294,5 +297,7 @@ Falta so o que precisa de voce (uma vez), no app que voce usa:
 
 FECHE e abra de novo o Claude Code (para pegar as variaveis novas) e digite:  /ogab comecar
 Diferencas do Windows: ~/.claude/skills/ogab/windows/README.md
+Log desta instalacao: $LOG
 "@
+try { Stop-Transcript | Out-Null } catch {}
 }

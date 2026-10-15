@@ -1,0 +1,30 @@
+name: PowerShell 5.1 (Windows)
+on:
+  push:
+    paths: ['**.ps1', '.github/workflows/powershell.yml']
+  pull_request:
+    paths: ['**.ps1']
+  workflow_dispatch:
+jobs:
+  sintaxe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Analisar todos os .ps1 no Windows PowerShell 5.1 (o padrão do Windows 10/11)
+        shell: powershell
+        run: |
+          $PSVersionTable.PSVersion
+          $falhou = $false
+          Get-ChildItem -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens = $null; $erros = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$erros) | Out-Null
+            if ($erros.Count) { $falhou = $true; $erros | ForEach-Object { Write-Host "ERRO $($_.Extent.File):$($_.Extent.StartLineNumber) $($_.Message)" } }
+            else { Write-Host "ok $($_.Name)" }
+          }
+          if ($falhou) { exit 1 }
+      - name: Funcao Py chama py.exe (sem recursao)
+        shell: powershell
+        run: |
+          $def = (Select-String -Path windows\install.ps1 -Pattern '^function Py ').Line
+          if ($def -notmatch 'py\.exe') { Write-Host "function Py precisa chamar py.exe: $def"; exit 1 }
+          Write-Host $def
