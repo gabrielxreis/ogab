@@ -25,12 +25,13 @@ Toda vez que a skill for usada, ANTES de qualquer outra coisa: `git -C SKILL_DIR
 
 **Manutenção (quem edita a skill):** toda mudança que o usuário percebe ganha uma linha no topo de `CHANGELOG.md` (nova versão `AAAA.MM.DD-N`), no mesmo commit, em linguagem de usuário (o que mudou e o que ele precisa fazer, se precisar).
 
-## Editor do usuário: DaVinci OU Premiere (escolhido na instalação)
+## Editor do usuário: DaVinci, Premiere OU CapCut (escolhido na instalação)
 
-`config.json` > `editor`: `"davinci"` (padrão, também quando a chave não existe) ou `"premiere"`. O Gab monta os vídeos **só no editor escolhido** e nunca abre nem cita o outro.
+`config.json` > `editor`: `"davinci"` (padrão, também quando a chave não existe), `"premiere"` ou `"capcut"`. O Gab monta os vídeos **só no editor escolhido** e nunca abre nem cita o outro.
 - `davinci`: tudo como descrito neste SKILL.md e em `docs/` (`resolve_lib.py`).
 - `premiere`: o método é o mesmo (roteiro, voz, legenda, música, SFX, takes, cor, lettering, motions, QC), mas toda etapa que mexe no editor segue `premiere/README.md` (`premiere/premiere_lib.py` no lugar do `resolve_lib.py`). Ler esse arquivo ao começar.
-- `/ogab config editor premiere|davinci` troca. Ao trocar para premiere, rodar `premiere/instalar.sh` (Mac) ou `premiere\instalar.ps1` (Windows) se o plugin Gab Ponte ainda não estiver instalado.
+- `capcut` (só Mac, beta): mesmo método, mas o CapCut não tem API; o Gab escreve o rascunho JSON direto com `capcut/capcut_lib.py` (projeto fechado no CapCut na hora de salvar). Ler `capcut/README.md` ao começar.
+- `/ogab config editor premiere|davinci|capcut` troca. Ao trocar para premiere, rodar `premiere/instalar.sh` (Mac) ou `premiere\instalar.ps1` (Windows) se o plugin Gab Ponte ainda não estiver instalado.
 
 ## Motions: automático OU After Effects (escolhido na instalação)
 

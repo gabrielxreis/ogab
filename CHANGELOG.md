@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-1 (15/10/2026)
+- **CapCut (Mac, beta):** o Gab agora edita no CapCut. Ele monta a timeline direto no projeto: vídeo, b-roll, música com fade, texto, legenda do SRT, keyframes, corte de silêncio, transições, animações de entrada e saída, efeitos e máscaras (mais de 900 da loja do CapCut). Use `/ogab config editor capcut`. Na hora de salvar, o projeto precisa estar fechado no CapCut (o app pode ficar na tela inicial).
 ## 2026.10.14-5 (14/10/2026)
 - **Música mais limpa sob a voz:** quando alguém fala, o Gab abaixa só a parte da música que disputa com a voz e mantém o grave, então a música não some nem fica magra.
 - **Música medida de verdade:** o Gab mede o BPM, as batidas, o tom e o segundo em que a batida entra, em vez de confiar no número do catálogo. Cortes e motions caem na batida, e riser, drone e impacto com nota saem no tom da música.
