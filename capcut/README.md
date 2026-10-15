@@ -48,19 +48,35 @@ import sys, os; sys.path.insert(0, os.path.expanduser("~/.claude/skills/ogab/cap
 | `d.mascara(id, "Circle", x=, y=, tamanho=, suavizar=, cantos=, inverter=)` | máscara: Split, Filmstrip, Circle, Rectangle, Stars, Heart |
 | `d.fundo(id, desfoque=0.5)` / `d.fundo(id, cor="#000000")` | fundo atrás de vídeo horizontal no 9x16 |
 | `C.catalogo(grupo, busca)` | nomes disponíveis: transicoes (116), video_entrada (43), video_saida (23), video_combo (108), texto_entrada (76), texto_saida (68), texto_loop (53), efeitos (345), efeitos_pessoa (95), mascaras (9). Nome errado devolve os parecidos. "(pro)" = precisa do CapCut Pro para exportar |
+| `d.filtro(id, "Azul da ilha", 80)` / `d.filtro_global(nome, t, dur, 80)` | filtro de cor no clipe / numa trilha de filtro que pega tudo embaixo. Nomes: `C.loja("filtros")` |
+| `d.adesivo(nome, t, dur, escala=, x=, y=)` | adesivo (sticker) da loja. `C.loja("adesivos", "emoji")` |
+| `d.voz(id, nome, forca=100)` | efeito de voz num clipe de áudio/vídeo. `C.loja("voz")` |
+| `d.modelo_texto(nome, texto, t, dur, y=, legenda=False)` | texto num modelo pronto da loja (beta). `C.loja("modelos_texto")` |
+| `d.animar(id_texto, legenda="Agitação")` | animação de legenda palavra a palavra. `C.loja("texto_anim", tipo="caption")` |
+| `C.loja(grupo, busca, tipo=)` | loja do CapCut: filtros, adesivos, modelos_texto, texto_anim (tipo in/out/loop/caption), video_anim, voz, efeitos_loja, fontes |
+| `C.atualizar_loja()` | relê o cache do CapCut e regrava `loja.json` (cada painel aberto no CapCut entra no cache) |
+| `python3 capcut/davinci_para_capcut.py [retrato.json]` | recria no CapCut a timeline aberta no DaVinci (ver abaixo) |
 | `d.salvar(projeto_fechado=True)` | grava em todas as cópias + backup `draft_info.gab_<data>.json` na 1a gravação |
 | `C.fechar_capcut()` / `C.abrir_capcut()` | fecha (AppleScript) / abre na tela inicial |
 
 ### Keyframes que o motor aceita (tirados do binário)
 Transformação: `KFTypePositionX/Y`, `KFTypeScaleX/Y`, `KFTypeRotation`, `KFTypeAlpha`, `KFTypeGlobalAlpha`. Áudio: `KFTypeVolume`, `KFTypeAudioPanning`. Cor: `KFTypeSaturation`, `KFTypeContrast`, `KFTypeBrightness`, `KFTypeTemperature`, `KFTypeHue`, `KFTypeSharpen`, `KFTypeVignetting`, `KFTypeHightLight`, `KFTypeShadow`, `KFTypeLUT`, `KFTypeFilter`. Máscara: `KFTypeMaskPostionX/Y`, `KFTypeMaskSizeX/Y`, `KFTypeMaskFeather`, `KFTypeMaskRotation`. Chroma: `KFTypeChromaIntensity`, `KFTypeChromaShadow`. Texto: `KFTypeTextColor`, `KFTypeTextAlpha`, `KFTypeBorderWidth`, `KFTypeShadowAlpha`, `KFTypeBackgroundAlpha`. Lista completa: `strings libVECreator.dylib | grep -o 'KFType[A-Za-z]*' | sort -u`.
 
+## Loja do CapCut (`loja.json`)
+O CapCut guarda as respostas da API dos painéis em `~/Movies/CapCut/User Data/Cache/ressdk_db/*/rp.db` (SQLite, tabela `http_cache`, rotas `/artist/v1/panel/get_panel_info` e `/artist/v1/effect/get_resources_by_category_id`). O `effect_type` diz o que é: 12 filtro, 2 adesivo, 48 modelo de texto, 18 animação de texto (categorias Entrada/Saída/Loop/Legenda), 13 animação de vídeo, 26 efeito de voz, 7/19 efeito, 10 fonte. `atualizar_loja()` lê isso (só leitura) e grava nome, `resource_id`, `effect_id`, Pro e tipo. Em 15/10/2026: 50 filtros, 2.148 adesivos, 4.316 modelos de texto, 1.839 animações de texto, 4.701 de vídeo, 361 vozes, 100 efeitos, 5.985 fontes. Só aparecem os painéis que o usuário já abriu no CapCut: abrir o painel de Filtros inteiro e rodar `atualizar_loja()` traz o resto. "(pro)" precisa do CapCut Pro para exportar.
+
+## DaVinci → CapCut (`davinci_para_capcut.py`)
+Só LÊ o DaVinci. Leva: clipes de todas as trilhas de vídeo (trecho exato pelo fps real do arquivo, zoom, pan/tilt, rotação, opacidade, desligado), Cross Dissolve (vira Dissolve), áudio (o que casa com o clipe fica no clipe, o resto vira trilha de áudio; Cross Fade vira fade) e legendas (texto na Y 724). Zoom: projeto vertical que preenche o quadro vira escala `zoom x fator de preenchimento` (16:9 em 9:16 = 3,16). Não leva: compound clip, Fusion/lettering, cor/LUT, efeitos do DaVinci (vão listados em `relatorio_capcut.json`). Mídia fora de `~/Movies` é copiada inteira (12 GB no teste NBA); nunca re-renderizar take.
+
 ## O que ainda não tem
-Filtros (LUT de cor da loja), modelos de legenda animada, adesivos, efeitos de voz e chroma. O caminho para incluir: aplicar uma vez à mão num rascunho, ler o JSON e copiar `resource_id`/`effect_id` para o `catalogo.json`. Os ids vêm do VectCutAPI (github.com/sun-guannan/VectCutAPI, Apache 2.0, catálogos `pyJianYingDraft/metadata/capcut_*.py` de 12/10/2026), convertidos lendo o código como texto (sem executar).
+Chroma key, fontes da loja no `texto()` (os ids já estão em `loja.json`) e conferência visual: modelos de texto e legendas animadas foram gravados mas ainda não abertos no CapCut. O caminho para incluir: aplicar uma vez à mão num rascunho, ler o JSON e copiar `resource_id`/`effect_id` para o `catalogo.json`. Os ids vêm do VectCutAPI (github.com/sun-guannan/VectCutAPI, Apache 2.0, catálogos `pyJianYingDraft/metadata/capcut_*.py` de 12/10/2026), convertidos lendo o código como texto (sem executar).
 
 ## Arquivos
 | Arquivo | O que é |
 |---|---|
 | `capcut_lib.py` | os comandos acima |
+| `loja.json` | ~19 mil itens da loja do CapCut tirados do cache local (filtros, adesivos, modelos, animações, vozes, fontes) |
+| `davinci_para_capcut.py` | recria no CapCut a timeline do DaVinci |
 | `catalogo.json` | 936 transições, animações, efeitos e máscaras com os ids internos do CapCut |
 | `molde.json` | estruturas reais de segmento/material extraídas do CapCut 9.4 (sem caminhos pessoais) |
 | `esqueleto/` | pasta de rascunho vazio do 9.4 (ids trocados a cada `novo()`) |

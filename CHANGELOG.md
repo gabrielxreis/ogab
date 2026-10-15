@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-2 (15/10/2026)
+- **CapCut: filtros, adesivos, vozes e modelos de texto.** O Gab agora usa a loja do seu próprio CapCut (o que você já abriu nos painéis): filtros de cor, adesivos, efeitos de voz, modelos de texto e animações de legenda palavra a palavra.
+- **Do DaVinci para o CapCut:** peça "recria essa timeline no CapCut" e o Gab monta no CapCut a timeline aberta no DaVinci (cortes, zoom, posição, áudio, transições e legendas), sem mexer no DaVinci.
 ## 2026.10.15-1 (15/10/2026)
 - **CapCut (Mac, beta):** o Gab agora edita no CapCut. Ele monta a timeline direto no projeto: vídeo, b-roll, música com fade, texto, legenda do SRT, keyframes, corte de silêncio, transições, animações de entrada e saída, efeitos e máscaras (mais de 900 da loja do CapCut). Use `/ogab config editor capcut`. Na hora de salvar, o projeto precisa estar fechado no CapCut (o app pode ficar na tela inicial).
 ## 2026.10.14-5 (14/10/2026)

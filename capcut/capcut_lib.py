@@ -27,6 +27,67 @@ MOLDE = json.load(open(os.path.join(AQUI, "molde.json")))
 CATALOGO = json.load(open(os.path.join(AQUI, "catalogo.json")))
 
 
+# loja do CapCut tirada do cache local dos painéis (Cache/ressdk_db/*/rp.db, tabela http_cache = respostas da API
+# /artist/v1/panel/get_panel_info). effect_type: 12 filtro, 2 adesivo, 48 modelo de texto, 18 animação de texto
+# (Entrada/Saída/Loop/Legenda), 13 animação de vídeo, 26 efeito de voz, 7/19 efeito de vídeo, 10 fonte.
+LOJA_ARQ = os.path.join(AQUI, "loja.json")
+TIPOS_LOJA = {12: "filtros", 2: "adesivos", 48: "modelos_texto", 18: "texto_anim", 13: "video_anim", 26: "voz",
+              7: "efeitos_loja", 19: "efeitos_loja", 10: "fontes"}
+CAT_ANIM = {"entrada": "in", "in": "in", "saída": "out", "out": "out", "loop": "loop", "legenda": "caption",
+            "caption": "caption", "combinação": "group", "combo": "group"}
+
+
+def atualizar_loja():
+    """Relê o cache do CapCut e regrava loja.json (abrir um painel no CapCut põe os itens dele no cache)."""
+    import glob, sqlite3
+    base = os.path.join(os.path.dirname(RAIZ), "..", "Cache", "ressdk_db")
+    loja = {g: {} for g in set(TIPOS_LOJA.values())}
+    for db in glob.glob(os.path.join(base, "*", "rp.db")):
+        con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        for (corpo,) in con.execute("select response_body from http_cache where url like '/artist/v1/%'"):
+            try:
+                dados = json.loads(corpo)["data"]
+            except Exception:
+                continue
+            cats = {str(c["category_id"]): c.get("category_name", "") for c in dados.get("categories") or []}
+            blocos = (dados.get("category_resources") or {}).items() if "category_resources" in dados else [("", dados)]
+            for cid, b in blocos:
+                for it in (b or {}).get("effect_item_list") or []:
+                    ca = it.get("common_attr") or {}
+                    g = TIPOS_LOJA.get(ca.get("effect_type"))
+                    if not g or not ca.get("effect_id"):
+                        continue
+                    e = loja[g].setdefault(ca["effect_id"], {"nome": ca.get("title", ""), "resource_id": ca.get("id"),
+                                                           "effect_id": ca["effect_id"], "vip": False, "tipos": []})
+                    e["vip"] = e["vip"] or '\\"is_vip\\":true' in json.dumps(ca.get("business_info") or {}) \
+                        or '"is_vip": true' in json.dumps(ca.get("business_info") or {})
+                    k = CAT_ANIM.get(cats.get(cid, "").strip().lower())
+                    if k and k not in e["tipos"]:
+                        e["tipos"].append(k)
+    json.dump(loja, open(LOJA_ARQ, "w"), ensure_ascii=False, separators=(",", ":"))
+    return {g: len(v) for g, v in loja.items()}
+
+
+LOJA = json.load(open(LOJA_ARQ)) if os.path.exists(LOJA_ARQ) else {}
+
+
+def loja(grupo, busca="", tipo=None):
+    """Itens da loja: filtros, adesivos, modelos_texto, texto_anim (tipo in/out/loop/caption), video_anim, voz,
+    efeitos_loja, fontes."""
+    return sorted({v["nome"].strip() + (" (pro)" if v.get("vip") else "") for v in LOJA.get(grupo, {}).values()
+                   if busca.lower() in v["nome"].lower() and (tipo is None or tipo in v.get("tipos", []))})
+
+
+def _loja(grupo, nome, tipo=None):
+    g = {k: v for k, v in LOJA.get(grupo, {}).items() if tipo is None or not v.get("tipos") or tipo in v["tipos"]}
+    alvo = nome.replace(" (pro)", "").strip().lower()
+    for v in g.values():
+        if v["nome"].strip().lower() == alvo or v["resource_id"] == nome:
+            return v
+    perto = difflib.get_close_matches(nome, [v["nome"] for v in g.values()], 5, 0.4)
+    raise KeyError(f"'{nome}' não está na loja ({grupo}). Parecidos: {perto}. Lista: loja('{grupo}')")
+
+
 def catalogo(grupo, busca=""):
     """Nomes disponíveis: grupo = transicoes, video_entrada, video_saida, video_combo,
     texto_entrada, texto_saida, texto_loop, efeitos, efeitos_pessoa, mascaras."""
@@ -187,6 +248,8 @@ class Rascunho:
                 m = self._mat(s["material_id"]) or {}
                 tr, sr = s["target_timerange"], s.get("source_timerange") or {}
                 nome = m.get("material_name") or m.get("name") or ""
+                if m.get("text_info_resources"):   # texto dentro de modelo
+                    m = self._mat(m["text_info_resources"][0]["text_material_id"]) or m
                 if m.get("type") == "text":
                     nome = json.loads(m["content"]).get("text", "")
                 segs.append({"id": s["id"], "nome": nome, "inicio": tr["start"] / US,
@@ -516,9 +579,10 @@ class Rascunho:
         s["extra_material_refs"].append(tr["id"])
         return tr["id"]
 
-    def animar(self, sid, entrada=None, saida=None, combo=None, loop=None, dur_entrada=None, dur_saida=None):
-        """Animação de entrada/saída. Vídeo/imagem: entrada, saida ou combo. Texto: entrada, saida e loop.
-        Nomes: catalogo('video_entrada'), catalogo('texto_entrada')..."""
+    def animar(self, sid, entrada=None, saida=None, combo=None, loop=None, dur_entrada=None, dur_saida=None, legenda=None):
+        """Animação de entrada/saída. Vídeo/imagem: entrada, saida ou combo. Texto: entrada, saida e loop,
+        ou legenda= (animação de legenda palavra a palavra, ocupa o texto inteiro).
+        Nomes: catalogo('video_entrada'), catalogo('texto_entrada'), loja('texto_anim', tipo='caption')..."""
         t, s = self.segmento(sid)
         texto = t["type"] == "text"
         dur = s["target_timerange"]["duration"]
@@ -533,7 +597,11 @@ class Rascunho:
         lista = []
 
         def item(grupo, nome, tipo, ini, d):
-            m = _cat(grupo, nome)
+            try:
+                m = _cat(grupo, nome)
+            except KeyError:   # não está no catálogo fixo: procura na loja (cache do CapCut)
+                m = dict(_loja("texto_anim" if texto else "video_anim", nome, tipo))
+                m["duracao"] = 0.5
             d = min(_us(d if d is not None else m["duracao"]), dur)
             ini = dur - d if ini is None else ini
             lista.append({"anim_adjust_params": None, "platform": "all", "panel": "" if texto else "video",
@@ -542,6 +610,15 @@ class Rascunho:
             return d
         pre = "texto" if texto else "video"
         d_in = d_out = 0
+        if legenda:
+            if not texto:
+                raise ValueError("Animação de legenda é só para texto")
+            m = _loja("texto_anim", legenda, "caption")
+            lista.append({"anim_adjust_params": None, "platform": "all", "panel": "", "material_type": "sticker",
+                          "name": m["nome"], "id": m["effect_id"], "type": "caption", "resource_id": m["resource_id"],
+                          "start": 0, "duration": dur})
+            mat["animations"] = lista
+            return mat["id"]
         if combo:
             if texto:
                 raise ValueError("Texto não tem combo: use loop")
@@ -627,6 +704,93 @@ class Rascunho:
             cv.update(type="canvas_blur", blur=desfoque, color="")
         else:
             cv.update(type="canvas_color", color=(cor or "#000000").upper() + "FF", blur=0.0)
+
+    # ---------- itens da loja (loja.json, tirado do cache do CapCut) ----------
+    def _filtro_mat(self, nome, intensidade):
+        m = _loja("filtros", nome)
+        mat = {"adjust_params": [], "algorithm_artifact_path": "", "apply_target_type": 0, "bloom_params": None,
+               "category_id": "", "category_name": "", "color_match_info": {"source_feature_path": "",
+               "target_feature_path": "", "target_image_path": ""}, "effect_id": m["effect_id"],
+               "enable_skin_tone_correction": False, "exclusion_group": [], "face_adjust_params": [], "formula_id": "",
+               "id": _id(), "intensity_key": "", "multi_language_current": "", "name": m["nome"], "panel_id": "",
+               "platform": "all", "resource_id": m["resource_id"], "source_platform": 1, "sub_type": "none",
+               "time_range": None, "type": "filter", "value": intensidade / 100, "version": ""}
+        self.j["materials"].setdefault("effects", []).append(mat)
+        return mat
+
+    def filtro(self, sid, nome, intensidade=100):
+        """Filtro de cor só neste clipe. Nomes: loja('filtros'). intensidade 0-100."""
+        s = self.segmento(sid)[1]
+        mat = self._filtro_mat(nome, intensidade)
+        velhos = {e["id"] for e in self.j["materials"]["effects"] if e.get("type") == "filter" and e is not mat}
+        s["extra_material_refs"] = [r for r in s["extra_material_refs"] if r not in velhos] + [mat["id"]]
+        return mat["id"]
+
+    def filtro_global(self, nome, tempo, dur, intensidade=100, trilha=0):
+        """Filtro de cor numa trilha própria: pega tudo que está embaixo nesse intervalo."""
+        mat = self._filtro_mat(nome, intensidade)
+        mat["apply_target_type"] = 2
+        t = self._trilha("filter", trilha)
+        ini, d = _us(tempo), _us(dur)
+        if not self._livre(t, ini, d):
+            raise ValueError(f"Trilha de filtro {trilha} ocupada em {tempo:.2f}s")
+        s = self._seg(mat["id"], ini, d, render=11000 + self._ordem(t))
+        s.update(clip=None, hdr_settings=None)
+        self._por(t, s)
+        return s["id"]
+
+    def adesivo(self, nome, tempo, dur, trilha=0, escala=1.0, x=None, y=None, rotacao=0.0, opacidade=1.0):
+        """Adesivo (sticker) da loja. Nomes: loja('adesivos', 'emoji')."""
+        m = _loja("adesivos", nome)
+        mat = {"id": _id(), "resource_id": m["resource_id"], "sticker_id": m["effect_id"], "source_platform": 1,
+               "type": "sticker", "name": m["nome"], "path": "", "unicode": "", "category_id": "", "category_name": "",
+               "icon_url": "", "preview_cover_url": "", "radius": {"x": 0.0, "y": 0.0}, "global_alpha": 1.0}
+        self.j["materials"].setdefault("stickers", []).append(mat)
+        anim = _novo("material_animations")
+        self.j["materials"].setdefault("material_animations", []).append(anim)
+        t = self._trilha("sticker", trilha)
+        ini, d = _us(tempo), _us(dur)
+        if not self._livre(t, ini, d):
+            raise ValueError(f"Trilha de adesivos {trilha} ocupada em {tempo:.2f}s")
+        s = self._seg(mat["id"], ini, d, refs=[anim["id"]], render=14000 + self._ordem(t))
+        s["hdr_settings"] = None
+        self._transformar(s, escala, x, y, rotacao, opacidade)
+        self._por(t, s)
+        return s["id"]
+
+    def voz(self, sid, nome, forca=100):
+        """Efeito de voz (trocador de voz) num clipe de áudio ou vídeo. Nomes: loja('voz')."""
+        s = self.segmento(sid)[1]
+        m = _loja("voz", nome)
+        mat = {"audio_adjust_params": [{"default_value": 1.0, "max_value": 1.0, "min_value": 0.0, "name": "strength",
+                                        "parameterIndex": 0, "portIndex": 0, "value": forca / 100}],
+               "category_id": "sound_effect", "category_name": "", "id": _id(), "is_ugc": False, "name": m["nome"],
+               "production_path": "", "resource_id": m["resource_id"], "speaker_id": "", "sub_type": 1,
+               "time_range": {"duration": 0, "start": 0}, "type": "audio_effect", "path": ""}
+        velhos = {e["id"] for e in self.j["materials"].setdefault("audio_effects", [])}
+        self.j["materials"]["audio_effects"].append(mat)
+        s["extra_material_refs"] = [r for r in s["extra_material_refs"] if r not in velhos] + [mat["id"]]
+        return mat["id"]
+
+    def modelo_texto(self, nome, texto, tempo, dur, trilha=0, x=None, y=None, escala=1.0, legenda=False):
+        """Texto num modelo pronto da loja (estilo + animação do próprio modelo). Nomes: loja('modelos_texto').
+        legenda=True marca como modelo de legenda (como o CapCut faz nas legendas automáticas). Beta: o
+        CapCut aplica o visual do modelo ao abrir; se vier texto simples, o modelo não aceitou a troca."""
+        m = _loja("modelos_texto", nome)
+        sid = self.texto(texto, tempo, dur, trilha=trilha, x=x, y=y, escala=escala)
+        t, s = self.segmento(sid)
+        txt_id = s["material_id"]
+        anim = s["extra_material_refs"][0]
+        tpl = copy.deepcopy(MOLDE["modelo_texto"])
+        tpl.update(id=_id(), effect_id=m["effect_id"], resource_id=m["resource_id"], name=m["nome"], path="",
+                   type="text_template_subtitle" if legenda else "text_template", resources=[])
+        tpl["text_info_resources"] = [{**tpl["text_info_resources"][0], "id": _id(), "text_material_id": txt_id,
+                                       "extra_material_refs": [anim],
+                                       "attach_info": {**tpl["text_info_resources"][0]["attach_info"], "duration": _us(dur)}}]
+        tpl["text_template_resource_type"] = "subtitle_template" if legenda else "text_template"
+        self.j["materials"].setdefault("text_templates", []).append(tpl)
+        s["material_id"] = tpl["id"]
+        return sid
 
     # ---------- corte de silêncio (V1) ----------
     def _clonar(self, s):

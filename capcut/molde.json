@@ -765,5 +765,173 @@
     "den": 1
    }
   }
+ },
+ "modelo_texto": {
+  "id": "A041857D-B9E2-4FAD-946E-E605F448CC03",
+  "version": "1.0.0",
+  "effect_id": "7535459012318383361",
+  "resource_id": "7535459012318383361",
+  "third_resource_id": "0",
+  "name": "多行放大渐显",
+  "type": "text_template_subtitle",
+  "path": "",
+  "category_id": "",
+  "category_name": "",
+  "platform": "all",
+  "text_to_audio_ids": [],
+  "source_platform": 1,
+  "resources": [
+   {
+    "panel": "fonts",
+    "path": "",
+    "resource_id": "7497919246530333969",
+    "source_platform": 1
+   },
+   {
+    "panel": "flower",
+    "path": "",
+    "resource_id": "7360952752714813953",
+    "source_platform": 0
+   },
+   {
+    "panel": "text",
+    "path": "",
+    "resource_id": "7343518591062381057",
+    "source_platform": 0
+   }
+  ],
+  "formula_id": "",
+  "text_info_resources": [
+   {
+    "id": "E8BDD880-428D-4E70-A119-C16618AB6B18",
+    "attach_info": {
+     "start_time": 0,
+     "duration": 1900000,
+     "original_size_width": 498.5180358886719,
+     "original_size_height": 111.91580200195312,
+     "clip": {
+      "scale": {
+       "x": 1.0,
+       "y": 1.0
+      },
+      "rotation": 0.0,
+      "transform": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "flip": {
+       "vertical": false,
+       "horizontal": false
+      },
+      "alpha": 1.0
+     }
+    },
+    "text_material_id": "C5705657-D9C7-49FA-9A58-EB5D1206427E",
+    "extra_material_refs": [
+     "6102298D-1302-4AB7-A9B4-78BD876DD61E",
+     "52185A69-477C-4869-953E-7D07047A06ED"
+    ],
+    "clip_type": "",
+    "lyric_keyframes": [],
+    "word_index": [],
+    "order_in_layer": 0,
+    "capital": ""
+   }
+  ],
+  "non_text_info_resources": [],
+  "check_flag": 7,
+  "text_template_preset_resource_id": "",
+  "is_3d": false,
+  "is_pre_rendered": false,
+  "aigc_type": "none",
+  "text_template_resource_type": "subtitle_template",
+  "aigc_config": {
+   "prompt": "",
+   "seed": 0,
+   "model": "",
+   "font_item": {
+    "id": "F87A8B7B-71E2-4EF7-A8B8-E72A69430737",
+    "resource_id": "",
+    "third_resource_id": "",
+    "category_id": "",
+    "category_name": "",
+    "source_platform": 0,
+    "path": "",
+    "effect_id": "",
+    "title": "",
+    "team_id": "",
+    "file_uri": "",
+    "request_id": ""
+   }
+  },
+  "request_id": "",
+  "origin_word_info": {
+   "text": "",
+   "start_time": 0,
+   "end_time": 0,
+   "words": [],
+   "keyword_ranges": []
+  },
+  "current_word_info": {
+   "text": "",
+   "start_time": 0,
+   "end_time": 0,
+   "words": [],
+   "keyword_ranges": []
+  },
+  "is_dynamic_build": false,
+  "is_ai_emoji": false,
+  "is_lyric_effect": false,
+  "lyric_group_id": "",
+  "merge_content": "",
+  "is_uneven_animation": false,
+  "material_text_ranges": [],
+  "ai_emoji_config": null
+ },
+ "efeito_texto": {
+  "id": "6102298D-1302-4AB7-A9B4-78BD876DD61E",
+  "effect_id": "",
+  "resource_id": "7360952752714813953",
+  "third_resource_id": "",
+  "name": "",
+  "report_name": "",
+  "type": "text_effect",
+  "sub_type": "none",
+  "path": "",
+  "value": 0.0,
+  "visible": true,
+  "item_effect_type": 0,
+  "category_id": "",
+  "category_name": "",
+  "category_key": "",
+  "sub_category_id": "",
+  "sub_category_name": "",
+  "platform": "all",
+  "apply_target_type": 0,
+  "source_platform": 0,
+  "version": "",
+  "adjust_params": [],
+  "time_range": null,
+  "formula_id": "",
+  "enable_skin_tone_correction": false,
+  "algorithm_artifact_path": "",
+  "intensity_key": "",
+  "face_adjust_params": [],
+  "exclusion_group": [],
+  "panel_id": "",
+  "bloom_params": null,
+  "request_id": "",
+  "color_match_info": null,
+  "multi_language_current": "",
+  "lumi_hub_path": "",
+  "covering_relation_change": 0,
+  "beauty_face_auto_preset_id": "",
+  "beauty_body_auto_preset_id": "",
+  "beauty_face_auto_retouch_info": {
+   "face_id": [],
+   "beauty_face_auto_retouch_id": ""
+  },
+  "smart_color_mode": 0,
+  "is_from_intelligent_quality": false
  }
 }
