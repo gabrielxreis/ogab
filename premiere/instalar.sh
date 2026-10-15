@@ -21,9 +21,20 @@ info "2/4 Plugin Gab Ponte (liga o Premiere ao /ogab)"
 CCX="${TMPDIR:-/tmp}/GabPonte.ccx"
 rm -f "$CCX"; (cd "$AQUI/plugin" && zip -qr "$CCX" . -x '.*')
 UPIA="/Library/Application Support/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.app/Contents/MacOS/UnifiedPluginInstallerAgent"
-if [ -x "$UPIA" ] && "$UPIA" --install "$CCX" >/tmp/ogab_upia.log 2>&1; then
+# Sem Premiere o instalador da Adobe fica parado para sempre (relato de 15/10/2026, Windows): só roda com o Premiere
+# instalado e com limite de 2 min; passou disso, encerra e segue.
+upia_rc=1
+if [ -z "$PR" ]; then
+  warn "plugin não instalado (sem Premiere). Depois de instalar o Premiere, rode de novo: bash $AQUI/instalar.sh"
+elif [ -x "$UPIA" ]; then
+  "$UPIA" --install "$CCX" >/tmp/ogab_upia.log 2>&1 & pid=$!
+  for _ in $(seq 120); do kill -0 $pid 2>/dev/null || break; sleep 1; done
+  if kill -0 $pid 2>/dev/null; then kill $pid 2>/dev/null; warn "o instalador da Adobe não respondeu em 2 min e foi encerrado"
+  else wait $pid; upia_rc=$?; fi
+fi
+if [ $upia_rc -eq 0 ]; then
   ok "plugin instalado (Premiere: Window > UXP Plugins > Gab Ponte)"
-else
+elif [ -n "$PR" ]; then
   warn "o instalador da Adobe não aceitou o plugin (ver /tmp/ogab_upia.log). Alternativa: UXP Developer Tool (Creative Cloud) > Add Plugin > $AQUI/plugin/manifest.json > Load"
 fi
 

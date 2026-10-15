@@ -24,12 +24,17 @@ Compress-Archive -Path (Join-Path $AQUI "plugin\*") -DestinationPath $zip -Force
 Move-Item $zip $ccx -Force
 $upia = Join-Path ${env:CommonProgramFiles} "Adobe\Adobe Desktop Common\RemoteComponents\UPI\UnifiedPluginInstallerAgent\UnifiedPluginInstallerAgent.exe"
 $instalado = $false
-if (Test-Path $upia) {
-  & $upia /install $ccx | Out-Null
-  $instalado = ($LASTEXITCODE -eq 0)
+# Sem Premiere o instalador da Adobe (UPIA) fica parado para sempre (relato de 15/10/2026): so roda com o Premiere
+# instalado e com limite de 2 min; passou disso, encerra e segue.
+if (-not $pr) {
+  Warn "plugin nao instalado (sem Premiere). Depois de instalar o Premiere, rode de novo: powershell -ExecutionPolicy Bypass -File `"$AQUI\instalar.ps1`""
+} elseif (Test-Path $upia) {
+  $proc = Start-Process -FilePath $upia -ArgumentList "/install", "`"$ccx`"" -PassThru -WindowStyle Hidden
+  if ($proc.WaitForExit(120000)) { $instalado = ($proc.ExitCode -eq 0) }
+  else { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue; Warn "o instalador da Adobe nao respondeu em 2 min e foi encerrado" }
 }
 if ($instalado) { Ok "plugin instalado (Premiere: Window > UXP Plugins > Gab Ponte)" }
-else { Warn "o instalador da Adobe nao aceitou o plugin. Alternativa: UXP Developer Tool (Creative Cloud) > Add Plugin > $AQUI\plugin\manifest.json > Load" }
+elseif ($pr) { Warn "o instalador da Adobe nao aceitou o plugin. Alternativa: UXP Developer Tool (Creative Cloud) > Add Plugin > $AQUI\plugin\manifest.json > Load" }
 
 Info "3/4 LUT de cor"
 $n = 0
