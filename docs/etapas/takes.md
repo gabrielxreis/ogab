@@ -47,3 +47,11 @@
 6. **Ritmo:** cortes de 0,7 a 2,5 s (média perto de 1,5 s); só o motion de valor segura 3 s.
 7. **O take ilustra o VERBO da frase:** "e fez o que todo estrangeiro faz" ganhou a porta giratória (entrar), "na Faria Lima" a silhueta andando; o Gab casa a ação do take com o verbo, não só com o substantivo.
 8. **Motions de tela cheia saíram de cima dos takes de IA**; ficam só overlays pontuais (WhatsApp, valor em alpha) onde a fala pede.
+
+## Horizontal em timeline vertical: conferir o enquadramento quadro a quadro (regra do usuário, 15/10/2026: "sempre verificar os frames se o vídeo é horizontal e vai para vertical, ele tem que enquadrar o objeto ou pessoa na cena")
+Todo clipe 16:9 (trailer, making of, YouTube) que entra numa timeline 9:16:
+1. `reenquadrar_vertical(p, itens)` (Smart Reframe; o clipe precisa estar em preencher, `Scaling` 3, zoom 1).
+2. **Tarja preta (letterbox/cinemascope):** o Smart Reframe não tira. Medir com `ffmpeg -ss <entrada+1> -t 2 -i <arquivo> -vf cropdetect=24:2:0 -f null -` e aplicar `ZoomX`/`ZoomY` = 1 / (altura útil ÷ altura total) + 0,02 (ex.: 2.39:1 dá 1,37). Quadro escuro ou cartela de título dá falso positivo (zoom 3 a 10): ignorar a medida e trocar o trecho.
+3. **Conferir de olho:** still do meio de cada clipe da V1 (`SetCurrentTimecode` + `Project.ExportCurrentFrameAsStill`), juntar numa folha (contato) e olhar: pessoa ou objeto principal dentro do quadro vertical, sem barra preta, sem rosto cortado ao meio.
+4. **Trocar, não remendar:** clipe com legenda queimada, texto de título cortado (ex.: "VID" de DAVID), cartela de estúdio ou só borrão: trocar por outro trecho do mesmo arquivo (`entrada_s` nova) e repetir 1 a 3 nele. Clipe que fica inteiro debaixo de motion de tela cheia não precisa troca.
+Só dizer que a montagem está pronta depois da folha conferida.

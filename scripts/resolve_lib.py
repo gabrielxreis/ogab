@@ -587,6 +587,8 @@ def takes_sem_cor(t):
     for k in range(1, t.GetTrackCount("video") + 1):
         for x in t.GetItemListInTrack("video", k) or []:
             m = x.GetMediaPoolItem(); fp = (m.GetClipProperty("File Path") if m else "") or ""
+            if m is None:   # título do Fusion (lettering) não é take e não recebe grade (relato 15/10/2026)
+                continue
             if not x.GetClipEnabled() or "/motions/" in fp or fp.lower().endswith(".mov"):
                 continue
             g = x.GetNodeGraph()
@@ -970,6 +972,7 @@ def inserir_ograf_na_trilha(t, trilha, lista, template="GabLettering"):
 
 
 MODELO_LEGENDA = "MODELO GAB USA"
+DRT_FPS = 24   # fps gravado no modelo_gab_usa.drt
 DRT_MODELO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "davinci", "modelo_gab_usa.drt")
 
 
@@ -979,7 +982,10 @@ def timeline_do_modelo(p, mp, nome, w=None, h=None, fps=None, modelo=MODELO_LEGE
     Usa a timeline-modelo do projeto; se não existir, importa assets/davinci/modelo_gab_usa.drt."""
     tls = {p.GetTimelineByIndex(i).GetName(): p.GetTimelineByIndex(i) for i in range(1, p.GetTimelineCount() + 1)}
     m = tls.get(modelo)
-    if not m and os.path.exists(drt):
+    # o .drt do modelo é 24 fps e ImportTimelineFromFile grava esse fps no PROJETO (relato 15/10/2026: 29,97 virou 24):
+    # projeto em outro fps não importa o modelo; quem chama cai na timeline vazia e o preset entra por legenda_ui.py
+    pfps = float(p.GetSetting("timelineFrameRate") or 0)
+    if not m and os.path.exists(drt) and abs(pfps - DRT_FPS) < 0.01:
         m = mp.ImportTimelineFromFile(drt, {"timelineName": modelo})
         if m: m.SetName(modelo)
     if not m:

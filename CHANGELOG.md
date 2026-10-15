@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-6 (15/10/2026)
+- **Vídeo horizontal em Reels vertical:** depois do reenquadramento, o Gab tira a tarja preta dos filmes (cinemascope) com o zoom certo e confere um quadro de cada corte: pessoa ou objeto sempre dentro do vertical. Corte com legenda queimada ou título cortado é trocado por outro trecho.
+- **Correções:** projeto em 29,97/30 fps não muda mais para 24 ao criar a timeline com a legenda GAB USA; o lettering editável não trava mais o export como "take sem cor".
+
 ## 2026.10.15-5 (15/10/2026)
 - **Clonador de voz local (opcional, Mac M1 ou mais novo):** o Gab clona a sua voz e narra no próprio Mac, de graça e sem limite, tudo por aqui (sem app para abrir). O instalador pergunta se você quer; para instalar depois, peça `/ogab voz-local instalar`. Toda geração mostra a barra de progresso ao vivo no terminal. Dá para escolher outros motores de voz com português (VoxCPM2, Confucius4, MOSS-Nano, PocketTTS). Atenção: o motor padrão (OmniVoice) é de uso **não comercial**; para vídeo de cliente, continue no ElevenLabs ou use um motor de licença aberta.
 
