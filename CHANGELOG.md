@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-7 (15/10/2026)
+- **Logos nos motions:** quando a narração cita uma empresa ou plataforma (Amazon, Netflix, Prime Video...), o motion mostra a logo oficial em vez do nome escrito.
+
 ## 2026.10.15-6 (15/10/2026)
 - **Vídeo horizontal em Reels vertical:** depois do reenquadramento, o Gab tira a tarja preta dos filmes (cinemascope) com o zoom certo e confere um quadro de cada corte: pessoa ou objeto sempre dentro do vertical. Corte com legenda queimada ou título cortado é trocado por outro trecho.
 - **Correções:** projeto em 29,97/30 fps não muda mais para 24 ao criar a timeline com a legenda GAB USA; o lettering editável não trava mais o export como "take sem cor".
