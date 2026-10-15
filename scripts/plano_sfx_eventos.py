@@ -23,7 +23,7 @@ def medir(f):
 def main(pasta, eventos):
     linhas = []
     for l in open(eventos):
-        m = re.match(r"\s*([\d.]+)\s+(\S+)\s+(-?\d+)dB\s+([\d.]+)\s+([opb])\s*:?\s*(.*)", l)
+        m = re.match(r"\s*([\d.]+)\s+(\S+)\s+(-?\d+)(?:dB)?\s+([\d.]+)\s+([opb])\s*:?\s*(.*)", l)
         if not m:
             continue
         t, n, db, dep, al, nota = float(m[1]), m[2], int(m[3]), float(m[4]), m[5], m[6]

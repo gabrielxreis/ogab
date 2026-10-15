@@ -11,7 +11,8 @@ const base = process.argv[2];
 for (const id of process.argv.slice(3)) {
   const p = await b.newPage();
   await p.goto('file://' + base + '/' + id + '/index.html', { waitUntil: 'networkidle0' });
-  out[id] = await p.evaluate(() => tl.getChildren(true, true, false).map(t => {
+  await p.waitForFunction(() => typeof tl !== 'undefined' || Object.keys(window.__timelines || {}).length, { timeout: 15000 });
+  out[id] = await p.evaluate(() => (typeof tl !== 'undefined' ? tl : Object.values(window.__timelines || {})[0]).getChildren(true, true, false).map(t => {
     const el = t.targets()[0]; const lab = el ? (el.id ? '#' + el.id : '') + (el.className && typeof el.className === 'string' ? '.' + el.className.split(' ')[0] : '') + (el.textContent ? ' "' + el.textContent.trim().slice(0, 24) + '"' : '') : '?';
     const v = Object.keys(t.vars).filter(k => !['duration', 'ease', 'delay', 'immediateRender', 'stagger', 'repeat', 'yoyo', 'onComplete'].includes(k));
     return [+t.startTime().toFixed(2), +t.duration().toFixed(2), lab, v.join(','), String(t.vars.ease || ''), t.targets().length];

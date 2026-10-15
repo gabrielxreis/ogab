@@ -9,3 +9,9 @@
 2. Se `opcoes.multi_formatos`: criar timelines extras nos formatos de `formatos_extras` (e cortes 15/30/60 s para Ads) e renderizar cada uma com sufixo (`- 4x5`, `- 30s`).
 3. **Conferência automática** (se habilitada; sem render, o qc confere legenda, takes e estrutura, e pula as checagens do MP4): `python3 SKILL_DIR/scripts/qc.py <pasta> --cliente clientes/<empresa> --plataforma <p>`. Corrigir todo **ERRO** e reconferir. Olhar a `qc_folha.jpg`.
 4. Salvar o projeto e entregar: link do vídeo, resumo (voz, música, takes banco x gerados, créditos gastos) e o que falta (ex.: logo).
+
+## "Exporta e agenda" (regra do usuário, 15/10/2026: "tinha que fazer o sfx, tira o agendamento")
+- Pedido de exportar ou agendar NÃO pula etapa: rodar `projeto.py checklist` antes e fazer o que faltar (SFX principalmente). `renderizar` recusa timeline sem nada da A3 em diante; `sem_sfx=True` só com pedido explícito do usuário.
+- Mandar o MP4 para o usuário ouvir antes de agendar quando houve mudança de som/imagem desde a última aprovação.
+- Agendar pelo Publora com arquivo local: `create_post` (rascunho, `platformSettings.instagram` REELS + shareToFeed) > `get_upload_url` > `curl -X PUT -H "Content-Type: video/mp4" --data-binary @arquivo "<uploadUrl>"` > `complete_media` > `update_post status=scheduled scheduledTime=...-03:00`. Cancelar = `update_post status=draft`.
+- Horário: dia útil 18h-19h e sábado 11h (plano do cliente manda).

@@ -304,3 +304,8 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 | 15/10/2026 | `timeline_do_modelo` trocou o fps do projeto (29,97 virou 24) (relato) | O `modelo_gab_usa.drt` é 24 fps e `ImportTimelineFromFile` grava o fps no projeto | Só importa o .drt se o projeto já é 24 fps; senão devolve None e quem chama cria timeline vazia (preset por `legenda_ui.py`) |
 | 15/10/2026 | `renderizar` recusava por lettering "sem cor" (relato) | `takes_sem_cor` contava título do Fusion (sem MediaPoolItem) como take | Item sem MediaPoolItem é pulado |
 | 15/10/2026 | Motion com texto encostando na borda, cortado no feed do Instagram | `centro.py` limitava à tela inteira (1000x1400); o feed corta o Reels em 4:5 (1080x1350) | Área segura 900x1200 no `centro.py` e regra em `lettering_motions.md` |
+| 15/10/2026 | Vídeos exportados e agendados sem SFX | "exporta e agenda" foi tratado como pular etapas; o checklist não rodou | `renderizar` recusa timeline sem SFX (A3+) salvo `sem_sfx=True`; regra em `render.md` |
+| 15/10/2026 | Buraco de 1-2 quadros entre cortes ao trocar trecho de trailer | `AppendToTimeline` com fonte 25/23,976 fps em timeline 24: endFrame exclusivo e duração arredondada para baixo | Fórmula em `davinci_api.md` (n = ceil(D x fps_fonte / fps_tl)) + conferir `GetEnd` |
+| 15/10/2026 | `movimentos.mjs` quebrava em kit com `const tl` dentro de função | Só lia o `tl` global | Cai para `window.__timelines` |
+| 15/10/2026 | `plano_sfx_eventos.py` lia 0 sons | Regex exigia "dB" colado no volume | "dB" opcional |
+| 15/10/2026 | Barra de progresso marcava motions como faltando | Detecção só pela trilha "MOTIONS" ou pelo nome | Também pela pasta `motions/` e trilha "MOTIONS ..." |

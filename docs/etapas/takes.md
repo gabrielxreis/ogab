@@ -55,3 +55,5 @@ Todo clipe 16:9 (trailer, making of, YouTube) que entra numa timeline 9:16:
 3. **Conferir de olho:** still do meio de cada clipe da V1 (`SetCurrentTimecode` + `Project.ExportCurrentFrameAsStill`), juntar numa folha (contato) e olhar: pessoa ou objeto principal dentro do quadro vertical, sem barra preta, sem rosto cortado ao meio.
 4. **Trocar, não remendar:** clipe com legenda queimada, texto de título cortado (ex.: "VID" de DAVID), cartela de estúdio ou só borrão: trocar por outro trecho do mesmo arquivo (`entrada_s` nova) e repetir 1 a 3 nele. Clipe que fica inteiro debaixo de motion de tela cheia não precisa troca.
 Só dizer que a montagem está pronta depois da folha conferida.
+
+- **Fade para o preto dentro do trailer (15/10/2026):** trailer tem cortes e fades no meio do trecho escolhido. Antes de fechar a montagem, rodar `qc.py` (quadros pretos) ou `ffmpeg -vf blackdetect` no MP4; achou, puxar a entrada ou dividir o trecho em dois cortes limpos (ver `davinci_api.md`, outro fps).

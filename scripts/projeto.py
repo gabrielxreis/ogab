@@ -52,7 +52,9 @@ def detectar(nome_tl):
     nome_trilha = {k: (t.GetTrackName("video", k) or "").upper() for k in tracks}
     acima = [(k, x) for k in tracks for x in itens("video", k)]
     eh_titulo = lambda x: x.GetMediaPoolItem() is None          # Fusion Title (não abre a composição)
-    eh_motion = lambda k, x: nome_trilha[k] == "MOTIONS" or bool(MOTION.search(x.GetName()))
+    _fp = lambda x: (x.GetMediaPoolItem().GetClipProperty("File Path") or "") if x.GetMediaPoolItem() else ""
+    # trilha "MOTIONS"/"MOTIONS LOGO" ou arquivo da pasta motions/ do vídeo (15/10/2026: motions na V2 sem nome não contavam)
+    eh_motion = lambda k, x: (nome_trilha[k] or "").upper().startswith("MOTIONS") or bool(MOTION.search(x.GetName())) or "/motions/" in _fp(x)
     v1 = [x for x in itens("video", 1) if x.GetMediaPoolItem() is not None]
     if any(not eh_titulo(x) and not eh_motion(k, x) for k, x in acima) or len(v1) >= 2: ok.add("broll")
     if any(eh_titulo(x) for k, x in acima): ok.add("letterings")

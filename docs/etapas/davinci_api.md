@@ -110,3 +110,9 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 3. Multicam + Smart Switch para podcast/entrevista com 2 câmeras.
 4. `Timeline.Export` para FCPXML/OTIO quando o usuário quiser abrir no Final Cut/CapCut/Premiere.
 5. Mapa completo dos menus do DaVinci (para o que só existe na tela), gerado com o DaVinci aberto.
+
+## AppendToTimeline com take de outro fps (aprendido em 15/10/2026, trailers de 25 e 23,976 fps em timeline 24)
+- `startFrame`/`endFrame` são quadros DA FONTE e o `endFrame` é exclusivo. O item na timeline fica com floor(n x fps_timeline / fps_fonte) quadros, n = endFrame - startFrame.
+- Por isso, para preencher D quadros da timeline, calcular n = ceil(D x fps_fonte / fps_timeline) e conferir o fim do item depois (`GetEnd`). Sem isso, sobra 1 a 2 quadros de buraco preto entre os cortes.
+- `GetLeftOffset()` vem em quadros da timeline: segundos da fonte = LeftOffset / fps_timeline.
+- Trocar um clipe por outro trecho: `DeleteClips` + `AppendToTimeline` no mesmo `recordFrame`, e depois refazer Smart Reframe, zoom de letterbox e grade (o item novo vem cru).

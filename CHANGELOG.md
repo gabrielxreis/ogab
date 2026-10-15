@@ -1,5 +1,10 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.15-9 (15/10/2026)
+- **Nada sai sem efeito sonoro:** o Gab não exporta mais uma timeline sem SFX (a não ser que você peça) e roda o checklist antes de exportar ou agendar.
+- **Sem quadro preto ao trocar trecho de trailer:** cortes de vídeos com outro fps (25, 23,976) agora fecham sem buraco entre eles; fades do próprio trailer são conferidos antes de exportar.
+- **Barra de progresso:** motions em qualquer trilha passam a contar.
+
+## 2026.10.15-9 (15/10/2026)
 - **Preset SERIF AZUL:** Reels editorial com a palavra-chave da legenda em serifada itálica azul, passos 1-2-3 que acendem, slider "iniciante → profissional" e cenas em papel claro subindo por cima de você (celular, ícone 3D, amostras de cor, nuvem de marcas). Peça "no preset serif azul".
 - **Efeitos sonoros em 3 passadas:** o Gab primeiro lista cada movimento, evento e virada do vídeo e sonoriza nessa ordem (whooshes, depois texturas, depois risers). Agora entra um riser com impacto uns 5 s depois do gancho e em cada troca de bloco, para dar a sensação de subida.
 

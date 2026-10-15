@@ -597,7 +597,7 @@ def takes_sem_cor(t):
     return faltam
 
 
-def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True):
+def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True, sem_sfx=False):
     """ate_fim_do_video: corta no último quadro de vídeo (música que passa do fim dava quadros pretos no final).
     master: masteriza o áudio do MP4 (masterizar)."""
     _cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"))) if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")) else {}
@@ -605,6 +605,12 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
         faltam = takes_sem_cor(p.GetCurrentTimeline())   # bug 14/10/2026: 10 takes trocados depois da cor saíram sem grade e o vídeo foi postado
         if faltam:
             raise RuntimeError(f"takes sem cor: {faltam}. Rode aplicar_grade (ou ApplyGradeFromDRX nesses) antes de exportar.")
+    if not sem_sfx:   # 15/10/2026: "exporta e agenda" saiu sem SFX e o agendamento foi cancelado ("tinha que fazer o sfx")
+        _t = p.GetCurrentTimeline()
+        _sfx = [x for k in range(3, _t.GetTrackCount("audio") + 1) for x in (_t.GetItemListInTrack("audio", k) or [])]
+        if not _sfx:
+            raise RuntimeError("timeline sem SFX (nada da A3 em diante): fazer os efeitos sonoros (sfx.md) antes de exportar; "
+                               "só passar sem_sfx=True se o usuário pediu para exportar sem SFX")
     for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
     # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False

@@ -132,3 +132,9 @@ Todo motion (texto, número, cartão, logo) cabe numa caixa central de **900 x 1
 - `centro.py medir/corrigir` já usa esse limite (LARGURA_MAX 900, ALTURA_MAX 1200): passou do limite, ele grava o scale no `#fit`.
 - Kit escrito à mão (sem passar pelo centro.py): embrulhar o conteúdo num `#fit` com `width:max-content` e escalar por `min(1, 900/largura, 1200/altura)` medido ANTES de montar a timeline do GSAP.
 - Conferir no quadro renderizado com a caixa desenhada por cima (`ffmpeg ... drawbox=x=90:y=360:w=900:h=1200`) antes de entregar.
+
+- **Armadilhas do auto-ajuste (#fit com width:max-content), 15/10/2026:**
+  - contador mede a largura no texto inicial ("US$ 0"): marcar o elemento com `data-final="US$ 30.000.000"` e medir com o texto final;
+  - `max-content` não quebra linha: o que era 2 linhas vira 1 e estoura; quebrar com `<br>` ou `display:block` em cada linha;
+  - elemento `position:absolute` dentro do #fit passa a se posicionar pelo #fit (o transform cria novo bloco de contenção): dar ao pai largura fixa e `margin:auto`;
+  - deixar folga para o zoom do palco e o overshoot do pop: medir contra 860 x 1150.
