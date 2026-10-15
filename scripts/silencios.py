@@ -13,6 +13,9 @@ Monta a timeline nova com o mesmo nome (do modelo, mesma resolução e fps) e gu
 "<nome> - com silencios" (nada é apagado).
 
 Roda DEPOIS dos cortes e ANTES de legenda/b-roll/música: se a timeline já tiver algo além da V1 e do áudio dela, para.
+NARRAÇÃO (voz por IA ou locução gravada, vídeo de takes): com a V1 vazia e a narração na A1, faz o mesmo nos clipes
+da A1 (regra do usuário, 15/10/2026: "tirar os silêncios seria bom entrar no processo"); mantém o volume do clipe
+(+5 dB da narração). Rodar logo depois de `colocar_narracao`, antes da legenda e dos takes.
 `--simular` mostra o que sairia sem mexer no DaVinci.
 """
 import argparse, os, sys
@@ -90,8 +93,12 @@ def main():
         raise SystemExit(f"PAROU: a timeline já tem {', '.join(outros)}. Silêncios saem ANTES de legenda/b-roll/música.")
     fps_tl = float(t.GetSetting("timelineFrameRate"))
     clipes = [x for x in (t.GetItemListInTrack("video", 1) or []) if x.GetMediaPoolItem() and x.GetClipEnabled()]
+    narracao = not clipes   # vídeo de narração: V1 vazia, a fala está na A1
+    if narracao:
+        clipes = [x for x in (t.GetItemListInTrack("audio", 1) or []) if x.GetMediaPoolItem() and x.GetClipEnabled()]
     if not clipes:
-        raise SystemExit("V1 sem clipe ligado com mídia")
+        raise SystemExit("V1 e A1 sem clipe ligado com mídia")
+    tipo, rot = ("audio", "A1") if narracao else ("video", "V1")
     # velocidade alterada (speed ramp, 50%, 200%): o AppendToTimeline remonta a 100% e o trecho cairia fora da fala.
     # TimelineItem.GetSpeed (21.1) dá a %; speed ramp não aparece nela, então também compara trecho do arquivo x duração.
     lentos = []
@@ -105,9 +112,9 @@ def main():
         if abs(pct - 100) > 0.5 or (tl > 0 and abs(src / tl - 1) > 0.03):
             lentos.append(f"{x.GetName()} ({pct:.0f}%)" if abs(pct - 100) > 0.5 else f"{x.GetName()} (~{100 * src / tl:.0f}%)")
     if lentos:
-        raise SystemExit("PAROU: clipe com velocidade alterada na V1: " + ", ".join(lentos) +
+        raise SystemExit(f"PAROU: clipe com velocidade alterada na {rot}: " + ", ".join(lentos) +
                          ". Tirar os silêncios ANTES de mexer na velocidade (nada foi alterado).")
-    infos, antes, depois, cortes = [], 0.0, 0.0, 0
+    infos, vols, antes, depois, cortes = [], [], 0.0, 0.0, 0
     cache = {}
     for x in clipes:
         it = x.GetMediaPoolItem(); fps = float(it.GetClipProperty("FPS") or fps_tl)
@@ -119,8 +126,11 @@ def main():
         dur, fica = fim - ini, sum(b - c for c, b in ks)
         antes += dur; depois += fica; cortes += max(0, len(ks) - 1) + (ks[0][0] > ini + 0.01) + (ks[-1][1] < fim - 0.01)
         print(f"  {x.GetName()}: {dur:.1f} s -> {fica:.1f} s" + (" (sem transcrição: entra inteiro)" if ws is None else f" ({len(ks)} trechos)"))
+        vol = x.GetProperty("AudioVolume") if narracao else None
         for c, b in ks:
-            infos.append({"mediaPoolItem": it, "startFrame": int(round(c * fps)), "endFrame": int(round(b * fps)) - 1})
+            info = {"mediaPoolItem": it, "startFrame": int(round(c * fps)), "endFrame": int(round(b * fps)) - 1}
+            if narracao: info.update({"mediaType": 2, "trackIndex": 1})
+            infos.append(info); vols.append(vol)
     print(f"total: {antes:.1f} s -> {depois:.1f} s (saem {antes - depois:.1f} s em {cortes} silêncios)")
     if a.simular:
         return
@@ -136,15 +146,18 @@ def main():
     dur = (nova.GetEndFrame() - nova.GetStartFrame()) / fps_tl
     if len(res) != len(infos):
         print(f"AVISO: entraram {len(res)} de {len(infos)} trechos; conferir a timeline")
-    # regra 1d: Voice Isolation na A1 (timeline nova nasce sem); mantém a intensidade que a original tinha
-    alvo_vi = vi if vi.get("isEnabled") else {"isEnabled": True, "amount": 100}
-    nova.SetVoiceIsolationState(1, alvo_vi)
-    print("Voice Isolation A1:", nova.GetVoiceIsolationState(1))
+    if narracao:   # volume do clipe (+5 dB da narração) não vem no AppendToTimeline
+        for x, v in zip(res, vols):
+            if isinstance(v, (int, float)): x.SetProperty("AudioVolume", v)
+    else:   # regra 1d: Voice Isolation na A1 (timeline nova nasce sem); mantém a intensidade que a original tinha
+        alvo_vi = vi if vi.get("isEnabled") else {"isEnabled": True, "amount": 100}
+        nova.SetVoiceIsolationState(1, alvo_vi)
+        print("Voice Isolation A1:", nova.GetVoiceIsolationState(1))
     R.salvar(r)
     # o salvar pode descartar clipes de um append que deu erro: conferir DEPOIS de salvar (armadilha da API)
-    n = len(nova.GetItemListInTrack("video", 1) or [])
+    n = len(nova.GetItemListInTrack(tipo, 1) or [])
     if n < len(infos):
-        raise SystemExit(f"ERRO: depois de salvar ficaram {n} de {len(infos)} trechos na V1; conferir a timeline {a.timeline!r}")
+        raise SystemExit(f"ERRO: depois de salvar ficaram {n} de {len(infos)} trechos na {rot}; conferir a timeline {a.timeline!r}")
     print(f"timeline {a.timeline!r}: {n} clipes, {dur:.1f} s; original guardada em {backup!r}")
 
 

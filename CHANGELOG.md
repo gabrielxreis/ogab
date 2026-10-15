@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-11 (15/10/2026)
+- **Silêncios também na narração:** em vídeo com voz gerada ou locução, o Gab tira as pausas longas da narração logo que ela entra na timeline, antes da legenda e dos takes (a versão original fica guardada como "<nome> - com silencios").
+
 ## 2026.10.15-10 (15/10/2026)
 - **Windows: instalador não trava mais** depois de instalar ffmpeg, Python e Node (ficava parado com o processador em 100%). Se a instalação travou, feche o PowerShell e rode o comando de instalação de novo.
 - **Windows: o instalador voltou a abrir** (um erro de digitação fazia ele parar logo no começo, com "Referência de variável inválida"). Agora todo instalador do Windows é testado automaticamente no PowerShell do Windows antes de chegar a você.
