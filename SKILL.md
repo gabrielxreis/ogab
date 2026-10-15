@@ -146,7 +146,7 @@ Pedir o máximo de fontes (site, redes, .md/briefing) e logo; varrer tudo e cria
 Listar 3-5 vozes no idioma (ElevenLabs `creative_list_voices`; incluir vozes do próprio usuário) com link de prévia. Depois da escolha: trocar no texto os termos de `pronuncia.json` pela forma `fala` (ex.: "EB-2" -> "ê-bê dois"), `estimate_only` -> informar custo -> gerar **1** take. Baixar para `narracoes/narracao.wav` (48 kHz). Transcrever (Resolve `TranscribeAudio` ou `creative_transcribe_audio`): se a transcrição mostrar erro de pronúncia de um termo, **atualizar `pronuncia.json` do cliente** (novo `erros_transcricao` e ajuste em `fala`) e regerar só o trecho, com aprovação.
 
 ## 4. DaVinci: projeto, narração, transcrição e cortes (`docs/etapas/davinci.md`)
-Projeto com fps/resolução certos e a árvore de pastas; narração/gravação; transcrição do DaVinci (`transcrever.py`); cortes de gravação com `cortes.py`.
+Projeto com fps/resolução certos e a árvore de pastas; narração/gravação; transcrição do DaVinci (`transcrever.py`); cortes de gravação com `cortes.py`. **Antes de automatizar algo novo no DaVinci ou dizer que "não dá": `docs/etapas/davinci_api.md`** (o que a API faz e não faz, funções úteis ainda não usadas, armadilhas, OGraf, MCP, menu pela tela).
 
 ## 4b. Legenda (PARAR para o usuário validar antes de takes e motions) (`docs/etapas/legenda.md`)
 Create Subtitles from Audio da timeline atual > métrica > quebras revisadas à mão > preset GAB USA (`legenda_auto.py`, modelo GAB USA). Mostrar e esperar a validação, avisando que legenda fora de tempo deixa o motion fora de tempo. Depois dos motions: `legenda_baixa.py "<timeline>" <pasta>` desce para Y 390, sem clicar, toda legenda que cruza motion/CTA/lettering (`--desfazer` volta).

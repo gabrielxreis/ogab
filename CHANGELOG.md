@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-2 (15/10/2026)
+- **Mapa do que o DaVinci faz por automação:** o Gab agora sabe tudo que dá pra fazer no DaVinci sem clicar, o que só dá pela tela e as armadilhas conhecidas. Também ficou mais seguro tirar silêncio de clipe com velocidade alterada.
+
 ## 2026.10.15-1 (15/10/2026)
 - **Memória da marca:** antes de editar, o Gab cria a pasta e um .md com o nome da marca. Ali ele anota o que você pediu de diferente, o que funcionou e o que fazer da próxima vez, e lê tudo antes do próximo vídeo da marca.
 - **Silêncios pela transcrição do DaVinci:** depois dos cortes e antes da legenda, o Gab corta as pausas entre as palavras que o DaVinci reconheceu, sem depender do volume, e guarda a timeline original como backup.

@@ -93,13 +93,17 @@ def main():
     if not clipes:
         raise SystemExit("V1 sem clipe ligado com mídia")
     # velocidade alterada (speed ramp, 50%, 200%): o AppendToTimeline remonta a 100% e o trecho cairia fora da fala.
-    # A API não expõe a velocidade; trecho usado do arquivo diferente da duração na timeline = velocidade mexida.
+    # TimelineItem.GetSpeed (21.1) dá a %; speed ramp não aparece nela, então também compara trecho do arquivo x duração.
     lentos = []
     for x in clipes:
         it = x.GetMediaPoolItem(); fps = float(it.GetClipProperty("FPS") or fps_tl)
         src = (x.GetSourceEndFrame() - x.GetSourceStartFrame()) / fps; tl = x.GetDuration() / fps_tl
-        if tl > 0 and abs(src / tl - 1) > 0.03:
-            lentos.append(f"{x.GetName()} ({100 * src / tl:.0f}%)")
+        try:
+            pct = float((x.GetSpeed() or {}).get("Percentage", 100))   # API 21.1; a proporção cobre speed ramp
+        except Exception:
+            pct = 100.0
+        if abs(pct - 100) > 0.5 or (tl > 0 and abs(src / tl - 1) > 0.03):
+            lentos.append(f"{x.GetName()} ({pct:.0f}%)" if abs(pct - 100) > 0.5 else f"{x.GetName()} (~{100 * src / tl:.0f}%)")
     if lentos:
         raise SystemExit("PAROU: clipe com velocidade alterada na V1: " + ", ".join(lentos) +
                          ". Tirar os silêncios ANTES de mexer na velocidade (nada foi alterado).")
