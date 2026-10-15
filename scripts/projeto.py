@@ -4,8 +4,10 @@
   python3 projeto.py marcar <pasta_do_video> <etapa> [--pular "motivo"] [--desmarcar]
   python3 projeto.py lote <pasta_da_empresa>          (barra de TODOS os vídeos do lote, com a timeline gravada de cada um)
   python3 projeto.py checklist <pasta_do_video>|<pasta_da_empresa>   (OBRIGATÓRIO antes de dizer "pronto"/entregar)
+  python3 projeto.py memoria <pasta_da_empresa> ["nota"] [--tipo pedido|aprendizado|proxima|feito]
+        (memória da marca: cria <pasta>/<Empresa>.md na 1ª vez e mostra; com nota, anota com a data na seção do tipo)
 
-Etapas (edição): cortes, legenda, legenda_validada, broll, cor, letterings, motions, musica, sfx, abas, qc, export.
+Etapas (edição): cortes, silencios, legenda, legenda_validada, broll, cor, letterings, motions, musica, sfx, abas, qc, export.
 cor = todos os takes da V1 com PowerGrade (nó > 1) ou LUT no nó 1 (detectado); letterings = título Fusion acima da V1 (detectado);
 motions = item na trilha MOTIONS ou nome de motion (detectado); abas = timelines abertas em abas (marcar depois de abrir_em_abas).
 Na criação (existe roteiro.txt) entram antes: roteiro, voz.
@@ -15,14 +17,14 @@ fora da pasta) é marcado com `marcar`. Estado em <pasta>/status.json. O bloco "
 import glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "legenda": "legenda", "legenda_validada": "validar a legenda",
+ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "silêncios (Ripple Delete Silence)", "legenda": "legenda", "legenda_validada": "validar a legenda",
           "broll": "b-roll/takes", "cor": "cor (PowerGrade)", "letterings": "letterings", "abas": "abas abertas", "motions": "motions", "musica": "música", "sfx": "efeitos sonoros", "qc": "QC final", "export": "export"}
 DEPENDE_DO_USUARIO = {"roteiro", "voz", "legenda_validada"}
 MOTION = re.compile(r"(^x\d\d-|motion|cta|lettering)", re.I)
 
 
 def etapas(pasta):
-    base = ["cortes", "legenda", "legenda_validada", "broll", "cor", "letterings", "motions", "musica", "sfx", "abas", "qc", "export"]
+    base = ["cortes", "silencios", "legenda", "legenda_validada", "broll", "cor", "letterings", "motions", "musica", "sfx", "abas", "qc", "export"]
     return (["roteiro", "voz"] if os.path.exists(os.path.join(pasta, "roteiro.txt")) else []) + base
 
 
@@ -44,6 +46,7 @@ def detectar(nome_tl):
     if not t: return set()
     ok = set(); itens = lambda tipo, k: t.GetItemListInTrack(tipo, k) or []
     if len(itens("video", 1)) > 1: ok.add("cortes")
+    if nome_tl + " - com silencios" in [p.GetTimelineByIndex(i).GetName() for i in range(1, p.GetTimelineCount() + 1)]: ok.add("silencios")
     if t.GetTrackCount("subtitle") and itens("subtitle", 1): ok.add("legenda")
     tracks = range(2, t.GetTrackCount("video") + 1)
     nome_trilha = {k: (t.GetTrackName("video", k) or "").upper() for k in tracks}
@@ -106,6 +109,33 @@ CONFERIR = [  # o que a API não vê: conferir de olho (prévia/screenshot) ante
 ]
 
 
+SECOES = {"pedido": "Pedidos diferentes do usuário", "aprendizado": "Inteligência nova (o que funcionou e por quê)",
+          "proxima": "Fazer da próxima vez", "feito": "Histórico de vídeos"}
+
+
+def memoria(pasta, nota=None, tipo="aprendizado"):
+    """Memória da marca (regra do usuário, 15/10/2026): um .md por marca na pasta dela, criado ANTES de editar e
+    alimentado durante o trabalho com o que o usuário pediu de diferente, a inteligência nova e o que fazer da próxima
+    vez. Lido no começo de todo vídeo da marca."""
+    import datetime
+    pasta = os.path.abspath(os.path.expanduser(pasta)); os.makedirs(pasta, exist_ok=True)
+    nome = os.path.basename(pasta.rstrip("/")); arq = os.path.join(pasta, nome + ".md")
+    if not os.path.exists(arq):
+        open(arq, "w").write(f"# {nome}: memória da marca\n\nLida no começo de todo vídeo desta marca. Regra que virou fixa "
+                             "sobe para o estilo.md do cliente.\n\n" + "".join(f"## {v}\n\n" for v in SECOES.values()))
+    if nota:
+        if tipo not in SECOES: sys.exit(f"tipo inválido: {tipo} (use {', '.join(SECOES)})")
+        linhas = open(arq).read().split("\n"); cab = "## " + SECOES[tipo]
+        if cab not in linhas: linhas += [cab, ""]
+        i = linhas.index(cab) + 1
+        while i < len(linhas) and not linhas[i].startswith("## "): i += 1
+        while i > 0 and linhas[i - 1] == "": i -= 1
+        linhas.insert(i, f"- {datetime.date.today():%d/%m/%Y}: {nota}")
+        linhas = [y for k, x in enumerate(linhas) for y in ([""] if x.startswith("## ") and k and linhas[k - 1] != "" else []) + [x]]
+        open(arq, "w").write("\n".join(linhas).rstrip() + "\n")
+    return arq
+
+
 def pastas_do_lote(base):
     return sorted(d for d in glob.glob(os.path.join(base, "*")) if os.path.isdir(d) and os.path.exists(os.path.join(d, "status.json")))
 
@@ -128,6 +158,10 @@ def main():
         for d in pastas_do_lote(a[1]): print(status(d)); print()
         return
     if len(a) >= 2 and a[0] == "checklist": sys.exit(checklist(a[1]))
+    if len(a) >= 2 and a[0] == "memoria":
+        tipo = a[a.index("--tipo") + 1] if "--tipo" in a else "aprendizado"
+        nota = next((x for i, x in enumerate(a[2:], 2) if not x.startswith("--") and a[i - 1] != "--tipo"), None)
+        arq = memoria(a[1], nota, tipo); print(open(arq).read()); return
     if len(a) < 2 or a[0] not in ("status", "marcar"): print(__doc__); sys.exit(2)
     pasta = a[1]; st = estado(pasta)
     if a[0] == "marcar":
