@@ -144,6 +144,27 @@ if [ -z "$RELATOS_ATUAL" ]; then
   fi
 fi
 
+# Clonador de voz local (opcional, pergunta UMA vez; padrão não). Ver voz_local/README.md.
+VOZ_PERG="$(python3 -c "import json;print(json.load(open('$DEST/config.json')).get('voz_local',{}).get('perguntado',False))" 2>/dev/null || echo False)"
+if [ "$VOZ_PERG" != "True" ] && [ "$(uname -m)" = arm64 ] && [ -r /dev/tty ]; then
+  printf "\n  Quer o clonador de voz LOCAL (clona sua voz e narra no Mac, grátis e sem limite)?\n  Baixa ~5,5 GB (motor + modelo OmniVoice). O modelo padrão é de uso NÃO comercial;\n  para vídeo de cliente continue no ElevenLabs. Dá para instalar depois: /ogab voz-local instalar. Instalar? [s/N]: "
+  read -r vozl < /dev/tty || true
+  case "${vozl:-n}" in [sS]*) VOZ_ATIVO=True;; *) VOZ_ATIVO=False;; esac
+  python3 - "$DEST/config.json" "$VOZ_ATIVO" <<'PY'
+import json, sys
+c = json.load(open(sys.argv[1])); v = c.setdefault("voz_local", {"motor": "omnivoice", "passos": 32})
+v["perguntado"] = True; v["ativo"] = sys.argv[2] == "True"
+json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
+PY
+  if [ "$VOZ_ATIVO" = True ]; then
+    zsh "$DEST/voz_local/voicestudio.sh" instalar && zsh "$DEST/voz_local/voicestudio.sh" modelo \
+      && { zsh "$DEST/voz_local/voicestudio.sh" stop >/dev/null; ok "clonador de voz local instalado (peça: /ogab clona minha voz)"; } \
+      || warn "o clonador não terminou; rode depois: /ogab voz-local instalar"
+  else
+    ok "clonador de voz local: não (para instalar depois: /ogab voz-local instalar)"
+  fi
+fi
+
 info "5/9 HyperFrames (motions, gráficos, edição dinâmica)"
 npx --yes skills add heygen-com/hyperframes -g -a claude-code -s '*' -y >/dev/null 2>&1 \
   && ok "skills do HyperFrames instaladas" \

@@ -187,5 +187,12 @@
   ]
  },
  "ficha_layout_exemplo": "caminho de uma ficha já aprovada (só para o layout; o rosto dela nunca é usado)",
- "boas_vindas_mostrada": false
+ "boas_vindas_mostrada": false,
+ "voz_local": {
+  "ativo": false,
+  "perguntado": false,
+  "motor": "omnivoice",
+  "passos": 32,
+  "_leia": "Clonador de voz local opcional (voz_local/README.md). ativo=true: o Gab oferece as vozes clonadas no Mac junto com o ElevenLabs. Motor padrão OmniVoice tem licença NÃO comercial."
+ }
 }

@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-5 (15/10/2026)
+- **Clonador de voz local (opcional, Mac M1 ou mais novo):** o Gab clona a sua voz e narra no próprio Mac, de graça e sem limite, tudo por aqui (sem app para abrir). O instalador pergunta se você quer; para instalar depois, peça `/ogab voz-local instalar`. Toda geração mostra a barra de progresso ao vivo no terminal. Dá para escolher outros motores de voz com português (VoxCPM2, Confucius4, MOSS-Nano, PocketTTS). Atenção: o motor padrão (OmniVoice) é de uso **não comercial**; para vídeo de cliente, continue no ElevenLabs ou use um motor de licença aberta.
+
 ## 2026.10.15-4 (15/10/2026)
 - **"Arruma esses aqui":** selecione os clipes no DaVinci e peça; o Gab mexe só neles.
 - **Podcast e entrevista com 2 câmeras:** o Gab monta o multicâmera sincronizado pelo áudio e troca de câmera sozinho conforme quem fala. Você ainda pode trocar o ângulo de qualquer trecho.

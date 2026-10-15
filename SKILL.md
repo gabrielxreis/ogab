@@ -63,6 +63,7 @@ Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode p
 - `doctor` (também quando algo da instalação falhar, ou o usuário disser que "não funciona"): rodar `python3 SKILL_DIR/scripts/doctor.py --corrigir`. Ele corrige sozinho o que dá; para cada linha com "!" que sobrar, guiar o usuário passo a passo (um passo por vez, esperando ele dizer "feito") e rodar o doctor de novo até ficar "Tudo certo". Itens com "·" são de apps que ele não escolheu: não insistir.
 - `cliente <nome>`: criar/atualizar o perfil do cliente (etapa 1).
 - **Instagram** (`/ogab instagram <pedido>` ou qualquer pedido de Instagram, mesmo sem a palavra): legenda do post, carrossel, gancho de Reel viral, hashtags, tirar cara de IA, semana de conteúdo, perfil, dados do nicho. Ler `SKILL_DIR/instagram/SKILL.md` e seguir. **Carrossel pronto em imagem** (PNG/PDF na marca do cliente): `instagram/carrossel/CARROSSEL.md`. A legenda do post (`videos/legenda_post.txt`, etapa capa_e_legenda_post) sai pelo `ig-caption-writer` + `ig-humanizer --mode audit`.
+- `voz-local [instalar|clonar|motores|status]`: clonador de voz local opcional (VoiceStudio sem o app visual); ler `SKILL_DIR/voz_local/README.md`.
 - `pauta [cliente]`: rodar a pauta automática (etapa 2b) e sugerir roteiros.
 - `comecar` (ou primeira vez que a skill roda: `config.json` sem `boas_vindas_mostrada`): rodar o `doctor` primeiro (e resolver as pendências com o usuário), depois mostrar o guia de `docs/BEM_VINDO.md` resumido e marcar `boas_vindas_mostrada: true`.
 - sem subcomando ou pedido livre ("faz um vídeo para X"): rodar o fluxo completo.
@@ -142,6 +143,8 @@ Pedir o máximo de fontes (site, redes, .md/briefing) e logo; varrer tudo e cria
 `python3 SKILL_DIR/scripts/pauta.py "<temas do cliente>" --fonte <gratis|newsapi|gnews>` e sugerir 2-3 pautas com roteiro curto. Pode ser agendada (tarefa recorrente) se o usuário pedir.
 
 ## 3. Voz (PARAR para o usuário escolher)
+
+**Voz local (opcional, `config.json > voz_local.ativo`):** se ativo, listar também as vozes clonadas no Mac (`python3 SKILL_DIR/voz_local/voz.py vozes`), marcando que são locais, grátis e, no motor padrão, **não comerciais**. Gerar com `voz.py gerar ... --saida <pasta>/narracoes/narracao.wav` rodando no terminal do app (barra ao vivo) e transcrever de volta. Pedido de clonar voz, motor novo ou instalar o clonador: ler `SKILL_DIR/voz_local/README.md` antes (pedir o sim com tamanho e licença de cada download).
 
 Listar 3-5 vozes no idioma (ElevenLabs `creative_list_voices`; incluir vozes do próprio usuário) com link de prévia. Depois da escolha: trocar no texto os termos de `pronuncia.json` pela forma `fala` (ex.: "EB-2" -> "ê-bê dois"), `estimate_only` -> informar custo -> gerar **1** take. Baixar para `narracoes/narracao.wav` (48 kHz). Transcrever (Resolve `TranscribeAudio` ou `creative_transcribe_audio`): se a transcrição mostrar erro de pronúncia de um termo, **atualizar `pronuncia.json` do cliente** (novo `erros_transcricao` e ajuste em `fala`) e regerar só o trecho, com aprovação.
 
