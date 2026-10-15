@@ -188,6 +188,9 @@ def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in
     é feito no DaVinci (ponto de entrada = inicio_faixa, duração = dur ou a timeline toda), com fade no clipe.
     Nada de cortar/renderizar o áudio antes: assim o usuário consegue arrastar e reajustar na timeline."""
     garantir_trilhas_audio(t, 2)
+    ocupado = t.GetItemListInTrack("audio", 2) or []
+    if ocupado:   # AppendToTimeline não sobrescreve: com a A2 ocupada no mesmo ponto o clipe novo some sem erro
+        raise RuntimeError(f"A2 já tem {len(ocupado)} clipe(s) ({ocupado[0].GetName()}): apagar/mover a música antiga antes")
     it = importar(mp, wav_bruto, "MUSICA")
     fps_c = float(it.GetClipProperty("FPS") or fps_tl(t))
     if dur is None:
@@ -198,12 +201,13 @@ def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in
     if not res:
         raise RuntimeError("a música não entrou na A2 (timeline atual é outra?)")
     x = res[0]
-    x.SetProperty("AudioVolume", db)
-    F = fps_tl(t)
-    try:
-        x.SetFades({"FadeIn": int(round(fade_in * F)), "FadeOut": int(round(fade_out * F))})
-    except Exception:
-        pass
+    F = fps_tl(t); fades = {"FadeIn": int(round(fade_in * F)), "FadeOut": int(round(fade_out * F))}
+    # DaVinci 21.1: volume e fade do PRÓPRIO clipe pela API (o usuário arrasta as alças depois). Conferir lendo de volta.
+    x.SetProperties({"AudioVolume": float(db)}) if hasattr(x, "SetProperties") else x.SetProperty("AudioVolume", db)
+    x.SetFades(fades)
+    lido, vol = x.GetFades() or {}, x.GetProperty("AudioVolume")
+    if any(abs(float(lido.get(k, -1)) - v) > 0.5 for k, v in fades.items()) or vol is None or abs(float(vol) - db) > 0.1:
+        print(f"AVISO: fade/volume da música não ficaram como pedido (fades {lido}, volume {vol}); ajustar à mão ou DaVinci < 21.1")
     return x
 
 
@@ -800,22 +804,78 @@ def inserir_letterings_na_trilha(t, trilha, lista, template, centro_y=None):
     depois = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
     if depois != antes: raise RuntimeError("outra trilha mudou durante a inserção (ripple): conferir")
 
+# ---- Recursos do DaVinci 21.1 pela API (testados em 15/10/2026, projeto NBA)
+
+def selecionados(t, tipo="video"):
+    """"Arruma esses aqui": os clipes que o USUÁRIO selecionou na timeline (Timeline.GetSelectedClips). tipo "video",
+    "audio" ou None (todos). Vem o vídeo e o áudio ligado: filtrar pelo tipo. Sem seleção: para e pede para selecionar.
+    O Gab age SÓ nesses itens (nunca no resto da timeline)."""
+    sel = t.GetSelectedClips() or []
+    if tipo: sel = [x for x in sel if (x.GetTrackTypeAndIndex() or [None])[0] == tipo]
+    if not sel: raise RuntimeError("nenhum clipe selecionado no DaVinci: selecione (clique / Cmd+clique) e peça de novo")
+    return sel
+
+
+def reenquadrar_vertical(p, itens, espera=600):
+    """Take horizontal numa timeline vertical: Smart Reframe do DaVinci (segue a ação/pessoa em vez do corte central).
+    Só funciona com o clipe em PREENCHER (Scaling 3, zoom 1): com o clipe ajustado (tarjas) ele não muda nada.
+    Devolve os itens que terminaram com JobStatus Complete. Conferir 2 quadros (antes x depois) quando importar."""
+    ok = []
+    for it in itens:
+        it.SetProperties({"Scaling": 3, "ZoomX": 1.0, "ZoomY": 1.0}) if hasattr(it, "SetProperties") else it.SetProperty("Scaling", 3)
+        if not it.SmartReframe(): continue
+        t0 = time.time(); st = {}
+        while time.time() - t0 < espera:
+            st = p.GetSmartReframeStatus() or {}
+            if st.get("JobStatus") in ("Complete", "Failed", "Cancelled"): break
+            time.sleep(2)
+        if st.get("JobStatus") == "Complete": ok.append(it)
+    return ok
+
+
+def estabilizar(itens):
+    """Estabiliza takes tremidos (TimelineItem.Stabilize, análise de alguns segundos por clipe). A API não devolve
+    nenhuma leitura do resultado: conferir a olho na prévia. Devolve os itens em que o DaVinci aceitou."""
+    return [it for it in itens if it.Stabilize()]
+
+
+def multicam_podcast(r, p, mp, clipes, nome, sync="audio", min_corte=1.5, w=1080, h=1920, fps=None):
+    """Podcast/entrevista com 2+ câmeras: cria o clipe Multicam (ângulos sincronizados pelo áudio, pelo timecode ou pelo
+    ponto de entrada), põe numa timeline nova e roda o Smart Switch (troca de câmera por quem fala, só pelo áudio).
+    clipes = MediaPoolItems (um por câmera, com o áudio de cada uma). Devolve a timeline. O resultado continua multicam
+    (o usuário troca o ângulo de um trecho no DaVinci); FlattenMulticam só se ele pedir."""
+    modo = {"audio": r.MULTICAM_ANGLE_SYNC_AUDIO, "timecode": r.MULTICAM_ANGLE_SYNC_TIMECODE, "in": r.MULTICAM_ANGLE_SYNC_IN}[sync]
+    mc = mp.CreateMulticamClip(list(clipes), {"name": nome + " - multicam", "angleSyncMode": modo, "multicamAudioMode": r.MULTICAM_AUDIO_ALL,
+                                              "angleNameMode": r.MULTICAM_ANGLE_NAME_CLIP, "createBinForSourceClips": False})
+    if not mc: raise RuntimeError("Multicam não foi criado (ângulos sem áudio em comum? tentar sync='timecode' ou 'in')")
+    t = mp.CreateEmptyTimeline(nome); p.SetCurrentTimeline(t); r.OpenPage("edit")
+    t.SetSetting("useCustomSettings", "1")
+    for k, v in (("timelineResolutionWidth", w), ("timelineResolutionHeight", h), ("timelineFrameRate", fps)):
+        if v: t.SetSetting(k, str(v))
+    it = (mp.AppendToTimeline([{"mediaPoolItem": mc[0]}]) or [None])[0]
+    if not it: raise RuntimeError("Multicam não entrou na timeline")
+    ok = it.PerformMulticamSmartSwitch({"minEditDuration": float(min_corte), "editChangeDelay": 0.3,
+                                        "analysisMode": r.SMART_SWITCH_ANALYSIS_MODE_AUDIO_ONLY, "quality": r.SMART_SWITCH_QUALITY_BETTER})
+    time.sleep(2); n = len(t.GetItemListInTrack("video", 1) or [])
+    if not ok or n < 2: print(f"AVISO: Smart Switch não trocou de câmera ({n} trecho): conferir o áudio de cada ângulo")
+    return t
+
+
 OGRAF_DIR = (os.path.join(os.environ.get("APPDATA", ""), "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Templates", "Edit", "Titles", "OGraf")
              if sys.platform.startswith("win") else
              os.path.expanduser("~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/Edit/Titles/OGraf"))
 
 
-def conferir_ograf(item, quadro, arq_png):
-    """Quadro do título OGraf renderizado de verdade (Saver do Fusion, com alfa). NÃO conferir pelo visualizador
-    (ExportCurrentFrameAsStill): ele mostra a página em cache com os valores antigos, o render final sai certo."""
-    comp = item.GetFusionCompByIndex(1); og = comp.FindTool("GabOGraf")
-    comp.Lock(); sv = comp.AddTool("Saver", -32768, -32768); comp.Unlock()
-    base = os.path.splitext(arq_png)[0]
-    sv.SetInput("Clip", base + ".png"); sv.Input = og.Output
-    comp.Render({"Start": quadro, "End": quadro, "Tool": sv, "Wait": True}); sv.Delete()
-    saida = f"{base}{int(quadro):04d}.png"
-    if os.path.exists(saida): os.replace(saida, arq_png)
-    return arq_png if os.path.exists(arq_png) else None
+def conferir_ograf(p, t, item, quadro, arq_png):
+    """Quadro do título OGraf no RENDER do DaVinci (o que sai no vídeo). Não usar o visualizador (ExportCurrentFrameAsStill
+    mostra a página em cache com valores velhos) nem o Saver do Fusion (comp.Render abre a janela "Render completed!",
+    que trava a API até alguém clicar em OK, mesmo com Quiet)."""
+    import tempfile
+    F = fps_tl(t); ini = (item.GetStart() - t.GetStartFrame() + int(quadro)) / F
+    pasta = tempfile.mkdtemp(prefix="ograf_conf_")
+    mp4 = renderizar_trecho(p, pasta, "conf", ini, ini + 2.0 / F, so_v1=False)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", mp4, "-frames:v", "1", arq_png], check=True)
+    return arq_png
 
 
 def _ograf_manifesto(template):
@@ -830,7 +890,7 @@ def _ograf_manifesto(template):
     return arq, json.load(open(arq))
 
 
-def ograf_no_item(item, template, valores=None, dur_f=None):
+def ograf_no_item(item, template, valores=None, dur_f=None, t=None, p=None):
     """Transforma um item "Fusion Composition" da timeline num título OGraf (HTML) EDITÁVEL no Inspector
     (testado em 15/10/2026, DaVinci 21.1). A API não insere título OGraf pelo nome; o caminho é o nó OGrafLoader do
     Fusion: TemplatePath + parâmetros dinâmicos. O loader numera os parâmetros pela ORDEM do schema do manifesto
@@ -849,12 +909,12 @@ def ograf_no_item(item, template, valores=None, dur_f=None):
     # o template carrega DEPOIS (assíncrono) e põe os padrões do manifesto por cima do que foi escrito antes:
     # recarregar, esperar o 1º parâmetro mostrar o padrão (carregou) e só então escrever; conferir de novo no fim
     og.SetInput("ReloadAction", 1)
-    # o template só carrega de verdade no 1º render do quadro (e aí reseta os parâmetros): render de aquecimento
-    import tempfile
-    tmp = os.path.join(tempfile.mkdtemp(prefix="ograf_"), "aquece.png")
-    comp.Lock(); sv = comp.AddTool("Saver", -32768, -32768); comp.Unlock()
-    sv.SetInput("Clip", tmp); sv.Input = og.Output
-    comp.Render({"Start": 0, "End": 0, "Tool": sv, "Wait": True}); sv.Delete()
+    # o template só carrega de verdade quando o quadro é mostrado (e aí reseta os parâmetros para o padrão):
+    # aquecer pelo visualizador (playhead dentro do item + exportar um quadro). NÃO usar comp.Render/Saver: abre janela.
+    if t is not None and p is not None:
+        import tempfile
+        _ir(t, item.GetStart() + 2); time.sleep(1.0)
+        p.ExportCurrentFrameAsStill(os.path.join(tempfile.mkdtemp(prefix="ograf_"), "aquece.png")); time.sleep(1.5)
     p0 = next(((i, d.get("default")) for i, (n, d) in enumerate(props) if d.get("type") == "string" and not d.get("gddType")), None)
     for _ in range(40):
         if not p0 or og.GetInput(f"DynParamText{p0[0]}") == p0[1]: break
@@ -900,7 +960,8 @@ def inserir_ograf_na_trilha(t, trilha, lista, template="GabLettering"):
             if not novo: raise RuntimeError("composição Fusion não entrou")
             novos = [x for x in (t.GetItemListInTrack("video", trilha) or []) if x.GetStart() == f and x.GetUniqueId() == novo.GetUniqueId()]
             if not novos: raise RuntimeError(f"OGraf não caiu na trilha {trilha} em {f}: conferir o destino da timeline")
-            ograf_no_item(novos[0], tpl, valores, dur_f=round(dur * F)); feitos.append(novos[0])
+            ograf_no_item(novos[0], tpl, valores, dur_f=round(dur * F), t=t, p=conectar(False).GetProjectManager().GetCurrentProject())
+            feitos.append(novos[0])
     finally:
         for k, i in travar: t.SetTrackLock(k, i, False)
     depois = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]

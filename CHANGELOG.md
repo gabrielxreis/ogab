@@ -1,4 +1,11 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-4 (15/10/2026)
+- **"Arruma esses aqui":** selecione os clipes no DaVinci e peça; o Gab mexe só neles.
+- **Podcast e entrevista com 2 câmeras:** o Gab monta o multicâmera sincronizado pelo áudio e troca de câmera sozinho conforme quem fala. Você ainda pode trocar o ângulo de qualquer trecho.
+- **Vídeo horizontal em vertical:** o Gab pode usar o Smart Reframe do DaVinci, que segue a ação em vez de cortar só o centro. Ele pergunta antes.
+- **Take tremido:** estabilização automática.
+- **Música:** volume e fades conferidos no próprio clipe; o Gab avisa em vez de perder a música quando a trilha A2 já está ocupada.
+
 ## 2026.10.15-3 (15/10/2026)
 - **Lettering editável dentro do DaVinci (beta):** o Gab pode pôr a frase de efeito como título em HTML que você edita no Inspector (texto, cores, tamanho, posição), sem vídeo renderizado. Ele pergunta antes de usar. Rode o instalador de novo e reinicie o DaVinci para receber o título "GabLettering".
 - **Mais seguro no DaVinci:** o Gab agora se protege de falhas conhecidas da automação (render que não começou, projeto não salvo, clipes que somem no salvar).

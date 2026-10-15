@@ -61,8 +61,9 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
   os trechos já cortados com `AppendToTimeline` (é o que `cortes.py` e `silencios.py` fazem) numa timeline nova.
 - **Insert/Overwrite/Replace/Fit-to-Fill:** só `AppendToTimeline` (com `recordFrame`/`trackIndex`). Sobreposição na
   mesma trilha: o item que entrou antes ganha, o novo é descartado sem erro.
-- **Volume, pan, EQ, automação, FairlightFX, AI Audio Assistant:** nada (só Voice Isolation e normalização). O ganho
-  da música/narração vem do arquivo ou da mão do usuário.
+- **EQ, automação, FairlightFX, AI Audio Assistant:** nada. MAS no 21.1 o clipe de áudio aceita pela API `AudioVolume`,
+  `AudioPan`, tom (`AudioPitchSemiTones/Cents`), Voice Isolation e Dialogue Leveler por clipe (`SetProperties`/`GetProperty`,
+  testado 15/10/2026: volume -8 dB e fades 24/72 quadros lidos de volta). A lista do MCP (feita no 21.0) ainda diz que não.
 - **Cor primária (lift/gamma/gain, curvas, janelas) e criar/ligar nós:** não. Só LUT, CDL, DRX/PowerGrade, CopyGrades.
 - **Texto e estilo de cada legenda:** não dá para editar texto/tempo de uma legenda nem o estilo da trilha pela API
   (o Gab usa SRT novo + timeline do modelo com o preset GAB USA).
@@ -70,6 +71,17 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
   tela. O Gab corta silêncio pela transcrição (`silencios.py`).
 - **Render in Place, gerar proxy/optimized media, Smart Bins, renomear pasta do Media Pool:** só pela tela.
 - **Magic Mask:** `CreateMagicMask` só rastreia uma máscara que o usuário já marcou com cliques.
+
+## Testado no Gab em 15/10/2026 (projeto NBA, Studio 21.1)
+
+| Recurso | Resultado | Função |
+|---|---|---|
+| Fade e volume da música no clipe | `GetFades` {24, 72}, `AudioVolume` -8 lidos de volta | `colocar_musica` |
+| Clipes selecionados pelo usuário | `GetSelectedClips` devolve vídeo + áudio ligado do clipe clicado | `selecionados` |
+| Smart Reframe | só muda algo com o clipe em preencher (`Scaling` 3); seguiu a jogada num 16:9 em 9:16 | `reenquadrar_vertical` |
+| Estabilizar | `Stabilize` True em ~6 s; nenhuma leitura de volta | `estabilizar` |
+| Multicam + Smart Switch | 2 ângulos, 5 trechos alternando câmera (só pelo áudio, ~4 s) | `multicam_podcast` |
+| Render do Fusion (`comp.Render`/Saver) | abre "Render completed!" e TRAVA a API até clicar OK (mesmo com Quiet) | não usar; render do DaVinci |
 
 ## Armadilhas verificadas (a função diz True e não fez)
 
