@@ -14,7 +14,7 @@
 
 </div>
 
-**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve ou no Adobe Premiere Pro** (Mac e Windows), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci e cuida do **Instagram**: legenda do post, carrossel, hashtags, semana de conteúdo e perfil.
+**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve ou no Adobe Premiere Pro** (Mac e Windows), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci (cortes, silêncios, multicâmera de podcast, reenquadramento para vertical) e cuida do **Instagram**: legenda do post, carrossel, hashtags, semana de conteúdo e perfil. A cada marca ele guarda uma **memória** com o que você pediu de diferente, para acertar de primeira no próximo vídeo.
 
 <div align="center">
 
@@ -46,6 +46,7 @@
     * [Comandos](#comandos)
     * [O fluxo](#o-fluxo)
     * [Editar um vídeo que já está no DaVinci](#editar-um-video-que-ja-esta-no-davinci)
+* [COMO O GAB TRABALHA NO DAVINCI](#como-o-gab-trabalha-no-davinci)
 * [CONFIGURAÇÃO](#configuracao)
     * [Opções](#opcoes)
     * [Cor e vídeos de iPhone](#cor-e-videos-de-iphone)
@@ -69,6 +70,12 @@
 
 O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo no começo da conversa. Histórico completo em [`CHANGELOG.md`](CHANGELOG.md). Últimas:
 
+- **Memória da marca:** antes de editar, o Gab cria a pasta e um `<Marca>.md` com o que você pediu de diferente, o que funcionou e o que fazer da próxima vez. Lê tudo antes do próximo vídeo da marca.
+- **Silêncios pela transcrição do DaVinci:** corta as pausas entre as palavras que o próprio DaVinci reconheceu (não depende do volume nem do barulho de fundo) e guarda a timeline original como backup.
+- **Podcast com 2 câmeras:** multicâmera sincronizado pelo áudio e troca de câmera automática por quem fala. **"Arruma esses aqui":** selecione os clipes no DaVinci e o Gab mexe só neles. **Smart Reframe** para vídeo horizontal em vertical e **estabilização** de take tremido.
+- **Lettering editável dentro do DaVinci (beta, OGraf):** a frase de efeito vira um título em HTML que você edita no Inspector (texto, cores, tamanho, posição), sem vídeo renderizado. O Gab pergunta antes de usar.
+- **Música medida e mixada melhor:** BPM real, batidas, tom e entrada da batida (`musica.py`); a música abaixa só na faixa da voz e mantém o grave; SFX tonal no tom da música; fades e volume no próprio clipe.
+- **Mapa do DaVinci:** engenharia reversa da API do 21.1 (o que dá, o que não dá e as armadilhas conhecidas) em [`docs/etapas/davinci_api.md`](docs/etapas/davinci_api.md).
 - **Instagram dentro do Gab:** legenda com gancho nos primeiros 125 caracteres, carrossel slide a slide, gancho de Reel viral, 3-5 hashtags dimensionadas, texto sem cara de IA, semana de conteúdo, perfil e dados do nicho. Publica e agenda pela Publora se você quiser.
 - **B-roll real no trecho certo:** o Gab acha onde a pessoa fala o que você pediu (pela legenda, capítulos e descrição do vídeo), olha uma folha de quadros antes de baixar e busca também no acervo da **NASA** e no **Wikimedia Commons** (domínio público, licença anotada). Lista posts de um perfil do **TikTok** sem login e tira **print vertical** de site ou notícia.
 - **Sonorização sem chave de IA:** lê o vídeo (o que entra, bate ou para, e de que lado da tela) e monta o som em camadas, com câmera lenta que se ouve, chão e ação certos e cada som conferido por um classificador de áudio.
@@ -118,7 +125,7 @@ O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
 - instala **Homebrew** (se faltar), **ffmpeg**, **yt-dlp**, **Node.js**, **Python 3**, **git** e **Pillow**;
 - baixa a skill em `~/.claude/skills/ogab` e cria o seu `config.json`;
 - instala o **HyperFrames** e roda o `hyperframes doctor`;
-- instala as fontes livres (Poppins, Playfair Display, Lobster) e o **lettering animado** (@gabrielxreis_ Text Presets) no DaVinci;
+- instala as fontes livres (Poppins, Playfair Display, Lobster, EB Garamond), o **lettering animado** (@gabrielxreis_ Text Presets) e os **títulos OGraf** do Gab no DaVinci;
 - confere o **DaVinci Resolve Studio** e o scripting, **detecta a versão** e, abaixo da 21.1, instala o **Whisper local** para a transcrição;
 - instala a parte do **Premiere** (plugin Gab Ponte, LUT DO GAB e os MOGRTs da biblioteca) e do **After Effects** (extensão Gab Ponte AE);
 - no fim roda o **doctor**, que confere tudo e corrige sozinho o que der, e diz em uma linha o que só você pode fazer.
@@ -208,14 +215,15 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 
 | # | Etapa | Você decide? | Ferramenta |
 |---|---|---|---|
+| 0 | Pasta do vídeo + **memória da marca** (`<Marca>.md`), lida antes de tudo | - | `projeto.py memoria` |
 | 1 | Perfil do cliente + logos e identidade visual baixadas do site | Só na 1ª vez | `competitor-profiling`, `marca.py` |
 | 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa com fonte e data |
 | 3 | **Voz** (narração por IA) | **Escolhe** | ElevenLabs ou Artlist |
 | 4 | Projeto no DaVinci (`Assunto - Empresa`), Media Pool organizado, Stacked Timelines | - | Scripting API |
-| 5 | Música (pop/remix leve por padrão), -10 dB, fade | Escolhe entre 3-4 | Artlist ou Envato |
+| 5 | Música bruta na timeline, -10 dB, fade no clipe; BPM e tom medidos | Escolhe entre 3-4 | Artlist ou Envato, `musica.py` |
 | 6 | Efeitos sonoros (whoosh, pop, impacto) | Liga/desliga | Artlist ou Envato |
 | 7 | Takes: IA, banco, material real ou misto; geração só no modo ilimitado | Origem | Envato, Artlist, Pexels / Magnific / YouTube, NASA, Commons (`baixar_video.py`) |
-| 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista | @gabrielxreis_ Text Presets (`.drfx`) |
+| 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista; **escolhe** padrão ou OGraf | @gabrielxreis_ Text Presets (`.drfx`) ou `ograf/` |
 | 9 | **Motions** centralizados e medidos, com as cores da marca, CTA animado | Vê a tabela | HyperFrames + `guias.py` |
 | 10 | **Legenda** de uma linha, métrica obrigatória, do início ao fim | - | `legendas.py`, `legenda_ui.py` |
 | 11 | Timeline pronta, **conferência**, **master** e export (se pedir), capa e texto do post | - | `resolve_lib.py`, `qc.py` |
@@ -227,7 +235,55 @@ Para gravação de apresentador (talking head), a skill:
 - liga **Voice Isolation** no áudio de iPhone ou câmera;
 - enquadra o rosto com o **mínimo de zoom**, sem punch-in alternado; nada sobre o rosto;
 - em vídeo emocional, põe **b-roll em toda imagem concreta** e lettering + b-roll nas frases de efeito;
-- corta retakes e pausas pela transcrição (`cortes.py`), com a timeline original como backup.
+- corta retakes e pausas pela transcrição (`cortes.py`), com a timeline original como backup;
+- tira os **silêncios** pelas palavras da transcrição do DaVinci (`silencios.py`), religa o Voice Isolation e para se algum clipe tiver velocidade alterada;
+- ordem fixa: **cortes > silêncios > legenda > você valida a legenda > b-roll, lettering e motions**;
+- **"arruma esses aqui"**: age só nos clipes que você selecionou na timeline;
+- podcast/entrevista com 2+ câmeras: monta o **multicâmera** e troca de câmera por quem fala, e você ainda ajusta o ângulo de qualquer trecho;
+- take horizontal em vídeo vertical: pergunta se quer **Smart Reframe** (segue a ação) ou o corte central; take tremido: **estabiliza**.
+
+**Exemplo de conversa:**
+
+```
+você: /ogab tira os silêncios da timeline "Depoimento Allan"
+Gab:  223,4 s -> 216,2 s (24 silêncios). Original guardada em "Depoimento Allan - com silencios".
+      ▰▰▱▱▱▱▱▱▱ 2 de 9 · próximo: legenda
+
+você: (seleciona 3 clipes no DaVinci) arruma esses aqui, estão tremidos
+Gab:  Estabilizei os 3 selecionados (o resto da timeline não mudou). Confere na prévia.
+
+você: /ogab monta o podcast com as duas câmeras da pasta gravacao
+Gab:  Multicâmera sincronizado pelo áudio, 5 trocas de câmera por quem fala. Troque qualquer trecho no DaVinci.
+```
+
+
+# COMO O GAB TRABALHA NO DAVINCI
+
+O Gab não clica no DaVinci para editar: ele fala com o programa pela **API de scripting** (Python), que o DaVinci Studio abre quando você liga *External scripting = Local*. Só o que não existe na API é feito pela tela, e só com o seu ok.
+
+```mermaid
+flowchart LR
+    V[Você pede no Claude Code] --> G[Gab /ogab]
+    G -->|API de scripting<br/>resolve_lib.py| A[Projeto, timeline, cortes,<br/>legenda, música, cor, render]
+    G -->|Fusion: nó OGrafLoader| O[Lettering em HTML<br/>editável no Inspector]
+    G -->|menu pela tela<br/>só quando não há API| M[Itens de menu sem função na API]
+    A --> R[MP4 -14 LUFS + capa + legenda do post]
+```
+
+| Pela API (sem clicar) | Só pela tela ou contornando |
+|---|---|
+| Criar projeto e timeline, importar, montar clipes por trecho, legenda (Create Subtitles from Audio), transcrição palavra por palavra, Voice Isolation, cor (PowerGrade/LUT), render e master | Cortar com blade, aparar ou mover clipe já na timeline: o Gab remonta os trechos numa timeline nova (original vira backup) |
+| Volume, pan e fade do clipe de áudio, velocidade do clipe, transições, clipes selecionados por você | EQ, automação e efeitos do Fairlight; cor primária (lift/gamma/gain, curvas) |
+| Multicâmera + troca automática por quem fala, Smart Reframe, estabilização, detecção de cortes de cena | Texto e estilo de cada legenda (o Gab usa o preset da trilha e o `legenda_ui.py`) |
+| Títulos Fusion do pacote e títulos **OGraf** (HTML) | "Remove Silent Portions" e "Ripple Delete Silence" (o Gab corta pela transcrição) |
+
+O mapa completo, com as funções que o Gab ainda não usa, as escondidas e as **armadilhas** (funções que dizem que funcionaram e não fizeram nada), está em [`docs/etapas/davinci_api.md`](docs/etapas/davinci_api.md). A lista de bugs da API verificados pela comunidade fica em [`docs/referencia/davinci_limitacoes_mcp.md`](docs/referencia/davinci_limitacoes_mcp.md) (do projeto [davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp), MIT).
+
+### Lettering editável (OGraf, beta)
+
+<p align="center"><img src=".github/ograf_lettering.jpg" width="220" alt="Lettering OGraf renderizado pelo DaVinci: MUDA DE VIDA HOJE com HOJE em verde"><br><sub>Quadro renderizado pelo DaVinci: texto, palavra de destaque, cor, tamanho e posição passados pela API e editáveis no Inspector.</sub></p>
+
+O DaVinci 21 aceita títulos feitos em HTML/JS (padrão OGraf, da EBU). O Gab traz o título **GabLettering** (palavras entrando uma a uma, uma em destaque) em [`ograf/`](ograf) e coloca na timeline pelo nó `OGrafLoader` do Fusion. Antes de usar ele pergunta: *"Quer como título editável no DaVinci (OGraf, beta) ou do jeito padrão?"*. Como criar um template novo: [`ograf/README.md`](ograf/README.md).
 
 
 # CONFIGURAÇÃO
@@ -331,7 +387,8 @@ Escreve na língua e na voz do cliente (lê `clientes/<empresa>/empresa.md` e `e
 # PASTA DO VÍDEO
 
 ```
-~/Desktop/<Empresa>/
+<pasta_saida>/<Empresa>/      (config.json > pasta_saida; padrão ~/Desktop)
+  <Empresa>.md                 memória da marca: pedidos diferentes, o que funcionou, próxima vez, histórico
   marca/                       logos/ identidade.json identidade.md (do site oficial)
   <Assunto> - <Empresa>/
     roteiro.txt  links.txt     (de onde veio cada coisa)
@@ -362,6 +419,8 @@ No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / 
 | Lettering | @gabrielxreis_ Text Presets (.drfx) | MOGRTs da biblioteca |
 | Detalhes | [`docs/etapas/`](docs/etapas) | [`premiere/README.md`](premiere/README.md) |
 
+**Também:** **CapCut** (Mac, beta): o CapCut não tem API, então o Gab escreve o rascunho do projeto direto e você abre no app ([`capcut/README.md`](capcut/README.md)). **Final Cut Pro**: em construção, por enquanto só o estudo de como controlar o app e um gerador de projeto FCPXML ([`finalcut/`](finalcut)).
+
 **Motions:** `hyperframes` (automático, em código) ou `aftereffects`: cada motion é montado no After Effects como **camadas nativas** (cada texto, número, check e cor editável, e uma camada CONTROLES que troca as cores da marca do motion inteiro) e entra na timeline como MOV com alfa. O `.aep` fica na pasta do vídeo. Detalhes em [`aftereffects/README.md`](aftereffects/README.md).
 
 # MOTIONS
@@ -369,6 +428,7 @@ No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / 
 - Feitos no **HyperFrames**, com as cores, a fonte e a logo da marca, numa trilha `MOTIONS` (exemplos animados [no topo](#readme)).
 - **Sempre centralizados**, medidos com `guias.py` (cutaway no centro da tela, imersivo abaixo do queixo). Nada sobre o rosto: se cobriria o rosto, vira tela cheia sobre um BG animado, que fica contínuo entre motions próximos.
 - Acabamento caprichado e variado, sem repetir o mesmo layout.
+- **Lettering como título editável no DaVinci (OGraf, beta)**, se você preferir a vídeo renderizado: ver [Como o Gab trabalha no DaVinci](#como-o-gab-trabalha-no-davinci).
 - **Inspiração:** antes de um motion novo, o Gab busca referências de movimento numa coleção de 850+ vídeos feitos em código (`scripts/inspiracao.py`).
 
 ## Biblioteca de motions
@@ -383,6 +443,9 @@ python3 ~/.claude/skills/ogab/scripts/biblioteca_motions.py listar
 # ÁUDIO E EXPORT
 
 - Voz com Voice Isolation, música a -10 dB, SFX discretos.
+- **Música bruta** na timeline (o WAV original, cortado no DaVinci), com volume e fades no próprio clipe, conferidos lendo de volta.
+- **Música medida antes de cortar na batida:** `musica.py medir` dá o BPM real (o do catálogo erra), o segundo de cada batida, o tom e a entrada da batida. Riser, drone e impacto com nota entram **no tom da música**.
+- **Sonorização com a voz na frente:** a música e o ambiente abaixam só na faixa da voz (médio/agudo 12 dB abaixo dela), e o grave desce no máximo 3 dB, então a música não fica magra.
 - `renderizar()` exporta com a legenda gravada, **corta no último quadro de vídeo** (nada de quadro preto no fim) e **masteriza** o áudio: loudnorm em duas passagens para **-14 LUFS** com pico de **-1,5 dBTP**, vídeo copiado sem recomprimir. Para com erro se ficar fora do alvo.
 - Render Cache fica desligado.
 
@@ -410,6 +473,12 @@ Todos em `scripts/`, rodando com `python3`.
 ### cortes.py
     plano  <transcricao.json> <saida.json> [--tirar "frase"] [--pausa 0.35]   Tira retakes e encurta pausas pela transcrição
 
+### silencios.py
+    "<timeline>" [--minimo 0.4] [--pre 0.10] [--pos 0.18] [--simular]   Tira os silêncios pelas palavras da transcrição do DaVinci
+
+### musica.py
+    medir <musica.wav> [--bumbo INI FIM] [--de S --ate S]   BPM real, batidas, tom e relativo, afinação e entrada da batida
+
 ### sonorizar.py
 Sonoriza cena, take ou animação sem chave de IA: `analisar <video>` (momentos de ação, cortes, pan e folha de quadros), `medir` (ataque e pico de cada som), `mixar <plano.json>` (ambiente, foley e pontuais em camadas, pan, ducking sob a voz, -14 LUFS, stems + prévia) e `davinci` (vira `plano_sfx.txt` editável som a som). Guia: `docs/etapas/sonorizacao.md`.
 
@@ -436,6 +505,7 @@ Efeitos sonoros pelos tempos da timeline (whoosh na entrada dos motions e do b-r
 
 ### projeto.py / retrato.py
     projeto.py status|lote|checklist <pasta>   Barra de progresso, PROJETO.md e checklist obrigatório antes de entregar
+    projeto.py memoria <pasta_da_marca> ["nota"] --tipo pedido|aprendizado|proxima|feito   Memória da marca
     retrato.py antes|depois "<timeline>" <pasta>   Fotografa a timeline antes de mexer e compara depois
 
 ### tresd/tresd.py
@@ -463,7 +533,7 @@ Efeitos sonoros pelos tempos da timeline (whoosh na entrada dos motions e do b-r
     "<tema1>; <tema2>" [--fonte gratis|newsapi|gnews] [--dias 7] [--n 8]   Notícias recentes para virar roteiro
 
 ### resolve_lib.py
-Biblioteca usada pela skill: projeto, timeline, narração, música, SFX, takes, legenda, lettering, enquadramento, organização do Media Pool, `renderizar()` e `masterizar()`.
+Biblioteca usada pela skill: projeto, timeline, narração, música, SFX, takes, legenda, lettering, enquadramento, organização do Media Pool, `renderizar()` e `masterizar()`. Do DaVinci 21.1: `selecionados()`, `reenquadrar_vertical()`, `estabilizar()`, `multicam_podcast()`, `inserir_ograf_na_trilha()` / `ograf_no_item()` / `conferir_ograf()`.
 
 
 # ARMADILHAS CONHECIDAS
@@ -480,6 +550,11 @@ Já tratadas pela skill:
 - **Música passando do fim** gera quadro preto: o render corta no último quadro de vídeo.
 - Conectores de Envato/Artlist/Magnific **não baixam** arquivos: download pelo navegador.
 - Gerar no Magnific **pelo MCP cobra crédito**; o ilimitado só vale pelo site.
+- **`AppendToTimeline` não sobrescreve:** se o lugar já tem clipe, o novo some sem erro, e um append com erro pode sumir no salvar. O Gab confere a contagem depois de salvar e para se a trilha da música já está ocupada.
+- **`DeleteClips` só funciona na página Edit** (no Fairlight ou Color devolve falso e não apaga). **Salvar o "Untitled Project"** falha e, sem interface, trava. **Criar projeto** descarta o atual se não estiver salvo. Tudo isso já é tratado no `resolve_lib`.
+- **Render do Fusion pela API** (`comp.Render`) abre a janela "Render completed!" e trava a API até alguém clicar OK: o Gab confere pelo render normal do DaVinci.
+- **Timecode da câmera:** as palavras da transcrição vêm no timecode da câmera (ex. `06:15:36;24`, drop frame); o Gab desconta o início do clipe.
+- **Perguntar se uma função existe** (`hasattr`) na API do DaVinci pode dar sim falso: o Gab confere chamando e lendo de volta.
 
 
 # ESTRUTURA DO REPOSITÓRIO
@@ -496,9 +571,12 @@ biblioteca_motions/      modelos de motion prontos (modelo.json + previa.png)
 config.example.json      modelo de configuração (copie para config.json)
 scripts/                 resolve_lib, legendas, legenda_ui, legenda_auto, legenda_baixa, guias, centro, cortes, qc,
                          transcrever, marca, midia, pauta, baixar_video, broll, rastrear, sonorizar, sfx_auto,
-                         sfx_conferir, projeto, retrato, doctor, novidades, biblioteca_motions, gerar_mogrts,
+                         sfx_conferir, projeto, retrato, doctor, novidades, biblioteca_motions, gerar_mogrts, silencios, musica,
                          inspiracao, morph_logo, svg_texto, movimentos.mjs
 tresd/                   3D no Blender: logo/texto extrudado e objetos (cenas/)
+ograf/                   títulos OGraf (HTML editável no DaVinci): GabLettering + README de como criar
+capcut/                  camada do CapCut (Mac, beta): escreve o rascunho do projeto
+finalcut/                Final Cut Pro (em construção): engenharia reversa e gerador FCPXML
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
@@ -506,16 +584,17 @@ docs/BACKGROUNDS.md      fundos animados para os motions
 instagram/               parte de Instagram: 9 especialidades (legenda, carrossel, hashtags, humanizer...), referências e lib de publicação
 instagram/carrossel/     gerador de carrossel em imagem (Next.js): carrossel.py novo | previa | exportar
 presets/<nome>/           presets de edição e motion (PRESET.md, kit HyperFrames, exemplo)
-docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado...)
+docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado, davinci_api...)
+docs/referencia/          bugs verificados da API do DaVinci (do davinci-resolve-mcp, MIT)
 clientes/_exemplo/       modelo de empresa.md, pronuncia.json e estilo.md
-assets/fontes/           Poppins, Playfair Display, Lobster (OFL)
+assets/fontes/           Poppins, Playfair Display, Lobster, EB Garamond (OFL)
 assets/lettering/        @gabrielxreis_ Text Presets.drfx (29 títulos animados do Fusion)
 ```
 
 
 # LICENÇA
 
-Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. O pacote de lettering `@gabrielxreis_ Text Presets` (`assets/lettering/`) é de Gabriel Reis, liberado para uso com a skill. Músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas.
+Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. O pacote de lettering `@gabrielxreis_ Text Presets` (`assets/lettering/`) é de Gabriel Reis, liberado para uso com a skill. Músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas. A lista de bugs da API do DaVinci em `docs/referencia/` vem do [davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp) (MIT, com o aviso de copyright no topo do arquivo).
 
 ## Skills extras instaladas junto (install.sh, passo 5b)
 
