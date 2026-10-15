@@ -75,6 +75,7 @@ O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo n
 - **Podcast com 2 câmeras:** multicâmera sincronizado pelo áudio e troca de câmera automática por quem fala. **"Arruma esses aqui":** selecione os clipes no DaVinci e o Gab mexe só neles. **Smart Reframe** para vídeo horizontal em vertical e **estabilização** de take tremido.
 - **Lettering editável dentro do DaVinci (beta, OGraf):** a frase de efeito vira um título em HTML que você edita no Inspector (texto, cores, tamanho, posição), sem vídeo renderizado. O Gab pergunta antes de usar.
 - **Música medida e mixada melhor:** BPM real, batidas, tom e entrada da batida (`musica.py`); a música abaixa só na faixa da voz e mantém o grave; SFX tonal no tom da música; fades e volume no próprio clipe.
+- **Clonador de voz local (opcional, Mac Apple Silicon):** clona a sua voz e gera a narração no próprio Mac, de graça e sem limite, com o motor do VoiceStudio rodando por trás do Claude (sem o app visual). O instalador pergunta uma vez se você quer. Atenção: o motor padrão é **não comercial**; para vídeo de cliente pago, use ElevenLabs ou um motor de licença aberta. Detalhes em [`voz_local/README.md`](voz_local/README.md).
 - **Mapa do DaVinci:** engenharia reversa da API do 21.1 (o que dá, o que não dá e as armadilhas conhecidas) em [`docs/etapas/davinci_api.md`](docs/etapas/davinci_api.md).
 - **Instagram dentro do Gab:** legenda com gancho nos primeiros 125 caracteres, carrossel slide a slide, gancho de Reel viral, 3-5 hashtags dimensionadas, texto sem cara de IA, semana de conteúdo, perfil e dados do nicho. Publica e agenda pela Publora se você quiser.
 - **B-roll real no trecho certo:** o Gab acha onde a pessoa fala o que você pediu (pela legenda, capítulos e descrição do vídeo), olha uma folha de quadros antes de baixar e busca também no acervo da **NASA** e no **Wikimedia Commons** (domínio público, licença anotada). Lista posts de um perfil do **TikTok** sem login e tira **print vertical** de site ou notícia.
@@ -207,6 +208,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | `/ogab comecar` | Primeiro uso: roda o doctor e explica como pedir |
 | `/ogab config editor premiere` | Troca o editor (`davinci` ou `premiere`) |
 | `/ogab config motion aftereffects` | Troca os motions (`hyperframes` ou `aftereffects`) |
+| `/ogab voz-local instalar\|clonar\|motores\|status` | Clonador de voz local opcional: instala, clona a sua voz, lista motores e licenças |
 | `/ogab update` | Atualiza a skill |
 
 ## O fluxo
@@ -218,7 +220,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | 0 | Pasta do vídeo + **memória da marca** (`<Marca>.md`), lida antes de tudo | - | `projeto.py memoria` |
 | 1 | Perfil do cliente + logos e identidade visual baixadas do site | Só na 1ª vez | `competitor-profiling`, `marca.py` |
 | 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa com fonte e data |
-| 3 | **Voz** (narração por IA) | **Escolhe** | ElevenLabs ou Artlist |
+| 3 | **Voz** (narração por IA) | **Escolhe** | ElevenLabs, Artlist ou a sua voz clonada no Mac (`voz_local/`) |
 | 4 | Projeto no DaVinci (`Assunto - Empresa`), Media Pool organizado, Stacked Timelines | - | Scripting API |
 | 5 | Música bruta na timeline, -10 dB, fade no clipe; BPM e tom medidos | Escolhe entre 3-4 | Artlist ou Envato, `musica.py` |
 | 6 | Efeitos sonoros (whoosh, pop, impacto) | Liga/desliga | Artlist ou Envato |
@@ -574,6 +576,7 @@ scripts/                 resolve_lib, legendas, legenda_ui, legenda_auto, legend
                          sfx_conferir, projeto, retrato, doctor, novidades, biblioteca_motions, gerar_mogrts, silencios, musica,
                          inspiracao, morph_logo, svg_texto, movimentos.mjs
 tresd/                   3D no Blender: logo/texto extrudado e objetos (cenas/)
+voz_local/               clonador de voz local opcional (motor do VoiceStudio, sem o app): voz.py, voicestudio.sh
 ograf/                   títulos OGraf (HTML editável no DaVinci): GabLettering + README de como criar
 capcut/                  camada do CapCut (Mac, beta): escreve o rascunho do projeto
 finalcut/                Final Cut Pro (em construção): engenharia reversa e gerador FCPXML
@@ -594,7 +597,7 @@ assets/lettering/        @gabrielxreis_ Text Presets.drfx (29 títulos animados 
 
 # LICENÇA
 
-Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. O pacote de lettering `@gabrielxreis_ Text Presets` (`assets/lettering/`) é de Gabriel Reis, liberado para uso com a skill. Músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas. A lista de bugs da API do DaVinci em `docs/referencia/` vem do [davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp) (MIT, com o aviso de copyright no topo do arquivo).
+Código: [MIT](LICENSE). Fontes em `assets/fontes/`: SIL Open Font License. O pacote de lettering `@gabrielxreis_ Text Presets` (`assets/lettering/`) é de Gabriel Reis, liberado para uso com a skill. Músicas, takes e vozes pertencem às plataformas e aos autores e seguem as licenças das suas assinaturas. O clonador de voz local usa o motor do [VoiceStudio](https://github.com/debpalash/VoiceStudio) (AGPL-3.0), baixado só se você aceitar; o modelo padrão (OmniVoice) é CC-BY-NC, não comercial. A lista de bugs da API do DaVinci em `docs/referencia/` vem do [davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp) (MIT, com o aviso de copyright no topo do arquivo).
 
 ## Skills extras instaladas junto (install.sh, passo 5b)
 
