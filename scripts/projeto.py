@@ -17,7 +17,7 @@ fora da pasta) é marcado com `marcar`. Estado em <pasta>/status.json. O bloco "
 import glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "silêncios (Ripple Delete Silence)", "legenda": "legenda", "legenda_validada": "validar a legenda",
+ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "silêncios (transcrição do DaVinci)", "legenda": "legenda", "legenda_validada": "validar a legenda",
           "broll": "b-roll/takes", "cor": "cor (PowerGrade)", "letterings": "letterings", "abas": "abas abertas", "motions": "motions", "musica": "música", "sfx": "efeitos sonoros", "qc": "QC final", "export": "export"}
 DEPENDE_DO_USUARIO = {"roteiro", "voz", "legenda_validada"}
 MOTION = re.compile(r"(^x\d\d-|motion|cta|lettering)", re.I)

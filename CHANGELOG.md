@@ -1,7 +1,7 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.15-1 (15/10/2026)
 - **Memória da marca:** antes de editar, o Gab cria a pasta e um .md com o nome da marca. Ali ele anota o que você pediu de diferente, o que funcionou e o que fazer da próxima vez, e lê tudo antes do próximo vídeo da marca.
-- **Silêncios pelo próprio DaVinci:** depois dos cortes e antes da legenda, o Gab usa o Ripple Delete Silence (Clip > Audio Operations) e guarda a timeline original como backup.
+- **Silêncios pela transcrição do DaVinci:** depois dos cortes e antes da legenda, o Gab corta as pausas entre as palavras que o DaVinci reconheceu, sem depender do volume, e guarda a timeline original como backup.
 
 ## 2026.10.15-1 (15/10/2026)
 - **Preset de legenda GAB USA incluído:** o arquivo vem com a skill (instalação e update). Na primeira legenda, se o preset não existir no seu DaVinci, o Gab importa sozinho. Não precisa criar nem baixar nada.
