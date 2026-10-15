@@ -43,6 +43,7 @@ def criar_projeto(nome, w=1080, h=1920, fps=30):
     """Cria (ou abre) o projeto 'Assunto - Empresa'. IMPORTANTE: fps de timeline E de playback
     são gravados ANTES de qualquer timeline; depois a API não muda o playback (áudio engasga)."""
     r = conectar(); pm = r.GetProjectManager()
+    salvar(r)   # CreateProject troca o projeto atual e DESCARTA o que não foi salvo (armadilha da API, MCP samuelgursky)
     p = pm.CreateProject(nome)
     if p:
         for k, v in (("timelineFrameRate", str(fps)), ("timelinePlaybackFrameRate", str(fps)),
@@ -151,6 +152,7 @@ def colar_motions(t, mp, max_vao=0.6):
     do anterior (mesma trilha), puxando o início e, se a mídia tiver sobra, o fim. Devolve [(nome, vão_s)] corrigidos.
     Complemento obrigatório: motion que entra logo depois de outro motion (ou por cima de um motion) é renderizado com
     bgfade=False, senão o fade de 0,25 s do fundo mostra o take de baixo."""
+    pagina_edit()   # DeleteClips só funciona na página Edit
     S, F = t.GetStartFrame(), fps_tl(t); feitos = []
     while True:
         its = []
@@ -336,6 +338,7 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1, lut=None):
 def colocar_legendas(t, mp, srt, trocar=True, p=None):
     """Importa o SRT na trilha de legenda. Se a trilha já existe, troca só os itens (mantém o preset de estilo)."""
     # DeleteClips/AppendToTimeline só valem na timeline ATUAL: abrir `t` antes de tudo
+    pagina_edit()   # DeleteClips só funciona na página Edit
     if p: p.SetCurrentTimeline(t); import time; time.sleep(0.5)
     if t.GetTrackCount("subtitle") == 0: t.AddTrack("subtitle")
     elif trocar:
@@ -468,6 +471,7 @@ def camada_letterings(t, mp, lista, template, centro_y=None):
     vazia em ordem cronológica (com áudio, legenda e outras trilhas TRAVADAS para o ripple não mexer) e cria
     uma trilha nova na posição 1 (a camada sobe). No fim recoloca os takes na V1. Reaplicar a cor depois.
     Devolve os intervalos ocupados (para sem_legenda)."""
+    pagina_edit()   # DeleteClips só funciona na página Edit
     F = fps_tl(t); S = t.GetStartFrame()
     # GetLeftOffset/GetDuration vêm em quadros da TIMELINE, mas AppendToTimeline (startFrame/endFrame) pede quadros
     # da FONTE: em take 24/25 fps numa timeline 30, usar direto desloca o início e estica o take a cada refação.
@@ -607,10 +611,15 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
         if fim and fim < t.GetEndFrame():
             cfg.update({"SelectAllFrames": False, "MarkIn": t.GetStartFrame(), "MarkOut": fim - 1})
     if legenda_gravada: cfg.update({"ExportSubtitle": True, "SubtitleFormat": "BurnIn"})
-    p.SetRenderSettings(cfg)
+    if not p.SetRenderSettings(cfg):   # uma chave recusada derruba o pacote inteiro (sem erro)
+        raise RuntimeError(f"SetRenderSettings recusou as configurações: {cfg}")
     jid = p.AddRenderJob(); p.StartRendering(jid)
+    time.sleep(2)
     while p.IsRenderingInProgress(): time.sleep(2)
-    st = p.GetRenderJobStatus(jid); arq = os.path.join(pasta, nome + ".mp4")
+    st = p.GetRenderJobStatus(jid) or {}; arq = os.path.join(pasta, nome + ".mp4")
+    # o booleano do StartRendering e o texto do JobStatus (traduzido) não provam nada: vale a % e o arquivo
+    if st.get("CompletionPercentage", 0) < 100 or st.get("Error") or not os.path.exists(arq):
+        raise RuntimeError(f"render não terminou (job ficou parado ou falhou): {st}; arquivo existe: {os.path.exists(arq)}")
     tem_audio = "audio" in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", arq],
                                           capture_output=True, text=True).stdout
     if not tem_audio: raise RuntimeError(f"render saiu SEM ÁUDIO: {arq}")
@@ -621,7 +630,16 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
 
 
 def salvar(r=None):
-    (r or conectar(False)).GetProjectManager().SaveProject()
+    """SaveProject com trava: no "Untitled Project" ele não tem onde salvar (False na interface, TRAVA sem interface)."""
+    pm = (r or conectar(False)).GetProjectManager(); p = pm.GetCurrentProject()
+    if p and p.GetName() != "Untitled Project":
+        return pm.SaveProject()
+    return False
+
+
+def pagina_edit(r=None):
+    """DeleteClips devolve False e não apaga nada fora da página Edit (ex.: usuário no Fairlight/Color)."""
+    (r or conectar(False)).OpenPage("edit")
 
 
 # Organização do Media Pool (regra do usuário): pastas fixas na raiz e, com mais de um vídeo no mesmo
@@ -782,6 +800,114 @@ def inserir_letterings_na_trilha(t, trilha, lista, template, centro_y=None):
     depois = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
     if depois != antes: raise RuntimeError("outra trilha mudou durante a inserção (ripple): conferir")
 
+OGRAF_DIR = (os.path.join(os.environ.get("APPDATA", ""), "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Templates", "Edit", "Titles", "OGraf")
+             if sys.platform.startswith("win") else
+             os.path.expanduser("~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/Edit/Titles/OGraf"))
+
+
+def conferir_ograf(item, quadro, arq_png):
+    """Quadro do título OGraf renderizado de verdade (Saver do Fusion, com alfa). NÃO conferir pelo visualizador
+    (ExportCurrentFrameAsStill): ele mostra a página em cache com os valores antigos, o render final sai certo."""
+    comp = item.GetFusionCompByIndex(1); og = comp.FindTool("GabOGraf")
+    comp.Lock(); sv = comp.AddTool("Saver", -32768, -32768); comp.Unlock()
+    base = os.path.splitext(arq_png)[0]
+    sv.SetInput("Clip", base + ".png"); sv.Input = og.Output
+    comp.Render({"Start": quadro, "End": quadro, "Tool": sv, "Wait": True}); sv.Delete()
+    saida = f"{base}{int(quadro):04d}.png"
+    if os.path.exists(saida): os.replace(saida, arq_png)
+    return arq_png if os.path.exists(arq_png) else None
+
+
+def _ograf_manifesto(template):
+    """template = nome da pasta em Titles/OGraf (ex.: "GabLettering") ou caminho de um .ograf.json."""
+    if template.endswith(".ograf.json"):
+        arq = template
+    else:
+        pasta = os.path.join(OGRAF_DIR, template)
+        arq = next((os.path.join(pasta, f) for f in os.listdir(pasta) if f.endswith(".ograf.json")), None) if os.path.isdir(pasta) else None
+    if not arq or not os.path.exists(arq):
+        raise RuntimeError(f"template OGraf {template!r} não instalado em {OGRAF_DIR} (rodar o instalador ou copiar a pasta de ograf/)")
+    return arq, json.load(open(arq))
+
+
+def ograf_no_item(item, template, valores=None, dur_f=None):
+    """Transforma um item "Fusion Composition" da timeline num título OGraf (HTML) EDITÁVEL no Inspector
+    (testado em 15/10/2026, DaVinci 21.1). A API não insere título OGraf pelo nome; o caminho é o nó OGrafLoader do
+    Fusion: TemplatePath + parâmetros dinâmicos. O loader numera os parâmetros pela ORDEM do schema do manifesto
+    (texto -> DynParamText<i>, número -> DynParamNum<i>, booleano -> DynParamCheck<i>, cor #rrggbb -> DynParamColor<i>_R/G/B),
+    então aqui se passa pelo NOME do manifesto: valores={"texto": "...", "corDestaque": "#ffb300"}.
+    dur_f: quadros até a saída (agenda um stopAction; a API não corta o clipe)."""
+    arq, man = _ograf_manifesto(template)
+    comp = item.GetFusionCompByIndex(1)
+    if not comp: raise RuntimeError("item sem composição Fusion (usar InsertFusionCompositionIntoTimeline)")
+    og = comp.FindTool("GabOGraf")
+    if not og:
+        comp.Lock(); og = comp.AddTool("OGrafLoader", -32768, -32768); og.SetAttrs({"TOOLS_Name": "GabOGraf"}); comp.Unlock()
+    mo = comp.FindTool("MediaOut1")
+    og.SetInput("TemplatePath", arq); mo.Input = og.Output
+    props = list((man.get("schema") or {}).get("properties", {}).items())
+    # o template carrega DEPOIS (assíncrono) e põe os padrões do manifesto por cima do que foi escrito antes:
+    # recarregar, esperar o 1º parâmetro mostrar o padrão (carregou) e só então escrever; conferir de novo no fim
+    og.SetInput("ReloadAction", 1)
+    # o template só carrega de verdade no 1º render do quadro (e aí reseta os parâmetros): render de aquecimento
+    import tempfile
+    tmp = os.path.join(tempfile.mkdtemp(prefix="ograf_"), "aquece.png")
+    comp.Lock(); sv = comp.AddTool("Saver", -32768, -32768); comp.Unlock()
+    sv.SetInput("Clip", tmp); sv.Input = og.Output
+    comp.Render({"Start": 0, "End": 0, "Tool": sv, "Wait": True}); sv.Delete()
+    p0 = next(((i, d.get("default")) for i, (n, d) in enumerate(props) if d.get("type") == "string" and not d.get("gddType")), None)
+    for _ in range(40):
+        if not p0 or og.GetInput(f"DynParamText{p0[0]}") == p0[1]: break
+        time.sleep(0.5)
+    _escrever_ograf(og, props, valores or {}, template)
+    time.sleep(2.0)
+    _escrever_ograf(og, props, valores or {}, template)      # se o carregamento ainda pisou em algo, reescreve
+    if dur_f:
+        og.SetInput("ScheduledAction_1.Name", "stopAction"); og.SetInput("ScheduledAction_1.Time", float(dur_f))
+        og.SetInput("StopActionUserModified", 1.0)
+    return og
+
+
+def _escrever_ograf(og, props, valores, template):
+    for nome, v in valores.items():
+        i = next((k for k, (n, _) in enumerate(props) if n == nome), None)
+        if i is None: raise RuntimeError(f"parâmetro {nome!r} não existe no manifesto de {template}: {[n for n, _ in props]}")
+        d = props[i][1]
+        if d.get("gddType", "").startswith("color") or (isinstance(v, str) and v.startswith("#") and len(v) == 7 and d.get("type") == "string" and "color" in nome.lower()):
+            for c, j in zip("RGB", (1, 3, 5)): og.SetInput(f"DynParamColor{i}_{c}", int(v[j:j + 2], 16) / 255)
+        elif d.get("type") in ("number", "integer"): og.SetInput(f"DynParamNum{i}", float(v))
+        elif d.get("type") == "boolean": og.SetInput(f"DynParamCheck{i}", 1.0 if v else 0.0)
+        else:
+            og.SetInput(f"DynParamText{i}", str(v))
+            if og.GetInput(f"DynParamText{i}") != str(v): raise RuntimeError(f"OGraf não aceitou {nome}={v!r}")
+
+
+def inserir_ograf_na_trilha(t, trilha, lista, template="GabLettering"):
+    """Como inserir_letterings_na_trilha, mas com título OGraf: lista [(valores_dict, inicio_s, dur_s[, template]), ...].
+    PRÉ-REQUISITO igual: destino da timeline na `trilha` (Option+N com o DaVinci na frente). Trava as outras trilhas."""
+    F = fps_tl(t); S = t.GetStartFrame(); pagina_edit()
+    travar = [(k, i) for k in ("audio", "subtitle") for i in range(1, t.GetTrackCount(k) + 1)] + \
+             [("video", i) for i in range(1, t.GetTrackCount("video") + 1) if i != trilha]
+    for k, i in travar: t.SetTrackLock(k, i, True)
+    t.SetTrackLock("video", trilha, False)
+    antes = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
+    feitos = []
+    try:
+        for item in sorted(lista, key=lambda x: x[1]):
+            valores, ini, dur = item[:3]; tpl = item[3] if len(item) > 3 else template
+            f = S + max(3, round(ini * F)); _ir(t, f); time.sleep(0.6); _ir(t, f)
+            novo = t.InsertFusionCompositionIntoTimeline()
+            if not novo: raise RuntimeError("composição Fusion não entrou")
+            novos = [x for x in (t.GetItemListInTrack("video", trilha) or []) if x.GetStart() == f and x.GetUniqueId() == novo.GetUniqueId()]
+            if not novos: raise RuntimeError(f"OGraf não caiu na trilha {trilha} em {f}: conferir o destino da timeline")
+            ograf_no_item(novos[0], tpl, valores, dur_f=round(dur * F)); feitos.append(novos[0])
+    finally:
+        for k, i in travar: t.SetTrackLock(k, i, False)
+    depois = _assinatura(t) + [(k, i, x.GetStart()) for k, i in travar if k == "video" for x in (t.GetItemListInTrack(k, i) or [])]
+    if depois != antes: raise RuntimeError("outra trilha mudou durante a inserção (ripple): conferir")
+    return feitos
+
+
 MODELO_LEGENDA = "MODELO GAB USA"
 DRT_MODELO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "davinci", "modelo_gab_usa.drt")
 
@@ -798,6 +924,7 @@ def timeline_do_modelo(p, mp, nome, w=None, h=None, fps=None, modelo=MODELO_LEGE
     if not m:
         return None
     p.SetCurrentTimeline(m)
+    pagina_edit()
     t = m.DuplicateTimeline(nome)
     if not t:
         return None
@@ -940,6 +1067,7 @@ SFX_DMAX = {"riser_hollow": 2.1, "hud_loading": 0.8, "whoosh_info": 1.1, "ui_sel
 def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
     """Coloca o desenho de som de `pasta_sfx/plano_sfx.txt` (linhas 'T.TTs Ax nome -NNdB[ D.Ds]: o que acompanha'), cada som
     na primeira trilha livre (A3..A6), cortado em SFX_DMAX, volume e fade no clipe. Apaga o que havia nessas trilhas."""
+    pagina_edit()   # DeleteClips só funciona na página Edit
     import re as _re
     ev = [(m[2], float(m[1]), int(m[3]), float(m[4]) if m[4] else None) for m in (_re.match(r"\s*([\d.]+)s A\d (\S+) (-?\d+)dB(?: ([\d.]+)s)?", l)
           for l in open(os.path.join(pasta_sfx, "plano_sfx.txt")).read().splitlines()) if m]

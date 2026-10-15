@@ -1,0 +1,35 @@
+{
+  "$schema": "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
+  "id": "gab-lettering",
+  "version": "1.0.0",
+  "name": "Gab Lettering",
+  "description": "Lettering do Gab (/ogab): palavras entram uma a uma, de baixo para cima, com uma palavra em destaque. Editável no Inspector.",
+  "author": { "name": "Gab (/ogab)" },
+  "main": "GabLettering.js",
+  "supportsRealTime": false,
+  "supportsNonRealTime": true,
+  "stepCount": 1,
+  "actionDurations": [
+    { "type": "playAction", "duration": 900 },
+    { "type": "updateAction", "duration": 0 },
+    { "type": "stopAction", "duration": 400 }
+  ],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "texto": { "type": "string", "title": "Texto", "default": "ESSA É A FRASE DE EFEITO" },
+      "destaque": { "type": "string", "title": "Palavra em destaque", "default": "EFEITO" },
+      "cor": { "title": "Cor do texto", "type": "string", "pattern": "^#[0-9a-f]{6}$", "gddType": "color-rrggbb", "default": "#ffffff" },
+      "corDestaque": { "title": "Cor do destaque", "type": "string", "pattern": "^#[0-9a-f]{6}$", "gddType": "color-rrggbb", "default": "#ffb300" },
+      "fonte": { "type": "string", "title": "Fonte", "default": "Montserrat" },
+      "tamanho": { "type": "number", "title": "Tamanho", "minimum": 0.3, "maximum": 3.0, "default": 1.0 },
+      "posY": { "type": "number", "title": "Posição vertical (0 topo, 1 base)", "minimum": 0.0, "maximum": 1.0, "default": 0.5 },
+      "sombra": { "type": "boolean", "title": "Sombra", "default": true }
+    }
+  },
+  "renderRequirements": [
+    { "resolution": { "width": { "ideal": 1080 }, "height": { "ideal": 1920 } }, "frameRate": { "ideal": 30 } }
+  ],
+  "v_bmd": { "duration": 3 }
+}

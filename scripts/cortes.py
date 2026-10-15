@@ -187,6 +187,9 @@ def montar(plano_json, nome_tl, clipe, fps_fonte=30.0):
     n = len(t.GetItemListInTrack("video", 1) or [])
     fps = float(t.GetSetting("timelineFrameRate"))
     dur = (t.GetEndFrame() - t.GetStartFrame()) / fps
+    R.salvar(r); n = len(t.GetItemListInTrack("video", 1) or [])   # conferir depois de salvar (append com erro some no save)
+    if n < len(infos):
+        print(f"AVISO: depois de salvar ficaram {n} de {len(infos)} trechos; conferir a timeline")
     print(f"timeline {nome_tl!r}: {n} cortes, {dur:.1f} s (plano {d['total']} s), appended={len(res or [])}")
     return t
 

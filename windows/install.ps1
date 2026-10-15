@@ -214,6 +214,14 @@ Get-ChildItem -Path (Join-Path $DEST "assets\lettering") -Filter *.drfx -ErrorAc
   Copy-Item $_.FullName (Join-Path $tpl $_.Name) -Force
   Ok "lettering $($_.Name) instalado (reinicie o DaVinci)"
 }
+# Titulos OGraf do Gab (HTML editavel no Inspector, DaVinci 21+): cada pasta de ograf\ vira um titulo em Titles\OGraf
+$ogd = Join-Path $tpl "Edit\Titles\OGraf"; New-Item -ItemType Directory -Force -Path $ogd | Out-Null
+Get-ChildItem -Path (Join-Path $DEST "ograf") -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+  if (Get-ChildItem -Path $_.FullName -Filter *.ograf.json -ErrorAction SilentlyContinue) {
+    Copy-Item -Recurse -Force $_.FullName $ogd; Ok "titulo OGraf $($_.Name) instalado (reinicie o DaVinci)"
+  }
+}
+
 
 # LUT DO GAB na pasta de LUTs do DaVinci (ProgramData)
 $lutD = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\LUT\LUT DO GAB"

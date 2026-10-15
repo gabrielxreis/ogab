@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-3 (15/10/2026)
+- **Lettering editável dentro do DaVinci (beta):** o Gab pode pôr a frase de efeito como título em HTML que você edita no Inspector (texto, cores, tamanho, posição), sem vídeo renderizado. Ele pergunta antes de usar. Rode o instalador de novo e reinicie o DaVinci para receber o título "GabLettering".
+- **Mais seguro no DaVinci:** o Gab agora se protege de falhas conhecidas da automação (render que não começou, projeto não salvo, clipes que somem no salvar).
+
 ## 2026.10.15-2 (15/10/2026)
 - **Mapa do que o DaVinci faz por automação:** o Gab agora sabe tudo que dá pra fazer no DaVinci sem clicar, o que só dá pela tela e as armadilhas conhecidas. Também ficou mais seguro tirar silêncio de clipe com velocidade alterada.
 

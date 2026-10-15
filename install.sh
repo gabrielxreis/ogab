@@ -198,6 +198,11 @@ mkdir -p "$TPL"
 for f in "$DEST"/assets/lettering/*.drfx; do
   [ -f "$f" ] && cp -f "$f" "$TPL/" && ok "lettering $(basename "$f") instalado (reinicie o DaVinci)"
 done
+# Títulos OGraf do Gab (HTML editável no Inspector, DaVinci 21+): cada pasta de ograf/ vira um título em Titles/OGraf
+OGD="$TPL/Edit/Titles/OGraf"; mkdir -p "$OGD"
+for d in "$DEST"/ograf/*/; do
+  ls "$d"*.ograf.json >/dev/null 2>&1 && cp -R "${d%/}" "$OGD/" && ok "título OGraf $(basename "$d") instalado (reinicie o DaVinci)"
+done
 
 # LUT DO GAB na pasta de LUTs do DaVinci (é do sistema: normalmente gravável; senão pede a senha do Mac uma vez)
 LUTD="/Library/Application Support/Blackmagic Design/DaVinci Resolve/LUT/LUT DO GAB"

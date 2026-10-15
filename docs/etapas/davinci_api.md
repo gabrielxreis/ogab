@@ -9,7 +9,7 @@
 |---|---|---|
 | **API de scripting** (`resolve_lib.py`) | 416 funções documentadas em `/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting/DaVinciResolveScript.pyi` (a fonte oficial; o README manda para ele). Só no Studio. | Sempre que existir função. |
 | **Fusion (`resolve.Fusion()`)** | 132 métodos sem documentação + `ActionManager` com 887 ações, **todas da página Fusion** (nenhuma de timeline/edição). | Composições, Text+, nós, keyframes dentro do Fusion. |
-| **OGraf (títulos em HTML)** | Padrão EBU: título feito em HTML/CSS/JS (Web Component com `goToTime`), renderizado pelo DaVinci como Title do Edit, com parâmetros editáveis no Inspector. Docs e exemplos em `Developer/OGraf HTML Templates/`; instala em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/Edit/Titles/OGraf/`. Exige `"supportsNonRealTime": true`. | Candidato a motion/lettering EDITÁVEL feito em HTML (mesma linguagem do HyperFrames) sem MOV. Ainda não testado no Gab. |
+| **OGraf (títulos em HTML)** | Padrão EBU: título feito em HTML/CSS/JS (Web Component com `goToTime`), renderizado pelo DaVinci como Title do Edit, com parâmetros editáveis no Inspector. Docs e exemplos em `Developer/OGraf HTML Templates/`; instala em `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Templates/Edit/Titles/OGraf/`. Exige `"supportsNonRealTime": true`. | Lettering/motion EDITÁVEL feito em HTML (mesma linguagem do HyperFrames) sem MOV. **Testado e funcionando (15/10/2026)** via nó `OGrafLoader` do Fusion; a API não insere OGraf pelo nome. Ver `ograf/README.md`. |
 | **Workflow Integration** | Plugin Electron dentro do DaVinci (painel próprio) usando a mesma API em JavaScript. | Painel para o usuário; não dá poder novo. |
 | **Menu pela tela** (`app_menu` do computer use ou System Events) | Qualquer item de menu, mesmo sem API. Age no projeto que estiver na frente e quebra se o layout mudar. | Só quando não houver API e o usuário quiser. Ex.: `Clip > Audio Operations > Ripple Delete Silence…`. |
 | **MCP `samuelgursky/davinci-resolve-mcp`** | 3,5 mil estrelas, cobre 100% da API, servidor "advanced" que edita `.drp/.drt/.drx` OFFLINE, e uma lista de armadilhas verificadas (`docs/reference/api-limitations.md`). | Opcional; o Gab já fala direto com a API. A lista de armadilhas vale mais que o servidor. |
@@ -80,11 +80,20 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 - `ProjectManager.CreateProject` descarta o projeto aberto se ele não estiver salvo: `salvar()` antes.
 - Timecode das palavras da transcrição e de clipes de câmera vem com `Start TC` (ex.: `06:15:36;19`, drop frame):
   descontar (`silencios.tc_quadros`).
-- Lista completa e atualizada: `docs/reference/api-limitations.md` do repositório do MCP acima (42 lacunas, 58 bugs).
+- `AppendToTimeline`: o retorno não prova nada e o SALVAR descarta trechos de um append que deu erro. Conferir a contagem DEPOIS de `salvar()` (`silencios.py` e `cortes.py` já fazem). Com fps da mídia diferente da timeline, cada trecho perde até 1 quadro (arredonda para baixo).
+- `DeleteClips` só funciona na página Edit (no Fairlight/Color devolve False e não apaga): `R.pagina_edit()` antes (já nas funções da lib que apagam).
+- `CreateProject` descarta o projeto atual se não estiver salvo: `criar_projeto` salva antes. `SaveProject` no "Untitled Project" falha (e TRAVA sem interface): `R.salvar()` pula esse caso.
+- Render: `SetRenderSettings` aplica POR CIMA do preset carregado e uma chave recusada derruba o pacote inteiro (devolve False); o `StartRendering` às vezes devolve False e o job fica parado; `JobStatus` é texto traduzido. Vale `CompletionPercentage == 100` + arquivo existindo (`renderizar` confere). `ExportSubtitle`/`BurnIn` já foi visto sem efeito: conferir a legenda num quadro do MP4.
+- `Project.GetCurrentRenderMode()` muda a tela para a página Deliver: não usar (ou ler a página antes e voltar).
+- Importar `.drt`/XML num projeto com mídia parecida religa os clipes na mídia ERRADA sem avisar (mesma identidade grosseira): conferir o File Path de cada item depois (já era regra 1a).
+- `Graph.SetLUT` só acha LUT na pasta MASTER de LUTs do DaVinci (o instalador do Gab já põe lá).
+- Fusion: valor escrito com `SetInput` entre `comp.Lock()` e `Unlock()` aparece certo na leitura e NÃO sai no render; travar só para criar/ligar nós (a lib já faz assim). Composição criada pela API só renderiza se o MediaOut descender do MediaIn.
+- Nunca fechar/apagar projeto com render rodando: trava a fila de render até sair do DaVinci.
+- Lista completa (101 itens, MIT): `docs/referencia/davinci_limitacoes_mcp.md`, copiada do repositório do MCP; ler a seção da função antes de usar algo novo.
 
 ## Próximos passos possíveis (ainda não feitos)
 
-1. Motions/letterings como **OGraf** (HTML editável no Inspector) em vez de MOV, reaproveitando o HyperFrames.
+1. Mais templates OGraf (CTA, lower third, número animado) e motions HyperFrames convertidos para OGraf (GSAP em modo seek).
 2. `SetFades` na música (fade no clipe pela API, já é a regra da música bruta) e `AddTransition` onde o estilo pede.
 3. Multicam + Smart Switch para podcast/entrevista com 2 câmeras.
 4. `Timeline.Export` para FCPXML/OTIO quando o usuário quiser abrir no Final Cut/CapCut/Premiere.

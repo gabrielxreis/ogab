@@ -140,8 +140,12 @@ def main():
     alvo_vi = vi if vi.get("isEnabled") else {"isEnabled": True, "amount": 100}
     nova.SetVoiceIsolationState(1, alvo_vi)
     print("Voice Isolation A1:", nova.GetVoiceIsolationState(1))
-    print(f"timeline {a.timeline!r}: {len(res)} clipes, {dur:.1f} s; original guardada em {backup!r}")
     R.salvar(r)
+    # o salvar pode descartar clipes de um append que deu erro: conferir DEPOIS de salvar (armadilha da API)
+    n = len(nova.GetItemListInTrack("video", 1) or [])
+    if n < len(infos):
+        raise SystemExit(f"ERRO: depois de salvar ficaram {n} de {len(infos)} trechos na V1; conferir a timeline {a.timeline!r}")
+    print(f"timeline {a.timeline!r}: {n} clipes, {dur:.1f} s; original guardada em {backup!r}")
 
 
 if __name__ == "__main__":

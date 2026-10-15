@@ -92,7 +92,7 @@ Frases: entrando em fase mecânica, "Agora é parte mecânica (<o quê>): pode p
 4. Provedores na ordem do `config.json`, pulando o que não estiver conectado.
 5. Sem green screen nos takes.
 6. Pessoa real: só com ficha de personagem e autorização; cenas simbólicas/dramatização, nunca como registro real.
-7. Movimentos nos takes e lettering no gancho: perguntar (salvo `config`).
+7. Movimentos nos takes e lettering no gancho: perguntar (salvo `config`). Ao perguntar do lettering, oferecer também a opção **título editável no DaVinci (OGraf, beta)** (`docs/etapas/lettering_motions.md` 8b2, `ograf/README.md`).
 8. Sem travessão (em dash) nos textos e legendas.
 9. **`PROJETO.md` em cada vídeo** (status, decisões, DaVinci, arquivos, custos, pendências): atualizar a cada etapa; ao retomar ("continua o vídeo X"), ler ele primeiro em vez de reconstruir pela conversa.
 10. Modelo/esforço por tarefa e ajudante barato: ver "Economia de tokens" no topo (aviso de troca de modelo em toda mudança de fase; lote mecânico sempre em subagente).

@@ -19,6 +19,14 @@ Pacote de títulos animados instalado (`config.lettering.pacote`, ex. `@gabrielx
 
 Como fazer: escolher 4-6 palavras-chave do roteiro (números, datas, siglas, a marca no CTA), mostrar a lista (texto + tempo) ao usuário e aplicar com `ocup = camada_letterings(t, mp, [(TEXTO, inicio_s, dur_s), ...], template)` **antes** de `montar_takes` (ou depois: a função guarda e recoloca os takes), depois `aplicar_grade` de novo. Por trás: a API só insere Fusion Title na V1 e com ripple; a função trava áudio/legenda/outras trilhas, insere na V1 vazia, cria trilha na posição 1 (`AddTrack("video", {"index": 1})`) para a camada subir, e reparte em mais camadas quando dois títulos ficariam sobrepostos. **Nunca cortar um Fusion Title no meio (derruba o Resolve)**: a duração visível vem do fade out (`FadeSaida`). A função confere que as trilhas travaram e que áudio/legenda não andaram (senão para com erro); ao recolocar os takes converte quadros da timeline para quadros da fonte (take 24/25 fps). Se o último lettering passar do fim do vídeo, estender o último take e a música (com fade) até ele, para não sobrar preto.
 
+## 8b2. Lettering/motion como título OGraf (beta, PERGUNTAR ao usuário)
+Desde 15/10/2026 o Gab sabe pôr lettering como **título HTML editável dentro do DaVinci (OGraf)**: texto, cores,
+tamanho e posição ficam no Inspector, sem MOV. Antes do lettering (ou de um motion simples de texto), perguntar uma vez
+por vídeo: "Quer como título editável no DaVinci (OGraf, beta) ou do jeito padrão?". Sem resposta: padrão (Fusion Title
+do pacote). Com sim: `R.inserir_ograf_na_trilha(...)`, conferir com `R.conferir_ograf(...)` (render do Fusion, nunca o
+visualizador) e anotar na memória da marca (`projeto.py memoria ... --tipo pedido`). Como funciona e como criar
+template novo (inclusive a correção de escala do quadro vertical): `ograf/README.md`.
+
 ## 8c. HyperFrames: motions e edição dinâmica
 
 **ANTES DE RENDERIZAR QUALQUER MOTION (regra do usuário, 12/10/2026: "verifica antes para não ter que refazer"):**
