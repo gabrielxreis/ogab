@@ -18,6 +18,7 @@ Saída (a mesma que o legendas.py lê): {"motor": ..., "language": ..., "segment
 HH:MM:SS:FF como o Resolve devolve.
 """
 import json, os, platform, subprocess, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 APP = "/Applications/DaVinci Resolve/DaVinci Resolve.app"
 API = "/Library/Application Support/Blackmagic Design/DaVinci Resolve/Developer/Scripting"
@@ -116,9 +117,13 @@ def via_clipe(nome_clipe):
     if not tr or not tr.get("segments"):
         raise SystemExit(f"o clipe {nome_clipe!r} ainda não tem transcrição no DaVinci (clique direito > Transcribe)")
     fps = float(item.GetClipProperty("FPS") or 30)
+    # palavras vêm no timecode DA CÂMERA (ex.: 06:15:36;24, drop frame em 29,97): descontar o Start TC do clipe para
+    # virar segundos do arquivo (bug 15/10/2026: sem isso os tempos saíam em horas e ';' quebrava o split)
+    from silencios import tc_quadros
+    ini = tc_quadros(item.GetClipProperty("Start TC") or "00:00:00:00", fps)
     def seg(tc):
         if isinstance(tc, (int, float)): return float(tc)
-        h, m, s_, f = [int(x) for x in tc.split(":")]; return h * 3600 + m * 60 + s_ + f / fps
+        return (tc_quadros(tc, fps) - ini) / fps
     segs = []
     for s_ in tr["segments"]:
         ws = [{"text": w["text"].strip(), "start": round(seg(w["start"]), 3), "end": round(seg(w["end"]), 3)}
