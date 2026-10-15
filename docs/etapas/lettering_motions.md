@@ -126,3 +126,9 @@ Toda vez que a narração cita uma empresa, marca ou plataforma (Amazon, Prime V
 - Logo preta em fundo escuro: `filter:brightness(0) invert(1)`; com as cores originais, pôr num cartão claro.
 - Citada em cima de trecho de vídeo (sem motion): overlay pequeno com alfa (`render --format mov`, fundo transparente), no centro, só durante a palavra.
 - Só a empresa que a fala cita ou que o fato confirma (ex.: plataforma onde a série passou de verdade); nunca pôr logo sugerindo parceria ou patrocínio.
+
+## Área segura do Instagram (regra do usuário, 15/10/2026: "coloque um limite nas bordas para o motion... quando postar no instagram ele dá um cropzinho")
+Todo motion (texto, número, cartão, logo) cabe numa caixa central de **900 x 1200 px** (x de 90 a 990, y de 360 a 1560): o feed e a grade mostram o Reels cortado em 4:5 e a interface cobre as bordas. Só o FUNDO (gradiente, partículas, raios, grão) vai até a borda.
+- `centro.py medir/corrigir` já usa esse limite (LARGURA_MAX 900, ALTURA_MAX 1200): passou do limite, ele grava o scale no `#fit`.
+- Kit escrito à mão (sem passar pelo centro.py): embrulhar o conteúdo num `#fit` com `width:max-content` e escalar por `min(1, 900/largura, 1200/altura)` medido ANTES de montar a timeline do GSAP.
+- Conferir no quadro renderizado com a caixa desenhada por cima (`ffmpeg ... drawbox=x=90:y=360:w=900:h=1200`) antes de entregar.

@@ -7,7 +7,9 @@ Como mede: copia a composição para uma pasta temporária, esconde o fundo (#bg
 tira snapshots do HyperFrames em vários tempos e faz a UNIÃO da caixa do conteúdo visível (canal alfa).
 Alvo: centro (540, 960) com tolerância de 6 px. O MOTION NUNCA FOGE DA LEGENDA (regra do usuário, 12/10/2026): não sobe
 nem encolhe por causa dela; quem se ajusta é a legenda (desce para Y 390 nas que cruzam o motion). Só reduz se não
-couber na tela (ALTURA_MAX/LARGURA_MAX = área segura do vertical).
+couber na ÁREA SEGURA DO INSTAGRAM (regra do usuário, 15/10/2026: "coloque um limite nas bordas... quando postar no
+instagram ele dá um cropzinho"): o feed e a grade cortam o Reels 9:16 para 4:5 (1080x1350, perde 285 px em cima e
+embaixo) e a interface cobre as laterais; o conteúdo do motion fica numa caixa central de LARGURA_MAX x ALTURA_MAX.
 CTA: a regra é a LOGO no centro exato (medir a logo, não a união).
 corrigir: calcula translate (+ scale só se não couber na tela) e grava em fit.json {id: "transform-origin...; transform..."};
 o build do motion aplica esse estilo num wrapper (#fit) em volta do conteúdo (o fundo fica fora). Depois mede de novo.
@@ -18,8 +20,8 @@ from pathlib import Path
 
 ALVO = (540, 960)
 TOL = 6
-ALTURA_MAX = 1400
-LARGURA_MAX = 1000
+ALTURA_MAX = 1200   # 4:5 do feed (1350) menos margem: y de 360 a 1560
+LARGURA_MAX = 900   # 90 px de margem em cada lado
 HF = ["npx", "--yes", "hyperframes@0.8.145"]
 
 

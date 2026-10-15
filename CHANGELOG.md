@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-8 (15/10/2026)
+- **Motion sem corte no Instagram:** textos, números e logos dos motions ficam dentro da área segura do feed (4:5), e o Instagram não corta mais as bordas quando o Reels aparece no feed ou no perfil. O fundo animado continua ocupando a tela toda.
+
 ## 2026.10.15-7 (15/10/2026)
 - **Logos nos motions:** quando a narração cita uma empresa ou plataforma (Amazon, Netflix, Prime Video...), o motion mostra a logo oficial em vez do nome escrito.
 
