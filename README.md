@@ -54,6 +54,7 @@
 * [CLIENTES](#clientes)
     * [Perfil, pronúncia e estilo de edição](#perfil-pronuncia-e-estilo-de-edicao)
 * [INSTAGRAM](#instagram)
+* [VOZ LOCAL (CLONADOR DE VOZ)](#voz-local-clonador-de-voz)
 * [PASTA DO VÍDEO](#pasta-do-video)
 * [LEGENDA](#legenda)
 * [EDITORES E MOTIONS](#editores-e-motions)
@@ -384,6 +385,64 @@ O Gab também é o social media: o vídeo sai pronto e o post sai junto. Basta p
 Escreve na língua e na voz do cliente (lê `clientes/<empresa>/empresa.md` e `estilo.md`) e nunca usa travessão.
 
 **Publicar é opcional.** Sem chave nenhuma, tudo funciona em modo rascunho: você copia e posta pelo app. Para o Gab subir a mídia e agendar, copie `instagram/.env.example` para `instagram/.env` (fora do git) e preencha a chave da [Publora](https://publora.com) (conta Business ou Creator). `APIFY_TOKEN` libera a leitura de dados do nicho e `PIXFARO_TOKEN` a geração de imagens. Ele só publica depois do seu "pode postar".
+
+
+# VOZ LOCAL (CLONADOR DE VOZ)
+
+O Gab pode **clonar a sua voz e narrar os vídeos com ela no próprio Mac**: de graça, sem limite de caracteres e sem mandar seu áudio para nenhum serviço. Por trás, ele usa o motor do [VoiceStudio](https://github.com/debpalash/VoiceStudio) (código aberto) sem o app visual: você só conversa com o Claude.
+
+> **Opcional e com licença a respeitar.** Só instala se você disser sim (o instalador pergunta uma vez; depois, `/ogab voz-local instalar`). O motor padrão (**OmniVoice**) tem licença **não comercial**: serve para os seus vídeos e testes. Para vídeo de cliente pago, use o ElevenLabs ou um dos motores de licença aberta da tabela abaixo. O Gab avisa antes de usar.
+
+**Como funciona**
+
+```mermaid
+flowchart LR
+    A[Um áudio seu<br/>falando 10 a 20 s] --> B[Gab escolhe ~18 s<br/>entre pausas]
+    B --> C[Transcreve a referência<br/>Whisper local]
+    C --> D[Clona a voz<br/>perfil salvo no Mac]
+    D --> E[Texto do roteiro aprovado]
+    E --> F[Narração WAV<br/>na pasta do vídeo]
+    F --> G[DaVinci + transcrição de volta<br/>para conferir as palavras]
+```
+
+**Na conversa**
+
+```
+você: /ogab clona minha voz com o áudio ~/Desktop/eu_falando.m4a, chama de "Gabriel"
+Gab:  Referência: 17,8 s (2,1 a 19,9 s do original). Transcrição: "Fala, pessoal, hoje eu vou..."
+      Voz "Gabriel" clonada.
+
+você: /ogab faz um reels para a X sobre Y, narra com a minha voz
+Gab:  (roteiro para você aprovar)
+      Vozes: ElevenLabs (...) · Gabriel (local, grátis, NÃO comercial). Qual?
+você: Gabriel
+Gab:  Gerando narração ▰▰▰▰▰▰▱▱▱▱ 62%   (a barra aparece ao vivo no terminal do app)
+      narracoes/narracao.wav pronta; transcrevi de volta e as palavras batem com o roteiro.
+```
+
+| Comando | O que faz |
+|---|---|
+| `/ogab voz-local instalar` | Baixa o motor (~2 GB) e o modelo padrão OmniVoice (~3,3 GB), pedindo o sim antes de cada download |
+| `/ogab clona minha voz` (+ um áudio) | Recorta a melhor janela entre pausas, transcreve e cria o perfil da voz |
+| `/ogab voz-local motores` | Lista os motores que falam português: instalado ou não, tamanho, onde roda e licença |
+| `/ogab voz-local status` | Mostra se o motor está no ar e as vozes clonadas |
+
+**Motores que clonam e falam português**
+
+| Motor | Roda no Mac | Tamanho | Licença | Destaque |
+|---|---|---|---|---|
+| `omnivoice` | GPU | 3,3 GB | CC-BY-NC (**não comercial**) | padrão, rápido |
+| `voxcpm2` | GPU | ~5 GB | Apache-2.0 | 48 kHz, voz por descrição |
+| `confucius4-tts` | CPU | ~5 GB | Apache-2.0 | mantém a voz entre idiomas |
+| `moss-tts-nano` | CPU | leve | Apache-2.0 | 48 kHz |
+| `pockettts` | CPU | leve | CC-BY-4.0 (aceitar o termo no Hugging Face) | 6 idiomas |
+
+**Para sair bom**
+- Mande um trecho **só de voz**, sem música, de 10 a 20 s. O modelo imita o jeito da amostra: um trecho animado gera fala animada, um lido gera fala lida.
+- Para pausas naturais, o Gab gera **frase por frase** e junta com silêncio na timeline.
+- Seja realista: copia bem o timbre, mas a entonação sai um pouco mais "lida" que no ElevenLabs.
+- Requisitos: **Mac Apple Silicon (M1 ou mais novo)**. Windows ainda não.
+- Arquivos em `~/Documents/Gab Voz Local/` (referências, áudios gerados, lista de vozes). Detalhes técnicos e armadilhas: [`voz_local/README.md`](voz_local/README.md).
 
 
 # PASTA DO VÍDEO
