@@ -1,0 +1,13 @@
+{
+  "w": 1080, "h": 1920, "fps": 60, "letra": "apple",
+  "cor": "#FF8B3D", "cor2": "#FFC49D",
+  "marca": { "nome": "Lumen", "dominio": "lumen.exemplo" },
+  "cenas": [
+    { "tipo": "gancho", "dur": 3.0, "olho": "Produto fictício", "texto": "Sua semana|virou caos?||O Lumen|*organiza.*" },
+    { "tipo": "logo", "dur": 2.6, "nome": "Lumen", "frase": "Agenda, tarefas e foco num lugar só", "luz": true },
+    { "tipo": "tela", "dur": 4.0, "imagem": "caps/desktop.png", "moldura": "navegador",
+      "titulo": "Tudo no|*seu tempo.*", "foco": [{ "y": 0, "zoom": 1 }, { "y": 0.35, "zoom": 1.06 }] },
+    { "tipo": "lista", "dur": 2.8, "itens": ["Agenda.", "Foco.", "*Revisão.*"] },
+    { "tipo": "cta", "dur": 2.6, "texto": "Comece|*grátis.*" }
+  ]
+}

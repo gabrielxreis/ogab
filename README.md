@@ -352,9 +352,10 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/cena/exemplo.gif" width="150" alt="Família CENA">&nbsp;
 <img src="presets/kinetic/exemplo.gif" width="150" alt="Kinetic">&nbsp;
 <img src="presets/serif-azul/exemplo.gif" width="150" alt="Serif azul">&nbsp;
+<img src="presets/launch/exemplo.gif" width="150" alt="Launch">&nbsp;
 <img src="presets/glass/exemplo.gif" width="267" alt="Glass">
 
-<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch · família CENA (destaque, palco, órbita, lente, bancada)</sub>
+<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch · família CENA (destaque, palco, órbita, lente, bancada) · launch</sub>
 
 </div>
 
@@ -372,6 +373,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **ÓRBITA** ([guia](presets/orbita/PRESET.md)) | Cartões de vidro em volta de você: cartões girando ao seu redor (passam atrás da cabeça e na frente abaixo do queixo, com texto ou print de reel), checklist que recebe o check na hora em que você fala cada item, barra "seu reel está pronto 100%" com pílulas, caixa de comentário digitando a palavra do CTA. Família CENA | <img src="presets/orbita/exemplo.gif" width="160" alt="Exemplo do preset Órbita"> |
 | **LENTE** ([guia](presets/lente/PRESET.md)) | Efeitos de câmera no próprio vídeo: zoom rápido no rosto na palavra forte (o recorte acompanha, então o PALCO continua atrás). Em seguida: foco de luz, congelar com etiqueta, antes e depois, transição com desfoque e encolher para dentro de uma janela. Família CENA | <img src="presets/lente/exemplo.gif" width="160" alt="Exemplo do preset Lente"> |
 | **BANCADA** ([guia](presets/bancada/PRESET.md)) | Em construção: tela verde para comentário, você recortado embaixo, o assunto atrás, gancho fixo no topo e o número circulado à mão. Família CENA | |
+| **LAUNCH** ([guia](presets/launch/PRESET.md)) | Filme de lançamento de produto com acabamento premium, na linguagem dos filmes de produto da Apple: fundo preto, uma ideia por cena, frases entrando por máscara com curvas longas que freiam no fim, logo nascendo com contraluz e brilho, o seu site ou app de verdade num painel de vidro flutuando em 3D com reflexo e luz passando, recursos um por vez e fecho limpo. O Gab captura o site sozinho (página inteira, cor da marca). Três letras: **apple**, **editorial** e **cinema**. Para lançar curso, app, SaaS ou site | <img src="presets/launch/exemplo.gif" width="160" alt="Exemplo do preset Launch"> |
 | **GLASS** ([guia](presets/glass/PRESET.md)), da comunidade | YouTube 16:9 premium: vidro escuro com aurora violeta e grão de filme, título metálico, destaque em Playfair itálico e números em Inter fina, revelação por máscara com desfoque. Cenas entram com slide junto com um empurrão de câmera na V1 (no Fusion de cada clipe, reversível), seus prints com anel e caixa marcando o número, stingers de capítulo e cartão de like + inscreva-se com a foto do canal. A cor violeta troca pela da sua marca. Para tutorial e explicativo com webcam e gravação de tela | <img src="presets/glass/exemplo.gif" width="240" alt="Exemplo do preset Glass"> |
 
 

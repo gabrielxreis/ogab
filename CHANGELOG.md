@@ -1,4 +1,14 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-3 (16/10/2026)
+- **Preset novo LAUNCH (filme de lançamento de produto):** mande o link do seu site, curso ou app e peça "um vídeo de 15 s apresentando o produto". O Gab captura a página inteira e a cor da sua marca e monta um filme curto com acabamento premium, no estilo dos lançamentos da Apple:
+  - fundo preto e uma ideia por cena;
+  - frases entrando com curvas longas;
+  - o logo nascendo com contraluz e brilho;
+  - o seu site num painel de vidro flutuando em 3D;
+  - os recursos um por vez e o fecho limpo.
+
+  Escolha a letra **apple**, **editorial** ou **cinema**. Cada vídeo sai também com um GIF de prévia. Peça "no preset launch".
+
 ## 2026.10.16-2 (16/10/2026)
 - **Família nova de presets para quem fala para a câmera (CENA):** você no centro e tudo acontecendo em volta. São presets separados que se combinam: **DESTAQUE** (legenda palavra por palavra com a palavra-chave grande em amarelo, em serifa com brilhinhos, em pílula com marca-texto ou em frase empilhada), **PALCO** (palavra gigante atrás da sua cabeça; o recorte é feito no próprio Mac, grátis), **ÓRBITA** (checklist que marca na hora da fala, barra "pronto 100%", caixa de comentário digitando a palavra do CTA) e **LENTE** (zoom rápido no rosto). **ÓRBITA** também tem cartões girando em volta de você (passam atrás da cabeça e na frente abaixo do queixo). Em todos, nada fica na frente do rosto: o Gab detecta o rosto, desce a legenda e manda a animação para trás de você. A **BANCADA** (tela verde de comentário) vem a seguir. Peça "no preset palco" (ou destaque, órbita, lente) ou deixe o Gab escolher.
 
