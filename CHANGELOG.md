@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-4 (16/10/2026)
+- **Efeitos novos para os motions:** palavras e cartões caindo e empilhando com física de verdade, esfera de pontos de "IA pensando" (6 jeitos: pensando, buscando, resolvendo, ouvindo, escrevendo, moldando), texto virando ASCII, lupa que estufa o texto e rabiscos à mão (círculo, sublinhado, seta, X e hachura) que se desenham e tremem como animação feita à mão.
+
 ## 2026.10.16-3 (16/10/2026)
 - **Carrossel de motion:** peça "faz um carrossel de motion sobre X" e cada slide vira um vídeo 4:5 que se monta sozinho: título subindo, celular com o app (números contando, lista recebendo check), cartões ligados por fios, hub mostrando como tudo se conecta e o CTA digitando a palavra que a pessoa deve comentar. Sai um MP4 e um PNG por slide, nas cores da sua marca.
 

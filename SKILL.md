@@ -114,6 +114,8 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 - **launch** (filme de lançamento de produto, a partir do /brag): SEMPRE acabamento premium estilo filme de produto da Apple (preto, uma ideia por cena, revelação por máscara com `expo.out`, produto em painel de vidro 3D com reflexo, som contido); `capturar.py <url>` tira a página inteira e a cor da marca, `gerar.py plano.json --render x.mp4 --gif`; `letra` apple (padrão) | editorial | cinema (`presets/launch/`, ler o `PRESET.md`).
 - **kinetic** (tipografia cinética estilo Katana): cada batida vira uma cena com palavras enormes, hierarquia, ecos, caixa vermelha, faixa, prompt digitando, render, rec, visor, formas 3D e explosão; fundos preto vivo/vermelho/branco/grafite; transições de chicote, glitch e risco de luz (`presets/kinetic/`, `gerar.py plano.json`).
 
+- **efeitos extras** (para qualquer motion, `presets/efeitos/EFEITOS.md`): física (palavras caindo e empilhando, Matter.js), esfera de "IA pensando" em 6 estados, ASCII, lupa que estufa o texto e rabiscos à mão com hachura (Rough.js). Acervo de 400+ vídeos de referência listado no mesmo guia.
+
 **Quando usar cada preset (o Gab escolhe sozinho no plano trecho a trecho e diz qual escolheu e por quê; o usuário pode trocar):**
 
 | O trecho/vídeo é... | Preset | Por quê |

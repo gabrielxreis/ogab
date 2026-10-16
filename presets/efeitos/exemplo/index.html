@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=1080, height=1920" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<style>
+@font-face { font-family: "CS"; src: url("fonts/Poppins-Black.ttf"); font-weight: 900; }
+@font-face { font-family: "CS"; src: url("fonts/Poppins-Bold.ttf"); font-weight: 700; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0f1013; }
+#root { position: relative; width: 1080px; height: 1920px; font-family: "CS"; color: #fff;
+  background: radial-gradient(ellipse 70% 50% at 50% 45%, #1d2029, #0f1013 75%); overflow: hidden; }
+.cena { position: absolute; inset: 0; opacity: 0; }
+.rot { position: absolute; left: 50%; top: 230px; transform: translateX(-50%); font-weight: 700; font-size: 30px; letter-spacing: .3em;
+  color: #F2D16B; border: 2px solid rgba(242,209,107,.5); border-radius: 40px; padding: 12px 30px; white-space: nowrap; }
+.bloco { display: flex; align-items: center; justify-content: center; border-radius: 26px; font-weight: 900; font-size: 74px; letter-spacing: -.03em;
+  background: #fff; color: #111; box-shadow: 0 20px 40px rgba(0,0,0,.4); }
+.bloco.d { background: #F2D16B; } .bloco.e { background: #2a2d36; color: #fff; border: 2px solid rgba(255,255,255,.18); }
+.orb { position: absolute; text-align: center; font-weight: 700; font-size: 26px; letter-spacing: .12em; color: rgba(255,255,255,.75); }
+.frase { position: absolute; left: 90px; right: 90px; font-weight: 900; font-size: 92px; line-height: 1.08; letter-spacing: -.035em; }
+</style></head><body>
+<div id="root" data-composition-id="efeitos" data-start="0" data-duration="17.5" data-width="1080" data-height="1920" data-fps="30"></div>
+<script src="efeitos.js"></script><script src="fisica.js"></script><script src="orbe.js"></script>
+<script src="ascii.js"></script><script src="lupa.js"></script><script src="rabisco.js"></script>
+<script>
+const root = document.getElementById("root"), tl = gsap.timeline({ paused: true }), DUR = 17.5;
+const cena = (rot, de, ate) => { const c = document.createElement("div"); c.className = "cena"; root.appendChild(c);
+  const r = document.createElement("div"); r.className = "rot"; r.textContent = rot; c.appendChild(r);
+  tl.fromTo(c, { opacity: 0 }, { opacity: 1, duration: .3 }, de); tl.to(c, { opacity: 0, duration: .3 }, ate - .3); return c; };
+const draws = [];
+// 1. FÍSICA
+{ const c = cena("FÍSICA", 0, 4.4), pal = [["PALAVRAS", 560, ""], ["QUE", 300, "e"], ["CAEM", 380, "d"], ["E", 160, "e"], ["EMPILHAM", 600, ""], ["!", 130, "d"]];
+  const corpos = pal.map(([t, w, k], i) => { const e = document.createElement("div"); e.className = "bloco " + k; e.textContent = t; c.appendChild(e);
+    return { el: e, w, h: 132, x: [380, 640, 470, 700, 520, 760][i], y: -120, de: .2 + i * .45, angulo: (i % 2 ? .06 : -.05), quique: .25 }; });
+  const d = EFX.fisica(tl, DUR, { corpos, chao: 1560, paredes: [80, 1000] }); draws.push(t => t < 4.4 && d(t)); }
+// 2. ORBE (6 estados)
+{ const c = cena("IA PENSANDO", 4.4, 8.4), est = ["pensando", "buscando", "resolvendo", "ouvindo", "escrevendo", "moldando"];
+  const ds = est.map((e, i) => { const x = 60 + (i % 2) * 500, y = 420 + Math.floor(i / 2) * 430;
+    const cv = EFX.canvas(c, 460, 340, { left: x + "px", top: y + "px" }); const l = document.createElement("div"); l.className = "orb";
+    Object.assign(l.style, { left: x + "px", width: "460px", top: (y + 340) + "px" }); l.textContent = e.toUpperCase(); c.appendChild(l);
+    return EFX.orbe(cv, { estado: e, cor: i === 0 ? "#F2D16B" : "#ffffff", pontos: 360, ponto: 3.4 }); });
+  draws.push(t => { if (t > 4.2 && t < 8.6) ds.forEach(d => d(t - 4.4)); }); }
+// 3. ASCII
+{ const c = cena("ASCII", 8.4, 11.6), cv = EFX.canvas(c, 1000, 560, { left: "40px", top: "620px" });
+  const fonte = EFX.texto_canvas("GAB", { w: 1000, h: 560, fonte: "900 400px CS", cor: "#ffffff" });
+  const d = EFX.ascii(cv, fonte, { cel: 13, cor: "#F2D16B", modo: "revela" });
+  draws.push(t => { if (t > 8.2 && t < 11.8) d(EFX.lim((t - 8.6) / 2.2), t); }); }
+// 4. LUPA
+{ const c = cena("LUPA", 11.6, 14.4), cv = EFX.canvas(c, 960, 760, { left: "60px", top: "560px" });
+  const fonte = EFX.texto_canvas("a lente passa\npor cima do\ntexto e estufa\ncada palavra", { w: 960, h: 760, fonte: "900 120px CS", cor: "#ffffff" });
+  const d = EFX.lupa(cv, fonte, { raio: .24, forca: .85, brilho: .1 });
+  draws.push(t => { if (t > 11.4 && t < 14.6) { const p = EFX.lim((t - 11.8) / 2.4); d(.12 + .76 * p, .2 + .6 * EFX.suave(p) + .06 * Math.sin(p * 9), EFX.lim((t - 11.6) / .4)); } }); }
+// 5. RABISCO
+{ const c = cena("RABISCO", 14.4, DUR + .3), f = document.createElement("div"); f.className = "frase"; f.style.top = "620px";
+  f.innerHTML = 'o Gab <span id="w1">nunca</span><br>edita <span id="w2">sozinho</span>:<br>ele usa <span id="w3" style="position:relative">IA</span>'; c.appendChild(f);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("width", 1080); svg.setAttribute("height", 1920);
+  svg.style.position = "absolute"; svg.style.inset = 0; c.insertBefore(svg, f);
+  const box = id => { const r = document.getElementById(id).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; };
+  // mede as palavras só com a fonte carregada (senão a caixa sai do tamanho da fonte reserva)
+  window.__pronto = document.fonts.ready.then(() => {
+    const b1 = box("w1"), b2 = box("w2"), b3 = box("w3");
+    EFX.rabisco(tl, svg, Object.assign({ forma: "circulo", de: 14.8, cor: "#F2D16B" }, b1));
+    EFX.rabisco(tl, svg, Object.assign({ forma: "sublinhado", de: 15.4, cor: "#F2D16B", seed: 3 }, b2));
+    EFX.rabisco(tl, svg, Object.assign({ forma: "hachura", de: 15.9, cor: "#E2683C", seed: 5, gap: 16 }, { x: b3.x - 18, y: b3.y + 10, w: b3.w + 36, h: b3.h - 10 }));
+    EFX.rabisco(tl, svg, { forma: "seta", x: 760, y: 1300, w: -150, h: -110, de: 16.4, cor: "#ffffff", seed: 9 });
+  });
+}
+EFX.relogio(tl, DUR, t => draws.forEach(d => d(t)));
+window.__timelines = window.__timelines || {}; window.__timelines["efeitos"] = tl;
+</script>
+</body></html>

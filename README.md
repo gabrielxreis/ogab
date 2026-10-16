@@ -377,6 +377,10 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **GLASS** ([guia](presets/glass/PRESET.md)), da comunidade | YouTube 16:9 premium: vidro escuro com aurora violeta e grão de filme, título metálico, destaque em Playfair itálico e números em Inter fina, revelação por máscara com desfoque. Cenas entram com slide junto com um empurrão de câmera na V1 (no Fusion de cada clipe, reversível), seus prints com anel e caixa marcando o número, stingers de capítulo e cartão de like + inscreva-se com a foto do canal. A cor violeta troca pela da sua marca. Para tutorial e explicativo com webcam e gravação de tela | <img src="presets/glass/exemplo.gif" width="240" alt="Exemplo do preset Glass"> |
 
 
+**Efeitos extras** ([guia](presets/efeitos/EFEITOS.md)), para qualquer motion: física (palavras caindo e empilhando), esfera de "IA pensando", ASCII, lupa e rabiscos à mão.
+
+<p align="center"><img src="presets/efeitos/exemplos/fisica.gif" width="150" alt="Física">&nbsp;<img src="presets/efeitos/exemplos/orbe.gif" width="150" alt="IA pensando">&nbsp;<img src="presets/efeitos/exemplos/ascii.gif" width="150" alt="ASCII">&nbsp;<img src="presets/efeitos/exemplos/lupa.gif" width="150" alt="Lupa">&nbsp;<img src="presets/efeitos/exemplos/rabisco.gif" width="150" alt="Rabisco"></p>
+
 # CLIENTES
 
 ## Perfil, pronúncia e estilo de edição
