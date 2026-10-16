@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=%W%, height=%H%" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "PalcoSans"; src: url("fonts/Poppins-Bold.ttf"); font-weight: 700; }
+@font-face { font-family: "PalcoSans"; src: url("fonts/Poppins-ExtraBold.ttf"); font-weight: 800; }
+@font-face { font-family: "PalcoSans"; src: url("fonts/Poppins-Black.ttf"); font-weight: 900; }
+@font-face { font-family: "PalcoSerif"; src: url("fonts/PlayfairDisplay-Italic.ttf"); font-style: italic; font-weight: 400; }
+@font-face { font-family: "PalcoSerif"; src: url("fonts/PlayfairDisplay-SemiBoldItalic.ttf"); font-style: italic; font-weight: 600; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: %W%px; height: %H%px; overflow: hidden; background: transparent; }
+#root { position: relative; width: 100%; height: 100%; font-family: "PalcoSans", sans-serif; color: #fff; }
+.abs { position: absolute; }
+.leg { position: absolute; left: 60px; right: 60px; text-align: center; }
+.leg .w { display: inline-block; margin: 0 .12em; }
+.base { font-weight: 800; font-size: 54px; line-height: 1.12; letter-spacing: -.01em; text-shadow: 0 3px 18px rgba(0,0,0,.55), 0 1px 3px rgba(0,0,0,.5); }
+.grande { font-weight: 900; font-size: 150px; line-height: .95; letter-spacing: -.035em; color: var(--dest); text-shadow: 0 6px 30px rgba(0,0,0,.45); }
+.serifa { font-family: "PalcoSerif"; font-style: italic; font-weight: 600; font-size: 118px; line-height: 1.12; padding-bottom: 8px; color: var(--dest); text-shadow: 0 6px 26px rgba(0,0,0,.45); }
+.pequena { font-weight: 700; font-size: 44px; line-height: 1.25; margin: 4px 0; text-shadow: 0 3px 14px rgba(0,0,0,.55); }
+.brilho { position: absolute; color: var(--dest); font-size: 44px; text-shadow: 0 0 12px var(--dest); }
+.atras { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; color: #fff; letter-spacing: -.045em; line-height: .9;
+         text-shadow: 0 0 40px rgba(255,255,255,.25); white-space: nowrap; }
+.atras.serif { font-family: "PalcoSerif"; font-style: italic; font-weight: 600; letter-spacing: -.02em; }
+.sub { position: absolute; left: 0; right: 0; text-align: center; font-weight: 700; font-size: 30px; letter-spacing: .5em; opacity: .92; }
+.card { position: absolute; background: rgba(18,18,20,.78); border: 1.5px solid rgba(255,255,255,.16); border-radius: 30px;
+        box-shadow: 0 24px 60px rgba(0,0,0,.45); padding: 30px 34px; color: #fff; }
+.card .tit { font-weight: 800; font-size: 26px; letter-spacing: .28em; color: rgba(255,255,255,.6); margin-bottom: 20px; }
+.card .it { display: flex; align-items: center; gap: 20px; font-weight: 700; font-size: 38px; margin: 16px 0; }
+.card .ck { width: 44px; height: 44px; border-radius: 50%; border: 3px solid rgba(255,255,255,.35); position: relative; flex: none; }
+.card .ck i { position: absolute; inset: -3px; border-radius: 50%; background: var(--dest); opacity: 0; }
+.card .ck svg { position: absolute; left: 9px; top: 11px; width: 26px; height: 22px; opacity: 0; }
+.cta { position: absolute; left: 70px; right: 70px; height: 112px; border-radius: 60px; background: rgba(18,18,20,.82);
+       border: 3px solid var(--dest); display: flex; align-items: center; padding: 0 22px; gap: 22px; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
+.cta .av { width: 66px; height: 66px; border-radius: 50%; background: linear-gradient(135deg,#ddd,#888); flex: none; }
+.cta .tx { flex: 1; font-weight: 800; font-size: 50px; letter-spacing: .02em; }
+.cta .car { display: inline-block; width: 5px; height: 48px; background: var(--dest); vertical-align: -6px; margin-left: 4px; }
+.cta .env { width: 72px; height: 72px; border-radius: 50%; background: var(--dest); flex: none; position: relative; }
+.cta .env svg { position: absolute; left: 18px; top: 16px; }
+.cta-rot { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 44px; text-shadow: 0 3px 14px rgba(0,0,0,.55); }
+.pilula { margin: 6px 0; }
+.pil { display: inline-block; background: #fff; color: #111; border-radius: 40px; padding: 10px 26px; font-weight: 800; font-size: 50px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.pil .marca { background: linear-gradient(transparent 55%, var(--dest) 55%) no-repeat; background-size: var(--m, 0%) 100%; }
+.card.prog { padding: 28px 32px; }
+.prog .pt { display: flex; justify-content: space-between; align-items: baseline; font-weight: 800; font-size: 40px; }
+.prog .pt b { color: var(--dest); font-size: 56px; }
+.prog .pb { height: 16px; border-radius: 10px; background: rgba(255,255,255,.15); margin: 18px 0 22px; overflow: hidden; }
+.prog .pb i { display: block; height: 100%; background: var(--dest); border-radius: 10px; }
+.prog .pp { display: flex; flex-wrap: wrap; gap: 12px; }
+.pil2 { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2); border-radius: 30px; padding: 8px 18px 8px 10px; font-weight: 700; font-size: 28px; }
+.pil2 svg { width: 30px; height: 26px; background: var(--dest); border-radius: 50%; padding: 5px; }
+</style></head><body>
+<div id="root" data-composition-id="cena-%CAMADA%" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%"></div>
+<script src="plano.js"></script>
+<script src="nucleo.js"></script>
+%MODULOS%
+<script src="fim.js"></script>
+<script>window.__timelines = window.__timelines || {}; window.__timelines["cena-%CAMADA%"] = CENA.tl;</script>
+</body></html>
