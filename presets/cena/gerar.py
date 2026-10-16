@@ -177,11 +177,18 @@ def rosto_lente(c, t, lente, w, h, rampa=.14):
     return (c[0] * z - ox, c[1] * z - oy, c[2] * z - ox, c[3] * z - oy)
 
 
-def proteger_rosto(video, w, h, dur, lente, legenda, cartoes):
+def caixas_rosto(plano, video, w, h, dur):
+    """Rosto por quadro: detectado (rosto.py) ou fixo no plano ("rosto": [x0, y0, x1, y1], ex.: apresentador ilustrado)."""
+    if plano.get("rosto"):
+        return {round(i * .5, 3): tuple(plano["rosto"]) for i in range(int(dur * 2) + 2)}
+    from rosto import rostos
+    return rostos(video, w, h, dur)
+
+
+def proteger_rosto(cx, w, h, lente, legenda, cartoes):
     """REGRA DO GAB: texto e animação nunca na frente do rosto. Legenda que bate no rosto desce; cartão que bate vai
     para TRÁS da pessoa (camada palco, com o recorte por cima); sem espaço embaixo, avisa para reenquadrar."""
-    from rosto import rostos, no_trecho, bate
-    cx = rostos(video, w, h, dur)
+    from rosto import no_trecho, bate
     if not cx:
         print("  rosto: nenhum rosto detectado, posições mantidas"); return [], []
     rost = lambda de, ate: no_trecho({t: rosto_lente(c, t, lente, w, h) for t, c in cx.items()}, de, ate)
@@ -210,10 +217,9 @@ def proteger_rosto(video, w, h, dur, lente, legenda, cartoes):
     return atras, avisos
 
 
-def preparar_giros(giros, video, w, h, dur, lente, absp, pasta):
+def preparar_giros(giros, cx, w, h, lente, absp):
     """Cartões girando: elipse em volta da pessoa com a passagem da FRENTE abaixo do queixo (regra do rosto)."""
-    from rosto import rostos, no_trecho
-    cx = rostos(video, w, h, dur)
+    from rosto import no_trecho
     for c in giros:
         c.setdefault("voltas", 1); c.setdefault("fase", 0.6)
         c.setdefault("cw", int(w * .30)); c.setdefault("ch", int(c["cw"] * (16 / 9 if any(k.get("img") for k in c["cartoes"]) else .62)))
@@ -248,17 +254,22 @@ def gerar(plano, pasta, fazer_render=True):
                 c["itens"] = [{"t": t, "em": em} for t, em in c["itens"]]
             cart.append(c)
         frente["orbita"] = cart; mods.append("orbita")
+    _cx = {}
+    def rosto_cx():
+        if "v" not in _cx:
+            _cx["v"] = caixas_rosto(plano, video, w, h, dur)
+        return _cx["v"]
     giros = [c for c in frente.get("orbita", []) if c["tipo"] == "giro"]
     if giros:
         frente["orbita"] = [c for c in frente["orbita"] if c["tipo"] != "giro"]
-        preparar_giros(giros, video, w, h, dur, plano.get("lente"), absp, pasta)
+        preparar_giros(giros, rosto_cx(), w, h, plano.get("lente"), absp)
     for c in giros:   # legenda desce para baixo dos cartões da frente durante o giro
         for g in frente.get("destaque") or []:
             if g["ini"] < c["ate"] and g["fim"] > c["de"] and g["y"] < c["_base"] + 30:
                 g["y"] = int(min(c["_base"] + 30, h * .9 - g["alto"]))
     atras_cart = []
     if plano.get("proteger_rosto", True) and mods:
-        atras_cart, _ = proteger_rosto(video, w, h, dur, plano.get("lente"), frente.get("destaque"), frente.get("orbita"))
+        atras_cart, _ = proteger_rosto(rosto_cx(), w, h, plano.get("lente"), frente.get("destaque"), frente.get("orbita"))
     projs = {}
     atras_cart = atras_cart + giros
     frente.setdefault("orbita", []).extend(giros)

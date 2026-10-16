@@ -14,6 +14,11 @@ nome próprio, todos rodando por este motor:
 
 Não confundir com VITRINE (já existia: cartões de produto) nem com TELA DIVIDIDA (painel de motion em cima).
 
+## Exemplo
+`exemplo/fazer.py <pasta>` monta tudo com um apresentador ILUSTRADO (ninguém real no repositório): a "gravação", o
+recorte direto do desenho e o `"rosto"` fixo no plano, e corta o `exemplo.gif` de cada preset. Os GIFs do README saem
+daí; nunca usar vídeo de cliente ou aluno no repositório público.
+
 ## Como gerar
 1. Transcrição com tempo por palavra (`palavras.json`: `[{"w","ini","fim"}]`).
 2. Plano (formato completo no topo do `gerar.py`): só as chaves dos presets que o vídeo usa
@@ -31,6 +36,7 @@ conta o zoom da LENTE) no tempo de cada elemento:
 - legenda que bate no rosto desce para baixo do queixo;
 - cartão/animação que bate vai para TRÁS da pessoa (camada `palco.mov`, com o recorte por cima);
 - CTA desce se couber, senão vai para trás;
+- rosto fixo (personagem ilustrado, sem detecção): `"rosto": [x0, y0, x1, y1]` no plano;
 - sem espaço embaixo: imprime `AVISO ... reenquadre`. Aí tirar o zoom do trecho, afastar/baixar a pessoa ou mover o
   texto; nunca entregar com o aviso pendente. `"proteger_rosto": false` no plano desliga (só se o usuário pedir).
 

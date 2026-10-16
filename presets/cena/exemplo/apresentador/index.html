@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=1080, height=1920" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+* { margin: 0; padding: 0; } html, body { width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+#root { position: relative; width: 1080px; height: 1920px; }
+#fundo { position: absolute; inset: 0; display: %FUNDO%;
+  background: radial-gradient(ellipse 70% 45% at 50% 40%, #3b4a5e 0%, #263142 55%, #161d29 100%); }
+#fundo .luz { position: absolute; left: 140px; top: 260px; width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,196,140,.35), rgba(255,196,140,0) 65%); }
+#fundo .prat { position: absolute; left: 70px; top: 520px; width: 250px; height: 14px; border-radius: 7px; background: #4b5a70; filter: blur(3px); }
+#fundo .vaso { position: absolute; left: 860px; top: 1180px; width: 150px; height: 420px; filter: blur(6px); }
+svg { position: absolute; inset: 0; }
+</style></head><body>
+<div id="root" data-composition-id="apresentador" data-start="0" data-duration="%DUR%" data-width="1080" data-height="1920" data-fps="24">
+  <div id="fundo"><div class="luz"></div><div class="prat"></div>
+    <svg class="vaso" viewBox="0 0 150 420"><path d="M40 300 h70 l-10 120 h-50z" fill="#c9824f"/><path d="M75 300 C 20 220 10 120 60 40 M75 300 C 120 210 140 140 110 60 M75 300 C 70 200 80 120 75 10" stroke="#5f8f5a" stroke-width="16" fill="none" stroke-linecap="round"/></svg>
+  </div>
+  <svg viewBox="0 0 1080 1920" id="pessoa">
+    <g id="corpo">
+      <path d="M90 1920 C 100 1500 170 1300 330 1250 L 470 1215 L 610 1215 L 750 1250 C 910 1300 980 1500 990 1920 Z" fill="#b5583b"/>
+      <path d="M470 1215 L 540 1330 L 610 1215" fill="#d9a07a"/>
+      <path d="M455 1212 L 540 1345 L 625 1212" fill="none" stroke="#9a4630" stroke-width="14" stroke-linejoin="round"/>
+      <rect x="480" y="1010" width="120" height="230" rx="40" fill="#cf9470"/>
+    </g>
+    <g transform="translate(0 70)"><g id="cabeca">
+      <ellipse cx="368" cy="830" rx="34" ry="58" fill="#d79c77"/><ellipse cx="712" cy="830" rx="34" ry="58" fill="#d79c77"/>
+      <ellipse cx="540" cy="800" rx="178" ry="218" fill="#e2ad87"/>
+      <path d="M358 760 C 340 560 470 520 560 540 C 680 520 760 610 724 770 C 710 700 690 650 640 640 C 590 680 470 690 420 650 C 380 690 372 720 358 760 Z" fill="#2a1d17"/>
+      <path d="M440 712 q 40 -18 80 -2 M560 710 q 40 -16 80 2" stroke="#2a1d17" stroke-width="12" fill="none" stroke-linecap="round" id="sobr"/>
+      <g id="olhos"><ellipse cx="480" cy="780" rx="13" ry="15" fill="#20160f"/><ellipse cx="600" cy="780" rx="13" ry="15" fill="#20160f"/></g>
+      <g fill="none" stroke="#171717" stroke-width="10"><rect x="415" y="735" width="125" height="92" rx="34"/><rect x="545" y="735" width="125" height="92" rx="34" transform="translate(-5 0)"/><path d="M535 770 q 5 -8 10 0"/></g>
+      <path d="M540 820 q -16 48 0 62 q 10 4 18 -2" fill="none" stroke="#c48661" stroke-width="7" stroke-linecap="round"/>
+      <ellipse id="boca" cx="540" cy="935" rx="42" ry="7" fill="#7a2f2a"/>
+      <path d="M498 930 q 42 26 84 0" fill="none" stroke="#a5523f" stroke-width="5" stroke-linecap="round" id="labio"/>
+    </g></g>
+  </svg>
+</div>
+<script>
+const PAL = %PALAVRAS%, DUR = %DUR%;
+const tl = gsap.timeline({ paused: true });
+tl.set("#boca", { attr: { ry: 7 } }, 0);
+PAL.forEach((p, i) => {   // boca abre em cada palavra, abertura varia com o tamanho da palavra
+  const ab = 14 + Math.min(16, p.w.length * 2.2) + (i % 3) * 3, d = Math.max(.08, p.fim - p.ini);
+  tl.to("#boca", { attr: { ry: ab }, duration: Math.min(.09, d / 2), ease: "power1.out" }, p.ini);
+  tl.to("#boca", { attr: { ry: 9 }, duration: Math.min(.1, d / 2), ease: "power1.in" }, p.fim - Math.min(.1, d / 2));
+});
+for (let t = 1.7; t < DUR; t += 3.1 + (Math.floor(t) % 3) * .4)   // piscadas
+  tl.to("#olhos", { scaleY: .1, transformOrigin: "50% 50%", duration: .06, yoyo: true, repeat: 1 }, t);
+for (let t = 0; t < DUR; t += 2.4) {   // cabeça balançando e respiração
+  tl.to("#cabeca", { rotation: (Math.floor(t / 2.4) % 2 ? -2.2 : 2), y: (Math.floor(t / 2.4) % 2 ? 4 : -6), svgOrigin: "540 1100", duration: 1.2, ease: "sine.inOut" }, t);
+  tl.to("#cabeca", { rotation: 0, y: 0, svgOrigin: "540 1100", duration: 1.2, ease: "sine.inOut" }, t + 1.2);
+  tl.to("#corpo", { scaleY: 1.008, svgOrigin: "540 1920", duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: 1 }, t);
+}
+PAL.forEach((p, i) => { if (/[.!?]$/.test(p.w)) tl.to("#sobr", { y: -10, duration: .15, yoyo: true, repeat: 1 }, p.ini); });
+tl.set({}, {}, DUR);
+window.__timelines = window.__timelines || {}; window.__timelines["apresentador"] = tl;
+</script>
+</body></html>
