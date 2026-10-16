@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-1 (16/10/2026)
+- **Arte estática vira animação (PSD, Canva ou imagem):** peça "anima essa arte" e mande o PSD, o PDF do Canva (Compartilhar > Baixar > PDF Impressão, sem achatar) ou só a imagem. O Gab separa cada camada (fundo, pessoas, título, textos, pílulas, linhas, ícones), anima cada uma do jeito dela e entrega o vídeo com o último quadro igual à arte. Com Photoshop no Mac, os estilos de camada saem perfeitos (ele trabalha numa cópia, seu arquivo não é tocado). Rode `/ogab doctor` para instalar os leitores de PSD e PDF.
+
 ## 2026.10.15-11 (15/10/2026)
 - **Legenda automática mais segura:** o Gab vai para a página Edit e espera o DaVinci terminar de criar as legendas (antes, com o DaVinci recém-aberto, a legenda saía vazia e o script quebrava). O preset GAB USA maximiza a janela do DaVinci sozinho antes de aplicar.
 - **Motions sem quadro preto entre cenas:** as cenas saem com uma folga no fim e o Gab confere que não ficou buraco; flash, queima de filme e caixa de texto não aparecem mais antes da hora.

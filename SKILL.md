@@ -132,6 +132,9 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 - Vídeo de cliente com `estilo.md`: o preset só troca o visual do trecho; cores da marca entram (`cor`/`destaque` no point cloud, `"cores": {"hi": ...}` no vector motion); a logo e o CTA continuam os do cliente.
 - Sem encaixe claro na tabela: não forçar preset; usar o motion padrão do Gab.
 
+## Arte estática animada: PSD, Canva ou imagem (`docs/etapas/arte_animada.md`)
+"Anima essa arte/flyer/post/PSD/design do Canva": pedir o PSD (ou o PDF do Canva, sem achatar) antes de aceitar só a imagem; `arte_animada.py ler` separa em camadas (PSD pelo Photoshop via ponte da /oyoshi ou psd-tools; PDF com texto, fotos e formas separados; imagem com pessoas recortadas pelo Vision), `plano` mostra papel e animação de cada camada, `montar` gera o HyperFrames com entrada por papel, respiro e trava final na arte exata. Render MP4 (ou MOV com alfa).
+
 ## Vídeo só motion + música (`docs/etapas/so_motion.md`)
 Sem narração: cenas na batida da música (bpm do Artlist), fonte em cada dado, render MP4 `--workers 1`, foley pelo que a cena mostra, entrega na Área de Trabalho.
 
