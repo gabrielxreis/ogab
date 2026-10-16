@@ -396,6 +396,8 @@ Cada empresa tem o seu estilo. Regra que você dá para uma marca vai para o `es
 
 O Gab também é o social media: o vídeo sai pronto e o post sai junto. Basta pedir para o `/ogab`.
 
+<p align="center"><img src="instagram/carrossel_motion/exemplo/exemplo.gif" alt="Carrossel de motion: capa, slide de app e CTA" width="300"><br><sub>Carrossel de motion: cada slide é um vídeo que se monta sozinho (capa, app no celular, CTA).</sub></p>
+
 <p align="center"><img src=".github/carrossel.jpg" alt="Carrossel de 7 slides gerado pelo Gab na marca do cliente" width="900"><br><sub>Carrossel gerado e exportado sem clique: 7 slides 1080x1350 nas cores e na fonte da marca (aqui, a do próprio Gab).</sub></p>
 
 <p align="center"><img src=".github/instagram.svg" alt="Exemplo de legenda do Instagram com gancho, corpo, CTA e hashtags" width="900"></p>
@@ -406,6 +408,7 @@ O Gab também é o social media: o vídeo sai pronto e o post sai junto. Basta p
 | "monta um carrossel sobre X" | Planeja slide a slide e **gera as imagens prontas** (PNG por slide e PDF para LinkedIn) nas cores e na fonte do cliente: 12 tipos de slide (gancho, lista, números, antes x depois, citação, CTA...) e formatos 4:5, quadrado, Stories e 16:9 |
 | "por que esse Reel viralizou?" + link | Extrai e classifica o gancho para você reaproveitar |
 | "planeja a semana da Bora Imigrar" | Reels, carrosséis e stories por pilar de conteúdo |
+| "faz um carrossel de motion sobre X" | Cada slide vira um **vídeo 4:5 de 6,5 s que se monta sozinho**: título subindo, celular com o app (números contando, lista recebendo check), cartões ligados por fios, hub de conexão e CTA digitando a palavra. Sai MP4 + PNG por slide, nas cores da marca ([guia](instagram/carrossel_motion/CARROSSEL_MOTION.md)) |
 | "transforma esse post do LinkedIn em carrossel" | Adapta conteúdo de outra rede para o formato do Instagram |
 | "revisa o perfil" | Foto, nome, bio, link, destaques, primeira grade e fixados |
 | "o que está funcionando no meu nicho?" | Lê dados reais de hashtag e de perfis (com token Apify) |
@@ -675,6 +678,7 @@ docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
 instagram/               parte de Instagram: 9 especialidades (legenda, carrossel, hashtags, humanizer...), referências e lib de publicação
 instagram/carrossel/     gerador de carrossel em imagem (Next.js): carrossel.py novo | previa | exportar
+instagram/carrossel_motion/  carrossel em vídeo (HyperFrames): gerar.py plano.json <saída> -> MP4 + PNG por slide
 presets/<nome>/           presets de edição e motion (PRESET.md, kit HyperFrames, exemplo)
 docs/etapas/              uma instrução por etapa (takes, legenda, sfx, sonorização, tracking, motion avançado, davinci_api...)
 docs/referencia/          bugs verificados da API do DaVinci (do davinci-resolve-mcp, MIT)

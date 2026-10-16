@@ -1,5 +1,8 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.16-3 (16/10/2026)
+- **Carrossel de motion:** peça "faz um carrossel de motion sobre X" e cada slide vira um vídeo 4:5 que se monta sozinho: título subindo, celular com o app (números contando, lista recebendo check), cartões ligados por fios, hub mostrando como tudo se conecta e o CTA digitando a palavra que a pessoa deve comentar. Sai um MP4 e um PNG por slide, nas cores da sua marca.
+
+## 2026.10.16-3 (16/10/2026)
 - **Preset novo LAUNCH (filme de lançamento de produto):** mande o link do seu site, curso ou app e peça "um vídeo de 15 s apresentando o produto". O Gab captura a página inteira e a cor da sua marca e monta um filme curto com acabamento premium, no estilo dos lançamentos da Apple:
   - fundo preto e uma ideia por cena;
   - frases entrando com curvas longas;
