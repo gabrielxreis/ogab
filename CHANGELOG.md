@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-2 (16/10/2026)
+- **Acabamento de cinema nos motions:** brilho estourado, grão de filme, separação de cor e luz entrando pelos cantos, em três níveis (sutil, suave, forte). Peça "com cinema" ou deixe `cinema: suave` no estilo do cliente. Funciona também nos motions com fundo transparente que vão por cima do vídeo.
+- **Física nos motions:** peças (pílulas, moedas, velas, logos, ícones) que caem, quicam, empilham e depois explodem revelando o CTA. Ótimo para "tudo que você precisa", "acumular" e "bagunça vira solução".
+
 ## 2026.10.16-4 (16/10/2026)
 - **Storyboard antes do render:** antes de renderizar um motion, o Gab te mostra o roteiro cena a cena e 3 quadros parados (gancho, cena principal e fecho). Você aprova ou pede ajuste pelo número da cena ("na 3, troca o texto"), e só aquela cena muda. Menos render jogado fora.
 - **Revisor com nota antes de entregar:** o vídeo passa por uma conferência automática:

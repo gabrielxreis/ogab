@@ -202,6 +202,8 @@ Presets de lettering do usuário; motions no centro (540, 960), visual do site d
 
 **Princípios (todo motion, HyperFrames ou AE):** 12 de Disney + 12 de UX, ritmo pela música, tokens de motion por cliente, referência = linguagem e recriação fiel: `docs/etapas/principios_animacao.md` (ler ao planejar motions ou receber referência).
 
+**Efeitos (`docs/etapas/fx.md`):** `fx.py cinema <projeto> --nivel sutil|suave|forte` dá acabamento cinematográfico (bloom, grão, aberração, luz nos cantos; `--alfa` em MOV sobre vídeo; `cinema:` no `estilo.md` do cliente) e `fx.py fisica` liga `Fisica.cair/explodir` (peças que caem, empilham e explodem, gravadas em keyframes).
+
 ## 8b. Tracking de texto e animação no editor (`docs/etapas/tracking_animacao.md`)
 Texto que segue rosto/objeto (`scripts/rastrear.py` + aplicar no DaVinci, Premiere ou AE) e animação de clipe com keyframes (punch-in, zoom, pan, giro, opacidade), sempre no editor escolhido e conferido por quadros.
 

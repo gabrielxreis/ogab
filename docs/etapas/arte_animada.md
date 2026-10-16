@@ -38,11 +38,12 @@ Ordem padrão: fundo e texturas no 0 s; pessoas a partir de 0,35 s; o resto de c
 ## 4. Montar, conferir, renderizar
 
 ```bash
-python3 SKILL_DIR/scripts/arte_animada.py montar "<projeto>" [--duracao 10] [--largura 1080] [--particulas "#ff9a3c"] [--sem-final-exato]
+python3 SKILL_DIR/scripts/arte_animada.py montar "<projeto>" [--duracao 10] [--largura 1080] [--particulas "#ff9a3c"] [--sem-final-exato] [--cinema suave] [--cinema-cor "#ffb070"]
 cd "<projeto>" && npx hyperframes lint && npx hyperframes snapshot --at 0.5,1.5,3,5,9
 npx hyperframes render --format mp4 --fps 30 -o "<pasta do vídeo>/videos/<arte>.mp4"     # ou --format mov (alfa)
 ```
 - **Trava final** (padrão): no fim da entrada, a arte exata (`_final.png`) entra por cima em 0,9 s. Corrige o que o navegador mistura diferente do Photoshop (modos Luz linear/Luz intensa, grupos atravessar). Desligar com `--sem-final-exato` só se os blocos já baterem com a arte (comparar o quadro final com `_final.png` lado a lado).
+- **Cinema** (`--cinema suave`, padrão para arte animada; ver `fx.md`): bloom, grão, aberração e luz nos cantos por cima de tudo, inclusive da trava final.
 - Conferir no contact sheet: nada piscando antes da hora, pessoa sem faixa cortada, título legível, último quadro igual à arte.
 - Depois do automático, dá para refinar à mão no `index.html` (é GSAP normal): ex. título letra a letra refazendo o texto em HTML, estrelas girando, elipse se desenhando (`stroke-dashoffset`).
 - SFX e música: seguir `sfx.md` (whoosh na pessoa, impacto no `slam`, brilho no chime) e a música bruta como sempre.

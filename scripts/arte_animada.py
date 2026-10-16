@@ -6,7 +6,7 @@ Fluxo (detalhes em docs/etapas/arte_animada.md):
                                 [--motor auto|psdtools|photoshop]
     python3 arte_animada.py plano <pasta_projeto>          # tabela: camada, papel, animação, tempo (para revisar)
     python3 arte_animada.py montar <pasta_projeto> [--duracao 10] [--largura 1080] [--particulas "#ff8a3c"]
-                                [--sem-final-exato]
+                                [--sem-final-exato] [--cinema sutil|suave|forte] [--cinema-cor "#ffb070"]
     npx hyperframes render --format mp4 -o <saida.mp4>     # dentro da pasta_projeto
 
 `ler` grava <pasta>/camadas/*.png (uma por bloco animável, recortada) + <pasta>/camadas.json (posição, papel, blend,
@@ -757,6 +757,8 @@ def main():
     c = sp.add_parser("montar"); c.add_argument("pasta"); c.add_argument("--duracao", type=float, default=10)
     c.add_argument("--largura", type=int, default=1080); c.add_argument("--particulas")
     c.add_argument("--sem-final-exato", action="store_true")
+    c.add_argument("--cinema", choices=["sutil", "suave", "forte"], help="acabamento cinematográfico (docs/etapas/fx.md)")
+    c.add_argument("--cinema-cor", help="cor do vazamento de luz")
     g = ap.parse_args()
     pasta = Path(g.pasta).expanduser().resolve()
     if g.cmd == "ler":
@@ -782,6 +784,11 @@ def main():
         mostrar_plano(pasta)
     else:
         montar(pasta, g.duracao, g.largura, g.particulas, not g.sem_final_exato)
+        if g.cinema:
+            cmd = [sys.executable, str(AQUI / "fx.py"), "cinema", str(pasta), "--nivel", g.cinema, "--alvo", "#push"]
+            if g.cinema_cor:
+                cmd += ["--cor", g.cinema_cor]
+            subprocess.run(cmd, check=True)
 
 
 if __name__ == "__main__":
