@@ -98,21 +98,22 @@ else
   ok "config.json mantido"
 fi
 
-# Editor: cada usuário escolhe UM (DaVinci ou Premiere) e o Gab trabalha só nele (config.json "editor").
+# Editor: cada usuário escolhe UM (DaVinci, Premiere, CapCut ou Final Cut) e o Gab trabalha só nele (config.json "editor").
 EDITOR_ATUAL="$(python3 -c "import json;print(json.load(open('$DEST/config.json')).get('editor',''))" 2>/dev/null || true)"
 OGAB_EDITOR="${OGAB_EDITOR:-$EDITOR_ATUAL}"
 if [ -z "$OGAB_EDITOR" ] && [ -r /dev/tty ]; then
-  printf "\n  Em qual editor o Gab vai montar seus vídeos?\n    1) DaVinci Resolve Studio\n    2) Adobe Premiere Pro\n  Escolha [1/2]: "
+  printf "\n  Em qual editor o Gab vai montar seus vídeos?\n    1) DaVinci Resolve Studio\n    2) Adobe Premiere Pro\n    3) CapCut (beta)\n    4) Final Cut Pro (beta)\n  Escolha [1-4]: "
   read -r esc < /dev/tty || true
-  [ "${esc:-1}" = "2" ] && OGAB_EDITOR="premiere" || OGAB_EDITOR="davinci"
+  case "${esc:-1}" in 2) OGAB_EDITOR="premiere" ;; 3) OGAB_EDITOR="capcut" ;; 4) OGAB_EDITOR="finalcut" ;; *) OGAB_EDITOR="davinci" ;; esac
 fi
 OGAB_EDITOR="${OGAB_EDITOR:-davinci}"
+case "$OGAB_EDITOR" in davinci|premiere|capcut|finalcut) ;; *) warn "editor \"$OGAB_EDITOR\" desconhecido; usando davinci"; OGAB_EDITOR="davinci" ;; esac
 python3 - "$DEST/config.json" "$OGAB_EDITOR" <<'PY'
 import json, sys
 c = json.load(open(sys.argv[1])); c["editor"] = sys.argv[2]
 json.dump(c, open(sys.argv[1], "w"), ensure_ascii=False, indent=2)
 PY
-ok "editor: $OGAB_EDITOR (para trocar: /ogab config editor davinci|premiere)"
+ok "editor: $OGAB_EDITOR (para trocar: /ogab config editor davinci|premiere|capcut|finalcut)"
 
 # Motions: automático (HyperFrames) ou no After Effects (camadas editáveis). Tudo é instalado; a escolha só diz qual o Gab usa.
 MOTION_ATUAL="$(python3 -c "import json;print(json.load(open('$DEST/config.json')).get('motion',''))" 2>/dev/null || true)"
@@ -289,13 +290,15 @@ python3 "$DEST/scripts/doctor.py" --corrigir || true
 cat <<EOF
 
 Pronto. Seu Gab vai editar no: $OGAB_EDITOR   |   motions: $OGAB_MOTION
-(trocar a qualquer hora: /ogab config editor davinci|premiere  e  /ogab config motion hyperframes|aftereffects)
+(trocar a qualquer hora: /ogab config editor davinci|premiere|capcut|finalcut  e  /ogab config motion hyperframes|aftereffects)
 
 Falta só o que precisa de você (uma vez), no app que você usa:
   DaVinci:        Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
                   Reinicie o DaVinci para carregar o lettering (@gabrielxreis_ Text Presets, já instalado em Fusion/Templates).
                   Preset de legenda GAB USA: vem junto (assets/davinci/GAB USA Subtitle.preset); o Gab importa no DaVinci na 1ª legenda.
   Premiere:       Window > UXP Plugins > Gab Ponte (deixe o painel encaixado).
+  CapCut:         abra o CapCut uma vez e entre na sua conta; feche o projeto quando o Gab for gravar nele.
+  Final Cut Pro:  crie uma biblioteca (Arquivo > Nova > Biblioteca) e deixe aberta; dê Acessibilidade ao Terminal/Claude.
   After Effects:  nada: a ponte sobe sozinha (se o AE estava aberto durante a instalação, feche e rode o instalador de novo).
   Todos:          conecte as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific...
                   e a extensão Claude in Chrome logada nos sites (downloads são pelo navegador).

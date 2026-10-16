@@ -94,13 +94,17 @@ if (Test-Path $cfg) {
 if (-not (Test-Path $cfg)) { Copy-Item (Join-Path $DEST "config.example.json") $cfg; Ok "config.json criado (fica so na sua maquina)" }
 else { Ok "config.json mantido" }
 
-# Editor: cada usuario escolhe UM (DaVinci ou Premiere) e o Gab trabalha so nele (config.json "editor").
+# Editor: cada usuario escolhe UM (DaVinci ou Premiere; CapCut e Final Cut so no Mac) e o Gab trabalha so nele (config.json "editor").
 $cfgJ = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
 $editor = if ($env:OGAB_EDITOR) { $env:OGAB_EDITOR } elseif ($cfgJ.editor) { $cfgJ.editor } else { "" }
 if (-not $editor) {
   Write-Host "`n  Em qual editor o Gab vai montar seus videos?`n    1) DaVinci Resolve Studio`n    2) Adobe Premiere Pro"
   $esc = Read-Host "  Escolha [1/2]"
   $editor = if ($esc -eq "2") { "premiere" } else { "davinci" }
+}
+if ($editor -notin @("davinci", "premiere")) {
+  Warn "CapCut e Final Cut sao so no Mac (beta); no Windows o Gab usa DaVinci ou Premiere. Usando davinci."
+  $editor = "davinci"
 }
 Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['editor']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $editor
 Ok "editor: $editor (para trocar: /ogab config editor davinci|premiere)"

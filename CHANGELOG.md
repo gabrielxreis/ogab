@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-10 (15/10/2026)
+- **CapCut e Final Cut Pro no instalador (Mac, beta):** agora dá para escolher o editor entre DaVinci, Premiere, CapCut e Final Cut na instalação ou depois, com `/ogab config editor capcut` ou `/ogab config editor finalcut`. O `/ogab doctor` confere o app escolhido (no Final Cut, se tem uma biblioteca criada). No Windows continuam DaVinci e Premiere.
+
 ## 2026.10.15-13 (15/10/2026)
 - **Preset novo GLASS (YouTube 16:9, da comunidade):** motions premium em vidro escuro com aurora violeta, título metálico e destaque em serifa itálica; cenas que entram deslizando junto com um empurrão de câmera no seu vídeo, seus prints com o número destacado por um anel, vinhetas de capítulo e cartão de like + inscreva-se. A cor violeta troca pela da sua marca. Peça "no preset glass".
 

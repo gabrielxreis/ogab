@@ -7,7 +7,7 @@
 [![DaVinci Resolve Studio](https://img.shields.io/badge/DaVinci_Resolve-Studio_21.1+-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)](#requisitos "Requisitos")
 [![Premiere Pro](https://img.shields.io/badge/Premiere_Pro-2026+-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)](premiere/README.md "Premiere")
 [![CapCut](https://img.shields.io/badge/CapCut-Mac_beta-000000.svg?style=for-the-badge)](capcut/README.md "CapCut")
-[![Final Cut Pro](https://img.shields.io/badge/Final_Cut_Pro-Mac_beta-6E44FF.svg?style=for-the-badge&logo=apple&logoColor=white)](finalcut/ENGENHARIA_REVERSA.md "Final Cut Pro")
+[![Final Cut Pro](https://img.shields.io/badge/Final_Cut_Pro-Mac_beta-6E44FF.svg?style=for-the-badge&logo=apple&logoColor=white)](finalcut/README.md "Final Cut Pro")
 [![After Effects](https://img.shields.io/badge/After_Effects-motions-9999FF.svg?style=for-the-badge&logo=adobeaftereffects&logoColor=white)](aftereffects/README.md "After Effects")
 [![macOS](https://img.shields.io/badge/-macOS-lightblue.svg?style=for-the-badge&logo=apple&logoColor=black)](#instalacao "Instalação")
 [![Windows](https://img.shields.io/badge/-Windows-0078D6.svg?style=for-the-badge&logo=windows&logoColor=white)](windows/README.md "Windows")
@@ -124,7 +124,7 @@ Se baixou o arquivo `install.ps1` em vez de usar o comando acima, rode com `powe
 
 **Instalando pelo Claude Code (ou outro terminal sem teclado):** as 3 perguntas do instalador não aparecem; responda antes por variável e acompanhe o log ao vivo em outra aba:
 ```powershell
-$env:OGAB_EDITOR = 'davinci'      # ou premiere
+$env:OGAB_EDITOR = 'davinci'      # ou premiere (CapCut e Final Cut só no Mac)
 $env:OGAB_MOTION = 'hyperframes'  # ou aftereffects
 $env:OGAB_RELATOS = 'sim'         # ou nao
 irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
@@ -134,12 +134,10 @@ Get-Content $env:TEMP\ogab-install.log -Wait
 ```
 
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
-1. **Editor:** DaVinci Resolve ou Adobe Premiere Pro.
+1. **Editor:** DaVinci Resolve, Adobe Premiere Pro, CapCut (Mac, beta) ou Final Cut Pro (Mac, beta). No Windows: DaVinci ou Premiere.
 2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).
 
-CapCut e Final Cut Pro (Mac, beta) não aparecem no instalador: depois de instalar, use `/ogab config editor capcut` ou peça "monta no Final Cut".
-
-Trocar depois, sem reinstalar: `/ogab config editor davinci|premiere|capcut` e `/ogab config motion hyperframes|aftereffects`.
+Trocar depois, sem reinstalar: `/ogab config editor davinci|premiere|capcut|finalcut` e `/ogab config motion hyperframes|aftereffects`.
 
 O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
 - instala **Homebrew** (se faltar), **ffmpeg**, **yt-dlp**, **Node.js**, **Python 3**, **git** e **Pillow**;
@@ -197,7 +195,7 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 | | Mínimo | Observação |
 |---|---|---|
 | Sistema | macOS ou Windows 10/11 | Testado em Apple Silicon; diferenças do Windows em [`windows/README.md`](windows/README.md) |
-| Editor | **DaVinci Resolve Studio 21.1+**, **Adobe Premiere Pro 2026+**, **CapCut 9.4+** (Mac) ou **Final Cut Pro 12.2+** (Mac) | DaVinci: a versão grátis não tem scripting externo. Premiere: ver [`premiere/README.md`](premiere/README.md). CapCut: grátis serve; efeito "(pro)" só exporta no Pro ([`capcut/README.md`](capcut/README.md)). Final Cut: ver [`finalcut/`](finalcut/ENGENHARIA_REVERSA.md) |
+| Editor | **DaVinci Resolve Studio 21.1+**, **Adobe Premiere Pro 2026+**, **CapCut 9.4+** (Mac) ou **Final Cut Pro 12.2+** (Mac) | DaVinci: a versão grátis não tem scripting externo. Premiere: ver [`premiere/README.md`](premiere/README.md). CapCut: grátis serve; efeito "(pro)" só exporta no Pro ([`capcut/README.md`](capcut/README.md)). Final Cut: ver [`finalcut/README.md`](finalcut/README.md) |
 | After Effects | 2024+ (só se escolher motions no AE) | Ver [`aftereffects/README.md`](aftereffects/README.md) |
 | Python | 3.10+ | Pillow; `pyobjc-framework-Vision` para o `legenda_ui.py` |
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
@@ -225,7 +223,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | `/ogab ajuda` | Mostra o que está habilitado e os provedores escolhidos |
 | `/ogab doctor` | Confere a instalação inteira, corrige o que der e guia você no resto |
 | `/ogab comecar` | Primeiro uso: roda o doctor e explica como pedir |
-| `/ogab config editor premiere` | Troca o editor (`davinci`, `premiere` ou `capcut`). Final Cut: é só pedir "monta no Final Cut" |
+| `/ogab config editor premiere` | Troca o editor (`davinci`, `premiere`, `capcut` ou `finalcut`) |
 | `/ogab config motion aftereffects` | Troca os motions (`hyperframes` ou `aftereffects`) |
 | `/ogab voz-local instalar\|clonar\|motores\|status` | Clonador de voz local opcional: instala, clona a sua voz, lista motores e licenças |
 | `/ogab update` | Atualiza a skill |
@@ -496,13 +494,13 @@ No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / 
 | | DaVinci Resolve | Adobe Premiere Pro | CapCut (Mac, beta) | Final Cut Pro (Mac, beta) |
 |---|---|---|---|---|
 | Como o Gab controla | API de scripting do Resolve | plugin **Gab Ponte** (painel UXP, uma vez: Window > UXP Plugins > Gab Ponte) | escreve o rascunho JSON direto (o CapCut não tem API); você abre o projeto no app | gera o projeto **FCPXML** e o Final Cut importa; ajustes no projeto que já existe, sem recriar |
-| Como escolher | `config editor davinci` (padrão) | `config editor premiere` | `config editor capcut` | pedir "monta no Final Cut" |
+| Como escolher | `config editor davinci` (padrão) | `config editor premiere` | `config editor capcut` | `config editor finalcut` |
 | Transcrição | do DaVinci (21.1+) | Speech to Text do Premiere | do DaVinci ou do `legendas.py` (`.srt`) | do DaVinci ou do `legendas.py` |
 | Isolar voz | Voice Isolation | Enhance Speech ("Aprimorador de voz") | efeitos de voz da loja | à mão no Final Cut (Isolamento de voz) |
 | Cor | PowerGrade (.drx) | LUT DO GAB pelo Lumetri | filtros da loja do CapCut | à mão no Final Cut (o Gab ainda não automatiza) |
 | Lettering e legenda | @gabrielxreis_ Text Presets (.drfx) | MOGRTs da biblioteca | modelos de texto e animação de legenda palavra a palavra da loja | títulos e legenda no estilo medido do cliente (`finalcut/presets/legenda/`) |
 | Extra | | | recria no CapCut uma timeline do DaVinci (`davinci_para_capcut.py`); corta silêncio | testado reconstruindo um vídeo de 63 s do DaVinci (24 takes, 18 motions, 44 áudios, 58 legendas) |
-| Detalhes | [`docs/etapas/`](docs/etapas) | [`premiere/README.md`](premiere/README.md) | [`capcut/README.md`](capcut/README.md) | [`finalcut/ENGENHARIA_REVERSA.md`](finalcut/ENGENHARIA_REVERSA.md) |
+| Detalhes | [`docs/etapas/`](docs/etapas) | [`premiere/README.md`](premiere/README.md) | [`capcut/README.md`](capcut/README.md) | [`finalcut/README.md`](finalcut/README.md) |
 
 **Beta:** no CapCut, feche o projeto antes de o Gab gravar (com ele aberto o app sobrescreve tudo) e a 1a abertura precisa de internet para baixar os efeitos da loja. No Final Cut, crie a primeira biblioteca uma vez à mão e deixe aberta (sem biblioteca aberta o app pergunta onde importar).
 

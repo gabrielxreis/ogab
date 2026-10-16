@@ -138,6 +138,8 @@ def python():
     if MAC and c.get("editor", "davinci") == "davinci":
         pacotes.append(("Vision", "pyobjc-framework-Vision", "OCR da legenda no DaVinci (legenda_ui.py)", False))
         pacotes.append(("Quartz", "pyobjc-framework-Quartz", "cliques da legenda no DaVinci (legenda_ui.py)", False))
+    if MAC and c.get("editor") == "finalcut":
+        pacotes.append(("ApplicationServices", "pyobjc-framework-ApplicationServices", "ajustes no Final Cut pela acessibilidade (finalcut/ax.py)", True))
     for mod, pac, uso, obrig in pacotes:
         try:
             __import__(mod)
@@ -419,6 +421,46 @@ def aftereffects(usa):
              "o AE está aberto mas a ponte não responde: veja se há um aviso aberto no AE; se não, feche e abra o AE")
 
 
+def capcut(usa):
+    """CapCut (Mac, beta): sem API; o Gab escreve o rascunho JSON (capcut/README.md)."""
+    if not MAC:
+        if usa:
+            item("!", "CapCut", "o Gab no CapCut é só no Mac: /ogab config editor davinci|premiere")
+        return
+    if not os.path.isdir("/Applications/CapCut.app"):
+        item(_rel(usa), "CapCut", "CapCut não instalado (capcut.com ou App Store)")
+        return
+    _, v = _versao_app("/Applications/CapCut.app")
+    rasc = os.path.join(HOME, "Movies/CapCut/User Data/Projects/com.lveditor.draft")
+    if not os.path.isdir(rasc):
+        item(_rel(usa), "CapCut", f"CapCut {v} instalado, mas ainda não foi aberto: abra uma vez e entre na sua conta")
+        return
+    item("✓", "CapCut", f"CapCut {v} e pasta de rascunhos" + ("" if usa else " (não é o editor escolhido)"))
+    if usa and not os.path.exists(os.path.join(RAIZ, "capcut", "loja.json")):
+        item("·", "CapCut", "loja.json ainda não lida: abra os painéis de Filtros/Texto no CapCut e o Gab roda atualizar_loja()")
+
+
+def finalcut(usa):
+    """Final Cut Pro (Mac, beta): projeto FCPXML (finalcut/fcpxml.py) e ajustes pela acessibilidade (finalcut/ax.py)."""
+    if not MAC:
+        if usa:
+            item("!", "Final Cut", "Final Cut Pro é só no Mac: /ogab config editor davinci|premiere")
+        return
+    apps = glob.glob("/Applications/Final Cut Pro*.app")
+    if not apps:
+        item(_rel(usa), "Final Cut", "Final Cut Pro não instalado (App Store)")
+        return
+    _, v = _versao_app(apps[0])
+    item("✓", "Final Cut", f"{os.path.basename(apps[0])[:-4]} {v}" + ("" if usa else " (não é o editor escolhido)"))
+    if not usa:
+        return
+    item("✓" if shutil.which("xmllint") else "·", "Final Cut", "xmllint (confere o FCPXML no DTD do Final Cut)" if shutil.which("xmllint")
+         else "xmllint faltando: o FCPXML sai sem a conferência no DTD (xcode-select --install)")
+    bibl = glob.glob(os.path.join(HOME, "Movies", "*.fcpbundle"))
+    item("✓" if bibl else "!", "Final Cut", f"{len(bibl)} biblioteca(s) em ~/Movies" if bibl else
+         "nenhuma biblioteca: no Final Cut, Arquivo > Nova > Biblioteca (uma vez) e deixe aberta; sem ela o import pergunta onde salvar")
+
+
 def windows():
     if not WIN:
         return
@@ -432,6 +474,8 @@ def main():
     c = cfg()
     davinci(c.get("editor", "davinci") == "davinci")
     premiere(c.get("editor") == "premiere")
+    capcut(c.get("editor") == "capcut")
+    finalcut(c.get("editor") == "finalcut")
     aftereffects(c.get("motion") == "aftereffects")
     if "--json" in sys.argv:
         print(json.dumps([{"estado": e, "grupo": g, "texto": t} for e, g, t in itens], ensure_ascii=False, indent=1))
