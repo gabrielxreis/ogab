@@ -35,10 +35,12 @@ o usuário quer ver a barra de progresso em tempo real (regra do usuário, 15/10
 | id | roda no Mac | tamanho | licença | destaque |
 |---|---|---|---|---|
 | `omnivoice` | GPU (MPS) | 3,3 GB | modelo **CC-BY-NC (não comercial)** | padrão, rápido |
-| `voxcpm2` | GPU (MPS) | ~5 GB | Apache-2.0 | 48 kHz, voz por descrição |
+| `voxcpm2` | GPU (MPS) | ~5 GB | Apache-2.0 | 48 kHz, voz por descrição; **Mac de 16 GB: inviável** (vira float32, ~10 GB de RAM, 4-12 min por frase com swap; 15/10/2026) |
 | `confucius4-tts` | CPU | ~5 GB | Apache-2.0 | mantém a voz entre idiomas |
 | `moss-tts-nano` | CPU | leve | Apache-2.0 | 48 kHz |
 | `pockettts` | CPU | leve | pesos CC-BY-4.0 (aceitar termo no Hugging Face) | 6 idiomas |
+
+**Memória (15/10/2026, vídeo Violet Jessop):** a placa do Mac não roda bfloat16, então o modelo ocupa ~2x o tamanho em RAM. Em Mac de 16 GB com DaVinci e Chrome abertos tudo vai para o swap e o Mac trava. Voz local é reserva: só com o Mac livre (DaVinci e Chrome fechados) e 20 GB+ livres no disco; com memória livre abaixo de 40 % (`memory_pressure`), parar e usar a ElevenLabs.
 
 IndexTTS (emoção) e CosyVoice (instrução) não falam português: não oferecer para pt-BR.
 

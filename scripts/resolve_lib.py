@@ -293,7 +293,7 @@ def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, 
         if respeitar_inicio: cur = max(cur, S + round(ini * F))
         nxt = S + round(takes[k + 1][1] * F) if k + 1 < len(takes) else fim_f
         checar_take_original(arq, permitir_render)
-        it = importar(mp, arq, "BROLLS")
+        it = importar(mp, arq, "BROLLS", permitir_render)
         sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
         e0 = min(int(round(entrada * sf)), mx - 1)
         n = min(mx - e0, math.ceil((nxt - cur) * sf / F) + 1)

@@ -31,6 +31,9 @@ Narração: a do usuário (voz clonada ou gravada); cada frase da fala troca a f
 - Transição dos pontos 1,1-1,6 s; segurar a figura pelo menos 1,5 s depois de formada.
 - Poucos pontos borram a foto (mínimo 5000); muitos pesam o render (máximo ~12000).
 
+## Primeiro quadro (15/10/2026, vídeo Violet Jessop)
+No TikTok/Reels o 1º quadro é a capa e o que segura o polegar: o vídeo não abre com poucos pontos (quase preto). Começar a 1ª cena já com a figura meio formada (pular o começo da formação ou `t0` adiantado) e conferir o quadro 0.
+
 ## Imagem clara/pastel (aprendido em 13/10/2026, vídeo "O Estrangeiro")
 Foto com fundo claro (pastel, estilo Wes Anderson) vira uma mancha de pontos. Antes de usar, transformar em CONTORNOS:
 `cv2.Canny` (blur 5x5, 40/110, dilatar 2x2) num PNG preto e branco e usar esse PNG na cena com `limiar` 0.3 e `mascara`

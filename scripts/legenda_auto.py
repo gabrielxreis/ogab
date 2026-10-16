@@ -14,13 +14,24 @@ sys.path.insert(0, AQUI)
 import resolve_lib as R
 
 
-def gerar(r, t):
+def gerar(r, t, espera=120):
+    """Roda o Create Subtitles from Audio e ESPERA as legendas aparecerem (15/10/2026: com o DaVinci recém-aberto fora da
+    página Edit o comando devolve True e a trilha fica com 0 itens; ler logo depois quebrava com IndexError)."""
+    r.OpenPage("edit"); time.sleep(1)
     old = t.GetItemListInTrack("subtitle", 1) or []
     if old: t.DeleteClips(old)
     cfg = {r.SUBTITLE_LANGUAGE: r.AUTO_CAPTION_PORTUGUESE, r.SUBTITLE_CAPTION_PRESET: r.AUTO_CAPTION_SUBTITLE_DEFAULT,
            r.SUBTITLE_CHARS_PER_LINE: 25, r.SUBTITLE_LINE_BREAK: r.AUTO_CAPTION_LINE_SINGLE, r.SUBTITLE_GAP: 0}
     if not t.CreateSubtitlesFromAudio(cfg):
         raise SystemExit("Create Subtitles from Audio falhou")
+    fim, antes = time.time() + espera, -1
+    while time.time() < fim:
+        n = len(t.GetItemListInTrack("subtitle", 1) or [])
+        if n and n == antes:   # parou de crescer
+            return n
+        antes = n; time.sleep(3)
+    raise SystemExit(f"Create Subtitles from Audio não gerou legenda em {espera} s: confira se o DaVinci está na página "
+                     "Edit, se a timeline tem áudio com fala e se a transcrição (Workspace > Transcribe) funciona à mão")
 
 
 def palavras_da_timeline(t):
@@ -46,6 +57,8 @@ def main():
     p.SetCurrentTimeline(t); time.sleep(0.5)
     if "--gerar" in a: gerar(r, t)
     ws = palavras_da_timeline(t)
+    if not ws:
+        raise SystemExit("a trilha de legenda 1 está vazia: rode com --gerar (ou crie as legendas) antes")
     os.makedirs(pasta, exist_ok=True)
     trans = os.path.join(pasta, "subtitles_from_audio.json")
     json.dump({"segments": [{"words": ws}]}, open(trans, "w"), ensure_ascii=False)

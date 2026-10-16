@@ -140,6 +140,11 @@ def python():
         pacotes.append(("Quartz", "pyobjc-framework-Quartz", "cliques da legenda no DaVinci (legenda_ui.py)", False))
     if MAC and c.get("editor") == "finalcut":
         pacotes.append(("ApplicationServices", "pyobjc-framework-ApplicationServices", "ajustes no Final Cut pela acessibilidade (finalcut/ax.py)", True))
+    # CLAP (conferir se cada SFX é o que diz ser): torch + transformers ~2 GB, por isso não instala sozinho (15/10/2026)
+    import importlib.util as _iu
+    clap = [m for m in ("torch", "transformers") if _iu.find_spec(m) is None]
+    item("✓" if not clap else "·", "python", "torch + transformers (conferência de SFX: sfx_conferir.py, sonorizar.py conferir)" if not clap
+         else f"{' e '.join(clap)} faltando: sem a conferência automática de SFX (~2 GB; com espaço: {sys.executable} -m pip install --user torch transformers)")
     for mod, pac, uso, obrig in pacotes:
         try:
             __import__(mod)

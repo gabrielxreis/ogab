@@ -10,7 +10,7 @@ pela interface sozinho: clica, digita e CONFERE por OCR (Vision da Apple), numa 
   python3 legenda_ui.py "<timeline>" --preset "GAB USA" [--arquivo x.preset]  # carrega o preset de estilo na trilha e segue
   python3 legenda_ui.py "<timeline>" --conferir          # render + checa a altura do texto de cada legenda
 
-Requisitos: DaVinci aberto e maximizado na página Edit com o Inspector visível; pyobjc-framework-Vision
+Requisitos: DaVinci aberto (o script maximiza a janela sozinho) na página Edit com o Inspector visível; pyobjc-framework-Vision
 (pip install pyobjc-framework-Vision); o Python precisa de permissão de Acessibilidade (já tem nesta máquina).
 Armadilhas (custaram caro): NUNCA Tab no campo (o foco vai p/ "Add New" e o Return cria legenda "Subtitle");
 o 1º duplo clique no campo às vezes arrasta o valor (sai 384), por isso digita 2x e confere por OCR.
@@ -104,10 +104,25 @@ def rolar(x, y, linhas):
 RETURN, CMD_A = 36, 0
 
 
+def maximizar():
+    """Janela principal do DaVinci ocupando a tela útil (15/10/2026: o --preset falhou com a janela menor, porque as
+    regiões INSPECTOR/TIMELINE são medidas com o DaVinci maximizado). Não usa tela cheia (outro Space some da AX)."""
+    from AppKit import NSScreen
+    tela = NSScreen.screens()[0]; f, v = tela.frame(), tela.visibleFrame()
+    x, y = int(v.origin.x), int(f.size.height - v.origin.y - v.size.height)   # AppKit (origem embaixo) -> tela (origem em cima)
+    w, h = int(v.size.width), int(v.size.height)
+    try:
+        _se('tell process "Resolve"', f"set position of window 1 to {{{x}, {y}}}", f"set size of window 1 to {{{w}, {h}}}", "end tell")
+    except subprocess.CalledProcessError:
+        print("AVISO: não consegui maximizar o DaVinci (Acessibilidade?): maximize à mão e rode de novo")
+    time.sleep(0.6)
+
+
 def frente():
     for a in NSRunningApplication.runningApplicationsWithBundleIdentifier_(BUNDLE):
         a.activateWithOptions_(NSApplicationActivateIgnoringOtherApps)
     time.sleep(0.8)
+    maximizar()
     coberta()
 
 

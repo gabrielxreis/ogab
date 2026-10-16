@@ -27,9 +27,26 @@ def _pcm(f, ini=None, fim=None, sr=48000):
     return np.frombuffer(subprocess.run(cmd, capture_output=True).stdout, np.float32)
 
 
+def python_com_clap():
+    """Outro python3 desta máquina que já tem torch + transformers (15/10/2026: rodaram com o /usr/bin/python3 do macOS,
+    que não tem, e pareceu que faltava instalar 2 GB)."""
+    import shutil
+    for py in dict.fromkeys(filter(None, [shutil.which("python3"), "/opt/homebrew/bin/python3", "/usr/local/bin/python3"])):
+        if os.path.realpath(py) == os.path.realpath(sys.executable): continue
+        if subprocess.run([py, "-c", "import torch, transformers"], capture_output=True).returncode == 0:
+            return py
+    return None
+
+
 def _clap():
-    import torch
-    from transformers import ClapModel, ClapProcessor
+    try:
+        import torch
+        from transformers import ClapModel, ClapProcessor
+    except ImportError:
+        outro = python_com_clap()
+        raise SystemExit(f"este Python ({sys.executable}) não tem torch/transformers. "
+                         + (f"Rode com {outro}, que já tem." if outro else
+                            f"Instale (~2 GB): {sys.executable} -m pip install --user torch transformers"))
     m = ClapModel.from_pretrained("laion/clap-htsat-unfused").eval(); p = ClapProcessor.from_pretrained("laion/clap-htsat-unfused")
     with torch.no_grad():
         te = m.get_text_features(**p(text=ROTULOS, return_tensors="pt", padding=True)); te = getattr(te, "pooler_output", te)

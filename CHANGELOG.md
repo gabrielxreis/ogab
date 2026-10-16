@@ -1,4 +1,10 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-11 (15/10/2026)
+- **Legenda automática mais segura:** o Gab vai para a página Edit e espera o DaVinci terminar de criar as legendas (antes, com o DaVinci recém-aberto, a legenda saía vazia e o script quebrava). O preset GAB USA maximiza a janela do DaVinci sozinho antes de aplicar.
+- **Motions sem quadro preto entre cenas:** as cenas saem com uma folga no fim e o Gab confere que não ficou buraco; flash, queima de filme e caixa de texto não aparecem mais antes da hora.
+- **Vídeo preto e branco:** filmagem de arquivo P&B fica cinza neutro (sem a LUT, que deixava sépia).
+- **Correções:** motion renderizado não é mais recusado quando você libera; o conferidor de SFX diz qual Python usar em vez de pedir para baixar 2 GB à toa; a voz local avisa que não roda bem em Mac de 16 GB com o DaVinci aberto.
+
 ## 2026.10.15-10 (15/10/2026)
 - **CapCut e Final Cut Pro no instalador (Mac, beta):** agora dá para escolher o editor entre DaVinci, Premiere, CapCut e Final Cut na instalação ou depois, com `/ogab config editor capcut` ou `/ogab config editor finalcut`. O `/ogab doctor` confere o app escolhido (no Final Cut, se tem uma biblioteca criada). No Windows continuam DaVinci e Premiere.
 

@@ -7,6 +7,8 @@ Vem ANTES de takes, lettering e motions nos dois fluxos (criação e edição): 
 **ORDEM DA LEGENDA (regra do usuário, 12/10/2026), sempre sobre a timeline ATUAL (o usuário mexe nos cortes):** 1) **Create Subtitles from Audio** da própria timeline (`Timeline.CreateSubtitlesFromAudio`, 1 linha, até 25 caracteres) para os tempos baterem com a fala que está na timeline agora; 2) **métrica** (`legendas.py metrica`/reflow: 0 problema, grafia do cliente); 3) **preset GAB USA** (trilha do modelo/`timeline_do_modelo` ou `legenda_ui.py --preset`). Nunca reaproveitar SRT gerado antes de uma edição da timeline. Antes de entregar, conferir que cada legenda bate com a fala (a 1ª e a última, e uma amostra no meio).
 
 
+**Transcrição erra nome e número (15/10/2026: "nao frajo" = naufrágio, "Jessup, camarada" = Jessop, camareira, "Olímpic", "BOT16"):** reler a legenda inteira contra o roteiro e corrigir o TEXTO mantendo os tempos das palavras; nomes estrangeiros, navios, siglas e números um por um. Termo que errou vai para o `pronuncia.json` (`erros_transcricao`).
+
 **Métrica da legenda (regra fixa do usuário, conferir SEMPRE antes de colocar e de exportar):**
 - **Contínua (regra do usuário, 12/10/2026):** uma legenda emenda na outra, sem buraco nas pausas da fala (o `sincronizar` já fecha buracos de até 1,2 s com `colar`). Legenda que some e volta entre frases é erro de métrica.
 - **Uma linha só** (nunca quebrar linha), até `config.regras.legenda.max_caracteres` (25 no 9:16), contando caracteres e não bytes (º, ç, ã contam 1).
