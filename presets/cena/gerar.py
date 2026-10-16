@@ -75,7 +75,7 @@ def destaque(palavras, cfg, dur):
 
     def bloco(ini, fim, linhas):
         alto = sum(ALTURA.get(l["tipo"], 62) for l in linhas)
-        return {"ini": round(ini, 3), "fim": round(fim, 3), "y": round(y0 - max(0, alto - 62) * .5), "linhas": linhas,
+        return {"ini": round(ini, 3), "fim": round(fim, 3), "y": round(y0 - max(0, alto - 62) * .5), "alto": alto, "linhas": linhas,
                 "brilho": any(l["tipo"] == "serifa" for l in linhas)}
 
     out = []
@@ -161,22 +161,56 @@ def luz_fundo(video, t, y0, y1, w, h):
     return sum(r.stdout) / max(1, len(r.stdout))
 
 
+def rosto_lente(c, t, lente, w, h, rampa=.14):
+    """Caixa do rosto depois do zoom da LENTE no tempo t (mesma conta do lente_filtro)."""
+    if not c:
+        return c
+    z, fy = 1.0, 0.0
+    for x in (lente or {}).get("zoom") or []:
+        k = max(0, min(1, (t - x["de"]) / rampa)) * max(0, min(1, (x["ate"] - t) / rampa))
+        z += (x.get("escala", 1.2) - 1) * k; fy += (x.get("centro_y", .42) - .5) * k
+    ih = h * z; oy = max(0, min(ih - h, (ih - h) / 2 + fy * ih)); ox = (w * z - w) / 2
+    return (c[0] * z - ox, c[1] * z - oy, c[2] * z - ox, c[3] * z - oy)
+
+
+def proteger_rosto(video, w, h, dur, lente, legenda, cartoes):
+    """REGRA DO GAB: texto e animação nunca na frente do rosto. Legenda que bate no rosto desce; cartão que bate vai
+    para TRÁS da pessoa (camada palco, com o recorte por cima); sem espaço embaixo, avisa para reenquadrar."""
+    from rosto import rostos, no_trecho, bate
+    cx = rostos(video, w, h, dur)
+    if not cx:
+        print("  rosto: nenhum rosto detectado, posições mantidas"); return [], []
+    rost = lambda de, ate: no_trecho({t: rosto_lente(c, t, lente, w, h) for t, c in cx.items()}, de, ate)
+    avisos, atras = [], []
+    for g in legenda or []:
+        r = rost(g["ini"], g["fim"])
+        if bate((60, g["y"], w - 60, g["y"] + g["alto"]), r):
+            novo = int(r[3] + 40)
+            if novo + g["alto"] > h * .9:
+                avisos.append(f"legenda {g['ini']:.1f}s: sem espaço abaixo do rosto, reenquadre (afaste/baixe a pessoa)")
+                novo = int(h * .9 - g["alto"])
+            g["y"] = novo
+    fica = []
+    for c in cartoes or []:
+        alto = {"checklist": 110 + 72 * len(c.get("itens", [])), "progresso": 230, "cta": 112}.get(c["tipo"], 300)
+        caixa = (70, c["y"], w - 70, c["y"] + alto) if c["tipo"] == "cta" else (c["x"], c["y"], c["x"] + c["w"], c["y"] + alto)
+        r = rost(c["de"], c["ate"])
+        if not bate(caixa, r):
+            fica.append(c); continue
+        if c["tipo"] == "cta" and r[3] + 120 + alto < h * .92:   # CTA desce em vez de ir para trás
+            c["y"] = int(r[3] + 120); fica.append(c); continue
+        atras.append(c); print(f"  rosto: {c['tipo']} {c['de']:.1f}s bateria no rosto -> vai para trás da pessoa")
+    cartoes[:] = fica
+    for a in avisos:
+        print("  AVISO", a)
+    return atras, avisos
+
+
 def gerar(plano, pasta, fazer_render=True):
     os.makedirs(pasta, exist_ok=True); base = os.path.dirname(os.path.abspath(plano["_arq"]))
     absp = lambda p: p if os.path.isabs(p) else os.path.join(base, p)
     video = absp(plano["video"]); w, h, fps, dur = sonda(video)
     comum = {"w": w, "h": h, "dur": dur, "dest": plano.get("dest", "#F2D16B")}
-    projs = {}
-    if plano.get("palco"):
-        itens = [dict({"y": int(h * .17), "tam": 0, "estilo": "sans"}, **a) for a in plano["palco"]]
-        for a in itens:   # palavra gigante que cabe em ~92% da largura
-            if not a["tam"]:
-                a["tam"] = int(min(w * .92 / max(1, len(a["texto"])) / (.62 if a["estilo"] == "sans" else .5), h * .2))
-            if not a.get("cor"):   # fundo claro (parede branca): texto escuro, senão some
-                luz = luz_fundo(video, (a["de"] + a["ate"]) / 2, a["y"], min(h, a["y"] + a["tam"]), w, h)
-                a["cor"] = "#141414" if luz > 150 else "#ffffff"
-                print(f"  palco '{a['texto']}': fundo {luz:.0f}/255 -> {a['cor']}")
-        projs["palco"] = camada("palco", ["palco"], dict(comum, palco=itens), pasta, w, h, fps, dur)
     frente, mods = dict(comum), []
     if plano.get("destaque") is not None:
         palavras = json.load(open(absp(plano["palavras"]), encoding="utf-8"))
@@ -189,9 +223,23 @@ def gerar(plano, pasta, fazer_render=True):
                 c["itens"] = [{"t": t, "em": em} for t, em in c["itens"]]
             cart.append(c)
         frente["orbita"] = cart; mods.append("orbita")
+    atras_cart = []
+    if plano.get("proteger_rosto", True) and mods:
+        atras_cart, _ = proteger_rosto(video, w, h, dur, plano.get("lente"), frente.get("destaque"), frente.get("orbita"))
+    projs = {}
+    if plano.get("palco") or atras_cart:
+        itens = [dict({"y": int(h * .17), "tam": 0, "estilo": "sans"}, **a) for a in plano.get("palco", [])]
+        for a in itens:   # palavra gigante que cabe em ~92% da largura
+            if not a["tam"]:
+                a["tam"] = int(min(w * .92 / max(1, len(a["texto"])) / (.62 if a["estilo"] == "sans" else .5), h * .2))
+            if not a.get("cor"):   # fundo claro (parede branca): texto escuro, senão some
+                luz = luz_fundo(video, (a["de"] + a["ate"]) / 2, a["y"], min(h, a["y"] + a["tam"]), w, h)
+                a["cor"] = "#141414" if luz > 150 else "#ffffff"
+                print(f"  palco '{a['texto']}': fundo {luz:.0f}/255 -> {a['cor']}")
+        projs["palco"] = camada("palco", ["palco"] + (["orbita"] if atras_cart else []), dict(comum, palco=itens, orbita=atras_cart), pasta, w, h, fps, dur)
     if mods:
         projs["frente"] = camada("frente", mods, frente, pasta, w, h, fps, dur)
-    print("camadas:", ", ".join(f"{k} ({'+'.join(['palco'] if k == 'palco' else mods)})" for k in projs) or "nenhuma")
+    print("camadas:", ", ".join(projs) or "nenhuma")
     if not fazer_render:
         return pasta
     for nome, proj in projs.items():

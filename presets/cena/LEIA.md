@@ -25,6 +25,15 @@ Não confundir com VITRINE (já existia: cartões de produto) nem com TELA DIVID
 V1 `base.mp4` (vídeo com a LENTE) · V2 `palco.mov` · V3 `recorte_lente.mov` (a pessoa) · V4 `frente.mov`
 (DESTAQUE + ÓRBITA). Sem LENTE, V1 é o vídeo original e V3 é `recorte.mov`. A linha principal nunca é apagada.
 
+## Regra do rosto (automática)
+Texto e animação NUNCA na frente do rosto. O `gerar.py` detecta o rosto (`rosto.py`, Apple Vision, grátis; leva em
+conta o zoom da LENTE) no tempo de cada elemento:
+- legenda que bate no rosto desce para baixo do queixo;
+- cartão/animação que bate vai para TRÁS da pessoa (camada `palco.mov`, com o recorte por cima);
+- CTA desce se couber, senão vai para trás;
+- sem espaço embaixo: imprime `AVISO ... reenquadre`. Aí tirar o zoom do trecho, afastar/baixar a pessoa ou mover o
+  texto; nunca entregar com o aviso pendente. `"proteger_rosto": false` no plano desliga (só se o usuário pedir).
+
 ## Recorte da pessoa (`recorte.py`)
 Mac: segmentação de pessoas da Apple (Vision), local e grátis, sem chave de IA. Cerca de 50 s para 30 s de vídeo
 1080p em "equilibrada". Borda suavizada e estabilizada no tempo. Fora do Mac: rembg (mais lento).
