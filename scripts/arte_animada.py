@@ -306,18 +306,20 @@ def _pixels_photoshop(arq, blocos, caixa):
     jsx = tmp / "pixels.jsx"
     jsx.write_text(JSX_PIXELS % {"arq": json.dumps(str(Path(arq).resolve())), "saida": json.dumps(str(tmp)),
                                  "blocos": json.dumps(lista), "ref": int(ref.layer_id) if ref else -1}, encoding="utf-8")
-    print("Photoshop exportando os blocos (cópia do arquivo; o original não é tocado)...")
-    res = _ps_arquivo(str(jsx)).split()
-    dx = dy = 0
-    if ref is not None and len(res) >= 4:
-        dx, dy = round(float(res[2])) - ref.left, round(float(res[3])) - ref.top
-    x0, y0, x1, y1 = caixa[0] + dx, caixa[1] + dy, caixa[2] + dx, caixa[3] + dy
-    out = [Image.open(tmp / f"b{i:02d}.png").convert("RGBA").crop((x0, y0, x1, y1)) for i in range(len(blocos))]
-    out.append(Image.open(tmp / "final.png").convert("RGBA").crop((x0, y0, x1, y1)))
-    if not os.environ.get("ARTE_DEBUG"):
-        shutil.rmtree(tmp, ignore_errors=True)
-    else:
-        print("debug:", tmp)
+    try:
+        print("Photoshop exportando os blocos (cópia do arquivo; o original não é tocado)...")
+        res = _ps_arquivo(str(jsx)).split()
+        dx = dy = 0
+        if ref is not None and len(res) >= 4:
+            dx, dy = round(float(res[2])) - ref.left, round(float(res[3])) - ref.top
+        x0, y0, x1, y1 = caixa[0] + dx, caixa[1] + dy, caixa[2] + dx, caixa[3] + dy
+        out = [Image.open(tmp / f"b{i:02d}.png").convert("RGBA").crop((x0, y0, x1, y1)) for i in range(len(blocos))]
+        out.append(Image.open(tmp / "final.png").convert("RGBA").crop((x0, y0, x1, y1)))
+    finally:  # PNGs da tela inteira passam de 200 MB por bloco: nunca deixar para trás, nem em erro
+        if os.environ.get("ARTE_DEBUG"):
+            print("debug:", tmp)
+        else:
+            shutil.rmtree(tmp, ignore_errors=True)
     return out
 
 
