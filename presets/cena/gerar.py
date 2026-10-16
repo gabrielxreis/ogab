@@ -116,6 +116,10 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur):
         shutil.copy(os.path.join(AQUI, "kit", f), proj)
     for m in modulos:
         shutil.copy(os.path.join(PRESETS, m, f"{m}.js"), proj)
+    for c in plano_js.get("orbita") or []:
+        for k in c.get("cartoes", []):
+            if k.get("_orig"):
+                os.makedirs(os.path.join(proj, "img"), exist_ok=True); shutil.copy(k["_orig"], os.path.join(proj, k["img"]))
     plano_js = dict(plano_js, camada=nome, modulos=modulos)
     open(os.path.join(proj, "plano.js"), "w").write("window.PLANO = " + json.dumps(plano_js, ensure_ascii=False) + ";\n")
     html = open(os.path.join(AQUI, "kit", "index.html")).read()
@@ -206,6 +210,27 @@ def proteger_rosto(video, w, h, dur, lente, legenda, cartoes):
     return atras, avisos
 
 
+def preparar_giros(giros, video, w, h, dur, lente, absp, pasta):
+    """Cartões girando: elipse em volta da pessoa com a passagem da FRENTE abaixo do queixo (regra do rosto)."""
+    from rosto import rostos, no_trecho
+    cx = rostos(video, w, h, dur)
+    for c in giros:
+        c.setdefault("voltas", 1); c.setdefault("fase", 0.6)
+        c.setdefault("cw", int(w * .30)); c.setdefault("ch", int(c["cw"] * (16 / 9 if any(k.get("img") for k in c["cartoes"]) else .62)))
+        c.setdefault("rx", int(w * .38)); c.setdefault("cx", w // 2)
+        r = no_trecho({t: rosto_lente(b, t, lente, w, h) for t, b in cx.items()}, c["de"], c["ate"]) if cx else None
+        # volta inclinada: atrás passa na altura do rosto (some atrás da cabeça), na frente passa abaixo do queixo
+        tras = (r[1] + r[3]) / 2 if r else h * .3
+        frente_y = (r[3] if r else h * .45) + 40 + c["ch"] / 2
+        c.setdefault("cy", int((tras + frente_y) / 2)); c.setdefault("ry", int((frente_y - tras) / 2))
+        c["_base"] = int(c["cy"] + c["ry"] + c["ch"] / 2)   # embaixo do cartão da frente (a legenda desce para cá)
+        for k in c["cartoes"]:
+            if k.get("img"):
+                orig = absp(k["img"]); nome = "giro_" + os.path.basename(orig)
+                k["_orig"] = orig; k["img"] = "img/" + nome
+        print(f"  giro {c['de']:.1f}s: {len(c['cartoes'])} cartões, atrás y {c['cy'] - c['ry']}, frente y {c['cy'] + c['ry']}")
+
+
 def gerar(plano, pasta, fazer_render=True):
     os.makedirs(pasta, exist_ok=True); base = os.path.dirname(os.path.abspath(plano["_arq"]))
     absp = lambda p: p if os.path.isabs(p) else os.path.join(base, p)
@@ -223,10 +248,22 @@ def gerar(plano, pasta, fazer_render=True):
                 c["itens"] = [{"t": t, "em": em} for t, em in c["itens"]]
             cart.append(c)
         frente["orbita"] = cart; mods.append("orbita")
+    giros = [c for c in frente.get("orbita", []) if c["tipo"] == "giro"]
+    if giros:
+        frente["orbita"] = [c for c in frente["orbita"] if c["tipo"] != "giro"]
+        preparar_giros(giros, video, w, h, dur, plano.get("lente"), absp, pasta)
+    for c in giros:   # legenda desce para baixo dos cartões da frente durante o giro
+        for g in frente.get("destaque") or []:
+            if g["ini"] < c["ate"] and g["fim"] > c["de"] and g["y"] < c["_base"] + 30:
+                g["y"] = int(min(c["_base"] + 30, h * .9 - g["alto"]))
     atras_cart = []
     if plano.get("proteger_rosto", True) and mods:
         atras_cart, _ = proteger_rosto(video, w, h, dur, plano.get("lente"), frente.get("destaque"), frente.get("orbita"))
     projs = {}
+    atras_cart = atras_cart + giros
+    frente.setdefault("orbita", []).extend(giros)
+    if giros and "orbita" not in mods:
+        mods.append("orbita")
     if plano.get("palco") or atras_cart:
         itens = [dict({"y": int(h * .17), "tam": 0, "estilo": "sans"}, **a) for a in plano.get("palco", [])]
         for a in itens:   # palavra gigante que cabe em ~92% da largura

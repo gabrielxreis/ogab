@@ -48,6 +48,14 @@ html, body { width: %W%px; height: %H%px; overflow: hidden; background: transpar
 .prog .pp { display: flex; flex-wrap: wrap; gap: 12px; }
 .pil2 { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2); border-radius: 30px; padding: 8px 18px 8px 10px; font-weight: 700; font-size: 28px; }
 .pil2 svg { width: 30px; height: 26px; background: var(--dest); border-radius: 50%; padding: 5px; }
+.giro { position: absolute; border-radius: 26px; background: rgba(18,18,20,.82); border: 2px solid rgba(255,255,255,.22);
+         box-shadow: 0 24px 60px rgba(0,0,0,.45); display: flex; flex-direction: column; align-items: center; justify-content: center;
+         color: #fff; text-align: center; overflow: hidden; opacity: 0; transform-style: preserve-3d; }
+.giro b { font-weight: 900; font-size: 46px; letter-spacing: -.01em; color: var(--dest); line-height: 1.05; padding: 0 14px; }
+.giro span { font-weight: 700; font-size: 22px; letter-spacing: .22em; opacity: .7; margin-top: 10px; }
+.giro.img { background: #000; }
+.giro img { width: 100%; height: 100%; object-fit: cover; }
+#root { perspective: 1400px; }
 </style></head><body>
 <div id="root" data-composition-id="cena-%CAMADA%" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%"></div>
 <script src="plano.js"></script>

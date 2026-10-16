@@ -52,5 +52,35 @@ CENA.mod.orbita = function (cartoes, C) {
       tl.to(b, { opacity: 0, duration: .25 }, c.ate - .25);
     },
   };
+  // giro: cartões girando em volta da pessoa. Roda nas DUAS camadas com a mesma conta: na de trás (palco) só aparece
+  // a metade de trás da volta (o recorte da pessoa cobre), na da frente só a metade da frente. Troca na lateral.
+  tipos.giro = function (c) {
+    const atras = C.P.camada === "palco", n = c.cartoes.length, els = [];
+    c.cartoes.forEach((k, i) => {
+      const e = el("div", "giro", null, k.img ? `<img src="${k.img}">` : `<b>${esc(k.texto || "")}</b>${k.sub ? `<span>${esc(k.sub)}</span>` : ""}`);
+      e.style.width = c.cw + "px"; e.style.height = c.ch + "px"; e.style.left = (-c.cw / 2) + "px"; e.style.top = (-c.ch / 2) + "px";
+      if (k.img) e.classList.add("img");
+      els.push(e);
+    });
+    // quadros-chave calculados (o render salta de quadro em quadro sem disparar onUpdate)
+    const dur = c.ate - c.de, passo = 1 / 24, estado = (i, tt) => {
+      const ent = Math.min(1, tt / .45), sai = Math.max(0, Math.min(1, (dur - tt) / .35)), p = tt / dur;
+      const th = c.fase + i * 2 * Math.PI / n + p * 2 * Math.PI * c.voltas, z = Math.sin(th);
+      const vis = atras ? z < 0 : z >= 0;
+      return { x: c.cx + c.rx * Math.cos(th), y: c.cy + c.ry * z, scale: (.72 + .28 * (z + 1) / 2) * (.6 + .4 * ent),
+               rotationY: -Math.cos(th) * 28, rotation: Math.cos(th) * -6,
+               opacity: vis ? Math.min(ent, sai) * (atras ? .85 : 1) : 0, filter: atras ? "blur(1.5px)" : "blur(0px)" };
+    };
+    els.forEach((e, i) => {
+      tl.set(e, Object.assign(estado(i, 0), { opacity: 0 }), 0);
+      tl.set(e, estado(i, 0), c.de);
+      for (let tt = passo; tt <= dur + 1e-6; tt += passo) {
+        const st = estado(i, tt), op = st.opacity; delete st.opacity;
+        tl.to(e, Object.assign(st, { duration: passo, ease: "none" }), c.de + tt - passo);
+        tl.set(e, { opacity: op }, c.de + tt);
+      }
+      tl.set(e, { opacity: 0 }, c.ate);
+    });
+  };
   cartoes.forEach(c => tipos[c.tipo] && tipos[c.tipo](c));
 };
