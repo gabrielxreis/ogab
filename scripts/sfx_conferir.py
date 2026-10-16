@@ -28,8 +28,8 @@ def _pcm(f, ini=None, fim=None, sr=48000):
 
 
 def python_com_clap():
-    """Outro python3 desta máquina que já tem torch + transformers (15/10/2026: rodaram com o /usr/bin/python3 do macOS,
-    que não tem, e pareceu que faltava instalar 2 GB)."""
+    """Outro python3 desta máquina que já tem torch + transformers (15/10/2026: script rodado num Python sem torch;
+    se outro python3 já tem, usa ele em vez de baixar ~2 GB)."""
     import shutil
     for py in dict.fromkeys(filter(None, [shutil.which("python3"), "/opt/homebrew/bin/python3", "/usr/local/bin/python3"])):
         if os.path.realpath(py) == os.path.realpath(sys.executable): continue
