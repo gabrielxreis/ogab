@@ -23,6 +23,20 @@ def ambiente():
     sys.path.append(os.path.join(RESOLVE_API, "Modules"))
 
 
+def set_fades(item, fades):
+    """TimelineItem.SetFades só existe no DaVinci 21.1+ (relato 15/10/2026, Windows com 21.0): sem ele, avisa e segue."""
+    f = getattr(item, "SetFades", None)
+    if f is None:
+        print("AVISO: DaVinci < 21.1 não tem SetFades pela API; fazer o fade à mão (ou atualizar o DaVinci)")
+        return False
+    return f(fades)
+
+
+def get_fades(item):
+    f = getattr(item, "GetFades", None)
+    return (f() if f else None) or {}
+
+
 def conectar(abrir=True, espera=120):
     """Conecta no Resolve (abre o app se precisar). Precisa de Preferences > System > General > External scripting = Local."""
     ambiente()
@@ -204,8 +218,8 @@ def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in
     F = fps_tl(t); fades = {"FadeIn": int(round(fade_in * F)), "FadeOut": int(round(fade_out * F))}
     # DaVinci 21.1: volume e fade do PRÓPRIO clipe pela API (o usuário arrasta as alças depois). Conferir lendo de volta.
     x.SetProperties({"AudioVolume": float(db)}) if hasattr(x, "SetProperties") else x.SetProperty("AudioVolume", db)
-    x.SetFades(fades)
-    lido, vol = x.GetFades() or {}, x.GetProperty("AudioVolume")
+    set_fades(x, fades)
+    lido, vol = get_fades(x) or {}, x.GetProperty("AudioVolume")
     if any(abs(float(lido.get(k, -1)) - v) > 0.5 for k, v in fades.items()) or vol is None or abs(float(vol) - db) > 0.1:
         print(f"AVISO: fade/volume da música não ficaram como pedido (fades {lido}, volume {vol}); ajustar à mão ou DaVinci < 21.1")
     return x
@@ -426,14 +440,14 @@ def ajustar_titulo(item, texto, size=None, dur_f=None, fade_f=31, entrelinha=0.8
         por(tool, "Red1", cor[0]); por(tool, "Green1", cor[1]); por(tool, "Blue1", cor[2])
         if "\n" in texto: por(tool, "LineSpacing", entrelinha)
         if centro_y is not None: por(tool, "Center", {1: 0.5, 2: centro_y})
-    item.SetFades({"FadeOut": fade_f or FADE_LETTERING})
+    set_fades(item, {"FadeOut": fade_f or FADE_LETTERING})
 
 
 def checar_fades(t):
     """Confere se TODO lettering (título, item sem MediaPoolItem acima da V1) tem fade out no bloco. NÃO abre a
     composição do Fusion (abrir congela a animação no render)."""
     ruins = [it.GetName() for v in range(2, t.GetTrackCount("video") + 1) for it in (t.GetItemListInTrack("video", v) or [])
-             if it.GetMediaPoolItem() is None and not (it.GetFades() or {}).get("FadeOut")]
+             if it.GetMediaPoolItem() is None and not (get_fades(it) or {}).get("FadeOut")]
     print("fades OK" if not ruins else f"SEM FADE NO BLOCO: {ruins}")
     return ruins
 
@@ -547,12 +561,12 @@ def gerar_capa(r, p, mp, take, texto, template, pasta, nome="capa", seg_take=1.0
     camada_letterings(t, mp, [(texto, 0.0, 5.0)], template)
     if drx: t.GetItemListInTrack("video", 1)[0].GetNodeGraph().ApplyGradeFromDRX(drx, 0)
     q = S + round(seg_quadro * F)
-    for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
     p.SetCurrentRenderFormatAndCodec("png", "RGB8")
     p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": q, "MarkOut": q, "TargetDir": pasta, "CustomName": nome,
                          "FormatWidth": w, "FormatHeight": h, "ExportVideo": True, "ExportAudio": False})
     jid = p.AddRenderJob(); p.StartRendering(jid)
     while p.IsRenderingInProgress(): time.sleep(1)
+    p.DeleteRenderJob(jid)   # só o job do Gab: a fila do usuário fica como estava
     p.SetCurrentTimeline(ant)
     import glob
     gerados = sorted(glob.glob(os.path.join(pasta, nome + "*.png")), key=os.path.getmtime)
@@ -611,7 +625,6 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
         if not _sfx:
             raise RuntimeError("timeline sem SFX (nada da A3 em diante): fazer os efeitos sonoros (sfx.md) antes de exportar; "
                                "só passar sem_sfx=True se o usuário pediu para exportar sem SFX")
-    for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
     # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False
     # gravado no projeto e o MP4 sairia mudo.
@@ -629,6 +642,7 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
     time.sleep(2)
     while p.IsRenderingInProgress(): time.sleep(2)
     st = p.GetRenderJobStatus(jid) or {}; arq = os.path.join(pasta, nome + ".mp4")
+    p.DeleteRenderJob(jid)   # só o job do Gab (relato 15/10/2026: apagava a fila inteira do usuário)
     # o booleano do StartRendering e o texto do JobStatus (traduzido) não provam nada: vale a % e o arquivo
     if st.get("CompletionPercentage", 0) < 100 or st.get("Error") or not os.path.exists(arq):
         raise RuntimeError(f"render não terminou (job ficou parado ou falhou): {st}; arquivo existe: {os.path.exists(arq)}")
@@ -782,7 +796,7 @@ def trocar_pela_copia(p, mp, t):
     if vi and vi.get("isEnabled") and not d.GetVoiceIsolationState(1).get("isEnabled"): d.SetVoiceIsolationState(1, vi)
     for j in range(2, d.GetTrackCount("video") + 1):          # título = item sem MediaPoolItem (não abre a composição)
         for x in d.GetItemListInTrack("video", j) or []:
-            if x.GetMediaPoolItem() is None and not (x.GetFades() or {}).get("FadeOut"): x.SetFades({"FadeOut": FADE_LETTERING})
+            if x.GetMediaPoolItem() is None and not (get_fades(x) or {}).get("FadeOut"): set_fades(x, {"FadeOut": FADE_LETTERING})
     return d
 
 
@@ -1038,16 +1052,22 @@ def renderizar_trecho(p, pasta, nome, ini, fim, so_v1=True):
                 for k in range(1, t.GetTrackCount(tipo) + 1):
                     if (tipo, k) != ("video", 1) and t.GetIsTrackEnabled(tipo, k):
                         t.SetTrackEnable(tipo, k, False); desligadas.append((tipo, k))
-        for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
-        os.makedirs(pasta, exist_ok=True); p.SetCurrentRenderFormatAndCodec("mp4", "H264")
+        # Windows: o H.264 do Media Foundation derruba o DaVinci ("Fail to create output buffer", relato 15/10/2026);
+        # prova sai em ProRes 422 LT (.mov), que renderiza rápido e não trava
+        ext, fmt, codec = ("mov", "mov", "ProRes422LT") if os.name == "nt" else ("mp4", "mp4", "H264")
+        os.makedirs(pasta, exist_ok=True); p.SetCurrentRenderFormatAndCodec(fmt, codec)
         p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": S + round(ini * F), "MarkOut": S + round(fim * F) - 1,
                              "TargetDir": pasta, "CustomName": nome, "ExportVideo": True, "ExportAudio": True,
                              "FormatWidth": int(t.GetSetting("timelineResolutionWidth")), "FormatHeight": int(t.GetSetting("timelineResolutionHeight"))})
         jid = p.AddRenderJob(); p.StartRendering(jid)
         while p.IsRenderingInProgress(): time.sleep(1)
-        return os.path.join(pasta, nome + ".mp4")
+        p.DeleteRenderJob(jid)
+        return os.path.join(pasta, nome + "." + ext)
     finally:
+        pagina_edit()   # SetTrackEnable não religa na página Deliver (relato 15/10/2026: V2-V4 ficaram desligadas)
         for tipo, k in desligadas: t.SetTrackEnable(tipo, k, True)
+        presas = [f"{tipo}{k}" for tipo, k in desligadas if not t.GetIsTrackEnabled(tipo, k)]
+        if presas: print("AVISO: trilhas continuam desligadas, religar à mão:", presas)
 
 
 def timeline_com_letterings(p, mp, nome, lista, w=1080, h=1920, fps=30):
@@ -1098,13 +1118,13 @@ def _conferir_titulos(p, t, pasta, quadro_ini, quadro_fim, S, F):
         for it in t.GetItemListInTrack("video", v) or []:
             if it.GetMediaPoolItem() is not None: continue      # só títulos; NÃO abrir a composição (congela)
             txt = it.GetName(); nome = f"tit_{it.GetStart()}"
-            for j in p.GetRenderJobList(): p.DeleteRenderJob(j["JobId"])
             p.SetCurrentRenderFormatAndCodec("mp4", "H264")
             p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": it.GetStart(), "MarkOut": it.GetStart() + quadro_fim + 2,
                                  "TargetDir": pasta, "CustomName": nome, "ExportVideo": True, "ExportAudio": False,
                                  "ExportSubtitle": False})
             jid = p.AddRenderJob(); p.StartRendering(jid)
             while p.IsRenderingInProgress(): time.sleep(0.5)
+            p.DeleteRenderJob(jid)
             conta = []
             for q in (quadro_ini, quadro_fim):
                 png = os.path.join(pasta, f"{nome}_{q}.png")
@@ -1152,7 +1172,7 @@ def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
         if its: t.DeleteClips(its)
         if not [x for x in (t.GetItemListInTrack("audio", k) or [])]:
             t.SetTrackName("audio", k, "SFX" if k == trilhas[0] else f"SFX {k - trilhas[0] + 1}")
-    S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0
+    S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0; avisou = False
     for nome, ini, db, dmax in sorted(ev, key=lambda e: e[1]):
         it = importar(mp, os.path.join(pasta_sfx, nome + ".wav"), "SFX"); fc = float(it.GetClipProperty("FPS") or F)
         dur = min(dmax or SFX_DMAX.get(nome, 2.0), fim_s - ini); rf = S + round(ini * F)   # 'NN dB D.Ds' na linha = duração própria
@@ -1161,7 +1181,10 @@ def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
         k = livres[0]
         x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": k, "recordFrame": rf, "startFrame": 0, "endFrame": round(dur * fc)}])
         if not x: print("SFX falhou:", nome, ini); continue
-        x[0].SetProperty("AudioVolume", db); x[0].SetFades({"FadeOut": min(8, round(dur * F / 4))}); fim[k] = x[0].GetEnd(); ok += 1
+        if not x[0].SetProperty("AudioVolume", db) and not avisou:   # DaVinci 21.0 não aceita volume pela API (relato 15/10/2026)
+            print("AVISO: o DaVinci não aceitou o volume do clipe pela API (< 21.1): SFX entraram no volume do arquivo;"
+                  " atualizar para 21.1+ ou gravar o ganho numa cópia (ffmpeg volume=NNdB)"); avisou = True
+        set_fades(x[0], {"FadeOut": min(8, round(dur * F / 4))}); fim[k] = x[0].GetEnd(); ok += 1
     return ok, len(ev)
 
 

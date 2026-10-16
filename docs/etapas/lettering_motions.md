@@ -138,3 +138,12 @@ Todo motion (texto, número, cartão, logo) cabe numa caixa central de **900 x 1
   - `max-content` não quebra linha: o que era 2 linhas vira 1 e estoura; quebrar com `<br>` ou `display:block` em cada linha;
   - elemento `position:absolute` dentro do #fit passa a se posicionar pelo #fit (o transform cria novo bloco de contenção): dar ao pai largura fixa e `margin:auto`;
   - deixar folga para o zoom do palco e o overshoot do pop: medir contra 860 x 1150.
+
+- **Lições de motion de um uso real (15/10/2026):**
+  - **Usar as imagens que o usuário deixou** (Media Pool e pasta do cliente: prints de painel, gráficos, depoimentos) ANTES de desenhar qualquer gráfico de dado; gráfico inventado num vídeo de resultado é erro grave.
+  - GSAP: `immediateRender:false` em `fromTo`/`set` que só deve valer no seu tempo (senão o destaque/cursor aparece antes da hora); posições de cursor/realce MEDIDAS no quadro real, não estimadas.
+  - Não animar propriedade de layout (`width`, `letterSpacing`): usar `scale`/`scaleX` (o lint do HyperFrames acusa e o render trava).
+  - SVG que se "desenha": sem `vector-effect:non-scaling-stroke` (quebra o stroke-dashoffset).
+  - Elemento que entra deslizando: `overflow:hidden` no contêiner da cena; saída do stinger termina 0,1 s antes do fim do clipe.
+  - Nome de arquivo gerado: hash fixo (md5), nunca `hash()` do Python (muda a cada execução).
+  - Motions em sequência: cada um termina antes do próximo começar (somar folgas encosta um no outro).

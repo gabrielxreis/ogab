@@ -16,10 +16,47 @@ if os.name == "nt":
     _PD = os.environ.get("PROGRAMDATA", r"C:\ProgramData")
     _API = os.path.join(_PD, "Blackmagic Design", "DaVinci Resolve", "Support", "Developer", "Scripting")
     _APP_DIR = os.path.join(_PF, "Blackmagic Design", "DaVinci Resolve")
+
+    def _pasta_resolve():
+        """DaVinci fora do Program Files (ex.: D:\\DaVinci, relato de 15/10/2026): procura no registro de desinstalação."""
+        try:
+            import winreg
+        except ImportError:
+            return None
+        for raiz in (r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"):
+            try:
+                k = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, raiz)
+            except OSError:
+                continue
+            for i in range(winreg.QueryInfoKey(k)[0]):
+                try:
+                    sub = winreg.OpenKey(k, winreg.EnumKey(k, i))
+                    nome = str(winreg.QueryValueEx(sub, "DisplayName")[0])
+                    loc = str(winreg.QueryValueEx(sub, "InstallLocation")[0]).rstrip("\\")
+                except OSError:
+                    continue
+                if nome.startswith("DaVinci Resolve") and os.path.exists(os.path.join(loc, "fusionscript.dll")):
+                    return loc
+        return None
+
+    if os.environ.get("RESOLVE_SCRIPT_LIB") and os.path.exists(os.environ["RESOLVE_SCRIPT_LIB"]):
+        _APP_DIR = os.path.dirname(os.environ["RESOLVE_SCRIPT_LIB"])
+    elif not os.path.exists(os.path.join(_APP_DIR, "fusionscript.dll")):
+        _APP_DIR = _pasta_resolve() or _APP_DIR
+        os.environ["RESOLVE_SCRIPT_LIB"] = os.path.join(_APP_DIR, "fusionscript.dll")
     _EXE = os.path.join(_APP_DIR, "Resolve.exe")
 
     os.environ.setdefault("RESOLVE_SCRIPT_API", _API)
     os.environ.setdefault("RESOLVE_SCRIPT_LIB", os.path.join(_APP_DIR, "fusionscript.dll"))
+    # Whisper na GPU: as DLLs CUDA dos pacotes nvidia-cublas-cu12/nvidia-cudnn-cu12 (pip) ficam em site-packages\nvidia\*\bin
+    try:
+        import glob as _glob, site as _site
+        for _sp_dir in _site.getsitepackages() + [_site.getusersitepackages()]:
+            for _bin in _glob.glob(os.path.join(_sp_dir, "nvidia", "*", "bin")):
+                os.add_dll_directory(_bin)
+                os.environ["PATH"] = _bin + os.pathsep + os.environ.get("PATH", "")
+    except Exception:
+        pass
     _mods = os.path.join(os.environ["RESOLVE_SCRIPT_API"], "Modules")
     if _mods not in sys.path:
         sys.path.append(_mods)

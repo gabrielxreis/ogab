@@ -47,3 +47,12 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
 | Claude Code | com Git Bash (o próprio instalador do Claude Code pede) |
 | Google Chrome | com a extensão Claude in Chrome logada |
 | Docker Desktop | **não precisa** (o aviso do `hyperframes doctor` pode ser ignorado) |
+
+## Armadilhas já resolvidas (relato de uso real, Windows 11 + DaVinci 21.0 + RTX 4060 Ti, 15/10/2026)
+- **DaVinci fora do C:** (ex.: `D:\DaVinci`): o instalador e a camada `windows\py` acham pelo processo aberto, pelo atalho do Menu Iniciar ou pelo registro. Se a API não conectar (`DLL load failed ... fusionscript`), rode o instalador de novo com o DaVinci aberto.
+- **`python3` não existe na sessão:** o Claude Code foi aberto antes do instalador gravar o PATH. Feche e abra o Claude Code.
+- **DaVinci 21.0:** sem `GetTranscription` (a skill usa o Whisper local), sem `SetFades` (fade fica à mão; a skill avisa) e sem `AudioVolume` pela API (a skill avisa; gravar o ganho numa cópia do SFX com ffmpeg). Atualizar para o 21.1+ resolve os três.
+- **Whisper:** o áudio vai decodificado pelo ffmpeg (o PyAV de algumas versões quebra com `metadata_errors`); com placa NVIDIA roda na GPU em `int8_float16` (cabe com o DaVinci aberto) e cai para a CPU se faltar CUDA ou memória.
+- **Render H.264 derruba o DaVinci** ("Fail to create output buffer" / Critical Exception, encoder do Media Foundation): provas (`renderizar_trecho`) saem em ProRes 422 LT (.mov). Se o export final também cair, exporte em ProRes e converta com ffmpeg.
+- **Fila de render do usuário:** o Gab só apaga o job que ele mesmo criou.
+- **Acentos:** nomes de arquivo podem vir em NFC ou NFD; comparar com `unicodedata.normalize("NFC", ...)`. Log de script com acento: `PYTHONUTF8=1` (o instalador grava).

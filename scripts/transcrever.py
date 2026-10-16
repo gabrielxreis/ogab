@@ -151,8 +151,23 @@ def via_whisper(audio, idioma):
             from faster_whisper import WhisperModel
         except ImportError:
             raise SystemExit("falta o Whisper local: pip3 install --user faster-whisper  (ou rode o install.sh de novo)")
-        modelo = WhisperModel(MODELO_FW, device="cpu", compute_type="int8")
-        it, info = modelo.transcribe(audio, language=idioma, word_timestamps=True)
+        # Áudio decodificado pelo ffmpeg e entregue como array: o PyAV de algumas instalações quebra ao abrir o arquivo
+        # ("metadata_errors"). GPU NVIDIA primeiro em int8_float16 (cabe com o DaVinci aberto ocupando ~3,5 GB; 9 min de
+        # áudio em ~30 s), CPU int8 se faltar CUDA/memória (relato de 15/10/2026, Windows + RTX 4060 Ti).
+        import numpy as np
+        pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", audio, "-f", "s16le", "-ac", "1", "-ar", "16000", "-"],
+                             capture_output=True, check=True).stdout
+        onda = np.frombuffer(pcm, np.int16).astype(np.float32) / 32768.0
+        it = info = None
+        for dev, ct in (("cuda", "int8_float16"), ("cpu", "int8")):
+            try:
+                modelo = WhisperModel(MODELO_FW, device=dev, compute_type=ct)
+                it, info = modelo.transcribe(onda, language=idioma, word_timestamps=True)
+                it = list(it)   # a transcrição roda aqui: erro de CUDA/memória aparece agora, não depois
+                break
+            except Exception as e:
+                if dev == "cpu": raise
+                print(f"Whisper na GPU não rodou ({str(e)[:80]}); usando a CPU", file=sys.stderr)
         lang = info.language
         segments = [{"start": round(s.start, 3), "end": round(s.end, 3), "text": s.text.strip(),
                      "words": [{"text": w.word.strip(), "start": round(w.start, 3), "end": round(w.end, 3)}

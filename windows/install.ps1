@@ -130,6 +130,24 @@ if (($null -eq $cfgJ.relatos) -or (($cfgJ.relatos -eq $true) -and ([int]($cfgJ.r
 Info "5/10 Ambiente do Windows (Resolve, Python, atalho python3)"
 $api  = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting"
 $appd = Join-Path $env:ProgramFiles "Blackmagic Design\DaVinci Resolve"
+# DaVinci fora do C:\Program Files (ex.: D:\DaVinci, relato de 15/10/2026): acha pelo processo aberto, pelo atalho do
+# Menu Iniciar ou pelo registro de desinstalacao; fica a primeira pasta que tem o fusionscript.dll.
+if (-not (Test-Path (Join-Path $appd "fusionscript.dll"))) {
+  $cands = @()
+  $proc = Get-Process Resolve -ErrorAction SilentlyContinue | Where-Object { $_.Path } | Select-Object -First 1
+  if ($proc) { $cands += Split-Path $proc.Path }
+  $sh = New-Object -ComObject WScript.Shell
+  foreach ($menu in (Join-Path $env:ProgramData "Microsoft\Windows\Start Menu\Programs"), (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs")) {
+    Get-ChildItem $menu -Recurse -Filter "DaVinci Resolve*.lnk" -ErrorAction SilentlyContinue | ForEach-Object {
+      $alvo = $sh.CreateShortcut($_.FullName).TargetPath; if ($alvo) { $cands += Split-Path $alvo } }
+  }
+  foreach ($k in "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*", "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*") {
+    Get-ItemProperty $k -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "DaVinci Resolve*" -and $_.InstallLocation } |
+      ForEach-Object { $cands += $_.InstallLocation.TrimEnd("\") }
+  }
+  $achou = $cands | Where-Object { $_ -and (Test-Path (Join-Path $_ "fusionscript.dll")) } | Select-Object -First 1
+  if ($achou) { $appd = $achou; Ok "DaVinci encontrado fora do padrao: $appd" }
+}
 $lib  = Join-Path $appd "fusionscript.dll"
 $winpy  = Join-Path $DEST "windows\py"
 $winbin = Join-Path $DEST "windows\bin"
@@ -263,6 +281,14 @@ if ($precisaWhisper) {
     Py -c "import faster_whisper" 2>$null
     if ($LASTEXITCODE -eq 0) { Ok "faster-whisper instalado; o modelo (~1,6 GB) baixa na primeira transcricao" }
     else { Warn "nao consegui instalar o faster-whisper; rode: py -3 -m pip install --user faster-whisper" }
+  }
+  # Placa NVIDIA: bibliotecas CUDA do Whisper na GPU (sem elas: "cublas64_12.dll not found"; relato de 15/10/2026).
+  # A camada windows\py registra as pastas bin delas sozinha; sem NVIDIA o Whisper roda na CPU.
+  $nv = Get-CimInstance Win32_VideoController -ErrorAction SilentlyContinue | Where-Object { $_.Name -match "NVIDIA" }
+  if ($nv) {
+    Py -m pip install --user --quiet nvidia-cublas-cu12 nvidia-cudnn-cu12
+    if ($LASTEXITCODE -eq 0) { Ok "Whisper na GPU ($($nv[0].Name)): bibliotecas CUDA instaladas" }
+    else { Warn "Whisper vai rodar na CPU (mais lento); para a GPU: py -3 -m pip install --user nvidia-cublas-cu12 nvidia-cudnn-cu12" }
   }
 }
 

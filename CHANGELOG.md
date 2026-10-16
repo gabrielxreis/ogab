@@ -1,4 +1,10 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-12 (15/10/2026)
+- **Sua fila de render fica intacta:** o Gab só apaga os renders que ele mesmo criou.
+- **Windows:** o DaVinci é encontrado em qualquer pasta (ex.: D:\DaVinci); provas de render em ProRes (o H.264 do Windows derrubava o DaVinci); Whisper na placa NVIDIA quando houver (9 min de áudio em ~30 s). Rode o instalador de novo para receber.
+- **DaVinci 21.0:** a skill não quebra mais por falta de fade e volume pela API; ela avisa o que fazer à mão (ou atualize para o 21.1).
+- **Trilhas religadas** depois de uma prova de render.
+
 ## 2026.10.15-11 (15/10/2026)
 - **Silêncios também na narração:** em vídeo com voz gerada ou locução, o Gab tira as pausas longas da narração logo que ela entra na timeline, antes da legenda e dos takes (a versão original fica guardada como "<nome> - com silencios").
 
