@@ -1,0 +1,44 @@
+// Preset MARCO: pontos girando num campo escuro se juntam e formam o número do marco; o número nítido assenta por
+// cima, os pontos ficam brilhando por trás, e a frase sobe embaixo. Valor exato do plano. Campos: ver gerar.py.
+(async function () {
+  const P = window.PLANO, W = P.w, H = P.h, VERT = H > W;
+  const serif = P.letra === "cinema", fam = serif ? "'Instrument Serif'" : "'Inter Tight'", peso = serif ? 400 : 800;
+  try { await Promise.all([document.fonts.load(`${peso} 300px ${fam}`), document.fonts.load("700 120px 'Inter Tight'"),
+    document.fonts.load("500 40px 'Inter Tight'"), document.fonts.load("120px 'Instrument Serif'")]); await document.fonts.ready; } catch (e) {}
+  const root = document.getElementById("root"), palco = document.getElementById("palco");
+  root.style.setProperty("--cor", P.cor || "#C4A34F"); root.style.setProperty("--cor2", P.cor2 || "#F2E2B3");
+  root.classList.add("letra-" + (P.letra || "apple"));
+  const U = Math.min(W, H) / 1080, px = v => Math.round(v * U) + "px";
+  const tl = gsap.timeline({ paused: true }), REVELA = "expo.out", dur = P.dur || 6;
+  const mk = (tag, cls, pai, css) => { const e = document.createElement(tag); if (cls) e.className = cls; if (css) Object.assign(e.style, css); if (pai) pai.appendChild(e); return e; };
+  const aparece = (el, t0, d = .9) => tl.fromTo(el, { opacity: 0, y: px(20), filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: d, ease: REVELA }, t0);
+
+  // Tamanho do número: o maior que cabe em 80% da largura (máx. 420 px na base 1080).
+  const num = String(P.numero), med = document.createElement("canvas").getContext("2d");
+  let tam = (P.tam || 420) * U; const esp = serif ? -.015 : -.05; med.font = `${peso} ${tam}px ${fam}`; med.letterSpacing = esp * tam + "px";
+  const larg = med.measureText(num).width; if (larg > W * .8) tam *= W * .8 / larg;
+  const cy = H * (VERT ? .44 : .45);
+  const alvos = window.pontosDoTexto(num, fam, tam, W / 2, cy, Math.max(3, Math.round(tam / 95)), peso, esp * tam);
+  const pt = new window.Particulas(document.getElementById("pontos"), W, H, alvos, { cor: P.cor || "#C4A34F", n: P.pontos || 5200, semente: 11, cx: W / 2, cy });
+  const J0 = .5, JD = 2.4, NITIDO = J0 + JD - .2;
+  const relogio = { t: 0 };
+  tl.to(relogio, { t: dur, duration: dur, ease: "none", onUpdate: () => pt.render(relogio.t, { junta: [J0, JD], apaga: relogio.t > NITIDO ? Math.max(.38, 1 - (relogio.t - NITIDO) / .8 * .62) : 1 }) }, 0);
+
+  // Número nítido por cima (mesma fonte e posição que os pontos), assentando com desfoque.
+  const n = mk("div", "numero", palco, { fontSize: tam + "px", top: cy - tam * .5 + "px", fontWeight: peso, fontFamily: fam });
+  if (P.destaqueNumero !== false) n.style.color = "var(--cor)";
+  n.textContent = num;
+  tl.fromTo(n, { opacity: 0, filter: "blur(14px)", scale: 1.04 }, { opacity: 1, filter: "blur(0px)", scale: 1, duration: 1.2, ease: REVELA }, NITIDO);
+  if (P.olho) { const o = mk("div", "olho legenda", palco, { fontSize: px(28), top: cy - tam * .5 - 110 * U + "px" }); o.textContent = P.olho; aparece(o, .2); }
+  if (P.texto) {
+    const t = mk("div", "titulo legenda", palco, { fontSize: px(P.tamTexto || (VERT ? 92 : 76)), top: cy + tam * .55 + 30 * U + "px" });
+    const ls = String(P.texto).split("|").map(ln => { const L = mk("span", "linha", t), d = mk("span", "", L);
+      ln.split(/(\*[^*]+\*)/).filter(Boolean).forEach(p => { const c = /^\*.*\*$/.test(p), s = mk("span", "p" + (c ? " cor" : ""), d); s.textContent = c ? p.slice(1, -1) : p; }); return d; });
+    tl.fromTo(ls, { yPercent: 115, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 1.1, ease: REVELA, stagger: .12 }, NITIDO + .25);
+  }
+  if (P.sub) { const s = mk("div", "sub legenda", palco, { fontSize: px(34), bottom: px(VERT ? 260 : 90) }); s.textContent = P.sub; aparece(s, NITIDO + .7); }
+  if (P.fonte) { const f = mk("div", "sub legenda", palco, { fontSize: px(26), bottom: px(VERT ? 150 : 50), opacity: .8 }); f.textContent = P.fonte; aparece(f, NITIDO + .9); }
+  tl.fromTo("#cam", { scale: 1.06 }, { scale: 1, duration: NITIDO + .8, ease: "power2.out" }, 0);
+  tl.set({}, {}, dur);
+  window.__timelines = window.__timelines || {}; window.__timelines["marco"] = tl;
+})();

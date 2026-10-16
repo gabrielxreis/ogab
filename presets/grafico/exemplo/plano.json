@@ -1,0 +1,3 @@
+{ "tipo": "barras", "cor": "#FF8B3D", "cor2": "#FFC49D", "olho": "Lumen · produto fictício", "titulo": "Usuários|*por ano*",
+  "dados": [ {"rotulo": "2022", "valor": 1200}, {"rotulo": "2023", "valor": 4800}, {"rotulo": "2024", "valor": 9350}, {"rotulo": "2025", "valor": 18400} ],
+  "fonte": "Dados fictícios, só para o exemplo do preset" }

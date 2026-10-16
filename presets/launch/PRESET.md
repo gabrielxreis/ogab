@@ -40,12 +40,19 @@ Vídeo curto (12-25 s) que apresenta um produto digital (site, app, SaaS, curso)
    - roteiro **gancho → logo → tela → lista → cta**, com 2-4 palavras por linha;
    - campos completos na docstring do `gerar.py`;
    - exemplo em [`exemplo/plano.json`](exemplo/plano.json).
-3. **Gerar, renderizar e tirar o GIF de prévia:**
+3. **Gerar e mostrar o storyboard (PARAR para aprovação):**
+   ```
+   python3 gerar.py plano.json <pasta>/projeto
+   python3 SKILL_DIR/scripts/storyboard.py <pasta>/projeto
+   ```
+   O ajuste vem por número de cena, e só aquela cena muda.
+4. **Renderizar (com GIF de prévia) e passar pelo revisor:**
    ```
    python3 gerar.py plano.json <pasta>/projeto --render <pasta>/launch.mp4 --gif
+   python3 SKILL_DIR/scripts/revisor.py <pasta>/launch.mp4 --pasta <pasta>/projeto
    ```
-   Isso gera `launch.mp4` (60 fps) e `launch.gif`.
-4. **Som:** mixar com ffmpeg como descrito acima, ou levar o MP4 para a timeline do cliente e colocar a música lá.
+   O render sai a 60 fps. O revisor dá nota com olhos novos (ver `docs/etapas/revisor.md`).
+5. **Som:** mixar com ffmpeg como descrito acima, ou levar o MP4 para a timeline do cliente e colocar a música lá.
 
 ## Cliente com marca
 - `cor` e `cor2` vêm da marca. O padrão é dourado `#C4A34F` / `#F2E2B3`.

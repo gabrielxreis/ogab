@@ -1,5 +1,26 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.16-4 (16/10/2026)
+- **Storyboard antes do render:** antes de renderizar um motion, o Gab te mostra o roteiro cena a cena e 3 quadros parados (gancho, cena principal e fecho). Você aprova ou pede ajuste pelo número da cena ("na 3, troca o texto"), e só aquela cena muda. Menos render jogado fora.
+- **Revisor com nota antes de entregar:** o vídeo passa por uma conferência automática:
+  - quadro preto ou imagem congelada;
+  - gancho parado;
+  - algo encostado na borda;
+  - volume fora de -14 LUFS;
+  - clichê proibido no código.
+
+  Depois, um revisor de olhos novos dá nota de 0 a 10 em 7 critérios: gancho, leitura no celular, som na batida, acabamento, ritmo, marca e fatos, movimento. O Gab corrige os 3 piores e repete; só entrega com tudo acima de 8.
+- **Clichês proibidos nos motions:** texto digitando letra a letra, brilho em texto, quique, degradê colorido em texto, fundo roxo e azul de "IA", movimento linear e efeitos empilhados ficam de fora. Só entram se você pedir ou se forem a assinatura do preset escolhido.
+- **Presets novos:**
+  - **GRÁFICO**: barras, linha, rosca ou comparação com o valor exato e a fonte do dado na tela;
+  - **MARCO**: pontos que se juntam e formam o seu número;
+  - **LOGO REVEAL**: abertura de marca com luz, linhas ou pontos.
+
+  Todos têm GIF no README.
+- **LOTTIE para site e app:** carregando, sucesso, curtir e botão "saiba mais" nas cores da marca, em arquivo leve que o site toca, com GIF de prévia.
+- **Referência de estilo:** peça "um vídeo estilo X". O Gab busca na galeria Prompt Motion (230+ filmes feitos com Claude) e indica a AI x Leaders e a Promptcat. Ele assiste e recria a linguagem com o seu material, sem copiar.
+- **Launch:** a perna do "g" e o acento no texto dourado não são mais cortados.
+
+## 2026.10.16-4 (16/10/2026)
 - **Efeitos novos para os motions:** palavras e cartões caindo e empilhando com física de verdade, esfera de pontos de "IA pensando" (6 jeitos: pensando, buscando, resolvendo, ouvindo, escrevendo, moldando), texto virando ASCII, lupa que estufa o texto e rabiscos à mão (círculo, sublinhado, seta, X e hachura) que se desenham e tremem como animação feita à mão.
 
 ## 2026.10.16-3 (16/10/2026)

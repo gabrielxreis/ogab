@@ -353,9 +353,16 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/kinetic/exemplo.gif" width="150" alt="Kinetic">&nbsp;
 <img src="presets/serif-azul/exemplo.gif" width="150" alt="Serif azul">&nbsp;
 <img src="presets/launch/exemplo.gif" width="150" alt="Launch">&nbsp;
+<img src="presets/grafico/exemplo.gif" width="150" alt="Gráfico">&nbsp;
+<img src="presets/marco/exemplo.gif" width="150" alt="Marco">&nbsp;
+<img src="presets/logo-reveal/exemplo.gif" width="150" alt="Logo reveal">&nbsp;
 <img src="presets/glass/exemplo.gif" width="267" alt="Glass">
 
-<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch · família CENA (destaque, palco, órbita, lente, bancada) · launch</sub>
+<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch · família CENA (destaque, palco, órbita, lente, bancada) · launch · gráfico · marco · logo reveal</sub>
+
+<img src="presets/lottie/exemplo.gif" width="480" alt="Lottie para site e app">
+
+<sub>lottie para site e app: carregando · sucesso · curtir · saiba mais</sub>
 
 </div>
 
@@ -374,6 +381,10 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **LENTE** ([guia](presets/lente/PRESET.md)) | Efeitos de câmera no próprio vídeo: zoom rápido no rosto na palavra forte (o recorte acompanha, então o PALCO continua atrás). Em seguida: foco de luz, congelar com etiqueta, antes e depois, transição com desfoque e encolher para dentro de uma janela. Família CENA | <img src="presets/lente/exemplo.gif" width="160" alt="Exemplo do preset Lente"> |
 | **BANCADA** ([guia](presets/bancada/PRESET.md)) | Em construção: tela verde para comentário, você recortado embaixo, o assunto atrás, gancho fixo no topo e o número circulado à mão. Família CENA | |
 | **LAUNCH** ([guia](presets/launch/PRESET.md)) | Filme de lançamento de produto com acabamento premium, na linguagem dos filmes de produto da Apple: fundo preto, uma ideia por cena, frases entrando por máscara com curvas longas que freiam no fim, logo nascendo com contraluz e brilho, o seu site ou app de verdade num painel de vidro flutuando em 3D com reflexo e luz passando, recursos um por vez e fecho limpo. O Gab captura o site sozinho (página inteira, cor da marca). Três letras: **apple**, **editorial** e **cinema**. Para lançar curso, app, SaaS ou site | <img src="presets/launch/exemplo.gif" width="160" alt="Exemplo do preset Launch"> |
+| **GRÁFICO** ([guia](presets/grafico/PRESET.md)) | Dado animado com acabamento premium: barras, linha, rosca ou comparação crescendo com curvas que freiam no fim, o valor EXATO que você aprovou contando até o número certo, um destaque na cor da marca e a fonte do dado sempre na tela (sem fonte, o Gab nem gera). Para "X% dos...", crescimento, ranking, antes e depois | <img src="presets/grafico/exemplo.gif" width="160" alt="Exemplo do preset Gráfico"> |
+| **MARCO** ([guia](presets/marco/PRESET.md)) | Milhares de pontos girando no escuro se juntam e desenham o seu número ("10 mil alunos", "1 milhão de views", "+10 anos"); o número nítido assenta por cima e a frase sobe. Combina com o POINT CLOUD | <img src="presets/marco/exemplo.gif" width="160" alt="Exemplo do preset Marco"> |
+| **LOGO REVEAL** ([guia](presets/logo-reveal/PRESET.md)) | Abertura de marca de 5-8 s: fio de luz que se abre e revela o logo, fios que desenham a moldura, ou pontos que se juntam no desenho do logo; contraluz, brilho atravessando e a frase da marca. Para abrir institucional, vinheta e fim de anúncio | <img src="presets/logo-reveal/exemplo.gif" width="160" alt="Exemplo do preset Logo reveal"> |
+| **LOTTIE** ([guia](presets/lottie/PRESET.md)) | Não é vídeo: animações leves para o site ou app do cliente (carregando, sucesso, curtir, botão "saiba mais") em arquivo .json de poucos KB, nas cores da marca, com GIF de prévia | <img src="presets/lottie/exemplo.gif" width="240" alt="Exemplo de Lottie"> |
 | **GLASS** ([guia](presets/glass/PRESET.md)), da comunidade | YouTube 16:9 premium: vidro escuro com aurora violeta e grão de filme, título metálico, destaque em Playfair itálico e números em Inter fina, revelação por máscara com desfoque. Cenas entram com slide junto com um empurrão de câmera na V1 (no Fusion de cada clipe, reversível), seus prints com anel e caixa marcando o número, stingers de capítulo e cartão de like + inscreva-se com a foto do canal. A cor violeta troca pela da sua marca. Para tutorial e explicativo com webcam e gravação de tela | <img src="presets/glass/exemplo.gif" width="240" alt="Exemplo do preset Glass"> |
 
 

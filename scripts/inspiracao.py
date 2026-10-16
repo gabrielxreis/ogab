@@ -3,6 +3,12 @@
   python3 inspiracao.py "counter numbers"                  # termos EM INGLÊS (os prompts são em inglês)
   python3 inspiracao.py "map route" --cat motion,explainer --n 5
   python3 inspiracao.py --atualizar                         # git pull da coleção
+  python3 inspiracao.py "launch phone" --galeria            # busca na galeria Prompt Motion (prompt-motion.com)
+  python3 inspiracao.py --galerias                          # lista as galerias de referência para ver no Chrome
+
+Pedido "um vídeo estilo X" ou "parecido com aquele": ANTES do plano, buscar referência aqui e nas galerias, ASSISTIR
+(preview mp4 ou página no Chrome), anotar a linguagem (ritmo, curvas, tipografia, transições, paleta, som) e recriar com
+o material do cliente. Nunca copiar o vídeo, os textos, as marcas nem o prompt inteiro; não citar o autor no vídeo.
 
 Só INSPIRAÇÃO de movimento e ritmo: as regras da skill continuam mandando (centro 540/960, visual do site do
 cliente, duração da fala, calmo). Nunca copiar o prompt inteiro para o cliente nem citar o autor no vídeo.
@@ -48,7 +54,50 @@ def buscar(termos, cats=None, n=8):
     return [v for _, v in saida[:n]]
 
 
+GALERIAS = [
+    ("Prompt Motion", "https://prompt-motion.com/", "230+ filmes feitos com Claude, com prompt ou skill ao lado; filtro por tipo (product UI, phone, kinetic type, charts, particles...)"),
+    ("AI x Leaders", "https://ai-x-leaders.com/en/prompt/", "mural dos mais curtidos (launch, logo reveal, kinetic type), com o prompt completo"),
+    ("Promptcat", "https://promptcat.org/use-cases/animation/", "161 casos de animação: Lottie de interface, filmes de produto, explicativos"),
+    ("Promptslove (pago)", "https://promptslove.com/motion-graphics-claude-skill/", "só a lista de tipos de vídeo e estilos serve de ideia; não usar o material"),
+]
+
+
+def galeria(termos, n=8):
+    """Busca na Prompt Motion: título e etiquetas; vertical e com prompt aberto sobem na lista."""
+    import urllib.request
+    req = urllib.request.Request("https://prompt-motion.com/", headers={"User-Agent": "Mozilla/5.0 ogab-inspiracao"})
+    html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore").replace('\\"', '"')
+    itens, vistos = [], set()
+    for m in re.finditer(r'\{"slug":"([^"]+)","title":"([^"]+)".*?"contentTags":\[([^\]]*)\].*?"promptShared":(true|false).*?"preview":"([^"]+)".*?"width":(\d+),"height":(\d+)', html):
+        slug, tit, tags, aberto, prev, w, h = m.groups()
+        if slug in vistos:
+            continue
+        vistos.add(slug)
+        itens.append({"url": "https://prompt-motion.com/" + slug, "titulo": tit, "tags": re.findall(r'"([^"]+)"', tags),
+                      "prompt": aberto == "true", "previa": prev, "formato": "vertical" if int(h) > int(w) else ("quadrado" if h == w else "horizontal")})
+    palavras = [_sem_acento(t) for t in termos.split() if t]
+    saida = []
+    for it in itens:
+        texto = _sem_acento(it["titulo"] + " " + " ".join(it["tags"]))
+        acertos = sum(1 for p in palavras if p in texto)
+        if palavras and not acertos:
+            continue
+        saida.append((acertos * 5 + (3 if it["formato"] == "vertical" else 0) + (2 if it["prompt"] else 0), it))
+    saida.sort(key=lambda x: -x[0])
+    return [it for _, it in saida[:n]], len(itens)
+
+
 def main(a):
+    if "--galerias" in a:
+        for nome, url, d in GALERIAS:
+            print(f"- {nome}: {url}\n  {d}")
+        return
+    if "--galeria" in a:
+        achados, total = galeria(a[0] if a and not a[0].startswith("--") else "", int(a[a.index("--n") + 1]) if "--n" in a else 8)
+        print(f"Prompt Motion: {len(achados)} de {total} filmes")
+        for it in achados:
+            print(f"- {it['titulo']} [{it['formato']}, {', '.join(it['tags'])}{', prompt aberto' if it['prompt'] else ''}]\n  {it['url']}  prévia: {it['previa']}")
+        return
     if "--atualizar" in a:
         garantir(True); print("coleção atualizada em", PASTA); return
     if not a or a[0].startswith("--"):
