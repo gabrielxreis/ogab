@@ -347,7 +347,8 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/vitrine/exemplo.gif" width="150" alt="Vitrine">&nbsp;
 <img src="presets/sketch/exemplo.gif" width="150" alt="Sketch">&nbsp;
 <img src="presets/kinetic/exemplo.gif" width="150" alt="Kinetic">&nbsp;
-<img src="presets/serif-azul/exemplo.gif" width="150" alt="Serif azul">
+<img src="presets/serif-azul/exemplo.gif" width="150" alt="Serif azul">&nbsp;
+<img src="presets/glass/exemplo.gif" width="267" alt="Glass">
 
 <sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch</sub>
 
@@ -362,6 +363,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **TELA DIVIDIDA** ([guia](presets/tela-dividida/PRESET.md)) | Reels de talking head com o painel de motion em cima (46,5 %) e você embaixo, legenda em etiqueta branca na emenda e quebras em tela cheia a cada 3-5 s. O Gab enquadra o rosto sozinho no DaVinci. Para vídeo explicativo que cita app, site, número ou passo a passo | <img src="presets/tela-dividida/guia.png" width="120" alt="Guia do layout tela dividida"> |
 | **KINETIC** ([guia](presets/kinetic/PRESET.md)) | Tipografia cinética estilo Katana: cada batida da fala vira uma cena com palavras enormes, hierarquia de tamanhos, ecos em contorno, caixa vermelha, faixa inclinada, prompt digitando, barra de render, ponto de gravação, visor de câmera, cubo 3D e estrela de explosão; fundo preto vivo, vermelho, branco ou grafite e transições de chicote, glitch e risco de luz. Para gancho, reação, frase de efeito e novidade | <img src="presets/kinetic/exemplo.gif" width="160" alt="Exemplo do preset Kinetic"> |
 | **SERIF AZUL** ([guia](presets/serif-azul/PRESET.md)) | Editorial: talking head escuro com legenda em duas fontes (sans pequena + palavra-chave em serifada itálica azul, palavra por palavra), passos 1-2-3 que acendem no vídeo todo, slider "iniciante → profissional" e cenas em papel off-white com grade e luz de janela subindo por cima do apresentador (celular caindo, ícone 3D que encolhe 25 %, amostras de cor, nuvem de marcas, cartões em órbita). Para "3 erros", "5 passos", dica de especialista e marca premium | <img src="presets/serif-azul/exemplo.gif" width="160" alt="Exemplo do preset Serif azul"> |
+| **GLASS** ([guia](presets/glass/PRESET.md)), da comunidade | YouTube 16:9 premium: vidro escuro com aurora violeta e grão de filme, título metálico, destaque em Playfair itálico e números em Inter fina, revelação por máscara com desfoque. Cenas entram com slide junto com um empurrão de câmera na V1 (no Fusion de cada clipe, reversível), seus prints com anel e caixa marcando o número, stingers de capítulo e cartão de like + inscreva-se com a foto do canal. A cor violeta troca pela da sua marca. Para tutorial e explicativo com webcam e gravação de tela | <img src="presets/glass/exemplo.gif" width="240" alt="Exemplo do preset Glass"> |
 
 
 # CLIENTES

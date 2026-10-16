@@ -1,0 +1,9 @@
+{"fps": 24, "motions": [
+ {"id": "e01-stinger", "tipo": "stinger", "ini": 0, "fim": 1.2, "rotulo": "capítulo 01", "texto": "A página"},
+ {"id": "e02-print", "tipo": "print_destaque", "ini": 1.5, "fim": 7.5, "dir": 1, "img": "imagens/print_ruim.png", "img2": "imagens/troca.png", "anel": [0.45, 0.32, 0.66, 1.0], "caixa": [0.52, 0.08, 0.63, 0.17], "rotulo": "o seu funil", "titulo": "Initiate Checkout", "destaque": "0%", "frase": "o famoso ", "frase_serif": "funil agulha", "t_conv": 2.2, "t_ic": 3.2, "t_assim": 4.2, "t_agulha": 5.6},
+ {"id": "e03-numero", "tipo": "numero", "ini": 8, "fim": 11.5, "t": 9.6, "valor": 7, "prefixo": "", "sufixo": " blocos", "legenda": "uma estrutura simples", "slide": true, "dir": -1},
+ {"id": "e04-versus", "tipo": "versus", "ini": 12, "fim": 17, "a": {"rot": "NÃO USE", "txt": "depoimento feito com IA", "t": 12.4, "img": "imagens/depoimento_ia.png"}, "b": {"rot": "USE", "txt": "print real de cliente", "t": 14.2, "icone": "celular"}},
+ {"id": "e05-callout", "tipo": "callout", "ini": 17.5, "fim": 21.5, "t": 17.8, "titulo": "Bloco 1", "sub": "o bloco principal", "t_sub": 18.6, "icone": "estrela"},
+ {"id": "e06-inscreva", "tipo": "inscreva", "ini": 22, "fim": 28, "avatar": "imagens/avatar.png", "canal": "@seucanal", "sub": "seu nicho aqui", "t_like": 23.5, "t_insc": 24.7},
+ {"id": "e07-foto", "tipo": "foto_lado", "ini": 28.5, "fim": 32, "img": "imagens/print_bom.png", "anel": [0.40, 0.33, 0.60, 0.99], "t": 28.8, "t_anel": 29.8, "rotulo": "lembra dele?"}
+]}

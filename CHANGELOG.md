@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.15-13 (15/10/2026)
+- **Preset novo GLASS (YouTube 16:9, da comunidade):** motions premium em vidro escuro com aurora violeta, título metálico e destaque em serifa itálica; cenas que entram deslizando junto com um empurrão de câmera no seu vídeo, seus prints com o número destacado por um anel, vinhetas de capítulo e cartão de like + inscreva-se. A cor violeta troca pela da sua marca. Peça "no preset glass".
+
 ## 2026.10.15-12 (15/10/2026)
 - **Sua fila de render fica intacta:** o Gab só apaga os renders que ele mesmo criou.
 - **Windows:** o DaVinci é encontrado em qualquer pasta (ex.: D:\DaVinci); provas de render em ProRes (o H.264 do Windows derrubava o DaVinci); Whisper na placa NVIDIA quando houver (9 min de áudio em ~30 s). Rode o instalador de novo para receber.
