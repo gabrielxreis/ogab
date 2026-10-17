@@ -119,6 +119,8 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 - **lottie** (entrega para site e app, não é vídeo): `.json` leve de carregando, sucesso, curtir e botão "saiba mais" nas cores da marca, com GIF de prévia (`presets/lottie/lottie.py`).
 - **kinetic** (tipografia cinética estilo Katana): cada batida vira uma cena com palavras enormes, hierarquia, ecos, caixa vermelha, faixa, prompt digitando, render, rec, visor, formas 3D e explosão; fundos preto vivo/vermelho/branco/grafite; transições de chicote, glitch e risco de luz (`presets/kinetic/`, `gerar.py plano.json`).
 
+- **lume** (estilo "antes e depois" de editor de short-form): legenda em duas camadas, linha pequena fina + palavra-chave grande que BRILHA em amarelo entrando letra a letra num leve 3D (atrás da mão da pessoa), cenas de mesa vista de cima (papel bege, sombra de janela, objetos recortados que nascem desfocados, seta tracejada e manuscrito que se desenham), mergulho de foco e luz vazada quente escondendo o corte para o close (`presets/lume/`, kit `lume.css` + `lume.js`).
+
 - **efeitos extras** (para qualquer motion, `presets/efeitos/EFEITOS.md`): física (palavras caindo e empilhando, Matter.js), esfera de "IA pensando" em 6 estados, ASCII, lupa que estufa o texto e rabiscos à mão com hachura (Rough.js). Acervo de 400+ vídeos de referência listado no mesmo guia.
 
 **Quando usar cada preset (o Gab escolhe sozinho no plano trecho a trecho e diz qual escolheu e por quê; o usuário pode trocar):**
@@ -132,6 +134,7 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 | transformação, escolha, identidade, nova fase | **vector motion** `objetos` | forma que vira outra, digital, aviões, porta |
 | gancho agressivo, reação ("não acredito", "okay"), novidade/lançamento, lista rápida, tecnologia e negócio | **kinetic** | palavra gigante trocando na batida da voz segura o polegar nos 3 primeiros segundos |
 | talking head explicativo que cita app, site, número, marca, passo a passo (40-60 s), ou pedido de "tela dividida" | **tela dividida** | painel de motion em cima, apresentador embaixo, legenda-etiqueta na emenda ([guia](presets/tela-dividida/PRESET.md)) |
+| talking head de bastidor/processo ("como a gente faz", "3 meses só na ideia"), números de produção, etapa que vira objeto (ideia, roteiro, publicar) | **lume** | brilho na palavra que pesa, mesa vista de cima mostrando a etapa como objeto, luz vazada no número final ([guia](presets/lume/PRESET.md)) |
 | talking head de lista ou método ("3 erros", "5 passos", "do iniciante ao profissional"), dica de especialista, marca que quer cara editorial/premium | **serif azul** | legenda com a palavra-chave em serifada azul, passos 1-2-3 e cenas em papel claro ([guia](presets/serif-azul/PRESET.md)) |
 | YouTube 16:9 explicativo com webcam e gravação de tela (marketing, negócio, tecnologia), print de painel/resultado do próprio usuário | **glass** | cenas premium em vidro escuro entrando com slide junto com a câmera, prints reais com o número destacado ([guia](presets/glass/PRESET.md)); não serve para vertical |
 | tutorial, "X apps/ferramentas que...", passo a passo, fluxo ferramenta → resultado, tecnologia/IA/produtividade | **sketch** | tudo vira esboço de marcador se desenhando, didático e leve ([guia](presets/sketch/PRESET.md)) |

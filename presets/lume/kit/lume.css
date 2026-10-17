@@ -1,0 +1,76 @@
+/* LUME: preset de motion do Gab (talking head com legenda que brilha + cenas de mesa vista de cima + luz vazada).
+   Copiar lume.css e lume.js para a pasta do projeto HyperFrames e trocar só as variáveis abaixo pelo cliente. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@800;900&family=Caveat+Brush&family=Caveat:wght@600&display=block");
+
+:root {
+  --l-brilho: #ffe14a;          /* palavra-chave que brilha (amarelo da referência): troque pela cor do cliente */
+  --l-halo: rgba(255, 214, 40, .75);
+  --l-quente: #f29a1f;          /* destaque laranja ("in advance") e frase sobre a mesa */
+  --l-frio: #8fb8ff;            /* palavra fria desfocada ("Before") */
+  --l-texto: #f4f2ee;           /* linha pequena branca */
+  --l-mesa: #e9dcc4;            /* papel da mesa (se não houver foto da mesa) */
+  --l-tinta: #2b2a28;           /* manuscrito e traços sobre a mesa */
+  --l-sans: "Inter", -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  --l-serif: "Playfair Display", "Times New Roman", serif;
+  --l-mao: "Caveat Brush", "Caveat", cursive;
+}
+
+.l-cena { position: absolute; inset: 0; overflow: hidden; font-family: var(--l-sans); -webkit-font-smoothing: antialiased; }
+.l-cena > img.l-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 35%; }
+
+/* acabamento do vídeo: vinheta embaixo (onde mora a legenda), grão e retícula leve (a referência tem pontos finos) */
+.l-vinheta { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 45%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.92) 100%); }
+.l-reticula { position: absolute; inset: 0; pointer-events: none; opacity: .10; mix-blend-mode: overlay;
+  background-image: radial-gradient(circle, #fff 0.9px, transparent 1.2px); background-size: 7px 7px; }
+.l-grao { position: absolute; inset: -50%; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+/* LEGENDA QUE BRILHA: linha pequena fina + palavra-chave grande que brilha, num leve ângulo 3D */
+.l-leg { position: absolute; left: 0; right: 0; text-align: center; perspective: 900px; }
+.l-leg .bloco { display: inline-block; transform-style: preserve-3d; transform: rotateX(14deg) rotateY(-10deg); }
+.l-leg.reto .bloco { transform: none; }
+.l-leg .l { display: block; white-space: nowrap; line-height: 1.02; }
+.l-leg .w, .l-leg .c { display: inline-block; will-change: transform, filter, opacity; }
+.l-leg .w { margin: 0 .13em; }   /* o espaço entre spans herda 16 px do pai: margem própria em vez dele */
+.l-leg .peq { font-family: var(--l-sans); font-weight: 400; font-size: 44px; color: var(--l-texto); letter-spacing: -.01em;
+  text-shadow: 0 2px 10px rgba(0,0,0,.55); }
+.l-leg .peq.serif { font-family: var(--l-serif); font-weight: 800; }
+.l-leg .chave { font-family: var(--l-sans); font-weight: 800; font-size: 112px; color: var(--l-brilho); letter-spacing: -.02em;
+  text-shadow: 0 0 6px var(--l-halo), 0 0 22px var(--l-halo), 0 0 48px rgba(255,190,30,.45); }
+.l-leg .chave.serif { font-family: var(--l-serif); font-weight: 900; font-size: 116px; letter-spacing: 0; }
+.l-leg .quente { font-family: var(--l-sans); font-weight: 800; font-size: 56px; color: var(--l-quente); text-shadow: 0 2px 12px rgba(0,0,0,.45); }
+.l-leg .frio { font-family: var(--l-sans); font-weight: 800; font-size: 58px; color: var(--l-frio);
+  text-shadow: 0 0 14px rgba(120,170,255,.8); }
+.l-leg .branca { font-family: var(--l-sans); font-weight: 800; font-size: 58px; color: var(--l-texto); text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+.l-leg.canto { text-align: left; left: auto; right: 70px; }
+.l-leg.canto .bloco { transform: none; }
+
+/* CENA DE MESA vista de cima */
+.l-mesa { background: var(--l-mesa); }
+.l-mesa > img.l-foto { transform-origin: 50% 50%; }
+.l-obj { position: absolute; transform-origin: 50% 50%; will-change: transform, filter, opacity;
+  filter: drop-shadow(10px 16px 14px rgba(60,40,20,.35)); }
+.l-obj img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.l-postit { position: absolute; width: 230px; height: 230px; background: #fbf8ee; transform-origin: 50% 50%;
+  box-shadow: 8px 12px 18px rgba(60,40,20,.28); padding: 22px 26px; box-sizing: border-box;
+  font-family: var(--l-mao); font-size: 40px; line-height: 1.12; color: var(--l-tinta); }
+.l-etiqueta { position: absolute; padding: 8px 22px; background: #f3cf5b; color: #3b2f12; font-family: var(--l-sans);
+  font-weight: 800; font-size: 26px; letter-spacing: .12em; box-shadow: 4px 6px 10px rgba(60,40,20,.25); }
+.l-mao { position: absolute; font-family: var(--l-mao); color: #fdfbf6; font-size: 92px; letter-spacing: .02em;
+  text-shadow: 0 2px 10px rgba(60,40,20,.25); white-space: nowrap; }
+.l-mao.tinta { color: var(--l-tinta); text-shadow: none; }
+.l-mao small { display: block; font-family: var(--l-sans); font-size: 26px; letter-spacing: .04em; text-align: center; opacity: .9; }
+.l-frase { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--l-sans); font-weight: 800; font-size: 60px;
+  color: var(--l-quente); text-shadow: 0 2px 8px rgba(255,255,255,.25); }
+.l-frase .w { display: inline-block; }
+.l-frase .fant { color: rgba(255,255,255,.75); font-family: var(--l-mao); font-weight: 400; }
+svg.l-seta { position: absolute; overflow: visible; }
+svg.l-traco { position: absolute; overflow: visible; }
+
+/* LUZ VAZADA: camada por cima de tudo (tela), anda de baixo para cima */
+.l-luz { position: absolute; inset: -20%; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+  background:
+    radial-gradient(60% 40% at 30% 85%, rgba(255,120,40,.95), rgba(255,120,40,0) 70%),
+    radial-gradient(55% 35% at 70% 70%, rgba(255,220,80,.95), rgba(255,220,80,0) 70%),
+    radial-gradient(70% 45% at 50% 40%, rgba(190,70,200,.85), rgba(190,70,200,0) 70%); }

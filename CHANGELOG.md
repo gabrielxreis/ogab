@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.17-3 (17/10/2026)
+- **Preset LUME** (aprendido de um Reels de "antes e depois"): legenda com a palavra-chave brilhando em amarelo letra a letra, passando atrás da sua mão; cenas de mesa vista de cima com objetos que nascem desfocados, seta tracejada e anotação à mão que se desenham; mergulho de foco e luz vazada quente para o close. Peça com "no preset lume".
+
 ## 2026.10.17-2 (17/10/2026)
 - **Personagem nunca cortado:** `enquadramento.py` acha os rostos na prévia e reprova pessoa cortada, apertada ou no canto; material de arquivo 4:3 entra em moldura (inteiro, sobre o fundo do kit, acima da legenda).
 - **Sketch com desenhos de iluminação** (luz de cima apagada, luz lateral 45-90° em planta baixa, afastar da parede, lado claro, rebatedor).

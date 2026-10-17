@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="lume.css" />
+<script src="lume.js"></script>
+<style>
+html, body { width: 1080px; height: 1920px; margin: 0; overflow: hidden; background: #000; }
+#root { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+/* apresentador fictício (no vídeo real é o take da V1, e a legenda sai como MOV com alfa por cima) */
+#v2 img.l-foto { transform-origin: 50% 24%; }
+#a1 { top: 1080px; } #a2 { top: 300px; } #a3 { top: 1240px; } #e1 { top: 1180px; } #e2 { top: 1230px; }
+/* mesa 1: pensar */
+#cerebro { left: 330px; top: 720px; width: 420px; height: 536px; }
+#lampada { left: 465px; top: 455px; width: 150px; height: 260px; }
+#nota { left: 735px; top: 500px; width: 240px; height: 248px; }
+#nota .txt { position: absolute; left: 30px; top: 26px; font-family: var(--l-mao); font-size: 38px; line-height: 1.12; color: var(--l-tinta); }
+#cafe { left: 690px; top: 1480px; width: 380px; height: 300px; }
+#lapis { left: 150px; top: 150px; width: 28px; height: 480px; }
+#f1 { top: 1300px; }
+/* mesa 2: do papel ao play */
+#papeis { left: 330px; top: 380px; width: 420px; height: 541px; }
+#rascunho { left: 375px; top: 560px; width: 330px; height: 236px; }
+#seta { left: 470px; top: 935px; width: 160px; height: 230px; }
+#tablet { left: 310px; top: 1180px; width: 460px; height: 334px; }
+#play { left: 310px; top: 1170px; width: 460px; height: 334px; }
+#etiq { left: 455px; top: 1550px; }
+#mao1 { left: 300px; top: 190px; transform: rotate(-4deg); }
+/* mergulho */
+#lampG { left: 340px; top: 400px; width: 400px; height: 693px; }
+#g1 { top: 1190px; }
+</style></head>
+<body>
+<div id="root" data-composition-id="lume" data-start="0" data-duration="16" data-width="1080" data-height="1920" data-fps="30">
+
+  <!-- 1. apresentador, plano médio -->
+  <div class="l-cena" id="v1">
+    <img class="l-foto" src="assets/apresentador.jpg" />
+    <div class="l-vinheta"></div><div class="l-reticula"></div>
+    <div class="l-leg" id="a1" style="opacity:0"></div>
+    <img class="l-foto" id="rec1" src="assets/mao_recorte.png" />   <!-- só a mão e o braço por cima: a frase passa ATRÁS da mão -->
+    <div class="l-leg canto" id="a2" style="opacity:0"></div>
+    <div class="l-leg reto" id="a3" style="opacity:0"></div>
+    <div class="l-leg" id="e1" style="opacity:0"></div>
+  </div>
+
+  <!-- 2. close (mesma foto, mais perto), depois da luz vazada -->
+  <div class="l-cena" id="v2" style="opacity:0">
+    <img class="l-foto" src="assets/apresentador.jpg" />
+    <div class="l-vinheta"></div><div class="l-reticula"></div>
+    <div class="l-leg" id="e2" style="opacity:0"></div>
+  </div>
+
+  <!-- 3. mesa: pensar -->
+  <div class="l-cena l-mesa" id="m1" style="opacity:0">
+    <img class="l-foto" src="assets/mesa.jpg" />
+    <div class="l-obj" id="lapis" style="opacity:0"><img src="assets/lapis.png" /></div>
+    <div class="l-obj" id="cerebro" style="opacity:0"><img src="assets/cerebro.png" /></div>
+    <div class="l-obj" id="lampada" style="opacity:0"><img src="assets/lampada.png" /></div>
+    <div class="l-obj" id="nota" style="opacity:0"><img src="assets/nota.png" /><div class="txt">✓ ideia<br>✓ roteiro<br>✓ estilo<br>✓ ...</div></div>
+    <div class="l-obj" id="cafe" style="opacity:0"><img src="assets/cafe.png" /></div>
+    <div class="l-frase" id="f1" style="opacity:0"></div>
+  </div>
+
+  <!-- 4. mesa: do papel ao play -->
+  <div class="l-cena l-mesa" id="m2" style="opacity:0">
+    <img class="l-foto" src="assets/mesa.jpg" />
+    <div class="l-obj" id="papeis" style="opacity:0"><img src="assets/papeis.png" /></div>
+    <svg class="l-traco" id="rascunho" viewBox="0 0 420 300" style="opacity:0" fill="none" stroke="#3a3936" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M30 40 H190 V140 H30 Z" /><path d="M95 68 L135 90 L95 112 Z" />
+      <path d="M220 55 H380" /><path d="M220 85 H360" /><path d="M220 115 H370" />
+      <path d="M30 190 H105 V255 H30 Z M30 190 L105 255 M105 190 L30 255" />
+      <path d="M125 190 H200 V255 H125 Z M125 190 L200 255 M200 190 L125 255" />
+      <path d="M220 190 H295 V255 H220 Z M220 190 L295 255 M295 190 L220 255" />
+      <path d="M315 190 H390 V255 H315 Z M315 190 L390 255 M390 190 L315 255" />
+    </svg>
+    <svg class="l-seta" id="seta" viewBox="0 0 160 230" style="opacity:0"></svg>
+    <div class="l-obj" id="tablet" style="opacity:0"><img src="assets/tablet.png" /></div>
+    <svg class="l-traco" id="play" viewBox="0 0 500 360" style="opacity:0" fill="none" stroke="#f4f2ee" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M220 140 L290 180 L220 220 Z" /><path d="M120 265 H380" />
+    </svg>
+    <div class="l-etiqueta" id="etiq" style="opacity:0">PUBLICAR</div>
+    <div class="l-mao" id="mao1" style="opacity:0">1-2 MESES<small>só pensando na ideia</small></div>
+  </div>
+
+  <!-- 5. mergulho de foco: a lâmpada grande por cima da mesa desfocada -->
+  <div class="l-obj" id="lampG" style="opacity:0"><img src="assets/lampada.png" /></div>
+  <div class="l-leg reto" id="g1" style="opacity:0"></div>
+
+  <div class="l-luz" id="luz"></div>
+  <div class="l-grao"></div>
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+// 1. apresentador (0-3.9): a frase passa atrás da mão, contexto no canto, palavra fria
+L.camera(tl, "#v1 img.l-foto", 0, 3.9, { de: 1.0, para: 1.05 });
+tl.fromTo("#rec1", { scale: 1.0 }, { scale: 1.05, duration: 3.9, ease: "none" }, 0);
+L.brilho(tl, "#a1", 0.15, "A gente trabalha / *nos vídeos*", { serif: true });
+L.sai(tl, "#a1", 1.45);
+L.brilho(tl, "#a2", 1.6, "uns três ou / =quatro meses= / ^antes^", { passo: 0.14 });
+L.sai(tl, "#a2", 3.0);
+L.brilho(tl, "#a3", 3.05, "mas ~antes~ disso", { passo: 0.14 });
+// 2. mesa 1 (3.9-7.2): corte seco, objetos nascem na fala
+L.mesa(tl, "#m1", 3.9, 3.3);
+L.objeto(tl, "#cerebro", 4.0);
+L.objeto(tl, "#lampada", 4.45, { de: 0.3 });
+L.objeto(tl, "#nota", 4.75, { de: 0.3, giro: -13, rot: 7 });
+L.objeto(tl, "#lapis", 5.0, { de: 0.5, giro: 20, rot: 55 });
+L.objeto(tl, "#cafe", 5.15, { de: 0.4 });
+L.frase(tl, "#f1", 5.4, "pensando no que / vem depois", { passo: 0.17 });
+// 3. mesa 2 (7.2-10.4): papel -> seta -> play
+tl.set("#m1", { opacity: 0 }, 7.2);
+L.mesa(tl, "#m2", 7.2, 4.3);
+L.objeto(tl, "#papeis", 7.3, { de: 0.2 });
+L.traco(tl, "#rascunho", 7.6, { passo: 0.08, dur: 0.22 });
+L.seta(tl, "#seta", 8.15, { d: "M60 10 C 10 30, 10 90, 60 100 C 120 112, 120 170, 90 215", ponta: [90, 215, 110], dur: 0.6 });
+L.objeto(tl, "#tablet", 8.7, { de: 0.25, giro: -22 });
+L.traco(tl, "#play", 9.05, { passo: 0.15, dur: 0.25 });
+L.objeto(tl, "#etiq", 9.3, { de: 0.4 });
+L.manuscrito(tl, "#mao1", 9.6, { dur: 0.8 });
+// 4. mergulho de foco (10.5-12.3)
+L.mergulho(tl, "#m2", "#lampG", 10.75);
+L.brilho(tl, "#g1", 11.05, "três a quatro meses / *só na ideia*", { passo: 0.13 });
+L.sai(tl, ["#g1", "#lampG"], 12.2);
+// 5. volta ao apresentador (12.4-16): brilho, luz vazada e o close no pico
+tl.set("#m2", { opacity: 0 }, 12.4);
+tl.set(["#a3"], { opacity: 0 }, 12.4);
+L.camera(tl, "#v1 img.l-foto", 12.4, 1.6, { de: 1.05, para: 1.1 });
+tl.fromTo("#rec1", { scale: 1.05 }, { scale: 1.1, duration: 1.6, ease: "none" }, 12.4);
+L.brilho(tl, "#e1", 12.5, "e depois umas semanas / *gravando*");
+const pico = L.luz(tl, "#luz", 13.55);
+tl.set("#v2", { opacity: 1 }, pico);
+L.camera(tl, "#v2 img.l-foto", pico, 16 - pico, { de: 1.75, para: 1.85 });
+L.brilho(tl, "#e2", pico + 0.2, "hoje a gente gasta / *1,5 milhão* por vídeo", { passo: 0.13 });
+window.__timelines["lume"] = tl;
+</script>
+</body></html>
