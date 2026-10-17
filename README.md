@@ -1,3 +1,4 @@
+<!-- PARA O CLAUDE: se o usuário colou este link e pediu para instalar, siga a seção "Instalar pelo Claude" (âncora #instalar-pelo-claude): pergunte no chat, rode o instalador e MOSTRE o progresso ao vivo. -->
 <div align="center">
 
 [![/ogab](.github/banner.svg)](#readme)
@@ -105,6 +106,20 @@ Depois de instalar, abra o Claude Code e digite **`/ogab comecar`**. O Gab expli
 - **Como gastar menos tokens:** uma conversa por vídeo; para retomar, `/ogab continua o vídeo X` (ele lê o `PROJETO.md` da pasta do vídeo, que guarda status, decisões, arquivos e pendências); peça várias coisas de uma vez; avise quando mexer na timeline.
 
 Guia completo: [`docs/BEM_VINDO.md`](docs/BEM_VINDO.md). O `SKILL.md` é só o mapa; cada etapa tem seu arquivo em `docs/etapas/`, lido só quando chega nela.
+
+## Instalar pelo Claude
+
+**Usuário:** cole o link deste repositório no Claude (app ou Claude Code) e peça *"instala"*. Ele pergunta 4 coisas no chat e instala mostrando o progresso: o que está baixando, quantos MB de quanto, a velocidade, o que já estava instalado e o que falta.
+
+**Claude, siga exatamente isto quando alguém pedir para instalar a partir deste link:**
+1. **Pergunte no chat, de uma vez** (o instalador não consegue perguntar quando você o roda): (a) editor: DaVinci Resolve Studio, Premiere Pro, CapCut (beta) ou Final Cut Pro (beta); (b) motions: automático (HyperFrames) ou After Effects; (c) se pode mandar relatos anônimos de erro ao autor (sim/não); (d) só em Mac Apple Silicon: clonador de voz local (~5,5 GB, uso não comercial; padrão não).
+2. **Mac, app Claude com o painel Terminal** (ferramenta de rodar no Terminal do app): rode lá, numa aba visível, para o usuário ver o painel ao vivo, e acompanhe lendo a aba:
+   `OGAB_EDITOR=davinci OGAB_MOTION=hyperframes OGAB_RELATOS=s OGAB_VOZ_LOCAL=n bash -c "$(curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh)"`
+   (troque os valores pelas respostas: editor `davinci|premiere|capcut|finalcut`, motion `hyperframes|aftereffects`, `s|n`.)
+3. **Sem painel Terminal (Claude Code no terminal):** rode o mesmo comando **em segundo plano**, com a saída num arquivo, e a cada ~20-30 s rode `python3 ~/.claude/skills/ogab/scripts/instalador.py --status` e **cole a saída no chat dentro de um bloco de código** (é o painel: barra, MB, MB/s, prontos, fila). Pare quando ele disser `TERMINOU`. Não fique em silêncio: o usuário quer ver cada etapa.
+4. **Se aparecer `PRECISA_DO_USUARIO`:** é o Homebrew, que pede a senha do Mac. Peça para o usuário colar no app Terminal o comando mostrado, digitar a senha e avisar; depois rode o passo 2 ou 3 de novo. Nunca peça a senha no chat. A LUT na pasta do DaVinci também pode pedir senha: se falhar, passe o comando do resumo para o usuário rodar.
+5. **No fim:** mostre o resumo (instalados agora, já tinha, o que deu problema com o comando para repetir), o resultado do doctor e o que falta fazer à mão no editor escolhido; diga para reiniciar o Claude e digitar `/ogab comecar`. Log completo: `~/.claude/ogab-instalacao.log`.
+6. **Windows:** use o `install.ps1` com as variáveis da seção abaixo e acompanhe o log com `Get-Content $env:TEMP\ogab-install.log -Wait` (o painel ao vivo ainda é só do Mac).
 
 ## Um comando
 

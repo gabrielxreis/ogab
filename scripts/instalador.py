@@ -18,6 +18,7 @@ DEST = Path(__file__).resolve().parent.parent
 HOME = Path.home()
 MAC, WIN = sys.platform == "darwin", os.name == "nt"
 LOG = HOME / ".claude" / "ogab-instalacao.log"
+STATUS = HOME / ".claude" / "ogab-instalacao.json"
 TTY = sys.stdout.isatty()
 PY = f'"{sys.executable}"'
 CFG = DEST / "config.json"
@@ -204,7 +205,7 @@ class Painel:
         if self.atual:
             self.atual.baixado = max(0, b - self.atual._rede0)
 
-    def linhas(self):
+    def linhas(self, tudo=False):
         L = []
         cols = shutil.get_terminal_size((90, 30)).columns
         fazer = [e for e in self.E if e.estado not in ("ja",)]
@@ -250,7 +251,7 @@ class Painel:
             else:
                 itens.append(("fila", CINZA(f"   · {e.nome}" + ("  (atualiza)" if e.sempre else "") + (f"  ~{mb(e.mb * 1e6)}" if e.mb >= 5 else ""))))
         alt = shutil.get_terminal_size((90, 30)).lines - 1
-        if len(L) + len(itens) <= alt:
+        if tudo or len(L) + len(itens) <= alt:
             return L + [t for _, t in itens]
         # não cabe: resumo dos prontos, erros, o que está rodando e o começo da fila
         ja = sum(1 for e in self.E if e.estado == "ja")
@@ -264,10 +265,34 @@ class Painel:
             L.append(CINZA(f"   … e mais {len(fila) - cabe} na fila"))
         return L
 
+    def salvar_status(self, fim=False):
+        """Estado em ~/.claude/ogab-instalacao.json: o Claude lê com `instalador.py --status` e mostra no chat."""
+        try:
+            fazer = [e for e in self.E if e.estado != "ja"]
+            st = {"atualizado": time.time(), "fim": fim, "titulo": self.titulo,
+                  "painel": [re.sub(r"\x1b\[[0-9;]*m", "", l) for l in self.linhas(tudo=True)],
+                  "prontas": [e.nome for e in self.E if e.estado == "ok"], "ja_tinha": [e.nome for e in self.E if e.estado == "ja"],
+                  "erros": [{"nome": e.nome, "erro": e.erro, "comando": e.cmd, "opcional": e.opcional} for e in self.E if e.estado == "erro"],
+                  "fila": [e.nome for e in self.E if e.estado in ("falta", "?")],
+                  "atual": self.atual.nome if self.atual else None, "etapas": [len([e for e in fazer if e.estado in ("ok", "erro")]), len(fazer)],
+                  "baixado_mb": round((self.rede - self.rede0) / 1e6, 1), "mb_s": round(self.vel / 1e6, 2)}
+            STATUS.write_text(json.dumps(st, ensure_ascii=False))
+        except Exception:
+            pass
+
     def desenhar(self, final=False):
         if not TTY:
+            with self.lock:
+                self.medir()
+                self.salvar_status()
+                a = self.atual
+                if a and not a.interativo and time.time() - getattr(self, "_txt", 0) >= 5:
+                    self._txt = time.time()
+                    agora = min(a.feito or a.baixado, a.total) if a.total else a.baixado
+                    print(f"    ... {a.nome}: {mb(agora)}" + (f" de {mb(a.total)}" if a.total else "") + f" ({mb(self.vel)}/s)", flush=True)
             return
         with self.lock:
+            self.salvar_status()
             if self.pausado and not final:
                 return
             self.medir()
@@ -296,6 +321,9 @@ GIT = re.compile(r"Receiving objects:\s+(\d+)%.*?([\d.]+)\s*(KiB|MiB|GiB)")
 def rodar(e, painel, log):
     e.estado, e._rede0, t0 = "rodando", bytes_rede(), time.time()
     painel.atual = e
+    if not TTY:
+        n = [x for x in painel.E if x.estado != "ja"]
+        print(f"[{n.index(e) + 1}/{len(n)}] {e.nome}...", flush=True)
     log.write(f"\n===== {e.grupo} / {e.nome}\n$ {e.cmd}\n")
     log.flush()
     if e.interativo:
@@ -343,6 +371,9 @@ def rodar(e, painel, log):
     e.estado = "ok" if rc == 0 else "erro"
     if rc:
         e.erro = e.linha or f"saiu com código {rc}"
+    if not TTY:
+        print(f"    {'ok' if rc == 0 else ('AVISO' if e.opcional else 'ERRO')}: {e.nome} ({tempo(e.dur)}" +
+              (f", {mb(e.baixado)}" if e.baixado > 5e5 else "") + ")" + (f": {e.erro[:100]}" if rc else ""), flush=True)
     log.write(f"\n----- {'ok' if rc == 0 else 'ERRO ' + str(rc)} em {e.dur:.0f}s\n")
     log.flush()
     painel.atual = None
@@ -350,10 +381,15 @@ def rodar(e, painel, log):
 
 def perguntar(cfg):
     """As perguntas vêm todas antes do painel (depois ele roda sozinho)."""
-    entrada = open("/dev/tty") if (MAC and not sys.stdin.isatty() and os.path.exists("/dev/tty")) else sys.stdin
+    entrada = sys.stdin if sys.stdin.isatty() else None
+    if entrada is None and MAC:
+        try:
+            entrada = open("/dev/tty")
+        except OSError:
+            entrada = None   # sem terminal (ex.: o Claude rodando): vale variável de ambiente ou o padrão
 
     def ler(msg, padrao):
-        if not (TTY or entrada is not sys.stdin):
+        if entrada is None:
             return padrao
         sys.stdout.write(msg)
         sys.stdout.flush()
@@ -383,7 +419,7 @@ def perguntar(cfg):
         cfg["editor"], cfg["motion"] = cfg.get("editor") or ed, mo
     v = cfg.setdefault("voz_local", {"motor": "omnivoice", "passos": 32})
     if MAC and platform.machine() == "arm64" and not v.get("perguntado"):
-        r = ler("\n  Quer o clonador de voz LOCAL (narra com a sua voz no Mac, grátis)? Baixa ~5,5 GB;\n"
+        r = os.environ.get("OGAB_VOZ_LOCAL") or ler("\n  Quer o clonador de voz LOCAL (narra com a sua voz no Mac, grátis)? Baixa ~5,5 GB;\n"
                 "  o modelo padrão é de uso NÃO comercial (cliente continua no ElevenLabs). [s/N]: ", "n")
         v["perguntado"], v["ativo"] = True, r.lower().startswith("s")
     CFG.write_text(json.dumps(cfg, ensure_ascii=False, indent=2))
@@ -401,7 +437,22 @@ def etapas_demo():
             Etapa("Demo", "limpar a pasta temporária", f'rm -rf "{t}"', mb=0)]
 
 
+def mostrar_status():
+    """Para o Claude (ou outra aba): o painel da instalação que está rodando, em texto."""
+    if not STATUS.exists():
+        sys.exit("Nenhuma instalação rodando (ainda não existe ~/.claude/ogab-instalacao.json).")
+    st = json.loads(STATUS.read_text())
+    idade = time.time() - st.get("atualizado", 0)
+    print("\n".join(st["painel"]))
+    if st.get("fim"):
+        print("\nTERMINOU." + (f" {len(st['erros'])} item(ns) com problema (ver acima e no log)." if st["erros"] else " Tudo certo."))
+    elif idade > 120:
+        print(f"\n(sem atualização há {tempo(idade)}: o instalador pode ter parado; ver {LOG})")
+
+
 def main():
+    if "--status" in sys.argv:
+        return mostrar_status()
     lista_so = "--lista" in sys.argv
     demo = "--demo" in sys.argv
     if not CFG.exists():
@@ -444,6 +495,7 @@ def main():
                 rodar(e, painel, log)
     parar.set(); th.join()
     painel.desenhar(final=True)
+    painel.salvar_status(fim=True)
     # 3) resumo
     novos = [e for e in E if e.estado == "ok"]
     ja = [e for e in E if e.estado == "ja"]

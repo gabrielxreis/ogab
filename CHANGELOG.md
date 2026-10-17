@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-4 (16/10/2026)
+- **Instalar colando o link no Claude:** cole o link do GitHub do Gab no Claude e peça "instala". Ele pergunta no chat o editor, os motions, os relatos e a voz local, e instala mostrando o progresso: no painel Terminal do app você vê o painel ao vivo; no Claude Code ele cola o painel no chat a cada etapa (o que baixa, MB de quanto, velocidade, o que já tinha e o que falta). Se faltar o Homebrew, ele pede para você rodar um comando no Terminal (é o único passo que precisa da sua senha).
+
 ## 2026.10.16-3 (16/10/2026)
 - **Instalador com painel ao vivo (Mac):** agora você vê o que está sendo instalado, quantos MB já baixou e de quanto, a velocidade, quanto tempo falta, o que já estava no seu Mac e o que ainda está na fila. No fim aparece o que não deu certo, com o comando para tentar de novo, e o log completo fica em `~/.claude/ogab-instalacao.log`. Para só ver o que tem e o que falta: `python3 ~/.claude/skills/ogab/scripts/instalador.py --lista`.
 

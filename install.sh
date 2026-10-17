@@ -7,6 +7,7 @@ set -euo pipefail
 REPO="https://github.com/gabrielxreis/ogab"
 DEST="$HOME/.claude/skills/ogab"
 
+tem_tty() { ( : < /dev/tty ) 2>/dev/null; }   # o Claude roda o instalador sem terminal: /dev/tty existe mas não abre
 ok()   { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 info() { printf "\n\033[1m%s\033[0m\n" "$1"; }
 warn() { printf "  \033[33m!\033[0m %s\n" "$1"; }
@@ -17,6 +18,12 @@ if [ "$(uname)" != "Darwin" ]; then
 fi
 
 info "1/3 Homebrew"
+if ! command -v brew >/dev/null 2>&1 && ! [ -x /opt/homebrew/bin/brew ] && ! [ -x /usr/local/bin/brew ] && ! tem_tty; then
+  echo "  PRECISA_DO_USUARIO: o Homebrew ainda não está instalado e pede a senha do Mac, que só você pode digitar."
+  echo "  Abra o app Terminal, cole o comando abaixo, digite a senha quando pedir e depois rode o instalador de novo:"
+  echo '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+  exit 2
+fi
 if ! command -v brew >/dev/null 2>&1; then
   echo "  Instalando o Homebrew (vai pedir a senha do Mac)..."
   # no "curl | bash" o stdin é o próprio script: o instalador do Homebrew precisa ler do terminal (senha, Enter)
@@ -71,5 +78,5 @@ fi
 
 # Daqui em diante: painel ao vivo em Python (perguntas, o que baixa, MB/s, o que já tem e o que falta).
 info "Instalando o resto (painel ao vivo; log em ~/.claude/ogab-instalacao.log)"
-if [ -r /dev/tty ]; then exec python3 "$DEST/scripts/instalador.py" < /dev/tty
+if tem_tty; then exec python3 "$DEST/scripts/instalador.py" < /dev/tty
 else exec python3 "$DEST/scripts/instalador.py"; fi
