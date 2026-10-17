@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.17-4 (17/10/2026)
+- **Voz sempre no ElevenLabs v4:** toda narração sai no modelo eleven_v4. Texto longo (mais de 5.000 caracteres) é gerado em partes e juntado sozinho num único `narracao.wav`.
+
 ## 2026.10.17-3 (17/10/2026)
 - **Preset LUME** (aprendido de um Reels de "antes e depois"): legenda com a palavra-chave brilhando em amarelo letra a letra, passando atrás da sua mão; cenas de mesa vista de cima com objetos que nascem desfocados, seta tracejada e anotação à mão que se desenham; mergulho de foco e luz vazada quente para o close. Peça com "no preset lume".
 

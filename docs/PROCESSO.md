@@ -88,7 +88,7 @@ Esse arquivo é a base para tudo: roteiro, escolha de takes, prompts de geraçã
 1. Listar opções com `creative_list_voices` (ElevenLabs) filtrando por idioma (`pt`), gênero, tom e uso (`social_media`, `advertisement`, `informative_educational`). Se o usuário tiver voz clonada, incluir.
 2. Mostrar 3 a 5 vozes com nome e descrição (e o link de prévia, quando houver) e **esperar ele escolher**.
 3. Antes de gerar, rodar `creative_generate_speech` com `estimate_only: true` e informar o custo em créditos.
-4. Gerar com a voz escolhida, `model_id` `eleven_v4` (ou `eleven_v3` se o roteiro tiver marcações de emoção como `[sorrindo]`), `generations_count: 1`. **Não chamar de novo para "tentar outra vez"**: cada chamada cobra.
+4. Gerar com a voz escolhida, `model_id` **SEMPRE `eleven_v4`** (regra do usuário, 17/10/2026; nenhum outro modelo, nem para marcações de emoção, que o v4 também aceita), textos acima de 5.000 caracteres divididos em partes, `generations_count: 1`. **Não chamar de novo para "tentar outra vez"**: cada chamada cobra.
 5. Acompanhar com `creative_get_flow_run_status` até concluir, baixar o áudio para `projeto/audio/narracao.mp3` (ou `.wav`).
 6. Ouvir o resultado (ou transcrever) e conferir pronúncia de nomes e números. Se errar, corrigir o texto (grafia fonética, vírgulas para pausas) e gerar só o trecho problemático, com aprovação.
 
