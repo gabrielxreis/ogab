@@ -337,3 +337,4 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 | 17/10/2026 | storyboard no Windows: FileNotFoundError ao rodar npm (relato) | subprocess sem shell não acha npm.cmd | `shutil.which("npm")` no navegador.py |
 | 17/10/2026 | instalador do Premiere não acha Premiere fora do C: (relato) | só procurava em ProgramFiles\Adobe | procura também pelo processo aberto do Premiere |
 | 17/10/2026 | Premiere 26.0: createSubClipAction is not a function (relato) | API UXP do 26.0 não tem subclipe | erro claro no soVideo + receita no README |
+| 17/10/2026 | palavras cortadas nas emendas da narração depois do silencios.py | o fim de palavra da transcrição do DaVinci vem cedo (até 0,4 s); `--pos 0.18` não cobria | `ate_voz_calar()`: cada borda anda no áudio até 60 ms abaixo de -46 dB, sem invadir o trecho vizinho |

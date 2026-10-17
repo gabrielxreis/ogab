@@ -77,6 +77,40 @@ def trechos(ws, ini, fim, minimo, pre, pos):
     return out
 
 
+def ate_voz_calar(trechos_, arquivo, ini, fim, lim=-46.0, maxs=0.6):
+    """Regra do usuário (17/10/2026: "você cortou os áudios e as palavras ficam cortadas"): a transcrição do DaVinci
+    marca o fim da palavra cedo (ex.: "1979," acabava 0,4 s depois). Confere no ÁUDIO: cada borda de corte anda até
+    60 ms seguidos abaixo de lim dB (fim para a frente, começo para trás), sem invadir o trecho vizinho."""
+    import subprocess, numpy as np
+    try:
+        a = np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", arquivo, "-ac", "1", "-ar", "16000", "-f", "f32le", "-"],
+                                         capture_output=True).stdout, dtype=np.float32)
+    except Exception:
+        return trechos_
+    if not len(a): return trechos_
+    jan = 160; n = len(a) // jan
+    db = 20 * np.log10(np.sqrt(np.mean(a[:n * jan].reshape(n, jan) ** 2, axis=1)) + 1e-9)
+    def anda(t, d):
+        i0 = int(t * 100); q = 0
+        for k in range(int(maxs * 100)):
+            i = i0 + k * d
+            if i < 0 or i >= n: break
+            q = q + 1 if db[i] < lim else 0
+            if q >= 6: return max(0.0, (k - 5) / 100) + 0.02
+        return maxs
+    out = [list(x) for x in trechos_]
+    for j, (c, b) in enumerate(out):
+        if j + 1 < len(out) or b < fim - 0.01:
+            nb = min(fim, b + anda(b, +1)); out[j][1] = min(nb, out[j + 1][0] if j + 1 < len(out) else fim)
+        if j > 0 or c > ini + 0.01:
+            nc = max(ini, c - anda(c, -1)); out[j][0] = max(nc, out[j - 1][1] if j > 0 else ini)
+    junto = []
+    for c, b in out:
+        if junto and c <= junto[-1][1] + 0.02: junto[-1][1] = b
+        else: junto.append([c, b])
+    return [tuple(x) for x in junto]
+
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("timeline")
     ap.add_argument("--minimo", type=float, default=0.4); ap.add_argument("--pre", type=float, default=0.10)
@@ -128,6 +162,7 @@ def main():
             cache[it.GetUniqueId()] = palavras(it, fps)
         ws = cache[it.GetUniqueId()]
         ks = [(ini, fim)] if ws is None else trechos(ws, ini, fim, a.minimo, a.pre, a.pos)
+        if ws is not None: ks = ate_voz_calar(ks, it.GetClipProperty("File Path"), ini, fim)   # palavra nunca cortada
         dur, fica = fim - ini, sum(b - c for c, b in ks)
         antes += dur; depois += fica; cortes += max(0, len(ks) - 1) + (ks[0][0] > ini + 0.01) + (ks[-1][1] < fim - 0.01)
         print(f"  {x.GetName()}: {dur:.1f} s -> {fica:.1f} s" + (" (sem transcrição: entra inteiro)" if ws is None else f" ({len(ks)} trechos)"))
