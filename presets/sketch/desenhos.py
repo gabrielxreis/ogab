@@ -185,6 +185,93 @@ def calculadora(t):
     return out
 
 
+
+# ---------------------------------------------------------------- iluminação (A Luz de A Paixão, 17/10/2026)
+def _hachura(t, x1, y1, x2, y2, passo=22, cor="branco"):
+    """Riscos diagonais dentro do retângulo: área escura."""
+    out = []; w, h = x2 - x1, y2 - y1
+    for d in range(0, int(w + h), passo):
+        a = (x1 + max(0, d - h), y1 + min(d, h)); b = (x1 + min(d, w), y1 + max(0, d - w))
+        out.append(("linha", L(t, a, b), cor))
+    return out
+
+
+def _lampada(t, x, y, cor="destaque", raios=True):
+    out = [("linha", L(t, (x - 26, y), (x + 26, y), (x + 16, y - 30), (x - 16, y - 30), (x - 26, y)), cor)]
+    if raios:
+        out += [("linha", L(t, (x - 30, y + 14), (x - 50, y + 42)), cor), ("linha", L(t, (x, y + 16), (x, y + 48)), cor),
+                ("linha", L(t, (x + 30, y + 14), (x + 50, y + 42)), cor)]
+    return out
+
+
+def _camera_topo(t, x, y):
+    return [("linha", ret(t, x - 34, y, x + 34, y + 44), "branco"), ("linha", L(t, (x - 16, y), (x - 22, y - 22), (x + 22, y - 22), (x + 16, y)), "azul")]
+
+
+def luz_cima_apagada(t):
+    out = [("linha", L(t, (40, 40), (560, 40)), "branco"), ("linha", L(t, (300, 40), (300, 92)), "branco")]
+    out += _lampada(t, 300, 122, "branco")
+    out += [("linha", L(t, (240, 70), (360, 190)), "vermelho"), ("linha", L(t, (360, 70), (240, 190)), "vermelho")]
+    out += boneco(t, 300, 385, 150, sentado=True, be=(30, 55), bd=(40, 50))
+    out += [("linha", L(t, (250, 385), (380, 385)), "branco"), ("texto", 470, 150, "luz de cima", 43, "vermelho"),
+            ("texto", 470, 182, "apagada", 43, "vermelho")]
+    return out
+
+
+def luz_lateral(t):
+    """Planta baixa: câmera embaixo, pessoa no meio, luz de lado entre 45 e 90 graus, um pouco acima dos olhos."""
+    px, py = 300, 175
+    out = [("linha", circ(t, px, py, 34), "branco"), ("linha", L(t, (px - 10, py + 34), (px - 4, py + 46)), "branco"),
+           ("texto", px, py - 52, "pessoa", 37, "branco")]
+    out += _camera_topo(t, px, 330) + [("texto", px, 400, "câmera", 37, "azul")]
+    out += [("linha", L(t, (px, py + 40), (px, 322)), "branco")]
+    lx, ly = 500, 120
+    out += _lampada(t, lx, ly, "destaque", raios=False) + [("linha", L(t, (lx, ly), (px + 38, py - 6)), "destaque"),
+            ("texto", lx + 10, ly - 46, "1 luz só", 40, "destaque")]
+    out += [("linha", Q(t, (px, py + 100), (px + 95, py + 95), (px + 95, py - 2)), "destaque"),
+            ("texto", px + 165, py + 85, "45° a 90°", 46, "destaque"), ("texto", px + 165, py + 120, "acima dos olhos", 34, "branco")]
+    return out
+
+
+def afastar_parede(t):
+    out = [("linha", L(t, (70, 30), (70, 385)), "branco")] + _hachura(t, 72, 30, 210, 385, 26, "roxo")
+    out += boneco(t, 400, 385, 210, be=(-30, 70), bd=(30, 70))
+    out += [("linha", L(t, (90, 385), (560, 385)), "branco"), ("linha", L(t, (120, 300), (330, 300)), "destaque"),
+            ("linha", L(t, (120, 300), (140, 288)) + " " + L(t, (120, 300), (140, 312)), "destaque"),
+            ("linha", L(t, (330, 300), (310, 288)) + " " + L(t, (330, 300), (310, 312)), "destaque"),
+            ("texto", 225, 280, "longe da parede", 37, "destaque")]
+    out += _lampada(t, 540, 150, "destaque", raios=False) + [("linha", L(t, (515, 165), (430, 205)), "destaque")]
+    return out
+
+
+def lado_claro(t):
+    cx, cy, r = 300, 205, 130
+    out = [("linha", circ(t, cx, cy, r), "branco")]
+    for k in range(-5, 6):
+        y = cy + k * 22; dx = math.sqrt(max(0, r * r - (y - cy) ** 2))
+        out.append(("linha", L(t, (cx - dx + 6, y), (cx - 6, y)), "roxo"))
+    out += [("linha", L(t, (cx, cy - r), (cx, cy + r)), "branco"),
+            ("linha", circ(t, cx + 48, cy - 25, 10), "branco"), ("linha", Q(t, (cx + 20, cy + 60), (cx + 50, cy + 75), (cx + 75, cy + 55)), "branco")]
+    out += _lampada(t, 530, 120, "destaque", raios=False) + [("linha", L(t, (505, 140), (cx + r - 8, cy - 40)), "destaque"),
+            ("texto", 520, 300, "expõe aqui", 40, "destaque"), ("linha", L(t, (480, 285), (cx + 90, cy + 40)), "destaque"),
+            ("texto", 95, 360, "deixa escuro", 37, "roxo")]
+    return out
+
+
+def rebatedor(t):
+    px, py = 300, 190
+    out = [("linha", circ(t, px, py, 34), "branco"), ("texto", px, py - 52, "pessoa", 37, "branco")]
+    out += _camera_topo(t, px, 330)
+    out += _lampada(t, 510, 150, "destaque", raios=False) + [("linha", L(t, (510, 150), (px + 38, py - 8)), "destaque")]
+    out += [("linha", ret(t, 80, 120, 110, 260), "branco"), ("texto", 95, 290, "rebatedor", 37, "branco"),
+            ("texto", 95, 318, "branco", 37, "branco"),
+            ("linha", L(t, (115, 190), (px - 40, py)), "azul"), ("linha", L(t, (px - 40, py), (px - 58, py - 10)) + " " + L(t, (px - 40, py), (px - 58, py + 10)), "azul"),
+            ("texto", 200, 235, "só um pouco", 34, "azul")]
+    return out
+
+
 CENAS = {"camera_igreja": camera_igreja, "editando_noite": editando_noite, "bolso_vazio": bolso_vazio,
          "equilibrio": equilibrio, "oferta": oferta, "peso": peso, "mesa_numeros": mesa_numeros,
-         "apresentando": apresentando, "calculadora": calculadora}
+         "apresentando": apresentando, "calculadora": calculadora,
+         "luz_cima_apagada": luz_cima_apagada, "luz_lateral": luz_lateral, "afastar_parede": afastar_parede,
+         "lado_claro": lado_claro, "rebatedor": rebatedor}

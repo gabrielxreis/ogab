@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.17-2 (17/10/2026)
+- **Personagem nunca cortado:** `enquadramento.py` acha os rostos na prévia e reprova pessoa cortada, apertada ou no canto; material de arquivo 4:3 entra em moldura (inteiro, sobre o fundo do kit, acima da legenda).
+- **Sketch com desenhos de iluminação** (luz de cima apagada, luz lateral 45-90° em planta baixa, afastar da parede, lado claro, rebatedor).
+
 ## 2026.10.17-1 (17/10/2026)
 - **Preset SKETCH com bonequinhos:** bloco `desenho` (cenas de bonecos de palito que se desenham: câmera na igreja, editando de madrugada, bolso vazio, peso, oferta, apresentação...), `em` (quando o bloco entra, para casar com a fala), `tempos` (quando cada item da lista marca) e `base` (o desenho termina acima da legenda). Ícone novo: microfone.
 - **Material real baixado entra direto na timeline:** o download inteiro deixou de ser recusado como "take re-renderizado"; vídeo que já vem em H.264 nem é re-encodado.
