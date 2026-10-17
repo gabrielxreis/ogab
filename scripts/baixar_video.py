@@ -406,9 +406,14 @@ def baixar(url, pasta, nome, de=None, ate=None, maxh=1080, com_audio=False):
     else:
         raise SystemExit("yt-dlp falhou 3 vezes (vídeo privado/bloqueado? atualize: brew upgrade yt-dlp)")
     baixado = next(os.path.join(pasta, f) for f in os.listdir(pasta) if f.startswith(f"_tmp_{nome}."))
-    # normaliza para o DaVinci: H.264, yuv420p, sem áudio (a não ser que peça)
-    enc = ["ffmpeg", "-y", "-loglevel", "error", "-i", baixado, "-c:v", "libx264", "-preset", "medium",
-           "-crf", "16", "-pix_fmt", "yuv420p"]
+    # normaliza para o DaVinci: H.264, yuv420p, sem áudio (a não ser que peça). Já em H.264 yuv420p = remux sem
+    # re-encode. Download INTEIRO leva a marca "ogab:download-integral" (montar_takes aceita: não é take cortado).
+    sv = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name,pix_fmt",
+                         "-of", "csv=p=0", baixado], capture_output=True, text=True).stdout.strip()
+    copia = sv.startswith("h264,yuv420p")
+    enc = ["ffmpeg", "-y", "-loglevel", "error", "-i", baixado] + (["-c:v", "copy"] if copia else
+          ["-c:v", "libx264", "-preset", "medium", "-crf", "16", "-pix_fmt", "yuv420p"])
+    if de is None and ate is None: enc += ["-metadata", "comment=ogab:download-integral"]
     enc += ["-c:a", "aac", "-b:a", "192k"] if com_audio else ["-an"]
     subprocess.run(enc + [destino], check=True)
     os.remove(baixado)

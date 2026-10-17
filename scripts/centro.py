@@ -2,6 +2,7 @@
 
   python3 centro.py medir    <pasta_do_motion> [--tempos 0.5,1.5,3,5]
   python3 centro.py corrigir <pasta_do_motion> [--tempos ...] [--fit fit.json]
+  python3 centro.py preto    <pasta_do_motion>     # trava: o motion NÃO pode começar do preto (fade é no editor)
 
 Como mede: copia a composição para uma pasta temporária, esconde o fundo (#bg / canvas e o background do body),
 tira snapshots do HyperFrames em vários tempos e faz a UNIÃO da caixa do conteúdo visível (canal alfa).
@@ -58,6 +59,20 @@ def medir(pasta, tempos):
     return dict(cx=round(cx, 1), cy=round(cy, 1), w=int(w), h=int(h), y0=int(y0), y1=int(y1), ok=bool(ok))
 
 
+def comeca_do_preto(pasta, comparar=0.6):
+    """Regra do usuário (13/10 e 17/10/2026): "não começa do black, o fade tem que ser no software e não no motion".
+    Snapshot COM o fundo no quadro 0 e em `comparar` s; se o quadro 0 for bem mais escuro, há fade do preto no motion."""
+    import numpy as np
+    from PIL import Image
+    pasta = Path(pasta).resolve(); tmp = Path(tempfile.mkdtemp(prefix="preto_")); dst = tmp / pasta.name
+    shutil.copytree(pasta, dst, ignore=shutil.ignore_patterns("snapshots"))
+    subprocess.run(HF + ["snapshot", str(dst), "--at", f"0,{comparar}"], capture_output=True, text=True, cwd=str(tmp))
+    pngs = sorted((dst / "snapshots").glob("*.png"), key=lambda p: float(re.search(r"at-([\d.]+)s", p.name).group(1)))
+    b = [float(np.asarray(Image.open(p).convert("L")).mean()) for p in pngs[:2]]
+    shutil.rmtree(tmp, ignore_errors=True)
+    return len(b) == 2 and b[0] < b[1] * 0.75 - 1, b
+
+
 def correcao(m):
     s = min(1.0, ALTURA_MAX / max(m["h"], 1), LARGURA_MAX / max(m["w"], 1))
     dx, dy = ALVO[0] - m["cx"], ALVO[1] - m["cy"]
@@ -68,6 +83,10 @@ def main():
     a = sys.argv[1:]
     if len(a) < 2: print(__doc__); sys.exit(2)
     cmd, pasta = a[0], a[1]
+    if cmd == "preto":
+        ruim, b = comeca_do_preto(pasta)
+        print(f"{Path(pasta).name}: brilho quadro 0 = {b[0]:.1f}, 0,6 s = {b[1]:.1f} | {'COMEÇA DO PRETO: tirar o fade de entrada (fade vai no DaVinci)' if ruim else 'OK'}")
+        sys.exit(1 if ruim else 0)
     tempos = [float(x) for x in a[a.index("--tempos") + 1].split(",")] if "--tempos" in a else [0.6, 1.5, 2.5, 3.5, 4.5, 5.5]
     m = medir(pasta, tempos)
     print(f"{Path(pasta).name}: centro ({m['cx']}, {m['cy']}) | {m['w']}x{m['h']} | y {m['y0']}..{m['y1']} | {'OK' if m['ok'] else 'FORA'}")

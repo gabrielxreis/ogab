@@ -77,6 +77,7 @@
 
   P.cenas.forEach((c, i) => {
     const g = el("g", { opacity: 0 });
+    if (c.ajuste) { const [cx, cy, k] = c.ajuste; g.setAttribute("transform", `translate(${P.w / 2} ${P.h / 2}) scale(${k}) translate(${-cx} ${-cy})`); }   // centro.py
     const tr = el("g", { filter: "url(#r0)" }, g), tx = el("g", { filter: "url(#r0)" }, g);
     tracos.push(tr, tx);
     const cena = { tr, tx };

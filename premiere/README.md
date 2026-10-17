@@ -53,6 +53,7 @@ Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Pont
 - Componentes e parâmetros de efeito só valem dentro de `project.lockedAccess(...)` e sem `await` no meio (senão "script object is no longer valid"). A seleção de `TrackItemSelection.createEmptySelection` só vale dentro do callback.
 - Overwrite numa trilha que não existe dá "invalid track index"; trilhas de áudio além das existentes são criadas só em alguns casos. Nunca usar a seleção do usuário (`remover()` usa seleção própria).
 - O Premiere não grava quadro exportado na pasta temporária do sistema (`/var/folders`); a calibração usa `assets/lut/_calibracao`.
+- **Premiere 26.0 (17/10/2026):** não tem `createSubClipAction`, então `colocar(..., audio=None)` e `montar_takes` param com erro claro. Motion MOV (sem áudio) entra com `createOverwriteItemAction(item, t, trilha, -1)` direto (conferir antes com ffprobe que o MOV não tem áudio). Overwrite numa V acima da última CRIA a trilha nesse caso. Recolocar um motion mais longo que o vão cobre o começo do seguinte: recolocar os seguintes em ordem.
 - O painel Gab Ponte carrega mesmo na tela inicial do Premiere; plugin atualizado só carrega depois de reiniciar o Premiere.
 
 ## Arquivos

@@ -4,7 +4,7 @@ texto manuscrito digitado, setas que se desenham, traço tremido de animação f
   python3 gerar.py plano.json <pasta_saida> [--render saida.mp4]
 
 plano.json:
-{ "formato": "vertical" | "horizontal",          # 1080x1920 (padrão) ou 1920x1080; "w"/"h" para outro tamanho
+{ "formato": "vertical" | "horizontal", (cena "ajuste": [cx, cy, escala] = centro medido -> 540,960; ver --centrar), "base": 1110 (opcional: o conteúdo termina acima desse Y, para a legenda),          # 1080x1920 (padrão) ou 1920x1080; "w"/"h" para outro tamanho
   "fps": 30,
   "cores": {"paleta": ["#f0884a", "#4aa3f0", "#3fcf6a", "#a07cf0"], "destaque": "#ffc83d", "texto": "#f2f2f2"},   # opcional
   "cenas": [ {"blocos": [ ...blocos... ], "segurar": 1.6}, ... ] }      # "dur" fixa a duração da cena (senão: animação + segurar)
@@ -21,6 +21,9 @@ Blocos (empilhados de cima para baixo, centralizados na altura do quadro; cada u
   {"tipo": "frase", "texto": "Instala uma vez e usa pra sempre", "cor": "destaque"}
   {"tipo": "lista", "itens": ["roteiro", "edição", "legenda"], "cor": "verde"}
   {"tipo": "espaco", "altura": 60}
+  {"tipo": "desenho", "cena": "camera_igreja", "altura": 440}   bonequinhos que se desenham (cenas em desenhos.py)
+Em qualquer bloco, "em": segundos desde o início da cena = o bloco só entra nesse instante (sincronizar com a fala).
+Na lista, "tempos": [s, s, ...] = instante de cada item (cada check entra quando o item é falado).
 Cores por nome: laranja, azul, verde, roxo, rosa, amarelo, branco, destaque (ou "#hex"). Sem cor, os cartões seguem a paleta.
 Ícones (kit/icones.js): video play tesoura email gmail drive instagram tiktok youtube github claude robo codigo terminal
 chat doc pasta grafico subida dolar check xis pessoa grupo globo raio estrela engrenagem lupa casa calendario coracao
@@ -28,6 +31,8 @@ celular link foguete cadeado sino carrinho lampada relogio alvo ia.
 """
 import json, math, os, shutil, subprocess, sys
 from fontTools.ttLib import TTFont
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import desenhos  # noqa: E402
 
 AQUI = os.path.dirname(os.path.abspath(__file__)); RAIZ = os.path.dirname(os.path.dirname(AQUI))
 FONTE = os.path.join(RAIZ, "assets", "fontes", "PatrickHand", "PatrickHand-Regular.ttf")
@@ -141,6 +146,8 @@ class Gerador:
             return len(b["itens"]) * 92 * u
         if t == "espaco":
             return b.get("altura", 60) * u
+        if t == "desenho":
+            return b.get("altura", 440) * u
         raise SystemExit(f"bloco desconhecido: {t}")
 
     def _lado_cartao(s, col):
@@ -259,6 +266,8 @@ class Gerador:
         if tp == "lista":
             cor = s.cor(b.get("cor")) or s.proxima(); tam = 48 * u
             for i, txt in enumerate(b["itens"]):
+                if b.get("tempos") and i < len(b["tempos"]):
+                    t = max(t, b["tempos"][i])
                 yy = y + i * 92 * u; q = 54 * u
                 t1 = cn.caixa(s.m, yy, q, q, cor, t, r=12 * u, dur=0.3, preench=0.0)
                 t1 = cn.texto(s.m + q + 30 * u, yy + q / 2, txt, tam, s.branco, t1)
@@ -266,6 +275,17 @@ class Gerador:
             return t
         if tp == "espaco":
             return t
+        if tp == "desenho":
+            alt = b.get("altura", 440) * u; larg = s.W - 2 * s.m
+            k = min(larg / 600, alt / 400); tr = desenhos.T((s.W - 600 * k) / 2, y + (alt - 400 * k) / 2, k)
+            passo = b.get("passo", 0.11)
+            for tr_ in desenhos.CENAS[b["cena"]](tr):
+                if tr_[0] == "linha":
+                    cn.linha(tr_[1], s.cor(tr_[2], s.branco), t, dur=0.3); t += passo
+                else:
+                    _, x, yy, txt, tam, cor = tr_; X, Y = tr.xy(x, yy)
+                    cn.texto(X, Y, txt, tam * k, s.cor(cor, s.branco), t, ancora="middle", modo="surgir"); t += passo
+            return t + 0.3
         raise SystemExit(f"bloco desconhecido: {tp}")
 
     def mock(s, cn, pn, x, y, w, h, cor, t):
@@ -321,11 +341,14 @@ class Gerador:
             cn = Cena(s); blocos = c["blocos"]; gap = c.get("espaco", 70) * s.u
             alts = [s.altura(b) for b in blocos]; tot = sum(alts) + gap * (len(blocos) - 1)
             y = max(s.H / 2 - tot / 2, 140 * s.u)          # centralizado na altura (regra do Gab: motion no centro)
+            if s.p.get("base"): y = max(min(y, s.p["base"] - tot), 100 * s.u)   # "base": px onde o bloco termina (legenda livre embaixo)
             t = 0.25
             for b, a in zip(blocos, alts):
+                if b.get("em") is not None:
+                    t = max(t, b["em"])
                 t = s.montar(cn, b, y, t) + 0.15; y += a + gap
             dur = c.get("dur") or round(t + c.get("segurar", 1.6), 2)
-            cenas.append({"inicio": round(inicio, 3), "dur": dur, "itens": cn.itens}); inicio += dur
+            cenas.append({"inicio": round(inicio, 3), "dur": dur, "itens": cn.itens, "ajuste": c.get("ajuste")}); inicio += dur
         return {"w": s.W, "h": s.H, "fps": s.p.get("fps", 30), "dur": round(inicio, 3), "cenas": cenas, "cps": s.cps,
                 "lw": round(5.5 * s.u, 2), "preench": 0.22, "boil": 8, "fade_final": s.p.get("fade_final", False),
                 "aspereza": {"freq": "0.035", "escala": str(round(2.6 * s.u, 2))},
@@ -348,12 +371,25 @@ def gerar(plano, pasta):
     print("ok", pasta, len(pr["cenas"]), "cenas", pr["dur"], "s"); return pasta
 
 
+def centrar(plano_json, pasta):
+    """Mede cada cena (centro.py) e grava "ajuste" para o conteúdo ficar no centro (540, 960) e dentro de 900x1200."""
+    sys.path.insert(0, os.path.join(AQUI, "..", "..", "scripts")); import centro
+    p = json.load(open(plano_json)); [c.pop("ajuste", None) for c in p["cenas"]]; gerar(p, pasta); ini = 0
+    for c in p["cenas"]:
+        m = centro.medir(pasta, [round(ini + c["dur"] - .4, 2)]); ini += c["dur"]
+        k = min(1.0, centro.ALTURA_MAX / max(m["h"], 1), centro.LARGURA_MAX / max(m["w"], 1))
+        if not m["ok"]: c["ajuste"] = [m["cx"], m["cy"], round(k, 4)]
+    json.dump(p, open(plano_json, "w"), ensure_ascii=False, indent=1); gerar(p, pasta)
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
+    if "--centrar" in a:
+        centrar(a[0], os.path.abspath(a[1])); a = [x for x in a if x != "--centrar"]
     if len(a) < 2:
         raise SystemExit(__doc__)
     pasta = gerar(json.load(open(a[0])), os.path.abspath(a[1]))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], check=True)
+        subprocess.run(["npx", "--yes", "hyperframes@0.8.151", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], check=True)
         print("render", saida)

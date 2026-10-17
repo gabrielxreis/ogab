@@ -279,6 +279,9 @@ def take_renderizado_aqui(arq):
     """True se o VÍDEO foi re-encodado pelo ffmpeg desta máquina (tag encoder do stream de vídeo começa com a libavcodec
     local, ex. 'Lavc62.28.102 libx264'). Remux sem re-encode (yt-dlp juntando áudio e vídeo) não tem essa tag e passa."""
     if not str(arq).lower().endswith((".mp4", ".mov", ".m4v", ".mkv", ".webm")): return False
+    nota = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format_tags=comment", "-of", "default=nw=1:nk=1", arq],
+                          capture_output=True, text=True).stdout.strip()
+    if nota == "ogab:download-integral": return False   # baixar_video.py: vídeo inteiro normalizado, sem corte
     tag = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream_tags=encoder", "-of", "default=nw=1:nk=1", arq],
                          capture_output=True, text=True).stdout.strip()
     return bool(_lavf_local()) and tag.startswith(_lavf_local())
@@ -620,9 +623,23 @@ def takes_sem_cor(t):
             if not x.GetClipEnabled() or "/motions/" in fp or fp.lower().endswith(".mov"):
                 continue
             g = x.GetNodeGraph()
-            if g and g.GetNumNodes() <= 1 and not g.GetLUT(1):
+            if g and g.GetNumNodes() <= 1 and not g.GetLUT(1) and not take_pb(x):
                 faltam.append(x.GetName())
     return faltam
+
+
+def take_pb(x):
+    """True se o trecho usado do take é P&B (filmagem de arquivo): regra 7b, P&B fica SEM a LUT do Gab (ela deixa sépia)."""
+    try:
+        import numpy as np
+        m = x.GetMediaPoolItem(); arq = m.GetClipProperty("File Path"); sf = float(m.GetClipProperty("FPS"))
+        meio = (x.GetSourceStartFrame() + (x.GetSourceEndFrame() - x.GetSourceStartFrame()) / 2) / sf
+        raw = subprocess.run(["ffmpeg", "-v", "error", "-ss", f"{meio:.2f}", "-i", arq, "-frames:v", "1", "-vf", "scale=64:36",
+                              "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+        a = np.frombuffer(raw, np.uint8).reshape(-1, 3).astype(float)
+        return bool(len(a)) and (np.abs(a[:, 0] - a[:, 1]).mean() + np.abs(a[:, 1] - a[:, 2]).mean()) < 6
+    except Exception:
+        return False
 
 
 def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True, sem_sfx=False):

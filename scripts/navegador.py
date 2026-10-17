@@ -13,7 +13,8 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 def garantir():
     os.makedirs(CACHE, exist_ok=True)
     if not os.path.isdir(os.path.join(CACHE, "node_modules", "playwright-core")):
-        subprocess.run(["npm", "install", "--silent", "--prefix", CACHE, "playwright-core@1.56.1"], check=True,
+        subprocess.run([shutil.which("npm") or "npm", "install",  # Windows: npm.cmd
+                        "--silent", "--prefix", CACHE, "playwright-core@1.56.1"], check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=300)
 
 

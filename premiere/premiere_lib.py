@@ -124,6 +124,7 @@ async function soVideo(p, it) {
   const pai = it.getParentBin ? it.getParentBin() : await p.getRootItem();
   for (const x of await pai.getItems()) if (x.name === nome) return x;
   const c = clip(it);
+  if (typeof c.createSubClipAction !== "function") throw new Error("este Premiere não tem createSubClipAction (26.0): atualize para 26.5+. MOV de motion sem áudio pode ir com createOverwriteItemAction(item, t, trilha, -1) direto");
   const fim = await c.getOutPoint(P.Constants.MediaType.VIDEO);
   await tx(p, "Gab: subclipe só vídeo", () => [c.createSubClipAction(nome, P.TickTime.TIME_ZERO, fim, false, { takeVideo: true, takeAudio: false })]);
   for (const x of await pai.getItems()) if (x.name === nome) return x;

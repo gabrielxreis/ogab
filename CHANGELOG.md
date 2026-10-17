@@ -1,4 +1,11 @@
 # Novidades do Gab (/ogab)
+## 2026.10.17-1 (17/10/2026)
+- **Preset SKETCH com bonequinhos:** bloco `desenho` (cenas de bonecos de palito que se desenham: câmera na igreja, editando de madrugada, bolso vazio, peso, oferta, apresentação...), `em` (quando o bloco entra, para casar com a fala), `tempos` (quando cada item da lista marca) e `base` (o desenho termina acima da legenda). Ícone novo: microfone.
+- **Material real baixado entra direto na timeline:** o download inteiro deixou de ser recusado como "take re-renderizado"; vídeo que já vem em H.264 nem é re-encodado.
+- **Windows:** storyboard acha o npm (npm.cmd); instalador do Premiere acha o Premiere instalado fora do C: (pelo programa aberto); Premiere 26.0 avisa com clareza que precisa do 26.5+ para subclipe.
+- **Motion não começa mais do preto:** fundo já aparece no quadro 0 e o fade fica no DaVinci; `centro.py preto <motion>` trava quem começar escuro.
+- **Filmagem de arquivo P&B exporta sem LUT** (a trava de cor não barra mais o export).
+- **Legenda desce também debaixo de motion** (não só de lettering) no `legenda_ui.py`.
 ## 2026.10.16-4 (16/10/2026)
 - **Instalar colando o link no Claude:** cole o link do GitHub do Gab no Claude e peça "instala". Ele pergunta no chat o editor, os motions, os relatos e a voz local, e instala mostrando o progresso: no painel Terminal do app você vê o painel ao vivo; no Claude Code ele cola o painel no chat a cada etapa (o que baixa, MB de quanto, velocidade, o que já tinha e o que falta). Se faltar o Homebrew, ele pede para você rodar um comando no Terminal (é o único passo que precisa da sua senha).
 

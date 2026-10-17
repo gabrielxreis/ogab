@@ -10,6 +10,11 @@ function Warn($m) { Write-Host "  [!] $m" -ForegroundColor Yellow }
 
 Info "1/4 Premiere Pro"
 $pr = Get-ChildItem (Join-Path $env:ProgramFiles "Adobe") -Directory -Filter "Adobe Premiere Pro 20*" -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
+# Premiere fora do C: (ex.: D:\Adobe\...): achar pelo processo aberto (relato de 17/10/2026)
+if (-not $pr) {
+    $proc = Get-Process -Name "Adobe Premiere Pro" -ErrorAction SilentlyContinue | Where-Object { $_.Path } | Select-Object -First 1
+    if ($proc) { $pr = Get-Item (Split-Path -Parent $proc.Path) }
+}
 if ($pr) {
   $exe = Join-Path $pr.FullName "Adobe Premiere Pro.exe"
   $ver = if (Test-Path $exe) { (Get-Item $exe).VersionInfo.ProductVersion } else { "?" }

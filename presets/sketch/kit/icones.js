@@ -1,6 +1,7 @@
 // Ícones do preset SKETCH: traço de marcador, desenhados à mão em código (viewBox 0 0 24 24, só contorno).
 // Cada ícone é uma lista de "d" de <path>. Nome novo: acrescentar aqui e na tabela do PRESET.md.
 window.ICONES = {
+  microfone: ["M9 3.5h6v9a3 3 0 0 1-6 0z", "M6 11.5a6 6 0 0 0 12 0", "M12 17.5v3.5", "M8.5 21h7"],
   video: ["M3 7.5h11.5v9H3z", "M14.5 10.5l6-3.2v9.4l-6-3.2"],
   play: ["M8 5.5l11 6.5-11 6.5z"],
   tesoura: ["M6.5 6.5m-2.6 0a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0-5.2 0", "M6.5 17.5m-2.6 0a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0-5.2 0",

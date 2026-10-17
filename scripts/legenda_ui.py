@@ -366,7 +366,7 @@ def dados(nome):
     p.SetCurrentTimeline(t); fps = int(round(float(t.GetSetting("timelineFrameRate") or 30)))
     let = []
     for k in range(1, t.GetTrackCount("video") + 1):
-        if "LETTERING" in (t.GetTrackName("video", k) or "").upper():
+        if any(n in (t.GetTrackName("video", k) or "").upper() for n in ("LETTERING", "MOTION")):   # motion também (regra: legenda desce sob lettering/motion/CTA)
             let += [(x.GetStart(), x.GetEnd()) for x in t.GetItemListInTrack("video", k)]
     subs = sorted(t.GetItemListInTrack("subtitle", 1) or [], key=lambda x: x.GetStart())
     caps = [dict(txt=s.GetName(), ini=s.GetStart(), fim=s.GetEnd(), tc=_tc(s.GetStart(), fps)) for s in subs]
