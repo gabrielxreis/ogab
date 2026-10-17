@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-3 (16/10/2026)
+- **Instalador com painel ao vivo (Mac):** agora você vê o que está sendo instalado, quantos MB já baixou e de quanto, a velocidade, quanto tempo falta, o que já estava no seu Mac e o que ainda está na fila. No fim aparece o que não deu certo, com o comando para tentar de novo, e o log completo fica em `~/.claude/ogab-instalacao.log`. Para só ver o que tem e o que falta: `python3 ~/.claude/skills/ogab/scripts/instalador.py --lista`.
+
 ## 2026.10.16-5 (16/10/2026)
 - **Motions, b-roll, SFX e música encaixam no quadro certo:** acabaram o quadro a menos e o vão de 1 quadro entre clipes colocados pelo Gab.
 - **Sem clipe duplicado no Media Pool:** reimportar o mesmo arquivo reaproveita o clipe que já está lá.
