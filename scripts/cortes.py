@@ -182,7 +182,7 @@ def montar(plano_json, nome_tl, clipe, fps_fonte=30.0):
             t.SetSetting(k, base.GetSetting(k))
     print("formato:", t.GetSetting("timelineResolutionWidth"), "x", t.GetSetting("timelineResolutionHeight"), t.GetSetting("timelineFrameRate"), "fps")
     infos = [{"mediaPoolItem": item, "startFrame": int(round(a * fps_fonte)),
-              "endFrame": int(round(b * fps_fonte)) - 1} for a, b in d["trechos"]]
+              "endFrame": int(round(b * fps_fonte))} for a, b in d["trechos"]]
     res = mp.AppendToTimeline(infos)
     n = len(t.GetItemListInTrack("video", 1) or [])
     fps = float(t.GetSetting("timelineFrameRate"))

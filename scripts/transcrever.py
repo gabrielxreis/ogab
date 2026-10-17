@@ -17,7 +17,7 @@ Saída (a mesma que o legendas.py lê): {"motor": ..., "language": ..., "segment
 "words": [{"text", "start", "end"}]}]}. No motor whisper os tempos são em segundos; no davinci, timecode
 HH:MM:SS:FF como o Resolve devolve.
 """
-import json, os, platform, subprocess, sys
+import json, os, platform, subprocess, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 APP = "/Applications/DaVinci Resolve/DaVinci Resolve.app"
@@ -86,8 +86,17 @@ def via_davinci(audio, idioma):
         item = (mp.ImportMedia([os.path.abspath(audio)]) or [None])[0]
     if not item:
         raise SystemExit(f"não achei nem consegui importar {alvo} no Media Pool")
-    item.TranscribeAudio()
+    # TranscribeAudio volta False fora das páginas Media/Cut/Edit (ex.: DaVinci parado na Deliver) e o resultado
+    # chega segundos depois (relato 16/10/2026): abrir a Edit e esperar até 3 min
+    if r.GetCurrentPage() not in ("media", "cut", "edit"):
+        r.OpenPage("edit"); time.sleep(2)
     tr = item.GetTranscription()
+    if not tr or not tr.get("segments"):
+        item.TranscribeAudio()
+        for _ in range(90):
+            tr = item.GetTranscription()
+            if tr and tr.get("segments"): break
+            time.sleep(2)
     if not tr or not tr.get("segments"):
         raise SystemExit("o DaVinci não devolveu transcrição (original offline? ver PROCESSO.md); use --motor whisper")
     tr["motor"] = "davinci"

@@ -106,9 +106,9 @@ def colocar(t, mp, trans, lista, trilha=2, nome_trilha="BROLL", bin_nome="BRoll"
         info = {"mediaPoolItem": it, "trackIndex": trilha, "recordFrame": S + int(round(seg_t * F)), "mediaType": 1}
         if not foto:
             e = int(round(b.get("entrada", 0.0) * fps_c))
-            info.update(startFrame=e, endFrame=e + int(round(b["dur"] * fps_c)) - 1)
+            info.update(startFrame=e, endFrame=e + int(round(b["dur"] * fps_c)))   # endFrame é exclusivo
         else:
-            info.update(startFrame=0, endFrame=int(round(b["dur"] * F)) - 1)
+            info.update(startFrame=0, endFrame=int(round(b["dur"] * F)))
         res = mp.AppendToTimeline([info])
         if not res:
             print("  falhou:", b["frase"], os.path.basename(b["arquivo"])); continue

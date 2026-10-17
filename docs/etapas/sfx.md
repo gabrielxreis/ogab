@@ -103,3 +103,17 @@ Complementa tudo acima (foley por objeto, camadas, conferência); não troca nad
    textura um pouco acima (-12 a -14), riser + hit é o ponto mais alto de cada virada (-10 a -12), e só UM momento mais
    alto por cena. Nada passa a voz; se o empilhamento riser + hit estourar, baixar o hit, nunca a voz.
 7. Relatar ao usuário a folha de eventos e o que entrou em cada passada (tempo | família | som | por quê).
+
+## Biblioteca local, DaVinci 21.0 e mixagem que não encobre a voz (relato 16/10/2026, Windows)
+- **Pacote de SFX sem pasta "whoosh"** (ex.: organizado por Transform, Friction, Music Transition): escolher pelo movimento, não pelo nome da pasta. Entrada/deslize = Friction/Movement; subida antes de revelar = Power Up curto ou Riser; papel = Paper Flip; clique de interface = Granular/Button/Select.
+- **Cada arquivo tem um respiro diferente antes do golpe** (0 a 2 s). Medir o envelope de cada candidato (ataque = primeiro ponto a 50% do pico; e a posição do pico) e alinhar o ATAQUE (golpe, clique, carimbo) ou o PICO (riser) no quadro exato do movimento.
+- **DaVinci 21.0 não tem `AudioVolume` nem `SetFades` pela API** (só no 21.1): gravar ganho e fade numa CÓPIA de cada som (`sfx/arquivos/`, o original fica intacto) e deixar os faders das trilhas livres para o ajuste fino do usuário.
+- **"Sem exagerar nem encobrir a voz":** um som por movimento principal, nada nas microanimações; picos entre -17 dBFS (impacto) e -27 dBFS; a soma dos SFX perto de -35 LUFS com a voz em -14, e a mistura continua em -14.
+- **Uma trilha por família** (riser/whoosh, impacto, UI, foley); se dois da mesma família se sobrepõem, o segundo vai para a próxima trilha livre.
+- **O usuário mexeu na timeline entre um pedido e outro** (duplicou um som, criou trilha): tirar um retrato novo antes do próximo passo e trabalhar em cima dele; nunca desfazer o que ele fez.
+
+### Música nessas condições
+- **Sem conector de música** (Artlist/Envato desligados): procurar primeiro na biblioteca local do usuário (pasta de trilhas dele) e mostrar 2-3 opções já mixadas com a voz, sem gastar crédito.
+- **Faixa masterizada muito alta** (ex.: -7 LUFS) num DaVinci sem volume pela API: cópia INTEIRA da faixa (regra da música bruta: sem cortar) só com o ganho (ex.: -24 dB) e o fade de saída gravados, para o trecho usado ficar ~16 dB abaixo da voz. Com 21.1+, nada disso: `colocar_musica(..., db=...)`.
+- Música abaixo dos SFX: trilha própria na ÚLTIMA posição de áudio ("MUSICA").
+

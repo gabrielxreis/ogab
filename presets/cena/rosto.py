@@ -26,6 +26,9 @@ def _caixa_vision(png, w, h):
 def _caixa_opencv(png):
     import cv2
     img = cv2.imread(png, cv2.IMREAD_GRAYSCALE)
+    if not hasattr(cv2, "CascadeClassifier"):   # OpenCV sem detecção (relato 16/10/2026): avisa em vez de quebrar
+        print("AVISO: OpenCV sem detecção de rosto; rode /ogab doctor --corrigir")
+        return []
     cas = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     return [(x, y, x + fw, y + fh) for x, y, fw, fh in cas.detectMultiScale(img, 1.1, 5, minSize=(80, 80))]
 

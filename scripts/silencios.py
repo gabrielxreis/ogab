@@ -38,7 +38,12 @@ def tc_quadros(tc, fps):
 def palavras(item, fps):
     tr = item.GetTranscription()
     if not tr or not tr.get("segments"):
-        item.TranscribeAudio(); tr = item.GetTranscription()
+        import time   # o resultado chega segundos depois do TranscribeAudio (relato 16/10/2026)
+        item.TranscribeAudio()
+        for _ in range(90):
+            tr = item.GetTranscription()
+            if tr and tr.get("segments"): break
+            time.sleep(2)
     if not tr or not tr.get("segments"):
         return None
     ini = tc_quadros(item.GetClipProperty("Start TC") or "00:00:00:00", fps)
@@ -128,7 +133,7 @@ def main():
         print(f"  {x.GetName()}: {dur:.1f} s -> {fica:.1f} s" + (" (sem transcrição: entra inteiro)" if ws is None else f" ({len(ks)} trechos)"))
         vol = x.GetProperty("AudioVolume") if narracao else None
         for c, b in ks:
-            info = {"mediaPoolItem": it, "startFrame": int(round(c * fps)), "endFrame": int(round(b * fps)) - 1}
+            info = {"mediaPoolItem": it, "startFrame": int(round(c * fps)), "endFrame": int(round(b * fps))}
             if narracao: info.update({"mediaType": 2, "trackIndex": 1})
             infos.append(info); vols.append(vol)
     print(f"total: {antes:.1f} s -> {depois:.1f} s (saem {antes - depois:.1f} s em {cortes} silêncios)")
@@ -137,11 +142,18 @@ def main():
     w, h = t.GetSetting("timelineResolutionWidth"), t.GetSetting("timelineResolutionHeight")
     vi = t.GetVoiceIsolationState(1) or {}
     t.SetName(backup)
-    nova = R.timeline_do_modelo(p, mp, a.timeline, w, h, t.GetSetting("timelineFrameRate")) or mp.CreateEmptyTimeline(a.timeline)
+    # duplicar a PRÓPRIA timeline (mantém fps, resolução e o estilo da trilha de legenda). Recriar pelo modelo GAB USA
+    # (24 fps) deixava a nova em 24 numa timeline de 30: SetSetting do fps não pega e os trechos saíam errados (relato 16/10/2026)
+    p.SetCurrentTimeline(t); R.pagina_edit()
+    nova = t.DuplicateTimeline(a.timeline)
+    if not nova:
+        t.SetName(a.timeline); raise SystemExit("DuplicateTimeline falhou; nada foi alterado")
     p.SetCurrentTimeline(nova)
-    nova.SetSetting("useCustomSettings", "1")
-    for k, v in (("timelineResolutionWidth", w), ("timelineResolutionHeight", h), ("timelineFrameRate", t.GetSetting("timelineFrameRate"))):
-        nova.SetSetting(k, str(v))
+    for k in ("video", "audio"):
+        its = nova.GetItemListInTrack(k, 1) or []
+        if its: nova.DeleteClips(its)
+    if abs(float(nova.GetSetting("timelineFrameRate")) - fps_tl) > 0.01:
+        raise SystemExit("a cópia mudou de fps; conferir (a original está guardada como backup)")
     res = mp.AppendToTimeline(infos) or []
     dur = (nova.GetEndFrame() - nova.GetStartFrame()) / fps_tl
     if len(res) != len(infos):

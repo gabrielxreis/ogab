@@ -102,6 +102,8 @@ def objeto(video, caixa, de=0.0, ate=None, previa=None):
 
 def rosto(video, de=0.0, ate=None, previa=None):
     cap, fps = _abrir(video, de)
+    if not hasattr(cv2, "CascadeClassifier"):   # relato 16/10/2026
+        raise SystemExit("este OpenCV não tem detecção de rosto: rode /ogab doctor --corrigir (reinstala o opencv-python)")
     det = cv2.CascadeClassifier(os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml"))
     pontos, t, base, w, h, gravador = [], de - 1.0 / fps, None, None, None, None
     while True:

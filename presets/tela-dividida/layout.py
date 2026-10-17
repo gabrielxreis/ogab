@@ -59,4 +59,6 @@ if __name__ == "__main__":
         r = L.conectar(); p = r.GetProjectManager().GetCurrentProject()
         t = next(p.GetTimelineByIndex(i) for i in range(1, p.GetTimelineCount() + 1) if p.GetTimelineByIndex(i).GetName() == a[1])
         trilha = int(a[2]) if len(a) > 2 else 1; it = t.GetItemListInTrack("video", trilha)[0]
-        f = L.medir_rosto(it.GetMediaPoolItem().GetClipProperty("File Path")); enq = calcular(f); aplicar(t, enq, trilha); print("aplicado", enq)
+        f = L.medir_rosto(it.GetMediaPoolItem().GetClipProperty("File Path"))
+        if not f: sys.exit("rosto não encontrado: nada aplicado (medir à mão num quadro com grade)")
+        enq = calcular(f); aplicar(t, enq, trilha); print("aplicado", enq)

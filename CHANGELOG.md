@@ -1,4 +1,13 @@
 # Novidades do Gab (/ogab)
+## 2026.10.16-5 (16/10/2026)
+- **Motions, b-roll, SFX e música encaixam no quadro certo:** acabaram o quadro a menos e o vão de 1 quadro entre clipes colocados pelo Gab.
+- **Sem clipe duplicado no Media Pool:** reimportar o mesmo arquivo reaproveita o clipe que já está lá.
+- **Detecção de rosto não quebra mais** quando o OpenCV vem incompleto: o `/ogab doctor` conserta sozinho.
+- **Motions sem neon por padrão:** a palavra-chave acende na cor da marca. Neon só se você pedir.
+- **Transcrição e corte de silêncios mais firmes:** o Gab abre a página Edit e espera o DaVinci terminar de transcrever, e o corte de silêncios mantém o fps da sua timeline (antes podia virar 24 fps).
+- **Letterings da V2 voltam a sair no vídeo:** timeline nova liga todas as trilhas, e o export avisa se alguma trilha com clipes estiver desligada.
+- **DaVinci 21.0:** como os SFX e a música ficam no volume certo mesmo sem volume pela API.
+
 ## 2026.10.16-2 (16/10/2026)
 - **Acabamento de cinema nos motions:** brilho estourado, grão de filme, separação de cor e luz entrando pelos cantos, em três níveis (sutil, suave, forte). Peça "com cinema" ou deixe `cinema: suave` no estilo do cliente. Funciona também nos motions com fundo transparente que vão por cima do vídeo.
 - **Física nos motions:** peças (pílulas, moedas, velas, logos, ícones) que caem, quicam, empilham e depois explodem revelando o CTA. Ótimo para "tudo que você precisa", "acumular" e "bagunça vira solução".

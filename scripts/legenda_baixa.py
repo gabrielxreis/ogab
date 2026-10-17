@@ -87,7 +87,7 @@ def main():
         m = clipe(x.GetName(), s1 - s0, int(round(F)), y, dest, len(movidas) + i)
         it = R.importar(mp, m, "Legendas")
         ok = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 1, "trackIndex": trilha, "recordFrame": x.GetStart(),
-                                   "startFrame": 0, "endFrame": x.GetEnd() - x.GetStart() - 1}])
+                                   "startFrame": 0, "endFrame": x.GetEnd() - x.GetStart()}])
         if not ok: sys.exit(f"não entrou o clipe de '{x.GetName()}': nada foi apagado dessa legenda")
         movidas.append((round(s0, 3), round(s1, 3), x.GetName()))
     if not t.DeleteClips([x for x, _, _ in alvo]): sys.exit("clipes entraram, mas as legendas originais não saíram (timeline atual?)")

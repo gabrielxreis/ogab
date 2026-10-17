@@ -127,8 +127,22 @@ def criar_timeline(p, mp, nome, w=None, h=None, fps=None):
     return t
 
 
+def _no_pool(mp, caminho):
+    """Item do Media Pool que já aponta para este arquivo (procura em todas as pastas), ou None."""
+    alvo = os.path.normcase(os.path.abspath(caminho)); pilha = [mp.GetRootFolder()]
+    while pilha:
+        f = pilha.pop()
+        for c in f.GetClipList() or []:
+            fp = c.GetClipProperty("File Path") or ""
+            if fp and os.path.normcase(os.path.abspath(fp)) == alvo: return c
+        pilha.extend(f.GetSubFolderList() or [])
+    return None
+
+
 def importar(mp, caminho, bin_nome, permitir_render=False):
     if bin_nome.upper() in ("BROLLS", "BROLL", "FOOTAGES", "TAKES"): checar_take_original(caminho, permitir_render)
+    ja = _no_pool(mp, caminho)   # ImportMedia sempre cria item novo: reimportar duplicava o clipe (relato 16/10/2026)
+    if ja: return ja
     _bin(mp, bin_nome)
     itens = mp.ImportMedia([caminho])
     if not itens: raise RuntimeError(f"não importou {caminho}")
@@ -211,7 +225,7 @@ def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in
         dur = (t.GetEndFrame() - t.GetStartFrame()) / fps_tl(t)
     ini = int(round(inicio_faixa * fps_c))
     res = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": 2, "recordFrame": t.GetStartFrame(),
-                                "startFrame": ini, "endFrame": ini + int(round(dur * fps_c)) - 1}])
+                                "startFrame": ini, "endFrame": ini + int(round(dur * fps_c))}])
     if not res:
         raise RuntimeError("a música não entrou na A2 (timeline atual é outra?)")
     x = res[0]
@@ -296,8 +310,8 @@ def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, 
         it = importar(mp, arq, "BROLLS", permitir_render)
         sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
         e0 = min(int(round(entrada * sf)), mx - 1)
-        n = min(mx - e0, math.ceil((nxt - cur) * sf / F) + 1)
-        x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": e0, "endFrame": e0 + n - 1, "mediaType": 1,
+        n = min(mx - e0, math.ceil((nxt - cur) * sf / F))
+        x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": e0, "endFrame": e0 + n, "mediaType": 1,
                                   "trackIndex": trilha, "recordFrame": cur}])[0]
         z = zoom * (_zoom_preencher(it, t) if preencher else 1.0)
         if z != 1.0: x.SetProperty("ZoomX", z); x.SetProperty("ZoomY", z)
@@ -625,6 +639,10 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
         if not _sfx:
             raise RuntimeError("timeline sem SFX (nada da A3 em diante): fazer os efeitos sonoros (sfx.md) antes de exportar; "
                                "só passar sem_sfx=True se o usuário pediu para exportar sem SFX")
+    _t = p.GetCurrentTimeline()   # trilha com clipes desligada some do export (V2 do modelo GAB USA, relato 16/10/2026)
+    _off = [f"{k[0].upper()}{n}" for k in ("video", "audio") for n in range(1, _t.GetTrackCount(k) + 1)
+            if not _t.GetIsTrackEnabled(k, n) and (_t.GetItemListInTrack(k, n) or [])]
+    if _off: print("AVISO: trilhas com clipes DESLIGADAS (não saem no vídeo):", _off, "- ligar se não foi de propósito")
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
     # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False
     # gravado no projeto e o MP4 sairia mudo.
@@ -734,6 +752,10 @@ QUEIXO_MAX = 1140     # em 1080x1920: queixo acima da faixa da legenda
 def medir_rosto(arquivo, passo_s=1.0, w=1080, h=1920):
     """Mediana do rosto (cx, cy, lado do quadrado do detector) em pixels do quadro w x h, sem zoom."""
     import cv2, statistics as st
+    if not hasattr(cv2, "CascadeClassifier"):   # relato 16/10/2026 (Windows): dois pacotes do OpenCV brigando
+        print("AVISO: este OpenCV não tem detecção de rosto. Corrigir: pip uninstall -y opencv-python opencv-python-headless "
+              "opencv-contrib-python && pip install opencv-python. Até lá, medir o rosto à mão num quadro com grade.")
+        return None
     cas = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     cap = cv2.VideoCapture(arquivo); fps = cap.get(cv2.CAP_PROP_FPS) or 30; n = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)); bx = []
     for fr in range(0, n, max(1, int(fps * passo_s))):
@@ -1023,6 +1045,9 @@ def timeline_do_modelo(p, mp, nome, w=None, h=None, fps=None, modelo=MODELO_LEGE
     t.SetSetting("useCustomSettings", "1")
     for k, v in (("timelineResolutionWidth", w), ("timelineResolutionHeight", h), ("timelineFrameRate", fps)):
         if v: t.SetSetting(k, str(v))
+    for k in ("video", "audio", "subtitle"):   # o modelo GAB USA tem a V2 desligada: letterings sumiam no export (relato 16/10/2026)
+        for n in range(1, t.GetTrackCount(k) + 1):
+            if not t.GetIsTrackEnabled(k, n): t.SetTrackEnable(k, n, True)
     return t
 
 

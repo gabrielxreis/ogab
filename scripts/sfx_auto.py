@@ -61,7 +61,7 @@ def main():
         it = itens[k]; fps_c = float(it.GetClipProperty("FPS") or F)
         ini = max(0.0, s - PICO[k])
         res = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": 3, "recordFrame": S + round(ini * F),
-                                    "startFrame": 0, "endFrame": max(1, round(DUR[k] * fps_c)) - 1}])
+                                    "startFrame": 0, "endFrame": max(1, round(DUR[k] * fps_c))}])
         if res:
             res[0].SetProperty("AudioVolume", DB["pop" if k == "pop" else tipo]); n += 1
     print(f"{n} de {len(ev)} efeitos na A3 de '{nome}'")

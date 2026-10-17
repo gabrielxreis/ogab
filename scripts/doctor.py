@@ -149,7 +149,13 @@ def python():
          else f"{' e '.join(clap)} faltando: sem a conferência automática de SFX (~2 GB; com espaço: {sys.executable} -m pip install --user torch transformers)")
     for mod, pac, uso, obrig in pacotes:
         try:
-            __import__(mod)
+            m_ = __import__(mod)
+            if mod == "cv2" and not hasattr(m_, "CascadeClassifier"):   # relato 16/10/2026: dois OpenCV instalados juntos
+                ok = CORRIGIR and roda([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless",
+                                        "opencv-contrib-python"]).returncode == 0 and pip_instalar("opencv-python")
+                item("⟳" if ok else "!", "python", "opencv-python reinstalado (detecção de rosto)" if ok else
+                     f"OpenCV sem detecção de rosto: {sys.executable} -m pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python && {sys.executable} -m pip install --user opencv-python")
+                continue
             item("✓", "python", f"{pac} ({uso})")
         except Exception:
             ok = CORRIGIR and pip_instalar(pac)
