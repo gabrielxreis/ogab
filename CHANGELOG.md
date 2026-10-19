@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.19-3 (19/10/2026)
+- **Armadilhas do Premiere e do HyperFrames registradas** (do job Baldi 08, Windows): instalador que não achava o Premiere fora do `Program Files`, `createSubClipAction` que não existe no Premiere 26.0, overwrite que recorta o clipe seguinte, Whisper local com PyAV incompatível, `npx` na pasta temporária e estado inicial escondido no lint. As correções já estavam no código; agora estão em `docs/PROCESSO.md` para não se repetirem.
+
 ## 2026.10.19-2 (19/10/2026)
 - **Export sem imagem corrigido:** o render agora parte do preset H.264 Master e avisa se o arquivo sair sem vídeo.
 
