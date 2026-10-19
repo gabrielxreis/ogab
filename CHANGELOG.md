@@ -1,5 +1,8 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.19-3 (19/10/2026)
+- **DaVinci mais confiável em vídeo longo:** sincronia certa com vídeo 23,976 em timeline de 24, overlays sem vãos de quadro e troca de mídia sem desfazer seus cortes (detalhes em docs/etapas/davinci_api.md).
+
+## 2026.10.19-3 (19/10/2026)
 - **Armadilhas do Premiere e do HyperFrames registradas** (do job Baldi 08, Windows): instalador que não achava o Premiere fora do `Program Files`, `createSubClipAction` que não existe no Premiere 26.0, overwrite que recorta o clipe seguinte, Whisper local com PyAV incompatível, `npx` na pasta temporária e estado inicial escondido no lint. As correções já estavam no código; agora estão em `docs/PROCESSO.md` para não se repetirem.
 
 ## 2026.10.19-2 (19/10/2026)

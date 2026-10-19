@@ -116,3 +116,12 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 - Por isso, para preencher D quadros da timeline, calcular n = ceil(D x fps_fonte / fps_timeline) e conferir o fim do item depois (`GetEnd`). Sem isso, sobra 1 a 2 quadros de buraco preto entre os cortes.
 - `GetLeftOffset()` vem em quadros da timeline: segundos da fonte = LeftOffset / fps_timeline.
 - Trocar um clipe por outro trecho: `DeleteClips` + `AppendToTimeline` no mesmo `recordFrame`, e depois refazer Smart Reframe, zoom de letterbox e grade (o item novo vem cru).
+
+
+## Armadilhas achadas em 19/10/2026 (dublagem Tamanhos de Plano)
+- Vídeo 23,976 numa timeline de 24: o DaVinci toca quadro a quadro (0,1% mais rápido; ~0,7 s em 12 min). Narração/música em tempo real descolam aos poucos. Posição na timeline = quadro_da_fonte (t*23.976) / 24; música/áudio externo do original: `atempo=1.001001`.
+- Mudança pela API numa timeline que NÃO está aberta pode sumir ao salvar: sempre `p.SetCurrentTimeline(t)` antes de mexer, e conferir as trilhas DEPOIS de `salvar`.
+- `AppendToTimeline`: `endFrame` é exclusivo (passar `sf + n`, não `sf + n - 1`, senão sobra vão de 1 quadro entre clipes).
+- Imagem parada (PNG) ignora `endFrame` e entra com 5 s: para overlay com duração exata, converter em MOV (QuickTime Animation `qtrle` com alfa; "PNG dentro de MOV" falha no render).
+- Arquivo substituído no mesmo caminho fica "quebrado" na timeline (o DaVinci guarda a duração antiga): usar `MediaPoolItem.ReplaceClip(novo_caminho)` com nome novo; troca a mídia sem mexer nos cortes do usuário.
+- Cartão e tarja na mesma trilha: quando se encostam, o append corta o começo do outro. Overlays de tipos diferentes em trilhas próprias.
