@@ -120,6 +120,7 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 
 ## Armadilhas achadas em 19/10/2026 (dublagem Tamanhos de Plano)
 - Vídeo 23,976 numa timeline de 24: o DaVinci toca quadro a quadro (0,1% mais rápido; ~0,7 s em 12 min). Narração/música em tempo real descolam aos poucos. Posição na timeline = quadro_da_fonte (t*23.976) / 24; música/áudio externo do original: `atempo=1.001001`.
+- **Mas nem sempre (19/10/2026, ep. 2 no mesmo projeto):** o vídeo posto por `AppendToTimeline` com `startFrame`/`endFrame` entrou no TEMPO REAL (12253 quadros da fonte viraram 12266 na timeline), e a conversão acima adiantou tudo 0,5 s no fim. Antes de converter tempos, comparar `GetDuration()` do item com `endFrame - startFrame` (iguais = quadro a quadro; maior = tempo real) ou comparar quadros do export com o original em 3 pontos. No tempo real: posição = t do original e música sem `atempo`.
 - Mudança pela API numa timeline que NÃO está aberta pode sumir ao salvar: sempre `p.SetCurrentTimeline(t)` antes de mexer, e conferir as trilhas DEPOIS de `salvar`.
 - `AppendToTimeline`: `endFrame` é exclusivo (passar `sf + n`, não `sf + n - 1`, senão sobra vão de 1 quadro entre clipes).
 - Imagem parada (PNG) ignora `endFrame` e entra com 5 s: para overlay com duração exata, converter em MOV (QuickTime Animation `qtrle` com alfa; "PNG dentro de MOV" falha no render).

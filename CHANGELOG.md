@@ -1,4 +1,9 @@
 # Novidades do Gab (/ogab)
+## 2026.10.19-4 (19/10/2026)
+- **Organizar o Media Pool por vídeo:** `scripts/organizar_por_video.py` cria uma pasta por vídeo ("NN Nome") com Takes, Motions, Audio e Timelines, sem mexer em timeline nenhuma.
+- **Export de vídeo já finalizado:** `renderizar(..., sem_cor=True)` para material de terceiro (dublagem) que não leva PowerGrade.
+- **23,976 em timeline de 24:** a doc agora explica como saber se o DaVinci tocou quadro a quadro ou no tempo real antes de converter tempos.
+
 ## 2026.10.19-3 (19/10/2026)
 - **DaVinci mais confiável em vídeo longo:** sincronia certa com vídeo 23,976 em timeline de 24, overlays sem vãos de quadro e troca de mídia sem desfazer seus cortes (detalhes em docs/etapas/davinci_api.md).
 

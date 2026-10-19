@@ -642,11 +642,12 @@ def take_pb(x):
         return False
 
 
-def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True, sem_sfx=False):
+def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_video=True, master=True, sem_sfx=False, sem_cor=False):
     """ate_fim_do_video: corta no último quadro de vídeo (música que passa do fim dava quadros pretos no final).
-    master: masteriza o áudio do MP4 (masterizar)."""
+    master: masteriza o áudio do MP4 (masterizar).
+    sem_cor: material já finalizado (ex.: vídeo de terceiro dublado), que não leva PowerGrade."""
     _cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"))) if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")) else {}
-    if (_cfg.get("cor") or {}).get("aplicar_power_grade"):
+    if (_cfg.get("cor") or {}).get("aplicar_power_grade") and not sem_cor:
         faltam = takes_sem_cor(p.GetCurrentTimeline())   # bug 14/10/2026: 10 takes trocados depois da cor saíram sem grade e o vídeo foi postado
         if faltam:
             raise RuntimeError(f"takes sem cor: {faltam}. Rode aplicar_grade (ou ApplyGradeFromDRX nesses) antes de exportar.")
