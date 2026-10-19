@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.19-5 (19/10/2026)
+- **Premiere: motion MOV sem áudio volta a entrar na timeline.** No Premiere 26.5 o motion (MOV com alfa, sem trilha de áudio) dava "startTime must be less than endTime"; agora o Gab confere se o arquivo tem áudio e, se não tem, coloca direto.
+- **Premiere: volume certo.** Todo ganho de clipe entrava 15 dB alto (música pedida a -9,5 dB tocava a +5,5 dB e o export estourava). Vídeos montados no Premiere antes desta versão: refaça a mixagem (`P.volume`) ou abaixe os clipes 15 dB.
+
 ## 2026.10.19-4 (19/10/2026)
 - **Organizar o Media Pool por vídeo:** `scripts/organizar_por_video.py` cria uma pasta por vídeo ("NN Nome") com Takes, Motions, Audio e Timelines, sem mexer em timeline nenhuma.
 - **Export de vídeo já finalizado:** `renderizar(..., sem_cor=True)` para material de terceiro (dublagem) que não leva PowerGrade.

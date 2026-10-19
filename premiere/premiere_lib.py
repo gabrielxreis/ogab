@@ -17,7 +17,7 @@ Uso típico (mesma ordem do fluxo do DaVinci):
     P.exportar(s, ".../videos/Assunto - Empresa.mp4")
 Trilhas: índice 0 = V1/A1 (a API do Premiere conta do zero).
 """
-import base64, hashlib, json, os, socket, struct, sys, time
+import base64, hashlib, json, os, socket, struct, subprocess, sys, time
 
 PORTA = int(os.environ.get("OGAB_PREMIERE_PORTA", "8765"))
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -260,7 +260,12 @@ _JS_COLOCAR = """
     }
     const v = c.video === null ? -1 : c.video, au = c.audio === null ? -1 : c.audio;
     let fonte = it;
-    if (c.audio === null && c.video !== null) fonte = await soVideo(p, it);   // com -1 o Premiere põe o áudio do take na A1 mesmo assim
+    // com -1 o Premiere põe o áudio do take na A1 mesmo assim, por isso o subclipe só de vídeo. Arquivo SEM áudio
+    // (motion MOV ProRes 4444) entra direto: o subclipe dele falha no 26.5 ("startTime must be less than endTime").
+    if (c.audio === null && c.video !== null && c.tem_audio !== false) {
+      try { fonte = await soVideo(p, it); }
+      catch (e) { if (c.tem_audio === null && /startTime must be less than endTime/i.test(String(e))) fonte = it; else throw e; }  // sem ffprobe: mesmo sintoma = sem áudio
+    }
     await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(c.tempo), v, au)]);
     if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
     saida.push(it.name);
@@ -269,12 +274,23 @@ _JS_COLOCAR = """
 """
 
 
+def _tem_audio(arquivo):
+    """O arquivo tem trilha de áudio? True/False pelo ffprobe; None se não deu para saber (sem ffprobe).
+    Motion MOV não tem áudio: entra sem subclipe (relato 002bf235ae, 19/10/2026)."""
+    try:
+        r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index",
+                            "-of", "csv=p=0", arquivo], capture_output=True, text=True, timeout=30)
+        return bool(r.stdout.strip()) if r.returncode == 0 else None
+    except Exception:
+        return None
+
+
 def colocar(seq, arquivo, tempo, video=0, audio=0, de=None, ate=None, db=None, fade_in=0, fade_out=0):
     """Overwrite do arquivo em `tempo` (s). video/audio = índice da trilha (0 = V1/A1) ou None para não usar.
     de/ate cortam a fonte (s). db/fades ajustam o volume do clipe de áudio colocado."""
     arquivo = _abs(arquivo)
     r = js(_JS_COLOCAR, "colocar", seq=seq, clipes=[dict(arquivo=arquivo, tempo=tempo, video=video, audio=audio,
-                                                           de=de, ate=ate, bin=_bin_de(arquivo))])
+                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo))])
     if audio is not None and (db is not None or fade_in or fade_out):
         volume(seq, audio, tempo, db or 0, fade_in, fade_out)
     return r
@@ -282,7 +298,9 @@ def colocar(seq, arquivo, tempo, video=0, audio=0, de=None, ate=None, db=None, f
 
 def volume(seq, trilha_audio, tempo, db=0.0, fade_in=0.0, fade_out=0.0):
     """Volume do clipe de áudio que começa em `tempo` na trilha (0 = A1): nível em dB e fades por keyframe.
-    O parâmetro Level do Premiere é linear (1.0 = 0 dB), por isso a conversão 10^(dB/20)."""
+    O parâmetro Level/Nível do Premiere vai de 0 a 1.0 = +15 dB: 0 dB vale 0.17782794 (10^(-15/20)), o padrão de todo
+    clipe. Por isso a conversão é 10^((dB - 15)/20), com teto em +15 dB. (Antes era 10^(dB/20) e todo ganho entrava
+    15 dB alto: música pedida a -9,5 dB tocou a +5,5 dB. Relato 2d6c34e0f1, 19/10/2026.)"""
     return js("""
       const p = await proj(); const s = await seqPorNome(p, args.seq);
       const tr = await s.getAudioTrack(args.trilha);
@@ -291,7 +309,7 @@ def volume(seq, trilha_audio, tempo, db=0.0, fade_in=0.0, fade_out=0.0):
         if (Math.abs((await it.getStartTime()).seconds - args.tempo) < 0.05) alvo = it;
       if (!alvo) throw new Error("clipe de áudio não encontrado em " + args.tempo + " s");
       const cadeia = await alvo.getComponentChain();
-      const lin = Math.pow(10, args.db / 20);
+      const lin = Math.min(1, Math.pow(10, (args.db - 15) / 20));   // escala do Premiere: 0.1778 = 0 dB, 1.0 = +15 dB (máximo)
       const ini = (await alvo.getStartTime()).seconds, fim = (await alvo.getEndTime()).seconds;
       // Componentes e parâmetros só valem DENTRO do lockedAccess e sem await no meio (senão "script object is no longer valid").
       let ok = false, achou = false;
@@ -339,7 +357,7 @@ def montar_takes(seq, takes, fim=None, trilha=1, com_audio=False):
         t1 = takes[i + 1][1] if i + 1 < len(takes) else fim
         arq = _abs(arq)
         clipes.append(dict(arquivo=arq, tempo=t0, video=trilha, audio=(trilha if com_audio else None),
-                           de=0.0, ate=(None if t1 is None else t1 - t0), bin=_bin_de(arq)))
+                           de=0.0, ate=(None if t1 is None else t1 - t0), bin=_bin_de(arq), tem_audio=_tem_audio(arq)))
     return js(_JS_COLOCAR, "montar takes", seq=seq, clipes=clipes)
 
 
