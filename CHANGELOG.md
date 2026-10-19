@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.19-1 (19/10/2026)
+- **Narração longa mais natural:** texto grande é gerado em trechos de ~1 minuto (a voz clonada fica estranha em gerações longas) e juntado de forma conferida num único `narracao.wav`.
+
 ## 2026.10.17-4 (17/10/2026)
 - **Voz sempre no ElevenLabs v4:** toda narração sai no modelo eleven_v4. Texto longo (mais de 5.000 caracteres) é gerado em partes e juntado sozinho num único `narracao.wav`.
 
