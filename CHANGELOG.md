@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.19-2 (19/10/2026)
+- **Export sem imagem corrigido:** o render agora parte do preset H.264 Master e avisa se o arquivo sair sem vídeo.
+
 ## 2026.10.19-1 (19/10/2026)
 - **Narração longa mais natural:** texto grande é gerado em trechos de ~1 minuto (a voz clonada fica estranha em gerações longas) e juntado de forma conferida num único `narracao.wav`.
 

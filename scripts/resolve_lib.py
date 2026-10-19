@@ -660,6 +660,9 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
     _off = [f"{k[0].upper()}{n}" for k in ("video", "audio") for n in range(1, _t.GetTrackCount(k) + 1)
             if not _t.GetIsTrackEnabled(k, n) and (_t.GetItemListInTrack(k, n) or [])]
     if _off: print("AVISO: trilhas com clipes DESLIGADAS (não saem no vídeo):", _off, "- ligar se não foi de propósito")
+    # preset primeiro: só o SetCurrentRenderFormatAndCodec("mp4") saiu SÓ COM ÁUDIO depois de um render de áudio no
+    # mesmo projeto (19/10/2026, prévias sem imagem); o preset H.264 Master zera o estado do Deliver
+    p.LoadRenderPreset("H.264 Master")
     p.SetCurrentRenderFormatAndCodec("mp4", "H264")
     # ExportVideo/ExportAudio SEMPRE explícitos: renders de quadro parado (capa, conferência) deixam ExportAudio=False
     # gravado no projeto e o MP4 sairia mudo.
@@ -684,6 +687,9 @@ def renderizar(p, pasta, nome, w=1080, h=1920, legenda_gravada=True, ate_fim_do_
     tem_audio = "audio" in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", arq],
                                           capture_output=True, text=True).stdout
     if not tem_audio: raise RuntimeError(f"render saiu SEM ÁUDIO: {arq}")
+    if "video" not in subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_type", "-of", "csv=p=0", arq],
+                                     capture_output=True, text=True).stdout:
+        raise RuntimeError(f"render saiu SEM IMAGEM: {arq} (conferir o preset/formato no Deliver)")
     if master:
         i, pk = masterizar(arq)
         if abs(i + 14) > 0.5 or pk > -1.0: raise RuntimeError(f"master fora do alvo: {i} LUFS, pico {pk}")
