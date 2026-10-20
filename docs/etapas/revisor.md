@@ -32,7 +32,15 @@ O script faz a parte objetiva. Ele sai com código 1 se achar ERRO. Na pasta `re
   - imagem congelada;
   - algo encostado na borda;
   - volume fora de -14 LUFS, pico acima de -1 dBTP, trecho mudo;
-  - clichê proibido no código (lista em `motion_proibidos.md`).
+  - clichê proibido no código (lista em `motion_proibidos.md`);
+  - seção **Tempo de leitura**: o OCR do macOS lê cada quadro e mede quanto tempo cada frase fica inteira na tela
+    (`scripts/leitura.py texto`, mínimo 0,3 s por palavra + 0,5 s, nunca menos de 1 s). Texto que repete a fala pode
+    passar mais rápido; texto que só aparece escrito e dá ERRO limita a nota de "Leitura no celular" a 7. Para
+    acelerar, tirar palavra da tela, nunca cortar antes de dar tempo de ler.
+
+**Voz IA ouvida de volta.** O `qc.py` transcreve o vídeo final (ou a narração) com o Whisper local e compara com o
+`roteiro.txt` (`scripts/leitura.py voz <audio> <roteiro.txt>`; número escrito e falado contam igual). Cada diferença
+vem com o tempo: ouvir o trecho. Nome próprio, número e sigla trocados são erro e a narração é refeita naquele trecho.
 
 **Nota de olhos novos.** Chamar um subagente SEM o contexto da edição (modelo barato, ver "Economia de tokens"). Passar a ele:
 - o `revisao.md`, as imagens e o plano;

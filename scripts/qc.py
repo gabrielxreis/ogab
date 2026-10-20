@@ -8,6 +8,7 @@ Confere:
   3. Legendas: uma linha só, tamanho máximo, grafias proibidas do cliente (erros de transcrição), palavra fraca no fim.
   4. Takes: green screen, arquivos pesados (4K/ProRes) que travam o playback.
   4b. Legenda picotada (legendas.picotado) e, com --timeline, motions fora do tempo da fala.
+  4c. Voz IA: transcreve de volta o vídeo final (ou a narração) e compara com roteiro.txt (leitura.py voz).
   5. Gera folha de contato (qc_folha.jpg) com 6 quadros do vídeo final.
 Saída: lista de OK / AVISO / ERRO. Corrigir os ERROs antes de entregar.
 """
@@ -127,6 +128,19 @@ def main(pasta, cliente=None, plataforma="instagram", timeline=None):
     else: er("nenhum SRT em legendas/")
 
     if timeline: motions_no_tempo(timeline, ok, av)
+
+    # Voz IA transcrita de volta contra o roteiro aprovado (pega nome, número e sigla falados errado).
+    rot = os.path.join(pasta, "roteiro.txt")
+    narr = sorted(glob.glob(os.path.join(pasta, "narracoes", "narracao*.wav")))
+    if not gravado and os.path.exists(rot) and (vids or narr):
+        try:
+            from leitura import voz
+            difs, n = voz(vids[-1] if vids else narr[-1], rot)
+            for d in difs[:15]:
+                av(f"voz [{d['t']:.1f} s] {d['tipo']}: roteiro \"{d['roteiro']}\" / ouvido \"{d['ouvido']}\" (ouvir o trecho)")
+            if not difs: ok(f"voz: as {n} palavras do roteiro foram ouvidas como escritas")
+        except SystemExit as e: av(f"voz não conferida: {e}")
+        except Exception as e: av(f"voz não conferida ({str(e)[:60]})")
 
     for f in sorted(glob.glob(os.path.join(pasta, "brolls", "take_*"))):
         nome = os.path.basename(f)

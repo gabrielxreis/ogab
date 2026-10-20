@@ -1,4 +1,9 @@
 # Novidades do Gab (/ogab)
+## 2026.10.20-1 (20/10/2026)
+- **Novo preset GRAVURA:** cada frase vira uma prancha de gravura em cobre que se grava sozinha (contorno, hachura, título cortado letra a letra, nota em cursiva e aquarela só no que importa). Para história, fé, tradição e herança de marca. Peça "no preset gravura". Motor do lemo-opuscar (MIT).
+- **Revisor mede o tempo de leitura:** lê o texto de cada quadro (OCR do Mac) e avisa quando uma frase sai da tela antes de dar tempo de ler.
+- **Voz IA ouvida de volta:** a conferência final transcreve a narração e compara com o roteiro aprovado, apontando palavra, número ou nome falado errado com o tempo.
+
 ## 2026.10.19-5 (19/10/2026)
 - **Premiere: motion MOV sem áudio volta a entrar na timeline.** No Premiere 26.5 o motion (MOV com alfa, sem trilha de áudio) dava "startTime must be less than endTime"; agora o Gab confere se o arquivo tem áudio e, se não tem, coloca direto.
 - **Premiere: volume certo.** Todo ganho de clipe entrava 15 dB alto (música pedida a -9,5 dB tocava a +5,5 dB e o export estourava). Vídeos montados no Premiere antes desta versão: refaça a mixagem (`P.volume`) ou abaixe os clipes 15 dB.

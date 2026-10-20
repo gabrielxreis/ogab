@@ -7,6 +7,7 @@
    - cortes_NN.jpg: tira de 6 quadros em volta de cada corte (pulo, quadro sujo, elemento sumindo antes da hora)
    - quadro preto, imagem congelada fora do fim, gancho parado (nada se mexe nos 2 primeiros segundos)
    - algo encostado na borda (texto ou elemento cortado pela margem de 4%)
+   - tempo de leitura de cada frase na tela (OCR do macOS, scripts/leitura.py texto): lista em revisao.md
    - som: volume integrado (-14 LUFS, +-1), pico (<= -1 dBTP), trecho mudo
    - com --pasta: clichês proibidos no código do motion (docs/etapas/motion_proibidos.md)
 2) Nota de 0 a 10 em 7 critérios, dada por um revisor de OLHOS NOVOS (subagente sem o contexto da edição) que lê
@@ -20,7 +21,8 @@ import json, os, re, subprocess, sys
 AQUI = os.path.dirname(os.path.abspath(__file__))
 CRITERIOS = [
     ("Gancho", "nos 2 primeiros segundos algo forte acontece e a mensagem principal aparece; nada de tela vazia"),
-    ("Leitura no celular", "na folha_celular todo texto se lê; cada frase fica na tela tempo de ler (~0,3 s por palavra + 0,5 s)"),
+    ("Leitura no celular", "na folha_celular todo texto se lê; cada frase fica na tela tempo de ler (~0,3 s por palavra + 0,5 s). "
+     "Cada ERRO da seção 'Tempo de leitura' que NÃO repete a fala limita a nota a 7"),
     ("Som na batida", "cada efeito cai no quadro do movimento dele; música e efeitos sem embolar; volume certo"),
     ("Acabamento", "nada cortado (acento, perna do g, borda), nada sobreposto, nada encostado na margem"),
     ("Ritmo e respiro", "uma ideia por cena, cortes sem pulo, sem cena arrastada nem atropelada"),
@@ -176,6 +178,13 @@ def main(a):
         lados = borda(f)
         if lados:
             avisos.append((f"{t:.2f} s", "conteúdo encostado na borda (" + ", ".join(lados) + "): conferir se nada está cortado"))
+    # Tempo de leitura (OCR): fica numa seção própria; o revisor decide se a fala cobre o texto rápido.
+    leit = []
+    try:
+        from leitura import texto as ler_texto
+        leit = [x for x in ler_texto(v) if x["nivel"]]
+    except Exception as e:
+        avisos.append(("todo", f"tempo de leitura não conferido ({str(e)[:60]}); rodar leitura.py texto no Mac"))
     # Som.
     au = audio(v, dur)
     if au is None:
@@ -198,13 +207,17 @@ def main(a):
     L = [f"# Revisão (rodada {rodada})", "", f"Vídeo: `{v}` ({dur:.1f} s). Provas nesta pasta: `folha.jpg`, `folha_celular.jpg`, "
          f"`corte_NN.jpg` ({len(cs)} cortes achados).", "", "## Conferência automática", ""]
     L += [f"- **ERRO** [{t}] {m}" for t, m in erros] + [f"- aviso [{t}] {m}" for t, m in avisos] or ["- nada encontrado"]
+    if leit:
+        L += ["", "## Tempo de leitura (OCR, mínimo 0,3 s por palavra + 0,5 s)", "",
+              "Texto que repete a fala pode ser mais rápido (quem ouve já leu). Texto que só aparece escrito precisa do tempo.", ""]
+        L += [f"- {x['nivel']} [{x['ini']:.2f} s] \"{x['texto']}\" fica {x['dur']:.2f} s (mínimo {x['minimo']:.1f} s)" for x in leit]
     L += ["", "## Nota (preencher: revisor de olhos novos, com evidência de arquivo e tempo)", "",
           "| # | Critério | O que olhar | Nota 0-10 | Evidência (arquivo, tempo) | Correção |", "|---|---|---|---|---|---|"]
     L += [f"| {i} | {n} | {o} |  |  |  |" for i, (n, o) in enumerate(CRITERIOS, 1)]
     L += ["", "Entrega: nenhum ERRO, todos >= 8 e pelo menos 2 rodadas. Senão: corrigir os 3 piores e rodar com "
           f"`--rodada {rodada + 1}`. Depois da rodada 3, entregar listando o que ficou em aberto."]
     open(os.path.join(out, "revisao.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
-    json.dump({"rodada": rodada, "erros": erros, "avisos": avisos, "cortes": cs, "audio": au},
+    json.dump({"rodada": rodada, "erros": erros, "avisos": avisos, "cortes": cs, "audio": au, "leitura": leit},
               open(os.path.join(out, "revisao.json"), "w"), ensure_ascii=False, indent=1)
     print(os.path.join(out, "revisao.md"))
     print(f"{len(erros)} erro(s), {len(avisos)} aviso(s), {len(cs)} corte(s)")

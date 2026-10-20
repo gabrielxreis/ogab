@@ -1,0 +1,6 @@
+{ "w": 1080, "h": 1920, "fps": 30, "centro_y": 900,
+  "cenas": [
+    {"dur": 5.5, "kicker": "Atos 1:8", "titulo": "A Grande Missão", "nota": "até os confins da terra", "forma": "lamparina", "cor": "#c98a2b"},
+    {"dur": 5.0, "kicker": "Prancha II", "titulo": "Pelo mar", "nota": "Paulo, rumo a Roma", "icone": "game-icons:sailboat", "cor": "#5b7f8c"},
+    {"dur": 6.0, "kicker": "Prancha III", "titulo": "A palavra escrita", "nota": "copiada à mão, de cidade em cidade", "forma": "pergaminho", "cor": "#a2492e"}
+  ] }

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=%W%, height=%H%" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Bodoni Moda"; src: url("fonts/BodoniModa-VF.ttf") format("truetype"); font-weight: 400 900; font-style: normal; }
+@font-face { font-family: "Bodoni Moda"; src: url("fonts/BodoniModa-Italic-VF.ttf") format("truetype"); font-weight: 400 900; font-style: italic; }
+@font-face { font-family: "Pinyon Script"; src: url("fonts/PinyonScript-Regular.ttf") format("truetype"); font-weight: 400; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: %W%px; height: %H%px; overflow: hidden; background: #f1e8d2; }
+#root { position: relative; width: 100%; height: 100%; background: #f1e8d2; }
+canvas { position: absolute; inset: 0; }
+</style></head><body>
+<div id="root" data-composition-id="gravura" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%">
+<canvas id="cv" width="%W%" height="%H%"></canvas>
+</div>
+<script src="dados.js"></script>
+<script type="module" src="gravura.js"></script>
+</body></html>
