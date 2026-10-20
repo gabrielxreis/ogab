@@ -391,7 +391,11 @@ def colocar_legendas(t, mp, srt, trocar=True, p=None):
     t.SetTrackEnable("subtitle", 1, True)
     n0 = len(t.GetItemListInTrack("subtitle", 1) or [])
     # sem recordFrame o SRT pode cair DEPOIS do fim da timeline (visto no ep. 5 da Lista de Planos: 58 legendas além do último quadro)
-    mp.AppendToTimeline([{"mediaPoolItem": it, "recordFrame": t.GetStartFrame()}])
+    # recordFrame sozinho é ignorado no SRT; com startFrame=0 ele respeita (testado no DaVinci 20/10/2026)
+    mp.AppendToTimeline([{"mediaPoolItem": it, "recordFrame": t.GetStartFrame(), "startFrame": 0}])
+    prim = (t.GetItemListInTrack("subtitle", 1) or [None])[0]
+    if prim and prim.GetStart() > t.GetEndFrame():
+        raise RuntimeError(f"a legenda caiu depois do fim de '{t.GetName()}'")
     if len(t.GetItemListInTrack("subtitle", 1) or []) == n0:
         raise RuntimeError(f"a legenda não entrou em '{t.GetName()}': passe p= para abrir a timeline certa")
     return len(t.GetItemListInTrack("subtitle", 1) or [])
