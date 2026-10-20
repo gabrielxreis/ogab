@@ -491,9 +491,15 @@ def baixar(url, pasta, nome, de=None, ate=None, maxh=1080, com_audio=False):
             trecho = "foto"
         else:
             corte = (["-ss", str(de)] if de else []) + (["-to", str(ate)] if ate is not None else [])
-            enc = ["ffmpeg", "-y", "-loglevel", "error", "-i", bruto] + corte + [
+            sv = (json.loads(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                                             "stream=codec_name,pix_fmt,height", "-of", "json", bruto],
+                                            capture_output=True, text=True).stdout or "{}").get("streams") or [{}])[0]
+            # já em H.264 yuv420p, inteiro e dentro da altura: só copia (recodificar em crf 16 quase dobrava o arquivo)
+            copia = (not corte and sv.get("codec_name") == "h264" and sv.get("pix_fmt") == "yuv420p"
+                     and int(sv.get("height") or 0) <= maxh)
+            enc = ["ffmpeg", "-y", "-loglevel", "error", "-i", bruto] + corte + (["-c:v", "copy"] if copia else [
                 "-vf", f"scale=-2:'min({maxh},ih)'", "-c:v", "libx264", "-preset", "medium", "-crf", "16",
-                "-pix_fmt", "yuv420p"] + (["-c:a", "aac", "-b:a", "192k"] if com_audio else ["-an"])
+                "-pix_fmt", "yuv420p"]) + (["-c:a", "aac", "-b:a", "192k"] if com_audio else ["-an"])
             subprocess.run(enc + [destino], check=True)
             os.remove(bruto)
         _anotar(pasta, f"{os.path.basename(destino)}  <-  {titulo} | {autor} | licença: {lic} | {url}  {trecho}")
