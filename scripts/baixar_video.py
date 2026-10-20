@@ -3,10 +3,17 @@ evento, acervo de domínio público, perfil do TikTok e print de site/notícia.
 
 Fluxo: buscar > achar o trecho > folha de quadros (olhar antes) > baixar.
 
-  python3 baixar_video.py buscar "<termos>" [--n 5] [--fonte youtube|commons|nasa] [--tipo video|imagem]
-        -> lista título, canal/autor, duração, licença (commons/nasa) e link. Não baixa nada.
-           commons = Wikimedia Commons, nasa = acervo da NASA: domínio público/licença livre, sem chave,
-           a rota mais segura em direitos (serve para anúncio pago).
+  python3 baixar_video.py buscar "<termos>" [--n 5] [--fonte youtube|commons|nasa|archive|met|aic] [--tipo video|imagem]
+                                  [--previa folha.jpg]
+        -> lista título, canal/autor, duração, licença e link. Não baixa nada. Acervos livres, sem chave, a rota
+           mais segura em direitos (serve para anúncio pago):
+             commons = Wikimedia Commons (vídeo e foto, conferir a licença de cada um)
+             nasa    = acervo da NASA (vídeo e foto, domínio público)
+             archive = Internet Archive, só o que está em domínio público/CC0 ou na coleção Prelinger (filmes
+                       antigos, cinejornal, institucional dos anos 1920-70: ótimo para história)
+             met     = Metropolitan Museum (pinturas, gravuras, mapas, objetos; só domínio público, CC0)
+             aic     = Art Institute of Chicago (obras em domínio público, CC0)
+           --previa: grade com a miniatura de cada resultado (archive, met, aic) para escolher olhando.
   python3 baixar_video.py achar <url> "<frase ou assunto>" [--n 3]
         -> lê legendas, capítulos e tempos da descrição do vídeo (sem baixar o vídeo) e devolve as
            janelas onde o assunto aparece, com nota. Escrever a frase no idioma do vídeo.
@@ -18,7 +25,8 @@ Fluxo: buscar > achar o trecho > folha de quadros (olhar antes) > baixar.
   python3 baixar_video.py baixar <url> <pasta_brolls> <nome> [--de 12.5 --ate 18] [--max 1080] [--com-audio]
         -> baixa só o trecho (ou tudo sem --de/--ate) em MP4 H.264, sem áudio por padrão, e anota a origem
            em <pasta do vídeo>/links.txt. Aceita YouTube, TikTok, Instagram etc. (yt-dlp) e também link
-           de arquivo do Commons (commons.wikimedia.org/wiki/File:...) e da NASA (images.nasa.gov/details/...):
+           de arquivo do Commons (commons.wikimedia.org/wiki/File:...), da NASA (images.nasa.gov/details/...), do
+           Internet Archive (archive.org/details/...), do Met e do Art Institute (link da obra):
            foto sai como imagem, vídeo é cortado e convertido.
   python3 baixar_video.py tiktok @usuario [--n 12]
         -> lista os posts recentes de um perfil do TikTok sem login (página de incorporação).
@@ -32,6 +40,7 @@ import datetime, glob, json, math, os, re, shutil, subprocess, sys, tempfile, un
 import urllib.parse, urllib.request
 
 UA = "ogab-broll/1.0 (editor de video; uso pessoal)"
+HDR = {"User-Agent": UA, "AIC-User-Agent": UA}   # o Art Institute recusa imagem sem o AIC-User-Agent
 
 
 def _seg(x):
@@ -56,7 +65,7 @@ def _ytdlp():
 
 
 def _get(url, as_json=True):
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    req = urllib.request.Request(url, headers=HDR)
     with urllib.request.urlopen(req, timeout=60) as r:
         dado = r.read()
     return json.loads(dado) if as_json else dado.decode("utf-8", "replace")
@@ -73,6 +82,12 @@ def buscar(termos, n=5, fonte="youtube", tipo="video"):
         res = _buscar_commons(termos, n, tipo)
     elif fonte == "nasa":
         res = _buscar_nasa(termos, n, tipo)
+    elif fonte == "archive":
+        res = _buscar_archive(termos, n)
+    elif fonte == "met":
+        res = _buscar_met(termos, n)
+    elif fonte == "aic":
+        res = _buscar_aic(termos, n)
     else:
         out = subprocess.run([_ytdlp(), f"ytsearch{n}:{termos}", "--flat-playlist", "-j", "--no-warnings"],
                              capture_output=True, text=True, timeout=120).stdout
@@ -82,11 +97,11 @@ def buscar(termos, n=5, fonte="youtube", tipo="video"):
             res.append({"titulo": d.get("title"), "canal": d.get("channel") or d.get("uploader"),
                         "duracao": _mmss(d.get("duration")), "licenca": "",
                         "url": d.get("url") or f"https://www.youtube.com/watch?v={d.get('id')}"})
-    for r in res:
+    for k, r in enumerate(res, 1):
         extra = f"  [{r['licenca']}]" if r.get("licenca") else ""
-        print(f"{r['duracao']:>7}  {r['canal']}  |  {r['titulo']}{extra}\n         {r['url']}")
+        print(f"{k:>2}. {r['duracao']:>7}  {r['canal']}  |  {r['titulo']}{extra}\n         {r['url']}")
     if not res:
-        print("nada encontrado (tente termos em inglês: o acervo da NASA e do Commons é quase todo em inglês)")
+        print("nada encontrado (tente termos em inglês: os acervos são quase todos em inglês)")
     return res
 
 
@@ -108,6 +123,71 @@ def _buscar_commons(termos, n, tipo):
                     "licenca": (meta.get("LicenseShortName") or {}).get("value", "?"),
                     "url": ii.get("descriptionurl") or "https://commons.wikimedia.org/wiki/" + p["title"].replace(" ", "_")})
     return res
+
+
+def _buscar_archive(termos, n):
+    """Internet Archive: filmes em domínio público/CC0 ou da coleção Prelinger (cinejornal, institucional antigo)."""
+    q = urllib.parse.urlencode({"q": f"({termos}) AND mediatype:movies AND (licenseurl:*publicdomain* OR collection:prelinger)",
+                                "fl[]": ["identifier", "title", "licenseurl", "creator", "runtime", "year"],
+                                "rows": n, "output": "json", "sort[]": "downloads desc"}, doseq=True)
+    docs = _get("https://archive.org/advancedsearch.php?" + q)["response"]["docs"]
+    lic = lambda d: "domínio público" if "publicdomain" in str(d.get("licenseurl", "")) else (d.get("licenseurl") or "Prelinger (domínio público)")
+    return [{"titulo": d.get("title"), "canal": str(d.get("creator") or d.get("year") or "?")[:60],
+             "duracao": d.get("runtime") or str(d.get("year") or ""), "licenca": lic(d),
+             "thumb": f"https://archive.org/services/img/{d['identifier']}",
+             "url": f"https://archive.org/details/{d['identifier']}"} for d in docs]
+
+
+def _buscar_met(termos, n):
+    """Metropolitan Museum: só obras em domínio público (Open Access, CC0)."""
+    q = urllib.parse.urlencode({"q": termos, "hasImages": "true", "isPublicDomain": "true", "limit": n * 2})
+    ids = (_get("https://collectionapi.metmuseum.org/public/collection/v1.1/search?" + q).get("objectIDs") or [])[:n * 2]
+    res = []
+    for i in ids:
+        o = _get(f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{i}")
+        if not (o.get("isPublicDomain") and o.get("primaryImage")):
+            continue
+        res.append({"titulo": o.get("title"), "canal": (o.get("artistDisplayName") or o.get("culture") or "The Met")[:60],
+                    "duracao": o.get("objectDate") or "", "licenca": "CC0 (Met Open Access)",
+                    "thumb": o.get("primaryImageSmall"), "url": o.get("objectURL") or f"https://www.metmuseum.org/art/collection/search/{i}"})
+        if len(res) >= n:
+            break
+    return res
+
+
+def _buscar_aic(termos, n):
+    """Art Institute of Chicago: só obras em domínio público (CC0)."""
+    q = urllib.parse.urlencode({"q": termos, "query[term][is_public_domain]": "true", "limit": n,
+                                "fields": "id,title,artist_display,date_display,image_id"})
+    d = _get("https://api.artic.edu/api/v1/artworks/search?" + q)
+    return [{"titulo": o.get("title"), "canal": (o.get("artist_display") or "?").split("\n")[0][:60],
+             "duracao": o.get("date_display") or "", "licenca": "CC0 (Art Institute of Chicago)",
+             "thumb": f"https://www.artic.edu/iiif/2/{o['image_id']}/full/400,/0/default.jpg",
+             "url": f"https://www.artic.edu/artworks/{o['id']}"} for o in d.get("data", []) if o.get("image_id")]
+
+
+def previa(res, saida):
+    """Grade com a miniatura de cada resultado, numerada na ordem da lista."""
+    from PIL import Image, ImageDraw
+    ims = []
+    for r in res:
+        try:
+            req = urllib.request.Request(r["thumb"], headers=HDR)
+            with urllib.request.urlopen(req, timeout=30) as f:
+                im = Image.open(__import__("io").BytesIO(f.read())).convert("RGB")
+            im.thumbnail((360, 360)); ims.append(im)
+        except Exception:
+            ims.append(Image.new("RGB", (360, 360), (40, 40, 40)))
+    if not ims:
+        return
+    col = min(4, len(ims)); lin = (len(ims) + col - 1) // col
+    g = Image.new("RGB", (col * 370, lin * 370), (18, 18, 20)); d = ImageDraw.Draw(g)
+    for k, im in enumerate(ims):
+        x, y = (k % col) * 370 + 5, (k // col) * 370 + 5
+        g.paste(im, (x + (360 - im.width) // 2, y + (360 - im.height) // 2))
+        d.rectangle((x, y, x + 34, y + 30), fill=(0, 0, 0)); d.text((x + 9, y + 8), str(k + 1), fill=(255, 255, 255))
+    g.save(saida, quality=88)
+    print(f"prévia: {saida}")
 
 
 def _buscar_nasa(termos, n, tipo):
@@ -352,6 +432,32 @@ def _acervo(url):
         pref = ["~orig.mp4", "~large.mp4", "~medium.mp4", "~orig.jpg", "~orig.png", "~large.jpg"]
         href = next((h for s in pref for h in hrefs if h.endswith(s)), hrefs[0])
         return href.replace("http://", "https://").replace(" ", "%20"), nid, "NASA", "NASA, domínio público"
+    m = re.search(r"archive\.org/details/([^?#/]+)", url)
+    if m:
+        ident = m.group(1); md = _get(f"https://archive.org/metadata/{ident}")
+        vids = [f for f in md.get("files", []) if f.get("name", "").lower().endswith((".mp4", ".m4v", ".mpeg", ".mpg", ".ogv"))]
+        if not vids:
+            raise SystemExit(f"{ident}: nenhum arquivo de vídeo no item")
+        # maior resolução; empate: H.264 (.mp4) antes de MPEG2/Ogg, e o arquivo menor (o servidor do Archive é lento)
+        alt = lambda f: int(float(f.get("height") or 0))
+        ordem = lambda f: (alt(f), f["name"].lower().endswith(".mp4"), -int(f.get("size") or 0))
+        f = max(vids, key=ordem); meta = md.get("metadata", {})
+        lic = "domínio público" if "publicdomain" in str(meta.get("licenseurl", "")) else (meta.get("licenseurl") or "Prelinger (domínio público)")
+        return (f"https://archive.org/download/{ident}/{urllib.parse.quote(f['name'])}", meta.get("title", ident),
+                str(meta.get("creator", "?"))[:80], lic)
+    m = re.search(r"metmuseum\.org/art/collection/search/(\d+)", url)
+    if m:
+        o = _get(f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{m.group(1)}")
+        if not o.get("isPublicDomain"):
+            raise SystemExit("obra do Met fora do domínio público: não usar")
+        return o["primaryImage"], o.get("title", "?"), o.get("artistDisplayName") or "The Met", "CC0 (Met Open Access)"
+    m = re.search(r"artic\.edu/artworks/(\d+)", url)
+    if m:
+        o = _get(f"https://api.artic.edu/api/v1/artworks/{m.group(1)}?fields=id,title,artist_display,image_id,is_public_domain")["data"]
+        if not o.get("is_public_domain"):
+            raise SystemExit("obra do Art Institute fora do domínio público: não usar")
+        return (f"https://www.artic.edu/iiif/2/{o['image_id']}/full/1686,/0/default.jpg", o.get("title", "?"),
+                (o.get("artist_display") or "?").split("\n")[0], "CC0 (Art Institute of Chicago)")
     return None
 
 
@@ -372,7 +478,7 @@ def baixar(url, pasta, nome, de=None, ate=None, maxh=1080, com_audio=False):
         ext = os.path.splitext(urllib.parse.urlparse(direto).path)[1].lower() or ".bin"
         bruto = os.path.join(pasta, f"_tmp_{nome}{ext}")
         with open(bruto, "wb") as f:
-            req = urllib.request.Request(direto, headers={"User-Agent": UA})
+            req = urllib.request.Request(direto, headers=HDR)
             with urllib.request.urlopen(req, timeout=600) as r:
                 shutil.copyfileobj(r, f)
         if ext in (".jpg", ".jpeg", ".png", ".tif", ".tiff", ".webp"):
@@ -481,7 +587,9 @@ if __name__ == "__main__":
         return a[a.index(k) + 1] if k in a else d
 
     if a[0] == "buscar":
-        buscar(a[1], int(opt("--n", 5)), opt("--fonte", "youtube"), opt("--tipo", "video"))
+        res = buscar(a[1], int(opt("--n", 5)), opt("--fonte", "youtube"), opt("--tipo", "video"))
+        if opt("--previa") and any(r.get("thumb") for r in res):
+            previa([r for r in res if r.get("thumb")], opt("--previa"))
     elif a[0] == "achar":
         achar(a[1], a[2], int(opt("--n", 3)))
     elif a[0] == "folha":

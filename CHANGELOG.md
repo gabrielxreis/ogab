@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.20-2 (20/10/2026)
+- **Mais acervo livre para b-roll:** além de Commons e NASA, a busca agora procura no Internet Archive (cinejornal e filmes antigos em domínio público), no Metropolitan Museum e no Art Institute of Chicago (pinturas, gravuras e mapas em domínio público). `--previa` mostra as miniaturas numeradas para escolher olhando.
+- **Fábrica de cortes:** uma aula, live ou podcast vira vários cortes verticais, cada um numa timeline própria no DaVinci, em ordem de força. O Gab confere se cada corte prende no começo, se entende sozinho e se termina numa conclusão.
+
 ## 2026.10.20-1 (20/10/2026)
 - **Novo preset GRAVURA:** cada frase vira uma prancha de gravura em cobre que se grava sozinha (contorno, hachura, título cortado letra a letra, nota em cursiva e aquarela só no que importa). Para história, fé, tradição e herança de marca. Peça "no preset gravura". Motor do lemo-opuscar (MIT).
 - **Revisor mede o tempo de leitura:** lê o texto de cada quadro (OCR do Mac) e avisa quando uma frase sai da tela antes de dar tempo de ler.
