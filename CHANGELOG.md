@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.20-3 (20/10/2026)
+- **Efeitos sonoros grátis do Pixabay:** quem não tem Artlist nem Envato (ou quando eles não acham o som) agora recebe SFX do Pixabay, sem conta e com uso comercial liberado. O Gab busca pelo navegador, baixa em WAV pronto para o DaVinci e anota a licença de cada som.
+
 ## 2026.10.20-2 (20/10/2026)
 - **Mais acervo livre para b-roll:** além de Commons e NASA, a busca agora procura no Internet Archive (cinejornal e filmes antigos em domínio público), no Metropolitan Museum e no Art Institute of Chicago (pinturas, gravuras e mapas em domínio público). `--previa` mostra as miniaturas numeradas para escolher olhando.
 - **Fábrica de cortes:** uma aula, live ou podcast vira vários cortes verticais, cada um numa timeline própria no DaVinci, em ordem de força. O Gab confere se cada corte prende no começo, se entende sozinho e se termina numa conclusão.

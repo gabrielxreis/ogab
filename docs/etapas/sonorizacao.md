@@ -66,7 +66,7 @@ e volta forte no fim) e marca na folha. Confirmar olhando e montar o slow-mo ass
 
 ## 3. Achar os sons
 - Artlist `search_sfx` em inglês, pelo OBJETO + ação + perspectiva ("porsche engine idle exterior", "car tires skid stop
-  on dirt"). Baixar pelo `playableUrl` (curl + `ffmpeg -ar 48000 x.wav`). Bibliotecas locais: `~/Desktop/<Empresa>/_sfx_artlist/`
+  on dirt"). Sem Artlist: Pixabay pelo `scripts/sfx_pixabay.py` (grátis, sem conta, ver `sfx.md` passo 7). Baixar pelo `playableUrl` (curl + `ffmpeg -ar 48000 x.wav`). Bibliotecas locais: `~/Desktop/<Empresa>/_sfx_artlist/`
   e `SKILL_DIR/biblioteca_sfx/`.
 - Não confiar no título: `sfx_conferir.py arquivos <pasta>` diz o que o som é (regra de `sfx.md`).
 - `sonorizar.py medir <pasta>` mostra ataque, pico e duração de cada som (o plano usa isso para alinhar sozinho).

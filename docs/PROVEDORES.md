@@ -6,7 +6,7 @@ A skill funciona com o que você tiver. Em `config.json`, cada etapa tem uma **l
 |---|---|---|---|
 | Voz (narração) | `elevenlabs`, `artlist` | Claude: Configurações > Conectores > ElevenLabs (diretório) / Artlist: conector personalizado `https://mcp.artlist.io/mcp` | Créditos da plataforma. A skill estima antes e gera 1 take |
 | Música | `artlist`, `envato` | Artlist (acima) / Envato: conector "Envato" no diretório | Assinatura. Só busca pelo MCP; download pelo navegador |
-| Efeitos sonoros | `artlist`, `envato` | idem | Assinatura |
+| Efeitos sonoros | `artlist`, `envato`, `pixabay` | idem / Pixabay: nada (busca pelo navegador, download direto, `scripts/sfx_pixabay.py`) | Assinatura (Pixabay grátis, uso comercial livre). Sem conta nos outros, a skill usa o Pixabay |
 | Takes de banco | `envato`, `artlist`, `storyblocks`, `pexels` | Envato/Artlist (acima) / Storyblocks: conector oficial / Pexels: MCP comunitário com chave grátis | Assinatura (Pexels grátis) |
 | Geração de takes | `magnific_site_ilimitado` (padrão), `artlist`, `magnific_mcp` | Magnific: conector `https://mcp.magnific.com` + login no site no Chrome | **Pelo site no modo ilimitado = sem crédito** (Nano Banana 2 1K + Kling 2.5 720p). Pelo MCP e Artlist **cobra crédito**: a skill só usa se `regras.geracao_so_ilimitada` for `false` |
 | Download | `navegador` | Extensão **Claude in Chrome** logada na mesma conta do Claude, e você logado nos sites | - |
