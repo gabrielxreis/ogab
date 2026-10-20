@@ -392,9 +392,18 @@ def colocar_legendas(t, mp, srt, trocar=True, p=None):
     n0 = len(t.GetItemListInTrack("subtitle", 1) or [])
     # sem recordFrame o SRT pode cair DEPOIS do fim da timeline (visto no ep. 5 da Lista de Planos: 58 legendas além do último quadro)
     # recordFrame sozinho é ignorado no SRT; com startFrame=0 ele respeita (testado no DaVinci 20/10/2026)
-    mp.AppendToTimeline([{"mediaPoolItem": it, "recordFrame": t.GetStartFrame(), "startFrame": 0}])
+    fim_video = max([x.GetEnd() for k in range(1, t.GetTrackCount("video") + 1) for x in (t.GetItemListInTrack("video", k) or [])] or [t.GetEndFrame()])
+    import time as _t
+    for _ in range(4):   # o DaVinci às vezes ignora a posição e solta o SRT depois do fim: apaga e tenta de novo
+        try: t.SetCurrentTimecode(_tc(t, t.GetStartFrame()))
+        except Exception: pass
+        _t.sleep(0.4)
+        mp.AppendToTimeline([{"mediaPoolItem": it, "recordFrame": t.GetStartFrame(), "startFrame": 0}])
+        prim = (t.GetItemListInTrack("subtitle", 1) or [None])[0]
+        if not prim or prim.GetStart() < fim_video: break
+        t.DeleteClips(t.GetItemListInTrack("subtitle", 1) or [], False); _t.sleep(0.4)
     prim = (t.GetItemListInTrack("subtitle", 1) or [None])[0]
-    if prim and prim.GetStart() > t.GetEndFrame():
+    if not prim or prim.GetStart() >= fim_video:
         raise RuntimeError(f"a legenda caiu depois do fim de '{t.GetName()}'")
     if len(t.GetItemListInTrack("subtitle", 1) or []) == n0:
         raise RuntimeError(f"a legenda não entrou em '{t.GetName()}': passe p= para abrir a timeline certa")
