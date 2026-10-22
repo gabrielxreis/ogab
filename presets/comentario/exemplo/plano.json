@@ -1,0 +1,6 @@
+{ "cor": "#FF8B3D", "estilo": "claro", "posicao": "topo",
+  "comentarios": [
+    { "usuario": "ana.lima", "texto": "Como você organiza a semana?", "curtidas": 248, "tempo": "há 2 h", "avatar": "avatar-ana.svg", "destaque": "organiza", "em": 0.3 },
+    { "usuario": "joao.pedro", "texto": "Qual app você usa pra estudar?", "curtidas": 96, "tempo": "há 5 h", "destaque": "pra estudar", "em": 2.9 },
+    { "usuario": "carla.m", "texto": "Funciona pra quem trabalha à noite?", "curtidas": 1320, "tempo": "há 1 d", "destaque": "à noite", "em": 5.5 }
+  ] }

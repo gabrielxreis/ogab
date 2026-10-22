@@ -146,6 +146,11 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 | abertura ou fecho de marca, vinheta de canal, "abre com o logo" | **logo reveal** | o logo do cliente nascendo do escuro em 5-8 s ([guia](presets/logo-reveal/PRESET.md)) |
 | cliente pede animação para o site ou app (carregando, botão, ícone, sucesso) | **lottie** | arquivo leve que o site toca; vai com GIF de prévia ([guia](presets/lottie/PRESET.md)) |
 | história, Bíblia, fé, tradição, "você sabia" de época, herança de marca, objeto com história (lamparina, barco, pergaminho, mapa) | **gravura** | prancha de gravura em cobre se gravando sozinha, título cortado letra a letra e aquarela só no que importa; ar de documentário antigo e premium ([guia](presets/gravura/PRESET.md)) |
+| ranking, tier list, "do pior ao melhor", top 3, comparação com veredito ("isso é S, aquilo é D") | **ranking** | cada item entra na fala, assenta na faixa e FICA enquanto o próximo é discutido ([guia](presets/ranking/PRESET.md)) |
+| "3 regras para...", "N coisas que...", entrevista de rua com respostas curtas | **respostas** | faixa no topo com "?" que vira ícone + palavra no instante da resposta ([guia](presets/respostas/PRESET.md)) |
+| "respondendo comentário", pergunta de seguidor, prova social em texto | **comentário** | card de comentário com @, curtidas e a palavra-chave marcada ([guia](presets/comentario/PRESET.md)) |
+| prova acumulada: números, depoimentos, prints de resultado, "olha quanta gente" | **cartões** | cartões empilhando em profundidade e abrindo em leque ou grade no fim ([guia](presets/cartoes/PRESET.md)) |
+| corte de podcast ou entrevista com DUAS pessoas | **podcast** | tela dividida com legenda na cor de quem fala, abaixo do queixo e acompanhando a cabeça (única exceção à legenda fixa) ([guia](presets/podcast/PRESET.md)) |
 | notícia ou dado que não cabe em gráfico | motion normal do cliente (cards, contadores) | precisão primeiro; preset só se o usuário pedir |
 
 - Num mesmo vídeo dá para MISTURAR: ex. point cloud no gancho (o "?" ou o personagem histórico), vector motion nas frases de efeito e o motion da marca no dado e no CTA. Cada trecho segue a duração da fala.

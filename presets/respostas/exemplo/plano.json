@@ -1,0 +1,6 @@
+{ "cor": "#3FCF8E", "pergunta": "3 regras para juntar o *primeiro milhão*", "dur": 8,
+  "itens": [
+    { "icone": "💰", "rotulo": "Gastar menos", "em": 1.6 },
+    { "icone": "📈", "rotulo": "Investir", "em": 3.8 },
+    { "icone": "⏳", "rotulo": "Paciência", "em": 5.9 }
+  ] }

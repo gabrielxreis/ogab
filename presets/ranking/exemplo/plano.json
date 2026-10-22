@@ -1,0 +1,9 @@
+{ "cor": "#E8B04B", "titulo": "Melhores hábitos|de *manhã*", "forma": "tier", "dur": 14,
+  "itens": [
+    { "texto": "Água", "faixa": "S", "em": 1.0 },
+    { "texto": "Celular", "faixa": "D", "em": 3.0 },
+    { "texto": "Exercício", "faixa": "A", "em": 5.0 },
+    { "texto": "Café", "faixa": "B", "em": 7.0 },
+    { "texto": "Soneca", "faixa": "C", "em": 9.0 },
+    { "texto": "Luz do sol", "faixa": "S", "em": 11.0 }
+  ] }

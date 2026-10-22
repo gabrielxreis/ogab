@@ -1,6 +1,7 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.22-1 (22/10/2026)
 - **Banco de presets da comunidade:** os motions que você cria (preset novo a partir de uma referência ou modelo salvo na biblioteca) são encontrados sozinhos e, se forem bem diferentes do que já existe e você tiver dito "sim" aos relatos, vão anônimos para o Gabriel avaliar. Os aprovados entram para todo mundo no próximo update. O banco inteiro fica em `biblioteca_motions/CATALOGO.md`.
+- **5 presets novos:** **ranking** (tier list e top 3 que se montam com a fala), **respostas** (faixa de "?" que vira resposta, estilo entrevista de rua), **comentário** (card de comentário de seguidor), **cartões** (provas empilhando em profundidade) e **podcast** (tela dividida com legenda na cor de quem fala, acompanhando a cabeça). Peça pelo nome ou deixe o Gab escolher.
 - **Grade com palavras para estudar referência:** `grade.py <video> --transcrever --cortes` mostra os quadros do vídeo com a palavra falada embaixo de cada um e os cortes marcados, para ver em que palavra cada texto ou motion entra e sai.
 - **Duração do roteiro antes da voz:** `estimar.py --arquivo roteiro.txt` diz quantos segundos cada trecho vai durar (sílabas do português). Depois do primeiro vídeo, `estimar.py calibrar` aprende o ritmo da voz e acerta ainda mais.
 - **Plano preso à palavra:** SFX e motions guardam em que palavra entram (`ancorar.py`). Regravou a narração ou trocou a voz? Tudo se reposiciona sozinho na fala nova.

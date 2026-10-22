@@ -1,0 +1,51 @@
+/* Preset RANKING: quadro de ranking (tier S-D ou pódio top 3) que se monta conforme a fala. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0c; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #0a0a0c;
+  --cor: #C4A34F; --tinta: #f5f5f7; --apagado: rgba(245,245,247,.55);
+  font-family: "Inter Tight", "Inter", system-ui, sans-serif; color: var(--tinta); -webkit-font-smoothing: antialiased; }
+#root.transparente, html.transparente, html.transparente body { background: transparent; }
+#root.transparente #bg { display: none; }
+#bg { position: absolute; inset: 0; background: linear-gradient(180deg, #0d0d10 0%, #08080a 100%); }
+#foco { position: absolute; left: 50%; top: -20%; width: 140%; aspect-ratio: 1.3; transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(255,255,255,.06), transparent); }
+#nevoa { position: absolute; left: 50%; top: 52%; width: 120%; aspect-ratio: 1.2; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--cor) 11%, transparent), transparent); filter: blur(40px); }
+#grao { position: absolute; inset: 0; opacity: .045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+#vinheta { position: absolute; inset: 0; background: radial-gradient(80% 65% at 50% 46%, transparent 50%, rgba(0,0,0,.8) 100%); }
+#cam, #quadro, #voo { position: absolute; inset: 0; }
+#spot { position: absolute; border-radius: 50%; opacity: 0; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--cor) 32%, transparent), transparent 72%); }
+
+.titulo { position: absolute; left: 0; right: 0; text-align: center; font-weight: 700; letter-spacing: -.035em; line-height: 1.02; }
+.titulo .linha { display: block; overflow: hidden; padding: .06em 0 .12em; margin-bottom: -.14em; }
+.titulo .linha > span { display: inline-block; }
+
+/* Tier */
+.faixa { position: absolute; }
+.rotulo { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.trilho { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 18px; background: rgba(255,255,255,.035);
+  border: 1.5px solid rgba(255,255,255,.08); }
+#root.transparente .trilho { background: rgba(10,10,12,.62); }
+.trilho .aceso { position: absolute; inset: -1.5px; border-radius: 18px; border: 2px solid var(--c); opacity: 0; }
+
+/* Card do item: nasce grande (nítido no destaque) e encolhe para a vaga */
+.card { position: absolute; left: 0; top: 0; border-radius: 30px; overflow: hidden; transform-origin: 50% 50%;
+  background: #18181c; border: 3px solid rgba(255,255,255,.14); display: flex; flex-direction: column; }
+.card .foto { flex: 1; background-size: cover; background-position: center; }
+.card .nome { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700;
+  letter-spacing: -.02em; line-height: 1.02; padding: 0 8%; }
+.card.so-texto .nome { flex: 1; }
+
+/* Pódio */
+.bloco { position: absolute; border-radius: 20px 20px 6px 6px; overflow: hidden; transform-origin: 50% 100%;
+  background: linear-gradient(180deg, #202026, #141418); border: 1.5px solid rgba(255,255,255,.08); }
+.bloco .luz { position: absolute; inset: 0; opacity: 0; }
+.bloco .pos { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; letter-spacing: -.05em; line-height: 1; }
+.vaga { position: absolute; border-radius: 30px; border: 3px dashed rgba(255,255,255,.16); display: flex; align-items: center;
+  justify-content: center; color: rgba(255,255,255,.28); font-weight: 300; }
+
+#root.letra-bebas .titulo, #root.letra-bebas .rotulo, #root.letra-bebas .pos, #root.letra-bebas .card .nome {
+  font-family: "Bebas Neue", "Inter Tight", sans-serif; font-weight: 400; letter-spacing: .01em; text-transform: uppercase; }

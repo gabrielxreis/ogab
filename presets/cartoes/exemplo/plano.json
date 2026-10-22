@@ -1,0 +1,8 @@
+{ "cor": "#FF8B3D", "final": "leque", "frase": "E isso é só uma parte.",
+  "cartoes": [
+    {"tipo": "numero", "titulo": "Alunos", "numero": "+3.200", "texto": "já passaram pelo método", "em": 0.3},
+    {"tipo": "texto", "texto": "Terminei o que comecei, enfim.", "titulo": "Aluna da turma 4", "em": 2.4},
+    {"tipo": "imagem", "imagem": "print-mensagem.svg", "titulo": "Mensagem de aluno", "texto": "recebida na semana 2", "em": 4.5},
+    {"tipo": "numero", "titulo": "Nota", "numero": "4,9", "texto": "média das avaliações", "em": 6.6},
+    {"tipo": "texto", "texto": "Minha semana nunca foi tão leve.", "titulo": "Aluno da turma 2", "em": 8.7}
+  ] }

@@ -1,0 +1,26 @@
+{
+  "w": 1080, "h": 1920, "fps": 30, "dur": 7,
+  "cor": "#F2B33D", "cor2": "#4FD1C5",
+  "maxPalavras": 3, "fonte": "Poppins", "nomes": true,
+  "falantes": [
+    {"nome": "Ana", "midia": "midia/falante_a.png"},
+    {"nome": "Bruno", "midia": "midia/falante_b.mp4", "trilha": "midia/falante_b_trilha.json", "rosto": {"alt": 280}}
+  ],
+  "palavras": [
+    {"texto": "Qual", "ini": 0.2, "fim": 0.55, "falante": 0},
+    {"texto": "foi", "ini": 0.55, "fim": 1.0, "falante": 0},
+    {"texto": "o", "ini": 1.0, "fim": 1.1, "falante": 0},
+    {"texto": "primeiro", "ini": 1.1, "fim": 1.55, "falante": 0},
+    {"texto": "passo?", "ini": 1.55, "fim": 2.1, "falante": 0},
+    {"texto": "Parar", "ini": 2.2, "fim": 2.55, "falante": 1},
+    {"texto": "de", "ini": 2.55, "fim": 2.7, "falante": 1},
+    {"texto": "esperar", "ini": 2.7, "fim": 3.15, "falante": 1},
+    {"texto": "o", "ini": 3.15, "fim": 3.25, "falante": 1},
+    {"texto": "momento", "ini": 3.25, "fim": 3.7, "falante": 1},
+    {"texto": "perfeito.", "ini": 3.7, "fim": 4.3, "falante": 1},
+    {"texto": "Começar", "ini": 4.65, "fim": 5.1, "falante": 1},
+    {"texto": "pequeno,", "ini": 5.1, "fim": 5.6, "falante": 1},
+    {"texto": "mas", "ini": 5.75, "fim": 5.95, "falante": 1},
+    {"texto": "começar.", "ini": 5.95, "fim": 6.5, "falante": 1}
+  ]
+}
