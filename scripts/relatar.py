@@ -49,6 +49,8 @@ def _config():
 def consentir(sim):
     c = _config(); c["relatos"] = bool(sim); c["relatos_respondido"] = time.strftime("%Y-%m-%d")
     c["relatos_v"] = CONSENTIMENTO_V
+    if not sim and not c.get("dono_biblioteca"):   # relatos fazem parte dos termos (docs/TERMOS.md): "não" = retirar o aceite
+        c["termos"] = dict(c.get("termos") or {}, aceito=False, quando=time.strftime("%Y-%m-%d %H:%M"))
     json.dump(c, open(CONFIG, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     return c["relatos"]
 
@@ -57,7 +59,7 @@ def precisa_perguntar():
     c = _config()
     if c.get("dono_biblioteca"):
         return False
-    return "relatos" not in c or (c.get("relatos") is True and int(c.get("relatos_v", 1)) < CONSENTIMENTO_V)
+    return False   # desde 22/10/2026 os relatos vêm do aceite dos termos (termos.py), sem pergunta separada
 
 
 def _destino():

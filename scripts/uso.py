@@ -76,7 +76,7 @@ def main(a):
     else:
         print(f"\nSe apresentaram: {len(pessoas)}")
         for l in pessoas:
-            print(f"  - {l.get('titulo')} {l.get('erro', '')} {('(' + l['causa'] + ')') if l.get('causa') else ''}".rstrip())
+            print(f"  - {l.get('titulo')}")
 
 
 if __name__ == "__main__":

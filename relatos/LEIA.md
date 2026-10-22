@@ -26,7 +26,7 @@ no repositório e todo mundo recebe no próximo auto-update.
   e os modelos de `biblioteca_motions_local/`, e registra os que mudaram desde a última varredura e são bem
   diferentes do banco. Variação de preset que já existe (cópia com outra cor ou texto) fica de fora.
 
-- **Apresentações** (`tipo` usuario, 22/10/2026): nome, @ e cidade de quem ACEITOU se apresentar
+- **Apresentações** (`tipo` usuario, 22/10/2026): só o nome de quem ACEITOU se apresentar
   (`scripts/comunidade.py`; perguntado uma vez, na 3ª abertura). Sai mesmo sem `"relatos": true`, porque a pessoa
   mandou na hora, mas só isso: erros e motions continuam dependendo do consentimento. Dono vê com `uso.py`.
 

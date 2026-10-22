@@ -17,6 +17,34 @@ if [ "$(uname)" != "Darwin" ]; then
   exit 1
 fi
 
+# Termos de uso (regra do autor, 22/10/2026): sem o aceite nada é baixado nem instalado. Texto em docs/TERMOS.md.
+TERMOS_URL="https://github.com/gabrielxreis/ogab/blob/main/docs/TERMOS.md"
+cat <<TERMOS
+
+TERMOS DE USO DO GAB (/ogab), versão 1
+- Licença pessoal de uso do Gab nos seus vídeos e nos dos seus clientes (os vídeos são seus).
+  Revender ou distribuir a skill depende de autorização do autor (Gabriel Reis).
+- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, os erros da skill que ele corrigir e a
+  estrutura dos motions novos que você criar. Nunca sai vídeo, roteiro, cliente, senha, chave ou dado pessoal.
+- Se apresentar com o nome é opcional e perguntado à parte.
+- Programas de terceiros (DaVinci, Premiere, ElevenLabs...) têm licenças próprias. Sem garantia.
+Texto completo: $TERMOS_URL
+TERMOS
+if [ "${OGAB_ACEITO:-}" = "sim" ]; then
+  ok "termos aceitos"
+elif tem_tty; then
+  printf "  Sem o aceite, nada é instalado. Para aceitar, digite ACEITO: "
+  read -r RESP < /dev/tty || RESP=""
+  case "$(printf %s "$RESP" | tr '[:lower:]' '[:upper:]')" in
+    ACEITO|ACEITA|ACEITE) ok "termos aceitos"; export OGAB_ACEITO=sim ;;
+    *) echo "  Instalação cancelada: os termos não foram aceitos. Nada foi instalado."; exit 3 ;;
+  esac
+else
+  echo "  PRECISA_DO_USUARIO: mostre os termos acima à pessoa. Só se ela digitar ACEITO, rode de novo com OGAB_ACEITO=sim."
+  echo "  Nada foi instalado."
+  exit 3
+fi
+
 info "1/3 Homebrew"
 if ! command -v brew >/dev/null 2>&1 && ! [ -x /opt/homebrew/bin/brew ] && ! [ -x /usr/local/bin/brew ] && ! tem_tty; then
   echo "  PRECISA_DO_USUARIO: o Homebrew ainda não está instalado e pede a senha do Mac, que só você pode digitar."

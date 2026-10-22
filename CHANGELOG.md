@@ -1,4 +1,12 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-3 (22/10/2026)
+- **Termos de uso:** para instalar e usar o Gab agora é preciso aceitar os termos (digitando ACEITO). Quem já usa vai ver os termos na próxima vez que abrir o Gab. Eles explicam a licença de uso e que o Gab envia ao Gabriel, de forma anônima, os erros que corrigir e a estrutura dos motions novos (nunca vídeo, roteiro, cliente ou dado pessoal). Texto completo em `docs/TERMOS.md`.
+- A apresentação ao Gabriel agora pede só o nome.
+
+## 2026.10.22-3 (22/10/2026)
+- **Preset novo: painel** (apresentação de app e fintech). Fundo navy com uma cor de destaque, linha de gráfico que se desenha, cartões do app em 3D com os números rolando, câmera mergulhando no cartão, disco da cor cobrindo a tela e fecho com a marca. Peça "no preset painel".
+- **Storyboard:** não quebra mais quando o texto de uma cena vem em lista (linhas, palavras, grupos).
+
 ## 2026.10.22-2 (22/10/2026)
 - **Preset launch, cena nova `editor`:** um DaVinci simulado montando a timeline (voz, takes, legenda, música, b-roll, motion e SFX entrando um por um, com aviso do que a IA está fazendo). Ideal para apresentar produto de edição.
 - **Preset launch:** o fecho agora aceita `tam` como as outras cenas, para a letra ficar grande em vídeo 16:9; o logo aceita `tamFrase` para a frase embaixo dele; e o fundo já começa aceso no primeiro quadro.
@@ -6,7 +14,7 @@
 - **Trava do "começa do preto":** não acusa mais quando o que acende é só um texto grande entrando; fade do preto de verdade continua travando.
 
 ## 2026.10.22-2 (22/10/2026)
-- **Conheça quem fez o Gab:** uma vez, o Gab pergunta se você quer se apresentar ao Gabriel (só o nome que você confirmar, e o @ e a cidade se quiser). É opcional; dizendo não, ele não pergunta de novo.
+- **Conheça quem fez o Gab:** uma vez, o Gab pergunta se você quer se apresentar ao Gabriel (só o nome que você confirmar). É opcional; dizendo não, ele não pergunta de novo.
 - De vez em quando (no máximo uma vez por semana) o Gab lembra que dá para deixar uma estrela na skill no GitHub e seguir o Gabriel no Instagram, @gabrielxreis_.
 
 ## 2026.10.22-1 (22/10/2026)

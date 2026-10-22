@@ -3,9 +3,9 @@
 o que já foi instalado e o que ainda falta.
 
 Chamado pelo install.sh depois do Homebrew, do Python e do clone da skill (que não dependem dele):
-    python3 ~/.claude/skills/ogab/scripts/instalador.py            # pergunta editor/motion/relatos/voz e instala
+    python3 ~/.claude/skills/ogab/scripts/instalador.py            # termos (aceite obrigatório), editor/motion/voz e instala
     python3 instalador.py --lista                                  # só mostra o que tem e o que falta
-Variáveis: OGAB_EDITOR, OGAB_MOTION, OGAB_RELATOS (s/n) pulam as perguntas. Log completo em ~/.claude/ogab-instalacao.log.
+Variáveis: OGAB_ACEITO=sim (só depois que a PESSOA aceitou os termos), OGAB_EDITOR, OGAB_MOTION pulam as perguntas. Log completo em ~/.claude/ogab-instalacao.log.
 
 Cada etapa tem um teste "já tem?" (pulada se sim), o comando, e um tamanho aproximado de download para a barra geral.
 Os MB baixados vêm do contador de rede do sistema (vale para brew, pip, npm e git) e, quando a ferramenta diz o
@@ -396,6 +396,16 @@ def perguntar(cfg):
         r = entrada.readline().strip()
         return r or padrao
 
+    sys.path.insert(0, str(DEST / "scripts"))
+    import termos   # aceite obrigatório (regra do autor, 22/10/2026): relatos anônimos fazem parte dos termos
+    if not termos.aceito():
+        if os.environ.get("OGAB_ACEITO") != "sim":
+            print("\n" + termos.RESUMO)
+            r = ler("  ", "")
+            if r.strip().upper() not in ("ACEITO", "ACEITA", "ACEITE"):
+                sys.exit("\n  Instalação cancelada: os termos não foram aceitos. Nada foi instalado.")
+        termos.gravar(True)
+        cfg.update(json.loads(CFG.read_text()))
     ed = os.environ.get("OGAB_EDITOR") or cfg.get("editor")
     if not ed:
         r = ler("\n  Em qual editor o Gab vai montar seus vídeos?\n    1) DaVinci Resolve Studio\n    2) Adobe Premiere Pro\n"
@@ -408,15 +418,7 @@ def perguntar(cfg):
                 "    2) No After Effects (camadas editáveis)\n  Escolha [1/2]: ", "1")
         mo = "aftereffects" if r == "2" else "hyperframes"
     cfg["motion"] = mo
-    rel = cfg.get("relatos")
-    if rel is None or (rel is True and int(cfg.get("relatos_v", 1)) < 2):
-        r = os.environ.get("OGAB_RELATOS") or ler(
-            "\n  Posso mandar ao Gabriel, de forma ANÔNIMA, os erros da skill que o Gab corrigir e a estrutura\n"
-            "  dos motions novos que você salvar? (nada de vídeo, roteiro, cliente, cor, nome ou pasta) [S/n]: ", "s")
-        subprocess.run([sys.executable, str(DEST / "scripts/relatar.py"), "consentir", "nao" if r.lower().startswith("n") else "sim"],
-                       capture_output=True)
-        cfg.update(json.loads(CFG.read_text()) if CFG.exists() else {})
-        cfg["editor"], cfg["motion"] = cfg.get("editor") or ed, mo
+    # relatos anônimos: já vêm ligados pelo aceite dos termos (seção 2 de docs/TERMOS.md)
     v = cfg.setdefault("voz_local", {"motor": "omnivoice", "passos": 32})
     if MAC and platform.machine() == "arm64" and not v.get("perguntado"):
         r = os.environ.get("OGAB_VOZ_LOCAL") or ler("\n  Quer o clonador de voz LOCAL (narra com a sua voz no Mac, grátis)? Baixa ~5,5 GB;\n"

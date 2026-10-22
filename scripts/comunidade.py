@@ -1,13 +1,13 @@
 """Comunidade do Gab (lado de quem usa): apresentação OPCIONAL ao Gabriel e lembrete de estrela + Instagram.
 
   python3 comunidade.py abrir                         # passo zero: imprime PERGUNTAR_APRESENTACAO e/ou LEMBRETE (ou nada)
-  python3 comunidade.py apresentar --nome "Ana" [--instagram @ana] [--cidade "Recife"]   # só depois do "sim" da pessoa
+  python3 comunidade.py apresentar --nome "Ana"     # só depois do "sim" da pessoa (só o nome, regra do Gabriel)
   python3 comunidade.py apresentar --nao              # não quer: nunca mais pergunta
   python3 comunidade.py status
 
 Apresentação (regra do Gabriel, 22/10/2026: saber quem usa a skill): perguntada UMA vez, na 3ª abertura (para não
 chegar junto do onboarding). O Gab sugere o nome que já conhece da pessoa ("posso dizer que é a Ana?"), mas só manda
-o que ela CONFIRMAR, e só nome, @ e cidade, se ela quiser. Vai pelo mesmo Formulário Google dos relatos (tipo
+o NOME que ela confirmar, e mais nada. Vai pelo mesmo Formulário Google dos relatos (tipo
 usuario): quem envia só responde, não vê nada da conta do Gabriel. Sem resposta ou "não", nada sai da máquina.
 A contagem de quantos usam NÃO depende disso: o Gabriel vê os computadores únicos pelo tráfego do GitHub (uso.py).
 
@@ -27,8 +27,7 @@ INSTAGRAM = "https://instagram.com/gabrielxreis_"
 LEMBRETE_CADA, LEMBRETE_DIAS, LEMBRETE_MAX = 10, 7, 6
 APRESENTAR_NA = 3
 PERGUNTA = ("O Gabriel (criador do Gab) gosta de saber quem está usando a skill. Quer se apresentar para ele? É opcional: "
-            "vai só o nome que você confirmar (e o @ do Instagram e a cidade, se quiser), nada de projeto, cliente ou "
-            "arquivo. Se preferir não, tudo bem, não pergunto de novo.")
+            "vai só o nome que você confirmar, nada de projeto, cliente ou arquivo. Se preferir não, tudo bem, não pergunto de novo.")
 LEMBRETE = (f"Se o Gab está te ajudando, deixa uma estrela em {REPO} e segue o Gabriel no Instagram: @gabrielxreis_ "
             f"({INSTAGRAM}). Ajuda muito a skill a crescer.")
 
@@ -65,17 +64,14 @@ def abrir():
     return saida
 
 
-def apresentar(nome=None, instagram="", cidade="", nao=False):
+def apresentar(nome=None, nao=False):
     c = _cfg(); com = c.setdefault("comunidade", {})
     if nao or not (nome or "").strip():
         com["apresentacao"] = "nao"; _salvar(c)
         return "ok, não pergunto de novo"
     import relatar
-    ig = instagram.strip()
-    if ig and not ig.startswith("@"):
-        ig = "@" + ig.split("/")[-1]
     rel = {"chave_envio": relatar.CHAVE_ENVIO, "tipo": "usuario", "titulo": nome.strip()[:120],
-           "erro": ig[:60], "causa": cidade.strip()[:80], "correcao": f"versão {relatar._versao()}",
+           "erro": "", "causa": "", "correcao": f"versão {relatar._versao()}",
            "diff": "", "assinatura": "usuario-" + relatar._instalacao(), "versao": relatar._versao(),
            "sistema": f"{__import__('platform').system()}", "editor": c.get("editor", ""),
            "instalacao": relatar._instalacao(), "quando": time.strftime("%Y-%m-%dT%H:%M:%S")}
@@ -84,7 +80,7 @@ def apresentar(nome=None, instagram="", cidade="", nao=False):
                         encoding="utf-8"), ensure_ascii=False, indent=1)
     com["apresentacao"] = "sim"; _salvar(c)
     n = relatar.enviar()
-    return f"apresentação {'enviada' if n else 'guardada (sai na próxima abertura com internet)'}: {nome}" + (f" {ig}" if ig else "")
+    return f"apresentação {'enviada' if n else 'guardada (sai na próxima abertura com internet)'}: {nome}"
 
 
 def main(a):
@@ -97,7 +93,7 @@ def main(a):
         for l in abrir():
             print(l)
     elif a[0] == "apresentar":
-        print(apresentar(arg("--nome", None), arg("--instagram"), arg("--cidade"), "--nao" in a))
+        print(apresentar(arg("--nome", None), "--nao" in a))
     elif a[0] == "status":
         print(json.dumps(_cfg().get("comunidade", {}), ensure_ascii=False))
     else:

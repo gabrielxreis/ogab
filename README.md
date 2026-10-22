@@ -109,13 +109,14 @@ Guia completo: [`docs/BEM_VINDO.md`](docs/BEM_VINDO.md). O `SKILL.md` é só o m
 
 ## Instalar pelo Claude
 
-**Usuário:** cole o link deste repositório no Claude (app ou Claude Code) e peça *"instala"*. Ele pergunta 4 coisas no chat e instala mostrando o progresso: o que está baixando, quantos MB de quanto, a velocidade, o que já estava instalado e o que falta.
+**Usuário:** cole o link deste repositório no Claude (app ou Claude Code) e peça *"instala"*. Ele mostra os termos de uso (sem o aceite nada é instalado), pergunta 3 coisas no chat e instala mostrando o progresso: o que está baixando, quantos MB de quanto, a velocidade, o que já estava instalado e o que falta.
 
 **Claude, siga exatamente isto quando alguém pedir para instalar a partir deste link:**
-1. **Pergunte no chat, de uma vez** (o instalador não consegue perguntar quando você o roda): (a) editor: DaVinci Resolve Studio, Premiere Pro, CapCut (beta) ou Final Cut Pro (beta); (b) motions: automático (HyperFrames) ou After Effects; (c) se pode mandar relatos anônimos de erro ao autor (sim/não); (d) só em Mac Apple Silicon: clonador de voz local (~5,5 GB, uso não comercial; padrão não).
+1. **Primeiro os termos:** mostre no chat o resumo dos [termos de uso](docs/TERMOS.md) (licença pessoal; erros e estrutura de motions vão anônimos ao autor; nome é opcional e perguntado à parte) e peça para a pessoa digitar **ACEITO**. Sem isso, PARE: nada é instalado. Nunca aceite por ela.
+   **Depois pergunte no chat, de uma vez** (o instalador não consegue perguntar quando você o roda): (a) editor: DaVinci Resolve Studio, Premiere Pro, CapCut (beta) ou Final Cut Pro (beta); (b) motions: automático (HyperFrames) ou After Effects; (c) só em Mac Apple Silicon: clonador de voz local (~5,5 GB, uso não comercial; padrão não).
 2. **Mac, app Claude com o painel Terminal** (ferramenta de rodar no Terminal do app): rode lá, numa aba visível, para o usuário ver o painel ao vivo, e acompanhe lendo a aba:
-   `OGAB_EDITOR=davinci OGAB_MOTION=hyperframes OGAB_RELATOS=s OGAB_VOZ_LOCAL=n bash -c "$(curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh)"`
-   (troque os valores pelas respostas: editor `davinci|premiere|capcut|finalcut`, motion `hyperframes|aftereffects`, `s|n`.)
+   `OGAB_ACEITO=sim OGAB_EDITOR=davinci OGAB_MOTION=hyperframes OGAB_VOZ_LOCAL=n bash -c "$(curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh)"`
+   (troque os valores pelas respostas: editor `davinci|premiere|capcut|finalcut`, motion `hyperframes|aftereffects`, voz `s|n`; `OGAB_ACEITO=sim` só depois do ACEITO da pessoa.)
 3. **Sem painel Terminal (Claude Code no terminal):** rode o mesmo comando **em segundo plano**, com a saída num arquivo, e a cada ~20-30 s rode `python3 ~/.claude/skills/ogab/scripts/instalador.py --status` e **cole a saída no chat dentro de um bloco de código** (é o painel: barra, MB, MB/s, prontos, fila). Pare quando ele disser `TERMINOU`. Não fique em silêncio: o usuário quer ver cada etapa.
 4. **Se aparecer `PRECISA_DO_USUARIO`:** é o Homebrew, que pede a senha do Mac. Peça para o usuário colar no app Terminal o comando mostrado, digitar a senha e avisar; depois rode o passo 2 ou 3 de novo. Nunca peça a senha no chat. A LUT na pasta do DaVinci também pode pedir senha: se falhar, passe o comando do resumo para o usuário rodar.
 5. **No fim:** mostre o resumo (instalados agora, já tinha, o que deu problema com o comando para repetir), o resultado do doctor e o que falta fazer à mão no editor escolhido; diga para reiniciar o Claude e digitar `/ogab comecar`. Log completo: `~/.claude/ogab-instalacao.log`.
@@ -129,6 +130,8 @@ Cole no **Terminal** do Mac:
 curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh | bash
 ```
 
+O instalador mostra primeiro os [termos de uso](docs/TERMOS.md): sem digitar **ACEITO**, nada é baixado nem instalado.
+
 No **Windows**, no PowerShell (usuário normal):
 
 ```powershell
@@ -141,7 +144,7 @@ Se baixou o arquivo `install.ps1` em vez de usar o comando acima, rode com `powe
 ```powershell
 $env:OGAB_EDITOR = 'davinci'      # ou premiere (CapCut e Final Cut só no Mac)
 $env:OGAB_MOTION = 'hyperframes'  # ou aftereffects
-$env:OGAB_RELATOS = 'sim'         # ou nao
+$env:OGAB_ACEITO = 'sim'          # só depois que a pessoa digitou ACEITO nos termos
 irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
 ```
 ```powershell
@@ -369,6 +372,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/serif-azul/exemplo.gif" width="150" alt="Serif azul">&nbsp;
 <img src="presets/lume/exemplo.gif" width="150" alt="Lume">&nbsp;
 <img src="presets/launch/exemplo.gif" width="150" alt="Launch">&nbsp;
+<img src="presets/painel/exemplo.gif" width="150" alt="Painel">&nbsp;
 <img src="presets/grafico/exemplo.gif" width="150" alt="Gráfico">&nbsp;
 <img src="presets/marco/exemplo.gif" width="150" alt="Marco">&nbsp;
 <img src="presets/logo-reveal/exemplo.gif" width="150" alt="Logo reveal">&nbsp;
@@ -411,6 +415,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **LENTE** ([guia](presets/lente/PRESET.md)) | Efeitos de câmera no próprio vídeo: zoom rápido no rosto na palavra forte (o recorte acompanha, então o PALCO continua atrás). Em seguida: foco de luz, congelar com etiqueta, antes e depois, transição com desfoque e encolher para dentro de uma janela. Família CENA | <img src="presets/lente/exemplo.gif" width="160" alt="Exemplo do preset Lente"> |
 | **BANCADA** ([guia](presets/bancada/PRESET.md)) | Em construção: tela verde para comentário, você recortado embaixo, o assunto atrás, gancho fixo no topo e o número circulado à mão. Família CENA | |
 | **LAUNCH** ([guia](presets/launch/PRESET.md)) | Filme de lançamento de produto com acabamento premium, na linguagem dos filmes de produto da Apple: fundo preto, uma ideia por cena, frases entrando por máscara com curvas longas que freiam no fim, logo nascendo com contraluz e brilho, o seu site ou app de verdade num painel de vidro flutuando em 3D com reflexo e luz passando, recursos um por vez e fecho limpo. O Gab captura o site sozinho (página inteira, cor da marca). Três letras: **apple**, **editorial** e **cinema**. Para lançar curso, app, SaaS ou site | <img src="presets/launch/exemplo.gif" width="160" alt="Exemplo do preset Launch"> |
+| **PAINEL** ([guia](presets/painel/PRESET.md)) | Apresentação de app e fintech: fundo navy contínuo com uma cor de destaque, linha de gráfico que se desenha com a ponta acesa, frase empilhada, cartões de interface em 3D com números rolando e câmera que mergulha, disco da cor cobrindo a tela, palavra que nasce do chão e vira gráfico, caos virando grade e fecho com a marca. Para lançamento de app, banco digital, investimento, painel/SaaS | <img src="presets/painel/exemplo.gif" width="160" alt="Exemplo do preset Painel"> |
 | **GRÁFICO** ([guia](presets/grafico/PRESET.md)) | Dado animado com acabamento premium: barras, linha, rosca ou comparação crescendo com curvas que freiam no fim, o valor EXATO que você aprovou contando até o número certo, um destaque na cor da marca e a fonte do dado sempre na tela (sem fonte, o Gab nem gera). Para "X% dos...", crescimento, ranking, antes e depois | <img src="presets/grafico/exemplo.gif" width="160" alt="Exemplo do preset Gráfico"> |
 | **MARCO** ([guia](presets/marco/PRESET.md)) | Milhares de pontos girando no escuro se juntam e desenham o seu número ("10 mil alunos", "1 milhão de views", "+10 anos"); o número nítido assenta por cima e a frase sobe. Combina com o POINT CLOUD | <img src="presets/marco/exemplo.gif" width="160" alt="Exemplo do preset Marco"> |
 | **LOGO REVEAL** ([guia](presets/logo-reveal/PRESET.md)) | Abertura de marca de 5-8 s: fio de luz que se abre e revela o logo, fios que desenham a moldura, ou pontos que se juntam no desenho do logo; contraluz, brilho atravessando e a frase da marca. Para abrir institucional, vinheta e fim de anúncio | <img src="presets/logo-reveal/exemplo.gif" width="160" alt="Exemplo do preset Logo reveal"> |

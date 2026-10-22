@@ -25,6 +25,30 @@ function Py { & py.exe -3 @args }
 
 if ($env:OS -ne "Windows_NT") { Write-Host "Este instalador e para Windows. No Mac use o install.sh."; return }
 
+# Termos de uso (regra do autor, 22/10/2026): sem o aceite nada e baixado nem instalado. Texto em docs/TERMOS.md.
+Write-Host @"
+
+TERMOS DE USO DO GAB (/ogab), versao 1
+- Licenca pessoal de uso do Gab nos seus videos e nos dos seus clientes (os videos sao seus).
+  Revender ou distribuir a skill depende de autorizacao do autor (Gabriel Reis).
+- Para melhorar a skill, o Gab envia ao autor, de forma ANONIMA, os erros da skill que ele corrigir e a
+  estrutura dos motions novos que voce criar. Nunca sai video, roteiro, cliente, senha, chave ou dado pessoal.
+- Se apresentar com o nome e opcional e perguntado a parte.
+- Programas de terceiros (DaVinci, Premiere, ElevenLabs...) tem licencas proprias. Sem garantia.
+Texto completo: https://github.com/gabrielxreis/ogab/blob/main/docs/TERMOS.md
+"@
+if ($env:OGAB_ACEITO -ne "sim") {
+  if ([Environment]::UserInteractive -and -not [Console]::IsInputRedirected) {
+    $resp = Read-Host "  Sem o aceite, nada e instalado. Para aceitar, digite ACEITO"
+    if ($resp.Trim().ToUpper() -notin @("ACEITO", "ACEITA", "ACEITE")) {
+      Write-Host "  Instalacao cancelada: os termos nao foram aceitos. Nada foi instalado."; return }
+  } else {
+    Write-Host "  PRECISA_DO_USUARIO: mostre os termos acima a pessoa. So se ela digitar ACEITO, rode de novo com OGAB_ACEITO=sim."
+    Write-Host "  Nada foi instalado."; return
+  }
+}
+Ok "termos aceitos"
+
 Info "1/10 winget"
 if (-not (Tem winget)) {
   Warn "winget nao encontrado. Instale o 'App Installer' pela Microsoft Store e rode de novo."
@@ -121,15 +145,9 @@ if (-not $motion) { $motion = "hyperframes" }
 Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['motion']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $motion
 Ok "motions: $motion (para trocar: /ogab config motion hyperframes|aftereffects)"
 
-# Relatos de erro anonimos (pergunta UMA vez; sem resposta "sim" nada sai da maquina). Ver relatos/LEIA.md.
-$cfgJ = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
-if (($null -eq $cfgJ.relatos) -or (($cfgJ.relatos -eq $true) -and ([int]($cfgJ.relatos_v) -lt 2))) {
-  $rel = if ($env:OGAB_RELATOS) { $env:OGAB_RELATOS } else {
-    Write-Host "`n  Posso mandar ao Gabriel, de forma ANONIMA, os erros da skill que o Gab corrigir e a estrutura`n  dos motions novos que voce salvar, para ele melhorar o Gab e publicar os melhores para todos?`n  (nada de video, roteiro, texto do cliente, cor da marca, nome ou pasta)."
-    Read-Host "  Enviar? [S/n]" }
-  if ($rel -match "^[nN]") { Py (Join-Path $DEST "scripts\relatar.py") consentir nao | Out-Null; Ok "relatos: nao (para ligar: /ogab config relatos sim)" }
-  else { Py (Join-Path $DEST "scripts\relatar.py") consentir sim | Out-Null; Ok "relatos anonimos: sim (para desligar: /ogab config relatos nao)" }
-}
+# Aceite dos termos gravado no config (inclui os relatos anonimos, secao 2 de docs/TERMOS.md)
+Py (Join-Path $DEST "scripts\termos.py") aceitar | Out-Null
+Ok "termos gravados (relatos anonimos fazem parte da licenca)"
 
 Info "5/10 Ambiente do Windows (Resolve, Python, atalho python3)"
 $api  = Join-Path $env:PROGRAMDATA "Blackmagic Design\DaVinci Resolve\Support\Developer\Scripting"
