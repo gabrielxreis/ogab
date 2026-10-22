@@ -557,6 +557,58 @@ class Rascunho:
         self.j["duration"] = max((o["target_timerange"]["start"] + o["target_timerange"]["duration"]
                                   for tr in self.j["tracks"] for o in tr["segments"]), default=0)
 
+    def _mat_texto(self, sid):
+        m = self._mat(self.segmento(sid)[1]["material_id"])
+        if not m or m.get("type") != "text":
+            raise ValueError(f"{sid} não é texto simples")
+        return m
+
+    def trocar_texto(self, sid, texto):
+        """Troca o texto mantendo estilo, posição e tempo."""
+        m = self._mat_texto(sid)
+        c = json.loads(m["content"])
+        c["text"] = texto
+        for st in c.get("styles", []):
+            st["range"] = [0, len(texto)]
+        m["content"] = json.dumps(c, ensure_ascii=False)
+        return sid
+
+    def estilo_texto(self, sid, tamanho=None, cor=None, contorno=None, contorno_largura=None, negrito=None,
+                     fonte=None, y=None, x=None, largura_max=None):
+        """Muda o estilo de um texto já na timeline (tamanho, cor, contorno, negrito, fonte .ttf, posição)."""
+        m = self._mat_texto(sid)
+        c = json.loads(m["content"])
+        for st in c.get("styles", []) or [{}]:
+            if tamanho is not None:
+                st["size"] = tamanho
+            if cor is not None:
+                st.setdefault("fill", {"alpha": 1.0, "content": {"render_type": "solid", "solid": {"alpha": 1.0}}})
+                st["fill"]["content"]["solid"]["color"] = _hex(cor)
+            if negrito is not None:
+                st["bold"] = bool(negrito)
+            if contorno is not None or contorno_largura is not None:
+                if contorno == "" or contorno is False:
+                    st.pop("strokes", None)
+                else:
+                    velho = (st.get("strokes") or [{}])[0]
+                    st["strokes"] = [{"content": {"solid": {"alpha": 1.0, "color": _hex(contorno) if contorno else
+                                      velho.get("content", {}).get("solid", {}).get("color", [0, 0, 0])}},
+                                      "width": contorno_largura if contorno_largura is not None else velho.get("width", .08)}]
+            if fonte:
+                f = self._trazer(fonte)
+                st["font"] = {"id": "", "path": f}
+                m.update(font_path=f, font_name=os.path.splitext(os.path.basename(f))[0])
+        m["content"] = json.dumps(c, ensure_ascii=False)
+        if tamanho is not None:
+            m["font_size"] = tamanho
+        if cor is not None:
+            m["text_color"] = cor.upper()
+        if largura_max is not None:
+            m["line_max_width"] = largura_max
+        if x is not None or y is not None:
+            self.transformar(sid, x=x, y=y)
+        return sid
+
     def desligar(self, sid, ligado=False):
         """Esconde o clipe sem apagar (estilo do Gabriel: desligar em vez de apagar)."""
         self.segmento(sid)[1]["visible"] = ligado
@@ -616,6 +668,10 @@ class Rascunho:
         pre = "texto" if texto else "video"
         d_in = d_out = 0
         if legenda:
+            # 22/10/2026 (CapCut 9.4/9.5): gravada assim aparece como "Perda da animação" e o app não baixa o arquivo
+            # (entrada/saída/loop de texto baixam). Deve precisar do tempo de cada palavra que só a legenda automática
+            # do CapCut grava. Até descobrir o formato, recusa em vez de deixar o texto quebrado.
+            raise NotImplementedError("animação de legenda (caption) ainda não carrega no CapCut: use entrada= ou loop=")
             if not texto:
                 raise ValueError("Animação de legenda é só para texto")
             m = _loja("texto_anim", legenda, "caption")
@@ -816,6 +872,28 @@ class Rascunho:
                 refs.append(r)
         n["extra_material_refs"] = refs
         n["common_keyframes"] = []
+        return n
+
+    def religar(self, velho, novo, deslocamento=0.0):
+        """Troca a mídia `velho` por `novo` em todos os clipes, somando `deslocamento` (s) ao ponto de entrada.
+        Uso: trecho baixado à parte (começa em 1551 s do original) -> religar(trecho, original, 1551)."""
+        novo = self._trazer(novo)
+        total, w, h, aud = _sonda(novo)
+        ids = set()
+        for lista in ("videos", "audios"):
+            for m in self.j["materials"].get(lista, []):
+                if m.get("path") and os.path.basename(m["path"]) == os.path.basename(velho):
+                    m.update(path=novo, duration=_us(total))
+                    if "material_name" in m: m["material_name"] = os.path.basename(novo)
+                    if "name" in m: m["name"] = os.path.basename(novo)
+                    ids.add(m["id"])
+        n = 0
+        for t in self.j["tracks"]:
+            for s in t["segments"]:
+                if s["material_id"] in ids and s.get("source_timerange"):
+                    s["source_timerange"]["start"] += _us(deslocamento)
+                    n += 1
+        self._no_pool(novo, "video", _us(total), w, h)
         return n
 
     def silencios(self, sid, ruido_db=-30, minimo=0.4):

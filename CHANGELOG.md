@@ -5,6 +5,9 @@
 - **Cortes de vídeo longo no CapCut:** `capcut.py cortes` cria um rascunho vertical por corte (fundo desfocado, gancho no topo, legenda embaixo) a partir da fábrica de cortes.
 - **Cortes de link do YouTube mais rápidos:** `scripts/vtt_transcricao.py` usa a legenda automática do YouTube como transcrição, para escolher os cortes antes do vídeo terminar de baixar.
 - **Fábrica de cortes:** o fim do corte não pega mais o começo da palavra seguinte, e o `conferir` aceita o mesmo `--pausa` do `frases` (antes os S1, S2... apontavam para outras frases).
+- **CapCut, um comando por ação:** `capcut.py faz "<rascunho ou CORTE*>" <ação> ...` roda qualquer ação (texto, transição, filtro, máscara, zoom, keyframes, adesivo, voz...) em um ou vários rascunhos de uma vez, encadeando com `+`. Seletores curtos no lugar dos ids (`@v0:2`, `@v0:todos`, `@em=12.5`, `@texto=Lula`); `capcut.py ids` mostra o seletor de cada clipe, `ops` lista as ações, `catalogo` e `loja` acham os nomes. Novas: `estilo_texto` (muda tamanho/cor/fonte/posição da legenda de todos os cortes num comando) e `trocar_texto`.
+- **CapCut, recursos conferidos no app:** transição, filtro, efeito, adesivo, máscara, animação de entrada de vídeo, entrada e loop de texto e efeito de voz funcionam. Animação de legenda da loja ainda não (o Gab avisa em vez de gravar).
+- **Prévia em lote:** `capcut.py previa "CORTE*" <pasta>` renderiza vários rascunhos em paralelo.
 
 ## 2026.10.22-4 (22/10/2026)
 - **Suas invenções ajudam todo mundo:** além dos motions novos, o Gab agora também encontra os scripts novos e as melhorias que você (ou o Claude) fizer nos arquivos da skill e manda ao Gabriel, anônimo, para virar novidade para todos. Por isso os termos foram para a versão 2, e o Gab pede o aceite de novo uma vez.

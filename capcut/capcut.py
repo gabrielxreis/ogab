@@ -4,12 +4,24 @@
     python3 capcut.py retrato "<rascunho>" [--json saida.json]
     python3 capcut.py plano plano.json [--projeto-fechado]      monta/edita um rascunho a partir de um plano JSON
     python3 capcut.py cortes cortes.json <video> --transcricao t.json [--prefixo "CORTE"] [--correcoes c.json]
+                     [--credito "Fonte"] [--secoes secoes.txt] [--tam-titulo 17] [--tam-legenda 11]
                                                                um rascunho vertical por corte (fabrica_cortes.py)
     python3 capcut.py previa "<rascunho>" saida.mp4 [--ate 10] [--escala 0.5]
+    python3 capcut.py previa "DEBATE*" <pasta> [--paralelo 3]  vários rascunhos de uma vez
                                                                renderiza o rascunho SEM o CapCut (ffmpeg + Pillow)
     python3 capcut.py conferir "<rascunho>"                     mídia offline, efeitos sem arquivo, buracos na V1
     python3 capcut.py abrir "<rascunho>"                        põe o rascunho no topo da tela inicial e abre o CapCut
     python3 capcut.py fechar                                    fecha o CapCut (ele salva o que estiver aberto)
+
+Comandos rápidos (uma ação = um comando, em 1 ou vários rascunhos):
+    python3 capcut.py ops                                       todas as ações com os parâmetros
+    python3 capcut.py ids "<rascunho>"                          segmentos com o seletor de cada um (@v0:2, @t1:0...)
+    python3 capcut.py faz "<rascunho|CORTE*|A,B>" <ação> [@seletor] [args] [chave=valor] [+ outra ação ...]
+        faz "CORTE*" estilo_texto @t2:todos tamanho=12 cor='"#FFE600"'      legenda de todos os cortes
+        faz "CORTE 01*" transicao @v0:todos Dissolve dur=0.3 + zoom @v0:0 1 1.08
+        faz "CORTE 03*" trocar_texto @texto=Vot "Vota em mim"
+    python3 capcut.py catalogo [grupo] [busca]                  transições, animações, efeitos, máscaras
+    python3 capcut.py loja [grupo] [busca] [--tipo in]          filtros, adesivos, modelos de texto, vozes, fontes
 
 Plano JSON (cada op é um método do Rascunho da capcut_lib; "id" guarda o segmento para usar depois como "$id"):
     {"nome": "Reels 01", "w": 1080, "h": 1920, "fps": 30, "substituir": true,
@@ -137,12 +149,27 @@ def legenda_dos_trechos(ws, trechos, cor=None, max_pal=4, max_car=22):
     return [(round(a, 3), round(b, 3), t.replace(">>", "").strip()) for a, b, t in blocos if t.replace(">>", "").strip()]
 
 
+def _secoes(arq):
+    """secoes.txt ("NN inicio fim" por linha, arquivos trecho_NN.mp4 ao lado): trechos baixados à parte
+    (yt-dlp --download-sections ... --force-keyframes-at-cuts). Devolve {NN: (arquivo, deslocamento)}."""
+    base = os.path.dirname(os.path.abspath(arq))
+    out = {}
+    for l in open(arq):
+        if l.strip():
+            n, a, _ = l.split()
+            out[int(n)] = (os.path.join(base, f"trecho_{n}.mp4"), float(a))
+    return out
+
+
 def cortes(cortes_json, video, transcricao, prefixo="CORTE", correcoes=None, credito="", fonte_titulo=None,
-           fonte_legenda=None, escala=1.3, projeto_fechado=False):
+           fonte_legenda=None, escala=1.3, projeto_fechado=False, secoes=None, tam_titulo=17, tam_legenda=11):
+    """video: o original inteiro (material bruto). secoes: secoes.txt quando só os trechos chegaram;
+    depois, com o original baixado, Rascunho.religar() troca sem mexer na edição."""
     lista = json.load(open(cortes_json))
     pasta = os.path.join(os.path.dirname(os.path.abspath(cortes_json)), "cortes")
     cor = json.load(open(correcoes)) if correcoes else {}
     ws = _palavras(transcricao)
+    secoes = _secoes(secoes) if secoes else {}
     fonte_titulo = fonte_titulo or os.path.expanduser("~/Library/Fonts/Anton-Regular.ttf")
     fonte_legenda = fonte_legenda or FONTE_PADRAO
     for c in lista:   # mesma ordem do fabrica_cortes.py conferir (média das notas, estável) = cortes/NN.json
@@ -155,19 +182,20 @@ def cortes(cortes_json, video, transcricao, prefixo="CORTE", correcoes=None, cre
         nome = f"{prefixo} {k:02d} - {c['titulo']}"
         d = C.novo(nome, 1080, 1920, 30, substituir=True)
         t = 0.0
+        arq, desl = secoes.get(k, (video, 0.0))
         for a, b in plano_c["trechos"]:
-            sid = d.video(video, t, de=a, ate=b, trilha=0, escala=escala)
+            sid = d.video(arq, t, de=a - desl, ate=b - desl, trilha=0, escala=escala)
             d.fundo(sid, desfoque=0.6)
             t += b - a
         total = t
         # título (gancho) no topo, o corte inteiro
-        d.texto(c.get("gancho", c["titulo"]).upper(), 0, total, trilha=0, tamanho=13, cor="#FFFFFF",
+        d.texto(c.get("gancho", c["titulo"]).upper(), 0, total, trilha=0, tamanho=tam_titulo, cor="#FFFFFF",
                 contorno="#000000", contorno_largura=0.12, fonte=fonte_titulo, y=1500, largura_max=0.86)
         if credito:
-            d.texto(credito, 0, total, trilha=1, tamanho=5, cor="#FFFFFF", fonte=fonte_legenda, y=1385,
+            d.texto(credito, 0, total, trilha=1, tamanho=5, cor="#FFFFFF", fonte=fonte_legenda, y=230,
                     largura_max=0.9)
         for a, b, txt in legenda_dos_trechos(ws, plano_c["trechos"], cor):
-            d.texto(txt, a, b - a, trilha=2, tamanho=9, cor="#FFFFFF", contorno="#000000", contorno_largura=0.1,
+            d.texto(txt, a, b - a, trilha=2, tamanho=tam_legenda, cor="#FFFFFF", contorno="#000000", contorno_largura=0.1,
                     negrito=True, fonte=fonte_legenda, y=470)
         d.salvar(projeto_fechado=projeto_fechado or not C.capcut_aberto())
         feitos.append((nome, total))
@@ -404,6 +432,133 @@ def previa(nome, saida, ate=None, escala=1.0):
     return saida
 
 
+# ---------------------------------------------------------------- comandos rápidos (faz / ids / ops)
+TIPOS = {"v": "video", "t": "text", "a": "audio", "e": "effect", "f": "filter", "s": "sticker"}
+
+
+def _valor(v):
+    try:
+        return json.loads(v)
+    except Exception:
+        return v
+
+
+def _nomes(padrao):
+    """'CORTE*' (curinga), 'A,B' (lista) ou nome exato."""
+    import fnmatch
+    todos = [n for n, *_ in C.rascunhos()]
+    achados = []
+    for p in padrao.split(","):
+        p = p.strip()
+        achados += [n for n in todos if fnmatch.fnmatchcase(n, p)] if any(c in p for c in "*?[") else [p]
+    if not achados:
+        raise SystemExit(f"nenhum rascunho com '{padrao}'")
+    return list(dict.fromkeys(achados))
+
+
+def alvos(d, sel):
+    """Seletor -> lista de ids de segmento.
+    @v0:2  vídeo trilha 0, segmento 2 (0 = primeiro, -1 = último)   @v0:todos (ou '@v0:*')  todos da trilha   @t*:*  todos os textos
+    @t1:2-5  intervalo   @em=12.5  segmento da V1 nesse segundo   @texto=palavra  textos que contêm a palavra
+    Sem @: id literal."""
+    if not isinstance(sel, str) or not sel.startswith("@"):
+        return [sel]
+    sel = sel[1:].replace(":todos", ":*").replace("todos:", "*:")   # zsh expande '*': @v0:todos = @v0:*
+    if sel.startswith("em="):
+        t = float(sel[3:]) * US
+        v1 = next(tr for tr in d.j["tracks"] if tr["type"] == "video")
+        return [s["id"] for s in v1["segments"]
+                if s["target_timerange"]["start"] <= t < s["target_timerange"]["start"] + s["target_timerange"]["duration"]]
+    if sel.startswith("texto="):
+        busca = sel[6:].lower()
+        out = []
+        for tr in d.j["tracks"]:
+            if tr["type"] == "text":
+                for s in tr["segments"]:
+                    m = d._mat(s["material_id"]) or {}
+                    if m.get("type") == "text" and busca in json.loads(m["content"]).get("text", "").lower():
+                        out.append(s["id"])
+        return out
+    m = re.fullmatch(r"([vtaefs])(\d+|\*):(\*|-?\d+(?:-\d+)?)", sel)
+    if not m:
+        raise SystemExit(f"seletor inválido: @{sel} (ex.: @v0:2, @t1:*, @em=12.5, @texto=Lula)")
+    tipo, n, i = TIPOS[m.group(1)], m.group(2), m.group(3)
+    trilhas = [tr for tr in d.j["tracks"] if tr["type"] == tipo]
+    trilhas = trilhas if n == "*" else trilhas[int(n):int(n) + 1]
+    out = []
+    for tr in trilhas:
+        segs = sorted(tr["segments"], key=lambda s: s["target_timerange"]["start"])
+        if i == "*":
+            out += [s["id"] for s in segs]
+        elif re.fullmatch(r"\d+-\d+", i):
+            a, b = map(int, i.split("-")); out += [s["id"] for s in segs[a:b + 1]]
+        else:
+            out += [segs[int(i)]["id"]] if segs else []
+    return out
+
+
+def faz(padrao, args, projeto_fechado=False):
+    """Uma ou mais ações (separadas por '+') em um ou vários rascunhos; salva cada rascunho uma vez.
+    capcut.py faz "CORTE*" fundo @v0:* desfoque=0.6 + estilo_texto @t2:* tamanho=12"""
+    acoes, cur = [], []
+    for x in args:
+        if x == "+":
+            acoes.append(cur); cur = []
+        else:
+            cur.append(x)
+    acoes.append(cur)
+    if C.capcut_aberto() and not projeto_fechado:
+        print("aviso: CapCut aberto; se um destes rascunhos estiver aberto nele, a edição será sobrescrita")
+    for nome in _nomes(padrao):
+        d = C.abrir(nome)
+        feitos = 0
+        for acao in acoes:
+            if not acao:
+                continue
+            metodo = getattr(d, acao[0], None)
+            if metodo is None or acao[0].startswith("_"):
+                raise SystemExit(f"'{acao[0]}' não existe. capcut.py ops lista as ações")
+            pos = [a for a in acao[1:] if not re.match(r"^[a-z_]+=", a)]
+            kw = {k: _valor(v) for k, v in (a.split("=", 1) for a in acao[1:] if re.match(r"^[a-z_]+=", a))}
+            ids_alvo = alvos(d, pos[0]) if pos and isinstance(pos[0], str) and pos[0].startswith("@") else None
+            resto = [_valor(p) for p in (pos[1:] if ids_alvo is not None else pos)]
+            for sid in (ids_alvo if ids_alvo is not None else [None]):
+                metodo(*([sid] if sid else []), *resto, **kw)
+                feitos += 1
+        d.salvar(projeto_fechado=True)
+        print(f"{nome}: {feitos} ação(ões)")
+
+
+def ids(nome):
+    d = C.abrir(nome)
+    letra = {v: k for k, v in TIPOS.items()}
+    cont = {}
+    for tr in d.j["tracks"]:
+        k = letra.get(tr["type"], tr["type"][0]); n = cont.get(k, 0); cont[k] = n + 1
+        print(f"{k}{n} ({tr['type']})")
+        for i, s in enumerate(sorted(tr["segments"], key=lambda s: s["target_timerange"]["start"])):
+            a = s["target_timerange"]["start"] / US; b = a + s["target_timerange"]["duration"] / US
+            m = d._mat(s["material_id"]) or {}
+            nome_m = json.loads(m["content"]).get("text", "") if m.get("type") == "text" else \
+                (m.get("material_name") or m.get("name") or m.get("type", ""))
+            print(f"  @{k}{n}:{i:<3} {a:7.2f}-{b:7.2f}  {str(nome_m)[:50]}")
+
+
+def ops():
+    import inspect
+    print("Ações (capcut.py faz \"<rascunho|CORTE*>\" <ação> [@seletor] [args] [chave=valor] [+ outra ação]):")
+    for n, f in inspect.getmembers(C.Rascunho, inspect.isfunction):
+        if n.startswith("_") or n in ("salvar", "segmento", "retrato"):
+            continue
+        sig = str(inspect.signature(f)).replace("self, ", "").replace("(self)", "()")
+        sig = re.sub(r"\bsid\b", "@alvo", sig)
+        doc = (f.__doc__ or "").strip().splitlines()[0] if f.__doc__ else ""
+        print(f"  {n}{sig}\n      {doc}")
+    print("\nSeletores:", alvos.__doc__.split("\n", 1)[1])
+    print("Nomes de transição/animação/efeito/máscara: capcut.py catalogo <grupo> [busca]")
+    print("Filtros, adesivos, modelos de texto, vozes, fontes da loja: capcut.py loja <grupo> [busca] [--tipo in|out|loop|caption]")
+
+
 # ---------------------------------------------------------------- CLI
 def main(a):
     op = lambda k, d=None: a[a.index(k) + 1] if k in a else d
@@ -423,13 +578,45 @@ def main(a):
         plano(a[1], "--projeto-fechado" in a)
     elif cmd == "cortes":
         cortes(a[1], a[2], op("--transcricao"), op("--prefixo", "CORTE"), op("--correcoes"), op("--credito", ""),
-               op("--fonte-titulo"), op("--fonte-legenda"), float(op("--escala", 1.3)), "--projeto-fechado" in a)
+               op("--fonte-titulo"), op("--fonte-legenda"), float(op("--escala", 1.3)), "--projeto-fechado" in a,
+               op("--secoes"), float(op("--tam-titulo", 17)), float(op("--tam-legenda", 11)))
     elif cmd == "previa":
-        previa(a[1], a[2], float(op("--ate")) if op("--ate") else None, float(op("--escala", 1.0)))
+        nomes = _nomes(a[1])
+        ate, esc = (float(op("--ate")) if op("--ate") else None), float(op("--escala", 1.0))
+        if len(nomes) == 1 and a[2].lower().endswith(".mp4"):
+            previa(nomes[0], a[2], ate, esc)
+        else:   # vários rascunhos -> uma pasta, em paralelo
+            from concurrent.futures import ThreadPoolExecutor
+            os.makedirs(a[2], exist_ok=True)
+            def um(n):
+                try:
+                    previa(n, os.path.join(a[2], n + ".mp4"), ate, esc); return f"ok {n}"
+                except SystemExit as e:
+                    return f"FALHOU {n}: {str(e)[-300:]}"
+            with ThreadPoolExecutor(int(op("--paralelo", 3))) as ex:
+                for r in ex.map(um, nomes):
+                    print(r)
     elif cmd == "conferir":
         sys.exit(1 if conferir(a[1]) else 0)
     elif cmd == "abrir":
         abrir_no_app(a[1])
+    elif cmd == "faz":
+        faz(a[1], [x for x in a[2:] if x != "--projeto-fechado"], "--projeto-fechado" in a)
+    elif cmd == "ids":
+        ids(a[1])
+    elif cmd == "ops":
+        ops()
+    elif cmd == "catalogo":
+        if len(a) < 2:
+            print("grupos:", ", ".join(g for g in C.CATALOGO if not g.startswith("_")))
+        else:
+            print("\n".join(C.catalogo(a[1], a[2] if len(a) > 2 and not a[2].startswith("--") else "")))
+    elif cmd == "loja":
+        if len(a) < 2:
+            print("grupos:", ", ".join(f"{g} ({len(v)})" for g, v in C.LOJA.items()))
+        else:
+            r = C.loja(a[1], a[2] if len(a) > 2 and not a[2].startswith("--") else "", op("--tipo"))
+            print("\n".join(r[:int(op("--max", 80))]), f"\n({len(r)} itens)")
     elif cmd == "fechar":
         print("fechado" if C.fechar_capcut() else "não fechou (diálogo aberto no CapCut?)")
     else:
