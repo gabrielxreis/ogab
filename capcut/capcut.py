@@ -6,7 +6,7 @@
     python3 capcut.py cortes cortes.json <video> --transcricao t.json [--prefixo "CORTE"] [--correcoes c.json]
                      [--credito "Fonte"] [--secoes secoes.txt] [--tam-titulo 17] [--tam-legenda 11]
                                                                um rascunho vertical por corte (fabrica_cortes.py)
-    python3 capcut.py previa "<rascunho>" saida.mp4 [--ate 10] [--escala 0.5]
+    python3 capcut.py previa "<rascunho>" saida.mp4 [--ate 10] [--escala 0.5] [--lufs -14|nao]
     python3 capcut.py previa "DEBATE*" <pasta> [--paralelo 3]  vários rascunhos de uma vez
                                                                renderiza o rascunho SEM o CapCut (ffmpeg + Pillow)
     python3 capcut.py conferir "<rascunho>"                     mídia offline, efeitos sem arquivo, buracos na V1
@@ -311,7 +311,7 @@ def _txt_png(mat, seg, W, H, png):
     img.save(png)
 
 
-def previa(nome, saida, ate=None, escala=1.0):
+def previa(nome, saida, ate=None, escala=1.0, lufs=-14.0):
     d = C.abrir(nome)
     j = d.j
     W, H = int(d.W * escala) // 2 * 2, int(d.H * escala) // 2 * 2
@@ -415,7 +415,8 @@ def previa(nome, saida, ate=None, escala=1.0):
         filtros.append(f); rotulos.append(f"[a{k}]")
     mapa = ["-map", f"[{atual}]"]
     if rotulos:
-        filtros.append("".join(rotulos) + f"amix=inputs={len(rotulos)}:normalize=0:dropout_transition=0,atrim=0:{dur:.3f}[aout]")
+        norm = f",loudnorm=I={lufs}:TP=-1.5:LRA=11" if lufs is not None else ""   # rede social: -14 LUFS (regra da /ogab)
+        filtros.append("".join(rotulos) + f"amix=inputs={len(rotulos)}:normalize=0:dropout_transition=0{norm},aresample=48000,atrim=0:{dur:.3f}[aout]")
         mapa += ["-map", "[aout]"]
     script = os.path.join(tmp, "filtros.txt")
     open(script, "w").write(";\n".join(filtros))
@@ -583,14 +584,15 @@ def main(a):
     elif cmd == "previa":
         nomes = _nomes(a[1])
         ate, esc = (float(op("--ate")) if op("--ate") else None), float(op("--escala", 1.0))
+        lufs = None if op("--lufs") == "nao" else float(op("--lufs", -14))
         if len(nomes) == 1 and a[2].lower().endswith(".mp4"):
-            previa(nomes[0], a[2], ate, esc)
+            previa(nomes[0], a[2], ate, esc, lufs)
         else:   # vários rascunhos -> uma pasta, em paralelo
             from concurrent.futures import ThreadPoolExecutor
             os.makedirs(a[2], exist_ok=True)
             def um(n):
                 try:
-                    previa(n, os.path.join(a[2], n + ".mp4"), ate, esc); return f"ok {n}"
+                    previa(n, os.path.join(a[2], n + ".mp4"), ate, esc, lufs); return f"ok {n}"
                 except SystemExit as e:
                     return f"FALHOU {n}: {str(e)[-300:]}"
             with ThreadPoolExecutor(int(op("--paralelo", 3))) as ex:
