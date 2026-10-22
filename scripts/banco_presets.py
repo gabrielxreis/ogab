@@ -10,7 +10,7 @@ inteiro e publica os bons para todo mundo no próximo update. Assim a biblioteca
   python3 banco_presets.py catalogo                      # refaz biblioteca_motions/CATALOGO.md (o banco inteiro)
 
 De onde vem: a planilha "Relatos do Gab (respostas)" (relatos/destino.json). Leitura pelo `gws` (Google Workspace
-CLI logado na conta do dono) ou, se o gws não estiver logado, por um CSV baixado no Chrome logado:
+CLI logado numa conta que enxerga a planilha; basta Leitor) ou, se o gws não estiver logado, por um CSV baixado no Chrome logado:
   https://docs.google.com/spreadsheets/d/<planilha_id>/export?format=csv&gid=<aba_gid>
 Só entram as linhas de `tipo` preset que ainda não foram resolvidas (relatos.py resolvidos). Partes do mesmo motion
 (pacote HyperFrames em até 4 relatos) são juntadas pela assinatura; motion enviado por várias máquinas conta "vezes".
@@ -67,7 +67,9 @@ def linhas(csv_arq=None):
             d = _destino()
             raise SystemExit(
                 "Não consegui ler a planilha pelo gws (" + str(e)[:160] + ").\n"
-                "Opção 1: logar de novo no terminal: gws auth login --scopes drive,spreadsheets\n"
+                "Opção 1: logar no terminal com a conta que enxerga a planilha (ou compartilhar a planilha como Leitor "
+                "com a conta do gws; 403 = essa conta não tem acesso):\n  gws auth login --scopes "
+                "https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/spreadsheets\n"
                 "Opção 2: no Chrome logado na conta da planilha, baixar o CSV e rodar com --csv:\n  "
                 f"https://docs.google.com/spreadsheets/d/{d['planilha_id']}/export?format=csv&gid={d.get('aba_gid', '0')}")
     if not brutas:
