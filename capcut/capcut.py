@@ -5,6 +5,7 @@
     python3 capcut.py plano plano.json [--projeto-fechado]      monta/edita um rascunho a partir de um plano JSON
     python3 capcut.py cortes cortes.json <video> --transcricao t.json [--prefixo "CORTE"] [--correcoes c.json]
                      [--credito "Fonte"] [--secoes secoes.txt] [--tam-titulo 17] [--tam-legenda 11]
+                     [--anim-legenda <nome ou id da loja>]   legenda já sai com o tempo real de cada palavra
                                                                um rascunho vertical por corte (fabrica_cortes.py)
     python3 capcut.py previa "<rascunho>" saida.mp4 [--ate 10] [--escala 0.5] [--lufs -14|nao]
     python3 capcut.py previa "DEBATE*" <pasta> [--paralelo 3]  vários rascunhos de uma vez
@@ -21,6 +22,10 @@ Comandos rápidos (uma ação = um comando, em 1 ou vários rascunhos):
         faz "CORTE 01*" transicao @v0:todos Dissolve dur=0.3 + zoom @v0:0 1 1.08
         faz "CORTE 03*" trocar_texto @texto=Vot "Vota em mim"
     python3 capcut.py catalogo [grupo] [busca]                  transições, animações, efeitos, máscaras
+    python3 capcut.py validar criar <grupo> [--n 40] [--busca x]  rascunho com N itens da loja para o app testar
+    python3 capcut.py validar ler                               lê o que o app baixou -> validados.json
+        grupos: legenda, texto_entrada, texto_saida, texto_loop, modelos_texto, modelos_legenda, filtros,
+                adesivos, efeitos_loja, video_entrada, video_saida
     python3 capcut.py loja [grupo] [busca] [--tipo in]          filtros, adesivos, modelos de texto, vozes, fontes
 
 Plano JSON (cada op é um método do Rascunho da capcut_lib; "id" guarda o segmento para usar depois como "$id"):
@@ -123,7 +128,7 @@ def _corrigir_itens(itens, cor):
     return out
 
 
-def legenda_dos_trechos(ws, trechos, cor=None, max_pal=4, max_car=22):
+def legenda_dos_trechos(ws, trechos, cor=None, max_pal=4, max_car=22, com_palavras=False):
     """Blocos de legenda (ini, fim, texto) no tempo do corte, contínuos, quebrando em pontuação."""
     cor = cor or {}
     itens, acc = [], 0.0
@@ -141,12 +146,13 @@ def legenda_dos_trechos(ws, trechos, cor=None, max_pal=4, max_car=22):
         prox = itens[k + 1] if k + 1 < len(itens) else None
         if (prox is None or len(cur) >= max_pal or len(txt) + 1 + len(prox[2]) > max_car
                 or re.search(r"[.?!:;]$", it[2]) or prox[0] - it[1] > .6):
-            blocos.append([cur[0][0], cur[-1][1], txt])
+            blocos.append([cur[0][0], cur[-1][1], txt, [tuple(x) for x in cur]])
             cur = []
     for i in range(len(blocos) - 1):   # contínua: cada bloco vai até o próximo (buraco curto)
         if blocos[i + 1][0] - blocos[i][1] < 1.0:
             blocos[i][1] = blocos[i + 1][0]
-    return [(round(a, 3), round(b, 3), t.replace(">>", "").strip()) for a, b, t in blocos if t.replace(">>", "").strip()]
+    out = [(round(a, 3), round(b, 3), t.replace(">>", "").strip(), p) for a, b, t, p in blocos if t.replace(">>", "").strip()]
+    return out if com_palavras else [x[:3] for x in out]
 
 
 def _secoes(arq):
@@ -162,7 +168,8 @@ def _secoes(arq):
 
 
 def cortes(cortes_json, video, transcricao, prefixo="CORTE", correcoes=None, credito="", fonte_titulo=None,
-           fonte_legenda=None, escala=1.3, projeto_fechado=False, secoes=None, tam_titulo=17, tam_legenda=11):
+           fonte_legenda=None, escala=1.3, projeto_fechado=False, secoes=None, tam_titulo=17, tam_legenda=11,
+           anim_legenda=None):
     """video: o original inteiro (material bruto). secoes: secoes.txt quando só os trechos chegaram;
     depois, com o original baixado, Rascunho.religar() troca sem mexer na edição."""
     lista = json.load(open(cortes_json))
@@ -194,9 +201,15 @@ def cortes(cortes_json, video, transcricao, prefixo="CORTE", correcoes=None, cre
         if credito:
             d.texto(credito, 0, total, trilha=1, tamanho=5, cor="#FFFFFF", fonte=fonte_legenda, y=230,
                     largura_max=0.9)
-        for a, b, txt in legenda_dos_trechos(ws, plano_c["trechos"], cor):
-            d.texto(txt, a, b - a, trilha=2, tamanho=tam_legenda, cor="#FFFFFF", contorno="#000000", contorno_largura=0.1,
-                    negrito=True, fonte=fonte_legenda, y=470)
+        for a, b, txt, pals in legenda_dos_trechos(ws, plano_c["trechos"], cor, com_palavras=True):
+            sid = d.texto(txt, a, b - a, trilha=2, tamanho=tam_legenda, cor="#FFFFFF", contorno="#000000",
+                          contorno_largura=0.1, negrito=True, fonte=fonte_legenda, y=470)
+            if len(pals) == len(txt.split()):   # tempo real de cada palavra (só se a correção não mudou a contagem)
+                d.palavras(sid, [(x[0], x[1], p) for x, p in zip(pals, txt.split())])
+            else:
+                d.palavras(sid)
+            if anim_legenda:
+                d.animar(sid, legenda=anim_legenda)
         d.salvar(projeto_fechado=projeto_fechado or not C.capcut_aberto())
         feitos.append((nome, total))
         print(f"{nome}: {total:.1f} s")
@@ -560,6 +573,87 @@ def ops():
     print("Filtros, adesivos, modelos de texto, vozes, fontes da loja: capcut.py loja <grupo> [busca] [--tipo in|out|loop|caption]")
 
 
+# ---------------------------------------------------------------- validar itens da loja (o app diz o que baixa)
+VALIDADOS = os.path.join(AQUI, "validados.json")
+GRUPOS_VALIDAR = {"legenda": ("texto_anim", "caption"), "texto_entrada": ("texto_anim", "in"),
+                  "texto_saida": ("texto_anim", "out"), "texto_loop": ("texto_anim", "loop"),
+                  "modelos_texto": ("modelos_texto", None), "modelos_legenda": ("modelos_texto", None),
+                  "filtros": ("filtros", None), "adesivos": ("adesivos", None), "efeitos_loja": ("efeitos_loja", None),
+                  "video_entrada": ("video_anim", "in"), "video_saida": ("video_anim", "out")}
+
+
+def validar_criar(grupo, n=40, busca="", pro=False, inicio=0):
+    """Rascunho 'GAB VALIDA <grupo>' com n itens da loja, 1 s cada. Abrir uma vez no CapCut (ele baixa o que
+    consegue), fechar e rodar `validar ler`."""
+    loja_g, tipo = GRUPOS_VALIDAR[grupo]
+    itens = [v for v in C.LOJA[loja_g].values() if busca.lower() in v["nome"].lower()
+             and (tipo is None or tipo in v.get("tipos", [])) and (pro or not v.get("vip"))]
+    ja = json.load(open(VALIDADOS)) if os.path.exists(VALIDADOS) else {}
+    itens = [v for v in itens if v["resource_id"] not in ja][inicio:inicio + n]
+    if not itens:
+        raise SystemExit("nada novo para validar nesse grupo/busca")
+    nome = f"GAB VALIDA {grupo}"
+    d = C.novo(nome, 1080, 1920, 30, substituir=True)
+    base = os.path.join(C.MIDIA, "validar.png")
+    if not os.path.exists(base):
+        os.makedirs(C.MIDIA, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "color=c=0x3060a0:s=1080x1920", "-frames:v", "1", base])
+    for i, v in enumerate(itens):
+        t = float(i)
+        rid = v["resource_id"]
+        if grupo in ("legenda", "texto_entrada", "texto_saida", "texto_loop"):
+            sid = d.texto(f"{i} {v['nome']}", t, 1, trilha=0, tamanho=9, y=960)
+            if grupo == "legenda":
+                d.animar(sid, legenda=rid)
+            else:
+                d.animar(sid, **{{"texto_entrada": "entrada", "texto_saida": "saida", "texto_loop": "loop"}[grupo]: rid})
+        elif grupo in ("modelos_texto", "modelos_legenda"):
+            d.modelo_texto(rid, f"{i} teste", t, 1, trilha=0, y=960, legenda=grupo == "modelos_legenda")
+        elif grupo == "filtros":
+            d.filtro_global(rid, t, 1)
+        elif grupo == "adesivos":
+            d.adesivo(rid, t, 1, y=960)
+        elif grupo == "efeitos_loja":
+            d.efeito(rid, t, 1)
+        else:
+            sid = d.video(base, t, trilha=0, dur=1)
+            d.animar(sid, **{"video_entrada": {"entrada": rid}, "video_saida": {"saida": rid}}[grupo])
+    d.salvar(projeto_fechado=True)
+    print(f"{nome}: {len(itens)} itens. Abrir no CapCut (capcut.py abrir \"{nome}\" + clique), esperar carregar, "
+          "fechar e rodar: capcut.py validar ler")
+    return nome
+
+
+def validar_ler():
+    """Lê TODOS os rascunhos: item da loja com arquivo baixado = funciona; sem arquivo num rascunho que o app já
+    abriu (app_version >= 9.4) = não funciona. Grava validados.json (a lib usa para preferir o que funciona)."""
+    ja = json.load(open(VALIDADOS)) if os.path.exists(VALIDADOS) else {}
+    novos = {"ok": 0, "falha": 0}
+    for n, *_ in C.rascunhos():
+        d = C.abrir(n)
+        # a lib grava new_version 181.0.0; o app regrava com a versão dele (185+) ao abrir: só esses contam
+        if str(d.j.get("new_version", "181")).split(".")[0] <= "181":
+            continue
+        for g, L in d.j["materials"].items():
+            if not isinstance(L, list):
+                continue
+            for m in L:
+                if not isinstance(m, dict):
+                    continue
+                for it in (m.get("animations") or [m]):
+                    rid = str(it.get("resource_id") or "")
+                    if not rid.isdigit() or len(rid) < 12:
+                        continue
+                    ok = bool(it.get("path"))
+                    if ja.get(rid) is not True:   # um sucesso em qualquer rascunho vale
+                        if ja.get(rid) != ok:
+                            novos["ok" if ok else "falha"] += 1
+                        ja[rid] = ok
+    json.dump(ja, open(VALIDADOS, "w"), indent=0)
+    print(f"validados.json: {sum(1 for v in ja.values() if v)} funcionam, {sum(1 for v in ja.values() if not v)} não "
+          f"(novos: {novos['ok']} ok, {novos['falha']} falha)")
+
+
 # ---------------------------------------------------------------- CLI
 def main(a):
     op = lambda k, d=None: a[a.index(k) + 1] if k in a else d
@@ -580,7 +674,7 @@ def main(a):
     elif cmd == "cortes":
         cortes(a[1], a[2], op("--transcricao"), op("--prefixo", "CORTE"), op("--correcoes"), op("--credito", ""),
                op("--fonte-titulo"), op("--fonte-legenda"), float(op("--escala", 1.3)), "--projeto-fechado" in a,
-               op("--secoes"), float(op("--tam-titulo", 17)), float(op("--tam-legenda", 11)))
+               op("--secoes"), float(op("--tam-titulo", 17)), float(op("--tam-legenda", 11)), op("--anim-legenda"))
     elif cmd == "previa":
         nomes = _nomes(a[1])
         ate, esc = (float(op("--ate")) if op("--ate") else None), float(op("--escala", 1.0))
@@ -619,6 +713,12 @@ def main(a):
         else:
             r = C.loja(a[1], a[2] if len(a) > 2 and not a[2].startswith("--") else "", op("--tipo"))
             print("\n".join(r[:int(op("--max", 80))]), f"\n({len(r)} itens)")
+    elif cmd == "validar":
+        if a[1] == "ler":
+            validar_ler()
+        else:
+            validar_criar(a[2] if a[1] == "criar" else a[1], int(op("--n", 40)), op("--busca", ""), "--pro" in a,
+                          int(op("--inicio", 0)))
     elif cmd == "fechar":
         print("fechado" if C.fechar_capcut() else "não fechou (diálogo aberto no CapCut?)")
     else:

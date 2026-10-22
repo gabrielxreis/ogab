@@ -8,6 +8,10 @@
 - **CapCut, um comando por ação:** `capcut.py faz "<rascunho ou CORTE*>" <ação> ...` roda qualquer ação (texto, transição, filtro, máscara, zoom, keyframes, adesivo, voz...) em um ou vários rascunhos de uma vez, encadeando com `+`. Seletores curtos no lugar dos ids (`@v0:2`, `@v0:todos`, `@em=12.5`, `@texto=Lula`); `capcut.py ids` mostra o seletor de cada clipe, `ops` lista as ações, `catalogo` e `loja` acham os nomes. Novas: `estilo_texto` (muda tamanho/cor/fonte/posição da legenda de todos os cortes num comando) e `trocar_texto`.
 - **CapCut, recursos conferidos no app:** transição, filtro, efeito, adesivo, máscara, animação de entrada de vídeo, entrada e loop de texto e efeito de voz funcionam. Animação de legenda da loja ainda não (o Gab avisa em vez de gravar).
 - **Prévia em lote:** `capcut.py previa "CORTE*" <pasta>` renderiza vários rascunhos em paralelo.
+- **CapCut, legenda animada palavra por palavra:** descoberto o formato da legenda automática do CapCut (tempo de cada palavra). `animar(..., legenda=...)` volta a funcionar e a fábrica de cortes (`capcut.py cortes`) já grava o tempo real de cada palavra; `--anim-legenda <nome ou id>` liga a animação.
+- **CapCut, palavra-chave colorida:** `texto(..., destaques={"LULA": "#FFE600"})` ou `destacar` pinta palavras dentro da legenda.
+- **CapCut, modelos de legenda da loja** agora carregam com o seu texto (antes vinha o texto de exemplo do modelo).
+- **CapCut, loja sem itens de teste:** itens internos que o app não baixa saíram da lista; `capcut.py validar` monta um lote para o app testar e guarda o que funciona.
 
 ## 2026.10.22-4 (22/10/2026)
 - **Suas invenções ajudam todo mundo:** além dos motions novos, o Gab agora também encontra os scripts novos e as melhorias que você (ou o Claude) fizer nos arquivos da skill e manda ao Gabriel, anônimo, para virar novidade para todos. Por isso os termos foram para a versão 2, e o Gab pede o aceite de novo uma vez.

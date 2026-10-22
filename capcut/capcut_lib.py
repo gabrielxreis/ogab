@@ -57,6 +57,10 @@ def atualizar_loja():
                     g = TIPOS_LOJA.get(ca.get("effect_type"))
                     if not g or not ca.get("effect_id"):
                         continue
+                    # itens de teste interno da ByteDance (publish_source "lumi_test"; 88 animações de legenda em
+                    # 22/10/2026) aparecem no painel mas o app não baixa: viram "Perda da animação"
+                    if "test" in str(ca.get("publish_source", "")):
+                        continue
                     e = loja[g].setdefault(ca["effect_id"], {"nome": ca.get("title", ""), "resource_id": ca.get("id"),
                                                            "effect_id": ca["effect_id"], "vip": False, "tipos": []})
                     e["vip"] = e["vip"] or '\\"is_vip\\":true' in json.dumps(ca.get("business_info") or {}) \
@@ -84,6 +88,8 @@ def _loja(grupo, nome, tipo=None):
     for v in g.values():
         if v["nome"].strip().lower() == alvo or v["resource_id"] == nome:
             return v
+    if str(nome).isdigit():   # id da loja que ainda não está no loja.json (ex.: copiado de um rascunho feito no app)
+        return {"nome": "", "resource_id": str(nome), "effect_id": str(nome), "vip": False, "tipos": []}
     perto = difflib.get_close_matches(nome, [v["nome"] for v in g.values()], 5, 0.4)
     raise KeyError(f"'{nome}' não está na loja ({grupo}). Parecidos: {perto}. Lista: loja('{grupo}')")
 
@@ -424,7 +430,8 @@ class Rascunho:
         return s["id"]
 
     def texto(self, texto, tempo, dur, trilha=0, tamanho=10.0, cor="#FFFFFF", contorno=None, contorno_largura=0.08,
-              negrito=False, fonte=None, x=None, y=None, escala=1.0, alinhamento=1, largura_max=0.82):
+              negrito=False, fonte=None, x=None, y=None, escala=1.0, alinhamento=1, largura_max=0.82,
+              destaques=None):
         """Texto simples. tamanho na escala do CapCut (legenda ~8-10, título ~15-20).
         contorno='#000000' liga a borda. fonte=caminho de .ttf/.otf (cópia vai para ~/Movies)."""
         estilo = {"fill": {"alpha": 1.0, "content": {"render_type": "solid", "solid": {"alpha": 1.0, "color": _hex(cor)}}},
@@ -440,7 +447,10 @@ class Rascunho:
             estilo["font"] = {"id": "", "path": f}
             mat.update(font_path=f, font_name=os.path.splitext(os.path.basename(f))[0],
                        fonts=[{"id": _id(), "path": f, "resource_id": "", "source_platform": 0, "title": os.path.basename(f)}])
-        mat["content"] = json.dumps({"styles": [estilo], "text": texto}, ensure_ascii=False)
+        mat["content"] = json.dumps({"styles": self._estilos(estilo, texto, destaques) if destaques else [estilo],
+                                     "text": texto}, ensure_ascii=False)
+        if destaques:
+            mat["is_rich_text"] = True
         self.j["materials"]["texts"].append(mat)
         anim = _novo("material_animations")
         self.j["materials"].setdefault("material_animations", []).append(anim)
@@ -563,13 +573,69 @@ class Rascunho:
             raise ValueError(f"{sid} não é texto simples")
         return m
 
+    def palavras(self, sid, lista=None, legenda=True):
+        """Tempo de cada palavra do texto (o que a legenda automática do CapCut grava; animação de legenda precisa).
+        lista = [(inicio_s, fim_s, "palavra"), ...] no tempo da TIMELINE; sem lista, divide a duração por igual.
+        legenda=True marca o texto como legenda (trilha de legenda, como o CapCut faz)."""
+        tr, seg = self.segmento(sid)
+        m = self._mat_texto(sid)
+        ini = seg["target_timerange"]["start"]
+        dur = seg["target_timerange"]["duration"]
+        txt = json.loads(m["content"]).get("text", "")
+        if lista is None:
+            ps = txt.split()
+            passo = dur / max(1, len(ps))
+            lista = [((ini + i * passo) / US, (ini + (i + 1) * passo) / US, p) for i, p in enumerate(ps)]
+        w = {"start_time": [], "end_time": [], "text": []}
+        for i, (a, b, p) in enumerate(lista):
+            a_ms = max(0, int(round((a * US - ini) / 1000))); b_ms = max(a_ms, int(round((b * US - ini) / 1000)))
+            w["start_time"].append(a_ms); w["end_time"].append(b_ms); w["text"].append(p)
+            if i < len(lista) - 1:   # o CapCut guarda o espaço como item de duração zero
+                w["start_time"].append(b_ms); w["end_time"].append(b_ms); w["text"].append(" ")
+        m["words"] = w
+        if legenda:
+            m.update(add_type=1, check_flag=47, recognize_type=0, recognize_text=txt, language=m.get("language") or "pt-BR",
+                     recognize_task_id=m.get("recognize_task_id") or f"gab_{uuid.uuid4().hex[:24]}")
+            tr["flag"] = 1
+        return sid
+
+    def _estilos(self, base, texto, destaques):
+        """Vários estilos no mesmo texto: destaques = {"palavra": "#FFE600", ...} (todas as ocorrências)."""
+        trechos = []
+        for palavra, cor in (destaques or {}).items():
+            for mm in re.finditer(re.escape(palavra), texto, flags=re.I):
+                trechos.append((mm.start(), mm.end(), cor))
+        trechos.sort()
+        out, pos = [], 0
+        def com(a, b, cor=None):
+            st = copy.deepcopy(base); st["range"] = [a, b]
+            if cor:
+                st["fill"] = {"alpha": 1.0, "content": {"render_type": "solid", "solid": {"alpha": 1.0, "color": _hex(cor)}}}
+            out.append(st)
+        for a, b, cor in trechos:
+            if a < pos:
+                continue
+            if a > pos: com(pos, a)
+            com(a, b, cor); pos = b
+        if pos < len(texto) or not out: com(pos, len(texto))
+        return out
+
+    def destacar(self, sid, destaques):
+        """Pinta palavras de outra cor dentro do texto: destaques = {"palavra": "#FFE600"}."""
+        m = self._mat_texto(sid)
+        c = json.loads(m["content"])
+        base = dict((c.get("styles") or [{}])[0])
+        c["styles"] = self._estilos(base, c.get("text", ""), destaques)
+        m["content"] = json.dumps(c, ensure_ascii=False)
+        m["is_rich_text"] = len(c["styles"]) > 1
+        return sid
+
     def trocar_texto(self, sid, texto):
         """Troca o texto mantendo estilo, posição e tempo."""
         m = self._mat_texto(sid)
         c = json.loads(m["content"])
         c["text"] = texto
-        for st in c.get("styles", []):
-            st["range"] = [0, len(texto)]
+        c["styles"] = [dict((c.get("styles") or [{}])[0], range=[0, len(texto)])]   # destaques antigos saem
         m["content"] = json.dumps(c, ensure_ascii=False)
         return sid
 
@@ -668,16 +734,18 @@ class Rascunho:
         pre = "texto" if texto else "video"
         d_in = d_out = 0
         if legenda:
-            # 22/10/2026 (CapCut 9.4/9.5): gravada assim aparece como "Perda da animação" e o app não baixa o arquivo
-            # (entrada/saída/loop de texto baixam). Deve precisar do tempo de cada palavra que só a legenda automática
-            # do CapCut grava. Até descobrir o formato, recusa em vez de deixar o texto quebrado.
-            raise NotImplementedError("animação de legenda (caption) ainda não carrega no CapCut: use entrada= ou loop=")
+            # Formato copiado de uma legenda automática real do CapCut (rascunho 0629, 22/10/2026): a animação de
+            # legenda só carrega se o texto tiver o tempo de cada palavra (`words`); vai com id e name vazios.
             if not texto:
                 raise ValueError("Animação de legenda é só para texto")
+            mt = self._mat(s["material_id"]) or {}
+            if mt.get("type") == "text" and not (mt.get("words") or {}).get("text"):
+                self.palavras(sid)   # sem tempos reais: distribui as palavras pela duração do texto
             m = _loja("texto_anim", legenda, "caption")
             lista.append({"anim_adjust_params": None, "platform": "all", "panel": "", "material_type": "sticker",
-                          "name": m["nome"], "id": m["effect_id"], "type": "caption", "resource_id": m["resource_id"],
-                          "start": 0, "duration": dur})
+                          "name": "", "id": "", "type": "caption", "resource_id": m["resource_id"],
+                          "third_resource_id": "", "source_platform": 0, "category_id": "", "category_name": "",
+                          "request_id": "", "path": "", "start": 0, "duration": dur})
             mat["animations"] = lista
             return mat["id"]
         if combo:
@@ -833,12 +901,15 @@ class Rascunho:
         s["extra_material_refs"] = [r for r in s["extra_material_refs"] if r not in velhos] + [mat["id"]]
         return mat["id"]
 
-    def modelo_texto(self, nome, texto, tempo, dur, trilha=0, x=None, y=None, escala=1.0, legenda=False):
+    def modelo_texto(self, nome, texto, tempo, dur, trilha=0, x=None, y=None, escala=1.0, legenda=False,
+                     palavras_lista=None):
         """Texto num modelo pronto da loja (estilo + animação do próprio modelo). Nomes: loja('modelos_texto').
         legenda=True marca como modelo de legenda (como o CapCut faz nas legendas automáticas). Beta: o
         CapCut aplica o visual do modelo ao abrir; se vier texto simples, o modelo não aceitou a troca."""
         m = _loja("modelos_texto", nome)
         sid = self.texto(texto, tempo, dur, trilha=trilha, x=x, y=y, escala=escala)
+        if legenda:   # modelo de legenda sem os campos da legenda automática mostra o texto de exemplo (22/10/2026)
+            self.palavras(sid, palavras_lista, legenda=True)
         t, s = self.segmento(sid)
         txt_id = s["material_id"]
         anim = s["extra_material_refs"][0]
