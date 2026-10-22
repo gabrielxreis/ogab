@@ -23,6 +23,17 @@ def composicao(pasta):
     return int(pega("width", 1080)), int(pega("height", 1920)), pega("duration", 10)
 
 
+def _txt(x):
+    """Texto da cena em uma linha, aceite string, lista, lista de listas ou itens {t: ...}."""
+    if isinstance(x, str):
+        return x
+    if isinstance(x, dict):
+        return str(x.get("t") or x.get("texto") or "")
+    if isinstance(x, (list, tuple)):
+        return " / ".join(p for p in (_txt(i) for i in x) if p)
+    return str(x)
+
+
 def cenas_do_plano(pasta, plano=None):
     try:
         if plano:
@@ -35,8 +46,8 @@ def cenas_do_plano(pasta, plano=None):
     t, out = 0.0, []
     for i, c in enumerate(P.get("cenas", []), 1):
         d = float(c.get("dur", 3))
-        texto = c.get("texto") or c.get("titulo") or c.get("frase") or c.get("nome") or \
-            " / ".join(x if isinstance(x, str) else x.get("t", "") for x in c.get("itens", [])) or ""
+        texto = _txt(c.get("texto") or c.get("titulo") or c.get("frase") or c.get("nome") or c.get("linhas")
+                     or c.get("palavras") or c.get("grupos") or c.get("antes") or c.get("itens") or "")
         out.append({"n": i, "ini": t, "dur": d, "tipo": c.get("tipo", ""), "texto": re.sub(r"[*|]+", " ", texto).replace("  ", " ").strip(),
                     "som": c.get("som", "")})
         t += d
