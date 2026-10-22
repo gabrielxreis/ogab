@@ -1,5 +1,8 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.22-4 (22/10/2026)
+- **Suas invenções ajudam todo mundo:** além dos motions novos, o Gab agora também encontra os scripts novos e as melhorias que você (ou o Claude) fizer nos arquivos da skill e manda ao Gabriel, anônimo, para virar novidade para todos. Por isso os termos foram para a versão 2, e o Gab pede o aceite de novo uma vez.
+
+## 2026.10.22-4 (22/10/2026)
 - **O Gab escolhe o preset sozinho e diz por quê:** lê o seu pedido (anima arte, cortes, abertura de logo, lançamento, animação para site...) e o roteiro frase por frase, escolhe o estilo do vídeo pelo assunto e coloca o preset certo em cada trecho (gráfico no dado, ranking, comentário, marco...).
 - **Seletor de presets com GIF:** se preferir escolher você, peça "quero escolher o preset" (ou `/ogab seletor`). Abre uma página com a prévia animada de cada preset; clique no trecho, depois na miniatura, e confirme. O Gab segue com a sua escolha.
 
@@ -12,6 +15,8 @@
 - **Storyboard:** não quebra mais quando o texto de uma cena vem em lista (linhas, palavras, grupos).
 
 ## 2026.10.22-2 (22/10/2026)
+- **Preset launch na batida:** `batida` no plano dá um pulso às cenas a cada compasso da música; a lista aceita `cada`/`inicio` para cada item entrar na batida.
+- **Preset launch com vídeo no painel:** a cena `tela` aceita `video` (um MP4 tocando dentro do vidro, por exemplo um mosaico de motions rodando ou uma análise quadro a quadro).
 - **Preset launch, cena nova `editor`:** um DaVinci simulado montando a timeline (voz, takes, legenda, música, b-roll, motion e SFX entrando um por um, com aviso do que a IA está fazendo). Ideal para apresentar produto de edição.
 - **Preset launch:** o fecho agora aceita `tam` como as outras cenas, para a letra ficar grande em vídeo 16:9; o logo aceita `tamFrase` para a frase embaixo dele; e o fundo já começa aceso no primeiro quadro.
 - **Launch, gancho em batidas:** a palavra em destaque da primeira frase agora sai junto com ela (antes ficava por cima da frase seguinte).

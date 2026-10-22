@@ -21,11 +21,12 @@ fi
 TERMOS_URL="https://github.com/gabrielxreis/ogab/blob/main/docs/TERMOS.md"
 cat <<TERMOS
 
-TERMOS DE USO DO GAB (/ogab), versão 1
+TERMOS DE USO DO GAB (/ogab), versão 2
 - Licença pessoal de uso do Gab nos seus vídeos e nos dos seus clientes (os vídeos são seus).
   Revender ou distribuir a skill depende de autorização do autor (Gabriel Reis).
-- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, os erros da skill que ele corrigir e a
-  estrutura dos motions novos que você criar. Nunca sai vídeo, roteiro, cliente, senha, chave ou dado pessoal.
+- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, os erros da skill que ele corrigir, a
+  estrutura dos motions novos que você criar e as invenções (scripts novos e melhorias) feitas nos arquivos
+  da própria skill. Nunca sai vídeo, roteiro, cliente, senha, chave ou dado pessoal.
 - Se apresentar com o nome é opcional e perguntado à parte.
 - Programas de terceiros (DaVinci, Premiere, ElevenLabs...) têm licenças próprias. Sem garantia.
 Texto completo: $TERMOS_URL

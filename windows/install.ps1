@@ -28,11 +28,12 @@ if ($env:OS -ne "Windows_NT") { Write-Host "Este instalador e para Windows. No M
 # Termos de uso (regra do autor, 22/10/2026): sem o aceite nada e baixado nem instalado. Texto em docs/TERMOS.md.
 Write-Host @"
 
-TERMOS DE USO DO GAB (/ogab), versao 1
+TERMOS DE USO DO GAB (/ogab), versao 2
 - Licenca pessoal de uso do Gab nos seus videos e nos dos seus clientes (os videos sao seus).
   Revender ou distribuir a skill depende de autorizacao do autor (Gabriel Reis).
-- Para melhorar a skill, o Gab envia ao autor, de forma ANONIMA, os erros da skill que ele corrigir e a
-  estrutura dos motions novos que voce criar. Nunca sai video, roteiro, cliente, senha, chave ou dado pessoal.
+- Para melhorar a skill, o Gab envia ao autor, de forma ANONIMA, os erros da skill que ele corrigir, a
+  estrutura dos motions novos que voce criar e as invencoes (scripts novos e melhorias) feitas nos arquivos
+  da propria skill. Nunca sai video, roteiro, cliente, senha, chave ou dado pessoal.
 - Se apresentar com o nome e opcional e perguntado a parte.
 - Programas de terceiros (DaVinci, Premiere, ElevenLabs...) tem licencas proprias. Sem garantia.
 Texto completo: https://github.com/gabrielxreis/ogab/blob/main/docs/TERMOS.md

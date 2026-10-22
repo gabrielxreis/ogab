@@ -30,6 +30,10 @@ no repositório e todo mundo recebe no próximo auto-update.
   (`scripts/comunidade.py`; perguntado uma vez, na 3ª abertura). Sai mesmo sem `"relatos": true`, porque a pessoa
   mandou na hora, mas só isso: erros e motions continuam dependendo do consentimento. Dono vê com `uso.py`.
 
+- **Invenções** (`tipo` invencao, 22/10/2026): scripts novos fora do git, `git diff` dos arquivos da skill e o que o
+  doctor guardou no stash no update (fora presets, clientes, config e assets). Anonimizado, até 4 partes, sem repetir o
+  mesmo conteúdo. No dono: `banco_presets.py puxar` > `candidatos/<id>/pacote.txt`; incorporar à mão e `recusar`.
+
 ## Banco de presets da comunidade (lado do dono)
 
 `scripts/banco_presets.py` (`/ogab presets`) transforma os motions que chegam em presets publicados:

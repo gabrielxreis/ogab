@@ -7,6 +7,7 @@
   python3 relatar.py parecido <pasta do modelo | modelo.json>  # quão diferente é da biblioteca (e dos já enviados)
   python3 relatar.py desempacotar <texto.txt> <pasta>  # (dono) remonta a pasta de um preset HyperFrames (colunas diff coladas)
   python3 relatar.py varrer                # acha os motions que ESTE usuário criou (presets/ novos e biblioteca local)
+                                           # e as INVENÇÕES na skill (scripts novos, melhorias, o que o doctor guardou no stash)
   python3 relatar.py enviar                # varre + manda os pendentes (ao abrir o Gab, em segundo plano) SÓ se "relatos": true
   python3 relatar.py status                # consentimento, pendentes e enviados
 
@@ -421,7 +422,7 @@ def _empacotar_hf(corpo_modelo, arquivos, pasta, nomes):
 
 def desempacotar(texto, destino):
     """(dono) Remonta a pasta do preset a partir das colunas diff (todas as partes, em qualquer ordem, coladas num texto)."""
-    pecas = re.split(r"^=== PACOTE HYPERFRAMES ogab v1 parte (\d+)/\d+ ===\n", texto, flags=re.M)
+    pecas = re.split(r"^=== PACOTE (?:HYPERFRAMES|INVENCAO) ogab v1 parte (\d+)/\d+ ===\n", texto, flags=re.M)
     corpo = "".join(p for _, p in sorted(((int(pecas[i]), pecas[i + 1]) for i in range(1, len(pecas) - 1, 2))))
     corpo = re.sub(r"\n?--- continua ---\n", "", corpo)
     corpo = corpo.split("--- fora do pacote ---")[0]
@@ -627,10 +628,91 @@ def varrer():
             res, porque = None, [f"erro: {e}"]
         vistos[chave] = imp
         feitos.append((chave, res or "não registrado: " + ("; ".join(porque) or "?")))
+    porque = []
+    try:
+        inv = registrar_invencoes(porque)
+    except Exception as e:
+        inv, porque = [], [f"erro: {e}"]
+    if inv:
+        feitos.append(("invenções na skill", f"{len(inv)} parte(s) registrada(s)"))
     if feitos:
         os.makedirs(PASTA, exist_ok=True)
         json.dump(vistos, open(VARRIDOS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return feitos
+
+
+# ------------------------------------------------------------ invenções (scripts novos e melhorias na skill)
+EXT_INVENCAO = (".py", ".js", ".mjs", ".css", ".html", ".md", ".json", ".sh", ".ps1", ".jsx", ".lua", ".txt")
+FORA_INVENCAO = ("presets/", "biblioteca_motions_local/", "clientes/", "assets/", "biblioteca_sfx/", "config.json",
+                 "relatos/destino.json", "voz_local/modelos/")
+MIN_LINHAS_INVENCAO = 6   # menos que isso é ajuste, não invenção
+
+
+def _git(*args):
+    r = subprocess.run(["git", "-C", SKILL, *args], capture_output=True, text=True, timeout=60)
+    return r.stdout if r.returncode == 0 else ""
+
+
+def _blocos_invencao():
+    """[(rótulo, texto)] do que este usuário mudou ou criou na skill (fora presets, que vão pelo varrer de motions)."""
+    blocos = []
+    for rel in sorted(_git("ls-files", "--others", "--exclude-standard").splitlines()):
+        if rel.startswith(FORA_INVENCAO) or not rel.endswith(EXT_INVENCAO) or "__pycache__" in rel:
+            continue
+        f = os.path.join(SKILL, rel)
+        if os.path.getsize(f) > 200_000:
+            continue
+        try:
+            blocos.append((f"arquivo novo: {rel}", open(f, encoding="utf-8").read()))
+        except Exception:
+            pass
+    fora = [f":(exclude){x}*" if x.endswith("/") else f":(exclude){x}" for x in FORA_INVENCAO]
+    d = _git("diff", "HEAD", "--", ".", *fora)
+    if d.strip():
+        blocos.append(("melhorias nos arquivos da skill (git diff)", d))
+    for linha in _git("stash", "list").splitlines():   # o doctor guarda as mudanças locais antes do update
+        ref = linha.split(":", 1)[0]
+        if "doctor" in linha:
+            sd = _git("stash", "show", "-p", "--include-untracked", ref, "--", ".", *fora) or _git("stash", "show", "-p", ref)
+            if sd.strip():
+                blocos.append((f"guardado pelo doctor antes do update ({ref})", sd))
+    return blocos
+
+
+def registrar_invencoes(motivo=None):
+    """Grava em pendentes/ (só sai com o aceite dos termos) as invenções deste usuário na skill, anonimizadas e em
+    partes de LIMITE_PARTE. Não repete o mesmo conteúdo (assinatura = hash). Devolve a lista de arquivos gravados."""
+    motivo = motivo if motivo is not None else []
+    blocos = _blocos_invencao()
+    linhas = sum(t.count("\n") for _, t in blocos)
+    if not blocos or linhas < MIN_LINHAS_INVENCAO:
+        motivo.append("nada novo na skill"); return []
+    cfg = _config(); nomes = _nomes_privados(cfg)
+    corpo = ""
+    for rot, txt in blocos:
+        txt = re.sub(r"data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+", "data:<removido>", txt)
+        txt = anonimizar(txt, nomes)
+        if len(txt) > LIMITE_ARQ_HF:
+            txt = txt[:LIMITE_ARQ_HF] + f"\n... cortado: {len(txt) - LIMITE_ARQ_HF} caracteres a mais"
+        corpo += f"--- {anonimizar(rot, nomes)} ---\n{txt}\n"
+    assinatura = "inv-" + hashlib.sha1(corpo.encode()).hexdigest()[:10]
+    if any(assinatura in os.path.basename(f) for f in glob.glob(os.path.join(PASTA, "*", "*.json"))):
+        motivo.append("estas invenções já foram registradas"); return []
+    partes = [corpo[i:i + LIMITE_PARTE - 300] for i in range(0, len(corpo), LIMITE_PARTE - 300)][:PARTES_MAX]
+    n = len(partes)
+    titulos = [r for r, _ in blocos]
+    os.makedirs(PEND, exist_ok=True); carimbo = time.strftime("%Y%m%d-%H%M%S"); saidas = []
+    for i, p_ in enumerate(partes, 1):
+        rel = {"chave_envio": CHAVE_ENVIO, "tipo": "invencao",
+               "titulo": (f"invenção na skill ({len(blocos)} item(ns))" + (f" (parte {i}/{n})" if n > 1 else ""))[:200],
+               "erro": anonimizar("; ".join(titulos), nomes)[:3000], "causa": f"{linhas} linhas",
+               "correcao": "remontar: relatar.py desempacotar (partes coladas) ou ler direto", "diff":
+               f"=== PACOTE INVENCAO ogab v1 parte {i}/{n} ===\n{p_}", "assinatura": assinatura, "versao": _versao(),
+               "sistema": f"{platform.system()} {platform.release()} {platform.machine()}", "editor": cfg.get("editor", ""),
+               "instalacao": _instalacao(), "quando": time.strftime("%Y-%m-%dT%H:%M:%S")}
+        f = os.path.join(PEND, f"{carimbo}-invencao-{assinatura}" + (f"-p{i}" if n > 1 else "") + ".json")
+        json.dump(rel, open(f, "w", encoding="utf-8"), ensure_ascii=False, indent=1); saidas.append(f)
+    return saidas
 
 
 def _log(msg):

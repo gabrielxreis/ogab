@@ -1,7 +1,8 @@
 """Banco de presets da comunidade (lado do DONO): puxa os motions que os usuários criaram, compara com o banco
 inteiro e publica os bons para todo mundo no próximo update. Assim a biblioteca cresce com quem usa o Gab.
 
-  python3 banco_presets.py puxar [--csv respostas.csv]   # lê a planilha dos relatos, remonta cada motion novo
+  python3 banco_presets.py puxar [--csv respostas.csv]   # lê a planilha, remonta cada motion novo e cada INVENÇÃO
+                                                         # (script novo ou melhoria na skill, em candidatos/<id>/pacote.txt)
   python3 banco_presets.py listar                        # candidatos do mais novo (diferente) ao mais repetido
   python3 banco_presets.py ver <id>                      # descrição, novidade, arquivos e de quantas máquinas veio
   python3 banco_presets.py previa <id>                   # renderiza a prévia (HyperFrames) em cinza: só para avaliar
@@ -107,16 +108,17 @@ def puxar(csv_arq=None):
     resolvidos = relatos.resolvidos()
     grupos = {}
     for l in linhas(csv_arq):
-        if (l.get("tipo") or "").strip().lower() != "preset":
+        tipo = (l.get("tipo") or "").strip().lower()
+        if tipo not in ("preset", "invencao"):
             continue
         a = (l.get("assinatura") or "").strip()
         if not a or a in resolvidos:
             continue
         g = grupos.setdefault(a, {"titulo": _titulo_base(l.get("titulo")), "descricao": l.get("erro", ""),
                                   "tags": l.get("causa", ""), "relato": l.get("correcao", ""), "partes": {},
-                                  "instalacoes": set(), "linhas": [], "versao": l.get("versao", "")})
+                                  "instalacoes": set(), "linhas": [], "versao": l.get("versao", ""), "tipo": tipo})
         diff = l.get("diff", "")
-        m = re.match(r"=== PACOTE HYPERFRAMES ogab v1 parte (\d+)/(\d+) ===", diff)
+        m = re.match(r"=== PACOTE (?:HYPERFRAMES|INVENCAO) ogab v1 parte (\d+)/(\d+) ===", diff)
         g["partes"][int(m.group(1)) if m else 1] = diff
         g["total"] = int(m.group(2)) if m else 1
         g["instalacoes"].add(l.get("instalacao", "?"))
@@ -130,20 +132,27 @@ def puxar(csv_arq=None):
         os.makedirs(pasta)
         completo = len(g["partes"]) >= g["total"]
         corpo = "".join(g["partes"][k] for k in sorted(g["partes"]))
-        if corpo.startswith("=== PACOTE HYPERFRAMES"):
+        if g["tipo"] == "invencao":   # script novo ou melhoria na skill: o dono lê, testa e incorpora à mão
+            texto = re.sub(r"^=== PACOTE INVENCAO ogab v1 parte \d+/\d+ ===\n", "", corpo, flags=re.M)
+            open(os.path.join(pasta, "pacote.txt"), "w", encoding="utf-8").write(texto)
+            arqs = ["pacote.txt"]
+        elif corpo.startswith("=== PACOTE HYPERFRAMES"):
             arqs = relatar.desempacotar(corpo, pasta)
         else:   # motion do After Effects: a coluna diff é o próprio modelo.json
             open(os.path.join(pasta, "modelo.json"), "w", encoding="utf-8").write(corpo)
             arqs = ["modelo.json"]
-        meta = {"id": a, "titulo": g["titulo"], "descricao": g["descricao"], "tags": g["tags"], "relato": g["relato"],
+        meta = {"id": a, "tipo": g["tipo"], "titulo": g["titulo"], "descricao": g["descricao"], "tags": g["tags"], "relato": g["relato"],
                 "vezes": len(g["linhas"]) // max(1, g["total"]), "maquinas": len(g["instalacoes"]),
                 "linhas_planilha": sorted(g["linhas"]), "completo": completo,
                 "partes": f"{len(g['partes'])}/{g['total']}", "arquivos": arqs, "versao": g["versao"],
                 "puxado": time.strftime("%Y-%m-%d %H:%M")}
-        try:
+        if g["tipo"] == "invencao":
+            meta["novidade"], meta["mais_parecido"] = 1.0, "invenção (ler pacote.txt)"
+        else:
+          try:
             json.load(open(os.path.join(pasta, "modelo.json"), encoding="utf-8"))
             meta["novidade"], meta["mais_parecido"] = _novidade(pasta)
-        except Exception as e:
+          except Exception as e:
             meta["novidade"], meta["mais_parecido"], meta["problema"] = 0, "?", f"modelo ilegível: {e}"
         json.dump(meta, open(os.path.join(pasta, "candidato.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         saida.append(meta)
@@ -189,6 +198,9 @@ def previa(id_):
 
 def aceitar(id_, nome, descricao=None, previa_png=None, push=True):
     pasta, meta = _cand(id_)
+    if meta.get("tipo") == "invencao":
+        raise SystemExit("invenção não vira modelo: ler pacote.txt, testar, incorporar à mão na skill (commit normal) "
+                         "e marcar com `recusar <id> \"incorporado em <commit>\"`")
     if not meta.get("completo"):
         print(f"aviso: chegaram só {meta['partes']} partes; conferir se o motion funciona antes de publicar")
     import biblioteca_motions as bm
@@ -312,6 +324,10 @@ def main(a):
             print("nenhum candidato (rode `banco_presets.py puxar`)")
         for c in cs:
             alerta = "" if c.get("novidade", 0) >= 1 - relatar.LIMIAR_PARECIDO else "  <- parecido com o banco"
+            if c.get("tipo") == "invencao":
+                print(f"- {c['id']}  INVENÇÃO  {c['maquinas']} máquina(s)  partes {c['partes']}\n    {_curto(c['descricao'], 160)}"
+                      f"\n    ler: {os.path.join(CAND, c['id'], 'pacote.txt')} (testar, incorporar à mão e `recusar <id> \"incorporado\"`)")
+                continue
             print(f"- {c['id']}  novidade {c.get('novidade', 0):.0%} (mais parecido: {c.get('mais_parecido')})"
                   f"  {c['maquinas']} máquina(s)  partes {c['partes']}{alerta}\n    {c['titulo']}: {_curto(c['descricao'], 140)}"
                   + (f"\n    PROBLEMA: {c['problema']}" if c.get("problema") else ""))

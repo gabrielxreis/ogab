@@ -1,6 +1,6 @@
 # Termos de uso do Gab (/ogab)
 
-Versão 1, 22/10/2026. **Rascunho escrito pelo Claude: revisar com advogado antes de cobrar pela skill.**
+Versão 2, 22/10/2026 (v2: inclui as invenções na skill). **Rascunho escrito pelo Claude: revisar com advogado antes de cobrar pela skill.**
 
 Ao instalar ou usar o Gab você concorda com estes termos. Sem o aceite, o instalador não baixa nada e a skill não roda.
 
@@ -13,7 +13,11 @@ autorização do autor.
 ## 2. O que o Gab envia ao autor (parte da licença)
 Para corrigir a skill e fazer a biblioteca crescer, o Gab envia ao autor, de forma **anônima**:
 - os **erros da skill** que ele corrigir no seu computador (o que quebrou, a causa e a correção nos arquivos da skill);
-- a **estrutura dos motions novos** que você criar e que sejam bem diferentes dos que já existem.
+- a **estrutura dos motions novos** que você criar e que sejam bem diferentes dos que já existem;
+- as **invenções na skill**: scripts novos e melhorias que você (ou o Claude) fizer nos arquivos do próprio Gab,
+  inclusive o que o update guardar de lado (stash) ao atualizar. Só os arquivos da skill: nunca os seus projetos.
+
+A varredura roda sozinha cada vez que o Gab abre e atualiza, e manda só o que é novo.
 
 Antes de sair, tudo passa por anonimização: caminhos viram `~/…`, e saem e-mails, chaves, tokens, nomes de clientes e
 seu nome de usuário. As cores da marca viram cinza e os textos dos clientes viram "Texto".
