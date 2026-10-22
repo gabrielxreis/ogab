@@ -393,6 +393,7 @@ def colocar_legendas(t, mp, srt, trocar=True, p=None):
     # sem recordFrame o SRT pode cair DEPOIS do fim da timeline (visto no ep. 5 da Lista de Planos: 58 legendas além do último quadro)
     # recordFrame sozinho é ignorado no SRT; com startFrame=0 ele respeita (testado no DaVinci 20/10/2026)
     fim_video = max([x.GetEnd() for k in range(1, t.GetTrackCount("video") + 1) for x in (t.GetItemListInTrack("video", k) or [])] or [t.GetEndFrame()])
+    fim_video = max(fim_video, t.GetStartFrame() + 1)   # timeline vazia: fim == início e a legenda certa parecia "depois do fim" (relato ced19e0b5d)
     import time as _t
     for _ in range(4):   # o DaVinci às vezes ignora a posição e solta o SRT depois do fim: apaga e tenta de novo
         try: t.SetCurrentTimecode(_tc(t, t.GetStartFrame()))

@@ -266,9 +266,22 @@ _JS_COLOCAR = """
       try { fonte = await soVideo(p, it); }
       catch (e) { if (c.tem_audio === null && /startTime must be less than endTime/i.test(String(e))) fonte = it; else throw e; }  // sem ffprobe: mesmo sintoma = sem áudio
     }
-    await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(c.tempo), v, au)]);
+    // Overwrite do ITEM com in point (sem subclipe) cai em tempo + in (relato 3f81261bd5, 20/10/2026: música com
+    // de=40 entrou em 40 s): compensa a posição; o subclipe (soVideo) já começa no zero e não precisa.
+    const desloc = (fonte === it && c.de) ? c.de : 0;
+    const pos = Math.max(0, c.tempo - desloc);
+    await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(pos), v, au)]);
     if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
-    saida.push(it.name);
+    let caiu = null;   // confere onde o clipe entrou (trilha de áudio, ou de vídeo se não tem áudio)
+    try {
+      const tr = au >= 0 ? await s.getAudioTrack(au) : await s.getVideoTrack(v);
+      for (const x of tr.getTrackItems(CLIPE, false)) {
+        const st = (await x.getStartTime()).seconds;
+        if (Math.abs(st - c.tempo) < 0.05) { caiu = st; break; }
+        if (Math.abs(st - c.tempo - desloc) < 0.05 || Math.abs(st - c.tempo - (c.de || 0)) < 0.05) caiu = st;
+      }
+    } catch (e) {}
+    saida.push({ nome: it.name, pedido: c.tempo, caiu });
   }
   return saida;
 """
@@ -291,6 +304,10 @@ def colocar(seq, arquivo, tempo, video=0, audio=0, de=None, ate=None, db=None, f
     arquivo = _abs(arquivo)
     r = js(_JS_COLOCAR, "colocar", seq=seq, clipes=[dict(arquivo=arquivo, tempo=tempo, video=video, audio=audio,
                                                            de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo))])
+    for x in (r or []):
+        if isinstance(x, dict) and x.get("caiu") is not None and abs(x["caiu"] - tempo) > 0.05:
+            raise RuntimeError(f"{x['nome']} entrou em {x['caiu']:.2f} s, não em {tempo:.2f} s (ponto de entrada de={de}): "
+                               "conferir createOverwriteItemAction nesta versão do Premiere")
     if audio is not None and (db is not None or fade_in or fade_out):
         volume(seq, audio, tempo, db or 0, fade_in, fade_out)
     return r
@@ -335,6 +352,41 @@ def volume(seq, trilha_audio, tempo, db=0.0, fade_in=0.0, fade_out=0.0):
       if (!achou) throw new Error("parâmetro Level do Volume não encontrado");
       return { db: args.db, linear: lin, ok };
     """, "volume", seq=seq, trilha=trilha_audio, tempo=tempo, db=db, fade_in=fade_in, fade_out=fade_out)
+
+
+def envelope_volume(seq, trilha_audio, tempo, pontos):
+    """Curva de volume no clipe de áudio que começa em `tempo` (s) na trilha (0 = A1): pontos = [(t_na_sequencia, dB), ...].
+    Serve para ducking (música abaixando sob uma fala) sem cortar o clipe. Mesma escala do volume(): 0 dB = 0.1778.
+    (Relato e5ee2c7e86, 19/10/2026: a função tinha ficado de fora do commit dde8d8b.)"""
+    return js("""
+      const p = await proj(); const s = await seqPorNome(p, args.seq);
+      const tr = await s.getAudioTrack(args.trilha);
+      let alvo = null;
+      for (const it of tr.getTrackItems(CLIPE, false))
+        if (Math.abs((await it.getStartTime()).seconds - args.tempo) < 0.05) alvo = it;
+      if (!alvo) throw new Error("clipe de áudio não encontrado em " + args.tempo + " s");
+      const ini = (await alvo.getStartTime()).seconds, entrada = (await alvo.getInPoint()).seconds;
+      const cadeia = await alvo.getComponentChain();
+      let ok = false, achou = false;
+      p.lockedAccess(() => {
+        let nivel = null;
+        for (let i = 0; i < cadeia.getComponentCount() && !nivel; i++) {
+          const comp = cadeia.getComponentAtIndex(i);
+          for (let j = 0; j < comp.getParamCount(); j++) { const pr = comp.getParam(j); if (/^(level|nível|nivel)$/i.test(pr.displayName)) { nivel = pr; break; } }
+        }
+        if (!nivel) return;
+        achou = true;
+        ok = p.executeTransaction((c) => {
+          c.addAction(nivel.createSetTimeVaryingAction(true));
+          for (const [t, db] of args.pontos) {
+            const kf = nivel.createKeyframe(Math.min(1, Math.pow(10, (db - 15) / 20))); kf.position = tt(t - ini + entrada);
+            c.addAction(nivel.createAddKeyframeAction(kf));
+          }
+        }, "Gab: envelope de volume");
+      });
+      if (!achou) throw new Error("parâmetro Level do Volume não encontrado");
+      return { pontos: args.pontos.length, ok };
+    """, "envelope", seq=seq, trilha=trilha_audio, tempo=tempo, pontos=[[float(a), float(b)] for a, b in pontos])
 
 
 def colocar_narracao(seq, wav, db=0.0, tempo=0.0, trilha=0):
