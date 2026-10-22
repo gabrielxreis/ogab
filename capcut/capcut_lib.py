@@ -431,7 +431,7 @@ class Rascunho:
 
     def texto(self, texto, tempo, dur, trilha=0, tamanho=10.0, cor="#FFFFFF", contorno=None, contorno_largura=0.08,
               negrito=False, fonte=None, x=None, y=None, escala=1.0, alinhamento=1, largura_max=0.82,
-              destaques=None):
+              destaques=None, **visual):
         """Texto simples. tamanho na escala do CapCut (legenda ~8-10, título ~15-20).
         contorno='#000000' liga a borda. fonte=caminho de .ttf/.otf (cópia vai para ~/Movies)."""
         estilo = {"fill": {"alpha": 1.0, "content": {"render_type": "solid", "solid": {"alpha": 1.0, "color": _hex(cor)}}},
@@ -464,6 +464,9 @@ class Rascunho:
                  common_keyframes=[], keyframe_refs=[])
         self._transformar(s, escala, x, y, 0.0, 1.0)
         self._por(t, s)
+        self._flag_texto(mat)
+        if visual:   # fundo=, sombra=... (ver estilo_texto)
+            self.estilo_texto(s["id"], **visual)
         return s["id"]
 
     def legenda_srt(self, srt, y=724, tamanho=8.0, cor="#FFFFFF", contorno="#000000", trilha=0, **kw):
@@ -640,9 +643,35 @@ class Rascunho:
         return sid
 
     def estilo_texto(self, sid, tamanho=None, cor=None, contorno=None, contorno_largura=None, negrito=None,
-                     fonte=None, y=None, x=None, largura_max=None):
-        """Muda o estilo de um texto já na timeline (tamanho, cor, contorno, negrito, fonte .ttf, posição)."""
+                     fonte=None, y=None, x=None, largura_max=None, fundo=None, fundo_alfa=1.0, fundo_raio=0.4,
+                     fundo_altura=0.14, fundo_largura=0.14, sombra=None, sombra_alfa=0.8, sombra_distancia=6.0,
+                     sombra_angulo=-45.0, sombra_suave=0.3):
+        """Muda o estilo de um texto já na timeline (tamanho, cor, contorno, negrito, fonte .ttf, posição).
+        fundo='#000000' = caixa atrás do texto (fundo_raio 0-1 arredonda: 1 = pílula; fundo_alfa; fundo=False tira).
+        sombra='#000000' = sombra (sombra_distancia, sombra_angulo, sombra_suave 0-1; sombra=False tira)."""
         m = self._mat_texto(sid)
+        if fundo is not None:
+            if fundo is False or fundo == "":
+                m.update(background_alpha=0.0, background_color="")
+            else:
+                m.update(background_color=fundo.upper(), background_alpha=fundo_alfa, background_style=1,
+                         background_round_radius=fundo_raio, background_height=fundo_altura,
+                         background_width=fundo_largura, background_horizontal_offset=0.0,
+                         background_vertical_offset=0.0)
+        if sombra is not None:
+            c0 = json.loads(m["content"])
+            for st in c0.get("styles", []):
+                if sombra is False or sombra == "":
+                    st.pop("shadows", None)
+                else:
+                    st["shadows"] = [{"diffuse": sombra_suave * 3 / 6, "angle": sombra_angulo, "distance": sombra_distancia,
+                                      "alpha": sombra_alfa, "content": {"solid": {"color": _hex(sombra)}}}]
+            m["content"] = json.dumps(c0, ensure_ascii=False)
+            if sombra is False or sombra == "":
+                m["has_shadow"] = False
+            else:
+                m.update(has_shadow=True, shadow_color=sombra.upper(), shadow_alpha=sombra_alfa,
+                         shadow_distance=sombra_distancia, shadow_angle=sombra_angulo, shadow_smoothing=sombra_suave * 3)
         c = json.loads(m["content"])
         for st in c.get("styles", []) or [{}]:
             if tamanho is not None:
@@ -673,6 +702,32 @@ class Rascunho:
             m["line_max_width"] = largura_max
         if x is not None or y is not None:
             self.transformar(sid, x=x, y=y)
+        self._flag_texto(m)
+        return sid
+
+    @staticmethod
+    def _flag_texto(m):
+        """check_flag do texto é um mapa de bits (VectCutAPI + legenda real): 7 base, +8 contorno, +16 fundo,
+        +32 sombra. Sem o bit, o CapCut ignora o recurso."""
+        c = json.loads(m.get("content") or "{}")
+        f = (m.get("check_flag") or 7) | 7
+        f = f | 8 if any(st.get("strokes") for st in c.get("styles", [])) else f & ~8
+        f = f | 16 if m.get("background_color") and m.get("background_alpha", 0) > 0 else f & ~16
+        f = f | 32 if m.get("has_shadow") else f & ~32
+        m["check_flag"] = f
+
+    def recortar(self, sid, esquerda=0.0, cima=0.0, direita=0.0, baixo=0.0):
+        """Recorte do clipe (fração 0-1 tirada de cada lado do quadro original)."""
+        m = self._mat(self.segmento(sid)[1]["material_id"])
+        e, c, d, b = esquerda, cima, 1 - direita, 1 - baixo
+        m["crop"] = {"upper_left_x": e, "upper_left_y": c, "upper_right_x": d, "upper_right_y": c,
+                     "lower_left_x": e, "lower_left_y": b, "lower_right_x": d, "lower_right_y": b}
+        m["crop_ratio"] = "free"
+        return sid
+
+    def espelhar(self, sid, horizontal=True, vertical=False):
+        """Espelha o clipe (flip)."""
+        self.segmento(sid)[1].setdefault("clip", {})["flip"] = {"horizontal": bool(horizontal), "vertical": bool(vertical)}
         return sid
 
     def desligar(self, sid, ligado=False):

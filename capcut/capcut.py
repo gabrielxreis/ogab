@@ -309,10 +309,27 @@ def _txt_png(mat, seg, W, H, png):
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     dr = ImageDraw.Draw(img)
     y0 = cy - alt * len(linhas) / 2
-    for i, l in enumerate(linhas):
-        lw = f.getlength(l)
-        x = cx - lw / 2
-        y = y0 + i * alt
+    pos = [(cx - f.getlength(l) / 2, y0 + i * alt, l) for i, l in enumerate(linhas)]
+    if mat.get("background_color") and mat.get("background_alpha", 0) > 0:   # caixa/pílula atrás do texto
+        bg = tuple(int(mat["background_color"].lstrip("#")[i:i + 2], 16) for i in (0, 2, 4))
+        ba = int(mat["background_alpha"] * 255)
+        pad = px * (0.18 + mat.get("background_width", .14))
+        padv = px * 0.1
+        raio = int(min(alt, pad) * mat.get("background_round_radius", 0))
+        for x, y, l in pos:
+            lw = f.getlength(l)
+            dr.rounded_rectangle([x - pad, y - padv, x + lw + pad, y + alt + padv], radius=raio, fill=bg + (ba,))
+    if mat.get("has_shadow"):   # sombra do texto
+        import math
+        sc = (mat.get("shadow_color") or "#000000").lstrip("#") or "000000"
+        scol = tuple(int(sc[i:i + 2], 16) for i in (0, 2, 4))
+        sa = int(mat.get("shadow_alpha", .8) * 255)
+        dist = mat.get("shadow_distance", 6) * W / 1080
+        ang = math.radians(mat.get("shadow_angle", -45))
+        dx, dy = dist * math.cos(ang), -dist * math.sin(ang)
+        for x, y, l in pos:
+            dr.text((x + dx, y + dy), l, font=f, fill=scol + (sa,))
+    for x, y, l in pos:
         kw = {"stroke_width": borda[1], "stroke_fill": borda[0]} if borda else {}
         dr.text((x, y), l, font=f, fill=cor + (255,), **kw)
         if est.get("bold") and "[wght]" not in fonte:

@@ -12,6 +12,7 @@
 - **CapCut, palavra-chave colorida:** `texto(..., destaques={"LULA": "#FFE600"})` ou `destacar` pinta palavras dentro da legenda.
 - **CapCut, modelos de legenda da loja** agora carregam com o seu texto (antes vinha o texto de exemplo do modelo).
 - **CapCut, loja sem itens de teste:** itens internos que o app não baixa saíram da lista; `capcut.py validar` monta um lote para o app testar e guarda o que funciona.
+- **CapCut, mais edição:** recortar clipe, espelhar (horizontal/vertical), caixa ou pílula atrás do texto (`fundo=`) e sombra do texto (`sombra=`) — tudo conferido abrindo no CapCut. A prévia (`capcut.py previa`) agora desenha fundo e sombra, então bate com o app.
 
 ## 2026.10.22-4 (22/10/2026)
 - **Suas invenções ajudam todo mundo:** além dos motions novos, o Gab agora também encontra os scripts novos e as melhorias que você (ou o Claude) fizer nos arquivos da skill e manda ao Gabriel, anônimo, para virar novidade para todos. Por isso os termos foram para a versão 2, e o Gab pede o aceite de novo uma vez.
