@@ -1,4 +1,14 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-2 (22/10/2026)
+- **Preset launch, cena nova `editor`:** um DaVinci simulado montando a timeline (voz, takes, legenda, música, b-roll, motion e SFX entrando um por um, com aviso do que a IA está fazendo). Ideal para apresentar produto de edição.
+- **Preset launch:** o fecho agora aceita `tam` como as outras cenas, para a letra ficar grande em vídeo 16:9; o logo aceita `tamFrase` para a frase embaixo dele; e o fundo já começa aceso no primeiro quadro.
+- **Launch, gancho em batidas:** a palavra em destaque da primeira frase agora sai junto com ela (antes ficava por cima da frase seguinte).
+- **Trava do "começa do preto":** não acusa mais quando o que acende é só um texto grande entrando; fade do preto de verdade continua travando.
+
+## 2026.10.22-2 (22/10/2026)
+- **Conheça quem fez o Gab:** uma vez, o Gab pergunta se você quer se apresentar ao Gabriel (só o nome que você confirmar, e o @ e a cidade se quiser). É opcional; dizendo não, ele não pergunta de novo.
+- De vez em quando (no máximo uma vez por semana) o Gab lembra que dá para deixar uma estrela na skill no GitHub e seguir o Gabriel no Instagram, @gabrielxreis_.
+
 ## 2026.10.22-1 (22/10/2026)
 - **Banco de presets da comunidade:** os motions que você cria (preset novo a partir de uma referência ou modelo salvo na biblioteca) são encontrados sozinhos e, se forem bem diferentes do que já existe e você tiver dito "sim" aos relatos, vão anônimos para o Gabriel avaliar. Os aprovados entram para todo mundo no próximo update. O banco inteiro fica em `biblioteca_motions/CATALOGO.md`.
 - **5 presets novos:** **ranking** (tier list e top 3 que se montam com a fala), **respostas** (faixa de "?" que vira resposta, estilo entrevista de rua), **comentário** (card de comentário de seguidor), **cartões** (provas empilhando em profundidade) e **podcast** (tela dividida com legenda na cor de quem fala, acompanhando a cabeça). Peça pelo nome ou deixe o Gab escolher.

@@ -17,7 +17,7 @@ Tipos:
   lista     olho, itens ["Método.", {t, d}] (um de cada vez, grande; 3 é o ideal), tam
   recursos  = lista (compatível com planos antigos)
   numero    de, ate, prefixo, sufixo, decimais, texto
-  cta       texto, url, botao (texto; opcional), comLogo (false = sem logo), aviso (linha pequena, ex.: risco)
+  cta       texto, url, botao (texto; opcional), comLogo (false = sem logo), aviso (linha pequena, ex.: risco), tam
 """
 import json, os, re, shutil, struct, subprocess, sys
 AQUI = os.path.dirname(os.path.abspath(__file__))

@@ -133,7 +133,7 @@
       const logo = c.logo || M.logo;
       if (logo && c.comLogo !== false) { const prop = c.logoProp || M.logoProp || 1, lw = (prop < .75 ? 260 : 110) * U;
         const im = mk("img", "logo-img", el, { width: lw + "px", height: (prop < .75 ? lw * prop : lw) + "px", marginBottom: px(60), opacity: .9 }); im.src = logo; aparece(im, t + .1, 1); }
-      if (c.texto) { const T = titulo(el, c.texto, VERT ? 140 : 104); revela(t + .25, T.linhas, 1.15, .14); }
+      if (c.texto) { const T = titulo(el, c.texto, c.tam || (VERT ? 140 : 104)); revela(t + .25, T.linhas, 1.15, .14); }
       const url = c.url || M.dominio || "";
       if (url) { const u = linhaSuave(el, url, VERT ? 44 : 38, "url-cta"); u.style.marginTop = px(44); aparece(u, t + .8); }
       if (c.botao) { const b = mk("div", "botao", el, { fontSize: px(VERT ? 36 : 30), marginTop: px(44) }); b.textContent = c.botao; aparece(b, t + 1.05); }

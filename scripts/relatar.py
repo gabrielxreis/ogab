@@ -639,10 +639,11 @@ def _log(msg):
 
 def enviar():
     cfg = _config(); dest = _destino()
-    if cfg.get("relatos") is not True or cfg.get("dono_biblioteca") or not dest.get("action"):   # só com consentimento
+    if cfg.get("dono_biblioteca") or not dest.get("action"):
         return 0
+    so_apresentacao = cfg.get("relatos") is not True   # sem consentimento de relatos: só a apresentação que a pessoa pediu
     try:
-        for chave, res in varrer():
+        for chave, res in ([] if so_apresentacao else varrer()):
             _log(f"varredura {chave}: {res}")
     except Exception as e:
         _log(f"varredura falhou: {e}")
@@ -651,6 +652,8 @@ def enviar():
     for arq in sorted(glob.glob(os.path.join(PEND, "*.json")))[:20]:
         try:
             rel = json.load(open(arq, encoding="utf-8"))
+            if so_apresentacao and rel.get("tipo") != "usuario":
+                continue   # erros e motions só com "relatos": true
             if rel.get("tipo") == "preset" and int(cfg.get("relatos_v", 1)) < CONSENTIMENTO_V:
                 continue   # motion só com o consentimento novo
             dados = urllib.parse.urlencode({f"entry.{eid}": str(rel.get(nome, ""))
