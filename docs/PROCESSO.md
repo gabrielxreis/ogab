@@ -75,6 +75,8 @@ Esse arquivo é a base para tudo: roteiro, escolha de takes, prompts de geraçã
 
 | Plataforma | Formato | Duração típica | Observações |
 |---|---|---|---|
+| 22/10/2026 | Fábrica de cortes: os S do `cortes.json` apontavam para outras frases (corte "Você me respeita" saiu em outro minuto) | `frases --pausa 1.2` numerava com uma pausa e o `conferir` renumerava sempre com 0,8 | `conferir` aceita `--pausa` e o doc manda usar o mesmo nos dois |
+| 22/10/2026 | Fábrica de cortes: todo corte terminava com o começo da palavra seguinte ("Olha", "Porque") no áudio e na legenda | a folga do `cortes.plano` no fim do trecho passava do início da próxima palavra | `conferir` limita o fim de cada trecho ao início da 1a palavra de fora e o começo ao fim da palavra anterior |
 | 22/10/2026 | Launch em 16:9: o fecho (cta) não crescia com `tam`, a letra ficava pequena para a tela | `cta` usava tamanho fixo (140/104) e ignorava `c.tam`, ao contrário das outras cenas | `cta` aceita `tam` (`presets/launch/kit/launch.js`); campo documentado no `gerar.py` |
 | 13/10/2026 | The Chosen: takes chegaram ao DaVinci já cortados e recortados em 9:16 (ffmpeg), sem como reajustar; e 22 s presos no mesmo assunto (diretor falando parado) | `montar_takes` só aceitava arquivo a partir do quadro 0, então os takes eram pré-cortados; plano de takes com blocos longos | `montar_takes` aceita `(arquivo, inicio_s, entrada_s)` e aplica zoom de preencher; regra 1h2 (material bruto) e ritmo de 1,5-3 s em `docs/etapas/takes.md` |
 | Instagram (Reels) | 9:16, 1080x1920 | **mínimo 30 s, máximo 1:30** (regra do usuário) | Gancho forte, legenda grande, música em alta. |

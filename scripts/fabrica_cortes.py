@@ -4,7 +4,8 @@ material bruto, corte no DaVinci, transcrição do DaVinci.
 
   python3 fabrica_cortes.py frases <transcricao.json> <frases.md> [--pausa 0.8]
         -> a transcrição em frases numeradas com o tempo (S1, S2...). É o que o Gab lê para escolher os cortes.
-  python3 fabrica_cortes.py conferir <transcricao.json> <cortes.json> [--min 20 --max 75]
+  python3 fabrica_cortes.py conferir <transcricao.json> <cortes.json> [--min 20 --max 75] [--pausa 0.8]
+        (use o MESMO --pausa do comando frases, senão os S1, S2... apontam para outras frases)
         -> confere cada corte escolhido e escreve o plano de trechos (pausas encurtadas) em cortes/NN.json.
   python3 fabrica_cortes.py montar <cortes.json> "<clipe do Media Pool>" [--vertical] [--reframe] [--fps-fonte 30]
         -> uma timeline por corte ("CORTE 01 - <título>"), na ordem da nota. --vertical: 1080x1920 com o clipe
@@ -60,8 +61,8 @@ def cmd_frases(trans, saida, pausa=.8):
     print(f"{saida}: {len(fs)} frases")
 
 
-def conferir(trans, cortes_json, mn=20, mx=75):
-    fs = {f[0]: f for f in frases(trans)}; ordem = list(fs)
+def conferir(trans, cortes_json, mn=20, mx=75, pausa=.8):
+    fs = {f[0]: f for f in frases(trans, pausa)}; ordem = list(fs)
     lista = json.load(open(cortes_json))
     pasta = os.path.join(os.path.dirname(os.path.abspath(cortes_json)), "cortes"); os.makedirs(pasta, exist_ok=True)
     for c in lista:
@@ -90,7 +91,21 @@ def conferir(trans, cortes_json, mn=20, mx=75):
         tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False); json.dump(seg, tmp); tmp.close()
         plano = os.path.join(pasta, f"{k:02d}.json")
         C.plano(tmp.name, plano); os.remove(tmp.name)
-        pj = json.load(open(plano)); pj["transcricao"] = os.path.abspath(trans); json.dump(pj, open(plano, "w"), indent=1)
+        pj = json.load(open(plano)); pj["transcricao"] = os.path.abspath(trans)
+        # a folga do cortes.plano não pode invadir a palavra de fora do corte (sobrava "Olha"/"Porque" no fim)
+        todas = sorted((float(w["start"]), float(w["end"])) for s in d["segments"] for w in s.get("words", []))
+        dentro = seg["segments"][0]["words"]
+        for tr in pj.get("trechos", []):
+            fins = [float(w["end"]) for w in dentro if float(w["end"]) <= tr[1] + .01]
+            inis = [float(w["start"]) for w in dentro if float(w["start"]) >= tr[0] - .01]
+            if fins:   # termina no começo da 1a palavra depois da última palavra do trecho
+                prox = [s for s, e in todas if s >= max(fins) - .001]
+                if prox: tr[1] = round(min(tr[1], prox[0]), 3)
+            if inis:   # começa depois do fim da palavra anterior
+                ant = [e for s, e in todas if s < min(inis) - .001]
+                if ant: tr[0] = round(max(tr[0], min(max(ant), min(inis))), 3)
+        pj["total"] = round(sum(y - x for x, y in pj.get("trechos", [])), 2)
+        json.dump(pj, open(plano, "w"), indent=1)
         c.update({"n": k, "ini": round(a, 2), "fim": round(b, 2), "plano": plano, "problemas": prob})
         ok &= not prob
         linhas.append(f"{k:02d}  {c['media']:>4}  {mmss(a)}-{mmss(b)} ({dur:.0f} s)  {c['titulo']}"
@@ -128,6 +143,6 @@ if __name__ == "__main__":
     if a[0] == "frases":
         cmd_frases(a[1], a[2], float(op("--pausa", .8)))
     elif a[0] == "conferir":
-        sys.exit(0 if conferir(a[1], a[2], float(op("--min", 20)), float(op("--max", 75))) else 1)
+        sys.exit(0 if conferir(a[1], a[2], float(op("--min", 20)), float(op("--max", 75)), float(op("--pausa", .8))) else 1)
     else:
         montar(a[1], a[2], "--vertical" in a, "--reframe" in a, float(op("--fps-fonte", 30)))

@@ -2,12 +2,35 @@
 
 Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando o usuário pedir CapCut (ou `"editor": "capcut"` no config), usar `capcut/capcut_lib.py` onde o `SKILL.md` manda usar `resolve_lib.py`.
 
+> **22/10/2026:** linha de comando (`capcut.py`), prévia renderizada sem o app e fábrica de cortes; rascunho gravado pela lib aberto e regravado pelo CapCut 9.4 (versão 181 -> 185) sem perder nada.
+>
 > **Status: beta, aberto no CapCut em 15/10/2026:** `NBA - TIMELINE` (36 itens vindos do DaVinci) carregou com toda a mídia, áudio com forma de onda, legendas e tempos certos. Ainda não conferidos no app: transição, animações, efeitos, filtros, adesivos, voz e modelos de texto (`GAB TESTE API 2` e `3`).
 >
 > **Antes:** Rascunhos de teste gerados em 14/10/2026 (`GAB TESTE API` e `GAB TESTE API 2`, este com transição, animações, efeito, máscara, fundo e corte de silêncio); falta conferir dentro do CapCut que tudo abre certo. Até essa conferência, avisar o usuário que é beta.
 
-## Como o Gab fala com o CapCut (engenharia reversa, CapCut 9.4.0, 14/10/2026)
+## Linha de comando (`capcut.py`, 22/10/2026): o jeito padrão de mexer no CapCut
 
+Igual ao DaVinci: tudo por comando, sem clicar. O CapCut só precisa estar com ESTE projeto fechado na hora de gravar.
+
+| Comando | O que faz |
+|---|---|
+| `python3 capcut/capcut.py rascunhos` | lista os rascunhos |
+| `capcut.py retrato "<rascunho>" [--json f]` | trilhas e segmentos (regra 1g) |
+| `capcut.py plano plano.json` | monta ou edita um rascunho a partir de um plano JSON: cada op é um método da lib (`video`, `audio`, `texto`, `fundo`, `animar`, `transicao`, `keyframes`...), `"id"` guarda o segmento e `"$id"` usa depois. Formato no topo do `capcut.py` |
+| `capcut.py cortes cortes.json <video> --transcricao t.json [--correcoes c.json] [--credito "..."]` | fábrica de cortes no CapCut: um rascunho 9x16 por corte (trechos do `fabrica_cortes.py conferir`, vídeo inteiro com fundo desfocado, gancho no topo, legenda palavra a palavra embaixo) |
+| `capcut.py previa "<rascunho>" saida.mp4 [--ate s] [--escala .5]` | **renderiza o rascunho sem o CapCut** (ffmpeg + Pillow): vídeo, foto, fundo desfocado/cor, escala, posição, opacidade, velocidade, textos (fonte, cor, contorno, quebra), áudio com volume e fade. Transição, efeito, filtro, adesivo e animação da loja ficam de fora (avisa). Texto calibrado no motor do CapCut |
+| `capcut.py conferir "<rascunho>"` | mídia offline ou fora de `~/Movies`, efeito da loja ainda sem arquivo, buraco na V1 |
+| `capcut.py abrir "<rascunho>"` | põe o rascunho em 1o na tela inicial (ela relê a lista sozinha, sem reiniciar) e abre o CapCut |
+| `capcut.py fechar` | fecha o CapCut |
+
+**Abrir e exportar dentro do app (testado 22/10/2026):** abrir = clique na 1a miniatura (o Gab faz com o computer-use em segundo plano, `app_click`; o projeto abre numa janela nova). Exportar = menu Arquivo > Exportar (dá para chamar em segundo plano com `app_menu`), mas o diálogo (folha com `ExportOkBtn`, `automationcancel`, resolução padrão 4K, pasta padrão Área de Trabalho) só aceita clique/tecla com o CapCut NA FRENTE: em segundo plano não exporta. Por script (AppleScript/System Events) funciona se o usuário der permissão de Acessibilidade ao Terminal/Claude (ajuste de segurança do macOS, só ele liga). Por isso a entrega padrão é o `previa` (MP4 do Gab) e o CapCut fica para o ajuste fino e a exportação manual. Com o diálogo aberto o "Sair" do CapCut é cancelado: `pkill -TERM -x CapCut` fecha limpo.
+
+**Texto: medida do motor (22/10/2026):** o CapCut fixa a ALTURA DE LINHA da fonte (hhea ascent - descent) em `tamanho x 6,35 px` num quadro de 1080 de largura; o corpo da letra sai dessa altura dividida pela métrica da fonte (Anton 1,505, Montserrat 1,219). Por isso o mesmo `tamanho` dá letras de alturas diferentes em fontes diferentes. Legenda legível no 9x16: 10-11; gancho: 16-18.
+
+## Como o Gab fala com o CapCut (engenharia reversa, CapCut 9.4.0, 14/10 e 22/10/2026)
+
+- **Nada abre um rascunho direto (22/10/2026):** o lançador (`Contents/MacOS/CapCut`, 446 KB) lê `--draft_path=`, `--draft_type=`, `--draft_from=` e as variáveis `LAUNCH_TOOL`, `DRAFT_PATH`, `DRAFT_TYPE` (modo "tool_app" do Jianying); testados com `open -a CapCut --args --draft_path=...` e com as variáveis: o 9.4 internacional cai na tela inicial nos dois. O `libVECreator` tem `lvop::PluginStandaloneInstance::restoreDraft` (modo plugin, outro produto) e os deep links só de painel (`capcut://com.ies.videocut/uganchor/anchor_point/<função>`). O QML do app está embutido como texto no `libVECreator.dylib` (`strings` mostra telas e nomes de botão).
+- **Nomes de automação:** botões do Qt têm nome de acessibilidade (`MainWindowTitleBarExportBtn`, `ExportOkBtn`, `automationcancel`, `automationrecycleBinBtnSmall`, `HomePageDraft`); as miniaturas de projeto não aparecem na árvore de acessibilidade.
 - **Não existe API de script nem porta local.** O app é Qt + motor ByteDance (`libVECreator`, `libvideoeditor`). O agente de IA interno (`libDeepAgentsService`, em Go) fala com a nuvem, não abre porta. O `capcut://` só abre painéis de IA (`.../anchor_point/ai_rough_cut`, `caption_auto_subtitles`...), não rascunhos.
 - **O rascunho é JSON puro, sem criptografia** (no Mac; o Jianying chinês criptografa): `~/Movies/CapCut/User Data/Projects/com.lveditor.draft/<nome>/draft_info.json`. A lib lê e escreve esse arquivo.
 - **Sandbox:** o CapCut só lê sem pedir o que está em `~/Movies` (entitlement `assets.movies.read-write`). A lib copia (hardlink quando dá) toda mídia de fora para `~/Movies/Gab CapCut/<rascunho>/`. Mídia fora dali aparece offline.
@@ -77,6 +100,7 @@ Chroma key, fontes da loja no `texto()` (os ids já estão em `loja.json`) e con
 ## Arquivos
 | Arquivo | O que é |
 |---|---|
+| `capcut.py` | linha de comando (plano JSON, cortes, prévia, conferir, abrir, fechar) |
 | `capcut_lib.py` | os comandos acima |
 | `loja.json` | ~19 mil itens da loja do CapCut tirados do cache local (filtros, adesivos, modelos, animações, vozes, fontes) |
 | `davinci_para_capcut.py` | recria no CapCut a timeline do DaVinci |

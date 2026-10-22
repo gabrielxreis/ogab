@@ -1,4 +1,11 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-5 (22/10/2026)
+- **CapCut pela linha de comando:** `capcut/capcut.py` faz no CapCut o que o Gab já fazia no DaVinci, sem clicar: monta ou edita um rascunho a partir de um plano, lista e confere rascunhos (mídia offline, efeito sem arquivo, buraco na V1) e abre o projeto em 1o na tela inicial.
+- **Prévia do CapCut sem o CapCut:** `capcut.py previa` renderiza o rascunho em MP4 direto (vídeo, fundo desfocado, textos, áudio), com o tamanho do texto medido no motor do CapCut. Exportar pelo próprio CapCut continua sendo um clique seu (o diálogo de exportação só aceita comando com o app na frente).
+- **Cortes de vídeo longo no CapCut:** `capcut.py cortes` cria um rascunho vertical por corte (fundo desfocado, gancho no topo, legenda embaixo) a partir da fábrica de cortes.
+- **Cortes de link do YouTube mais rápidos:** `scripts/vtt_transcricao.py` usa a legenda automática do YouTube como transcrição, para escolher os cortes antes do vídeo terminar de baixar.
+- **Fábrica de cortes:** o fim do corte não pega mais o começo da palavra seguinte, e o `conferir` aceita o mesmo `--pausa` do `frases` (antes os S1, S2... apontavam para outras frases).
+
 ## 2026.10.22-4 (22/10/2026)
 - **Suas invenções ajudam todo mundo:** além dos motions novos, o Gab agora também encontra os scripts novos e as melhorias que você (ou o Claude) fizer nos arquivos da skill e manda ao Gabriel, anônimo, para virar novidade para todos. Por isso os termos foram para a versão 2, e o Gab pede o aceite de novo uma vez.
 
