@@ -360,6 +360,8 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 
 <div align="center">
 
+**O Gab escolhe sozinho:** pelo pedido e pelo roteiro frase por frase (`scripts/escolher_preset.py`, cérebro em `presets/catalogo.json`), com o porquê de cada escolha. Prefere escolher você? Peça "quero escolher o preset" (`/ogab seletor`): abre uma página com a prévia animada de cada preset e a sugestão do Gab trecho a trecho para você trocar.
+
 <img src="presets/point-cloud/exemplo.gif" width="150" alt="Point cloud">&nbsp;
 <img src="presets/vector-motion/exemplos/a_destaque.gif" width="150" alt="Vector motion destaque">&nbsp;
 <img src="presets/vector-motion/exemplos/b_bolhas.gif" width="150" alt="Vector motion bolhas">&nbsp;

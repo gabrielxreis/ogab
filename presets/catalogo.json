@@ -1,0 +1,1363 @@
+{
+ "_leia": "Cérebro da escolha de preset (scripts/escolher_preset.py e scripts/seletor.py). Palavras em minúsculas e SEM acento; cada uma vale como começo de palavra (\"cresc\" pega cresce, crescer, crescimento). Frase com espaço vale inteira. papel: linguagem = estilo do vídeo inteiro (as cenas dele mudam por frase); trecho = entra só onde o sinal aparece; abertura/fecho = começo ou fim; entrega = não é vídeo. apresentador: precisa | sem | tanto_faz. Preset novo: adicionar aqui (e o GIF em presets/<id>/exemplo.gif). fora_do_seletor: pastas que não são preset escolhível (motor comum, em construção, extras).",
+ "categorias": {
+  "dados": "Números, gráficos e marcos",
+  "produto": "Produto, app e lançamento",
+  "apresentador": "Pessoa falando para a câmera",
+  "ideia": "Frase de efeito, ideia e história",
+  "lista": "Lista, ranking e passo a passo",
+  "social": "Comentário, prova social e entrevista",
+  "marca": "Abertura, marca e entrega para site"
+ },
+ "presets": [
+  {
+   "id": "painel",
+   "nome": "Painel",
+   "categoria": "produto",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "App de finanças/dados: navy, cartões do app em 3D com números rolando, gráfico que se desenha, câmera mergulhando.",
+   "quando": "lançamento de app, fintech, banco digital, investimento, controle de gastos, SaaS com números",
+   "nichos": [
+    "financ",
+    "dinheiro",
+    "invest",
+    "banco",
+    "cartao",
+    "gasto",
+    "saldo",
+    "renda",
+    "economi",
+    "fintech",
+    "conta digital",
+    "pix",
+    "orcamento",
+    "patrimonio",
+    "dashboard",
+    "metrica",
+    "saas"
+   ],
+   "sinais": [
+    "acompanh",
+    "organiz",
+    "control",
+    "saldo",
+    "gasto",
+    "dinheiro",
+    "cresc",
+    "rend",
+    "invest",
+    "meta",
+    "tudo em um",
+    "num so lugar",
+    "em um so lugar",
+    "app",
+    "aplicativo"
+   ],
+   "padroes": {
+    "dinheiro": 2,
+    "porcentagem": 1,
+    "marca": 1
+   },
+   "cenas": {
+    "pilha": [],
+    "linha": [
+     "@primeira"
+    ],
+    "painel": [
+     "acompanh",
+     "veja",
+     "organiz",
+     "tudo em um",
+     "num so lugar",
+     "gasto",
+     "controle de",
+     "painel",
+     "relatorio"
+    ],
+    "revela": [
+     "@marca"
+    ],
+    "troca": [
+     "@tres_adjetivos"
+    ],
+    "cresce": [
+     "cresc",
+     "rend",
+     "invest",
+     "meta",
+     "aument",
+     "multiplic",
+     "subir",
+     "chegar"
+    ],
+    "caos": [
+     "menos ",
+     "bagunc",
+     "caos",
+     "confus"
+    ],
+    "regras": [
+     "automatic",
+     "regra",
+     "configur",
+     "ativ",
+     "personaliz",
+     "do seu jeito"
+    ],
+    "fecho": [
+     "@ultima"
+    ]
+   }
+  },
+  {
+   "id": "launch",
+   "nome": "Launch",
+   "categoria": "produto",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Filme de lançamento premium estilo Apple: preto, uma ideia por cena, telas reais do produto em vidro 3D.",
+   "quando": "apresentar produto digital (curso, app, SaaS, site) com as telas dele",
+   "nichos": [
+    "lancament",
+    "produto",
+    "curso",
+    "plataforma",
+    "software",
+    "saas",
+    "site",
+    "ferramenta"
+   ],
+   "sinais": [
+    "lanc",
+    "apresent",
+    "conheca",
+    "chegou",
+    "novo",
+    "nova",
+    "plataforma",
+    "produto",
+    "curso",
+    "site",
+    "ferramenta"
+   ],
+   "padroes": {
+    "marca": 2
+   },
+   "cenas": {
+    "gancho": [],
+    "logo": [
+     "@marca"
+    ],
+    "tela": [
+     "tela",
+     "veja",
+     "painel",
+     "site",
+     "app",
+     "plataforma",
+     "dentro"
+    ],
+    "lista": [
+     "@lista"
+    ],
+    "numero": [
+     "@numero"
+    ],
+    "cta": [
+     "@ultima",
+     "@cta"
+    ]
+   }
+  },
+  {
+   "id": "vitrine",
+   "nome": "Vitrine",
+   "categoria": "produto",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Interface limpa de luxo: cada frase vira um pedaço de interface (conversor, perfil, cartão, janela, pílula).",
+   "quando": "frase que cita valor, preço, perfil, seguidores, arquivo, aviso ou canal",
+   "nichos": [
+    "instagram",
+    "youtube",
+    "seguidor",
+    "criador",
+    "perfil",
+    "rede social"
+   ],
+   "sinais": [
+    "preco",
+    "valor",
+    "cotac",
+    "dolar",
+    "perfil",
+    "seguidor",
+    "inscrit",
+    "notific",
+    "arquivo",
+    "aviso",
+    "canal",
+    "conta",
+    "escolh",
+    "opcao",
+    "janela",
+    "botao"
+   ],
+   "padroes": {
+    "dinheiro": 1,
+    "interface": 3
+   },
+   "cenas": {
+    "pilula": [],
+    "conversor": [
+     "dolar",
+     "real",
+     "cotac",
+     "convert",
+     "cambio",
+     "preco"
+    ],
+    "perfil": [
+     "perfil",
+     "seguidor",
+     "bio"
+    ],
+    "canal": [
+     "canal",
+     "inscrit",
+     "youtube"
+    ],
+    "selecao": [
+     "escolh",
+     "opcao",
+     "ou "
+    ],
+    "janela": [
+     "arquivo",
+     "aviso",
+     "erro",
+     "alerta",
+     "janela"
+    ]
+   }
+  },
+  {
+   "id": "kinetic",
+   "nome": "Kinetic",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Tipografia cinética agressiva: palavras gigantes trocando na batida da voz, caixa vermelha, glitch, chicote.",
+   "quando": "gancho agressivo, reação, novidade, lista rápida, tecnologia e negócio",
+   "nichos": [
+    "ia",
+    "inteligencia artificial",
+    "tecnolog",
+    "negocio",
+    "startup",
+    "noticia",
+    "novidade"
+   ],
+   "sinais": [
+    "nao acredit",
+    "serio",
+    "olha isso",
+    "novo",
+    "novidade",
+    "lancou",
+    "acabou de",
+    "chocante",
+    "absurdo",
+    "inacredit",
+    "ninguem",
+    "pare"
+   ],
+   "padroes": {
+    "exclamacao": 2,
+    "curta": 1,
+    "pergunta": 1
+   },
+   "evitar": [
+    "deus",
+    "fe ",
+    "luto",
+    "morte",
+    "saudade",
+    "oracao"
+   ],
+   "cenas": {
+    "palavra": [],
+    "hierarquia": [
+     "@pergunta"
+    ],
+    "caixa": [
+     "nao e",
+     "nao sao",
+     "isso nao",
+     "nunca foi"
+    ],
+    "faixa": [
+     "@exclamacao"
+    ],
+    "prompt": [
+     "prompt",
+     "digit",
+     "escrev",
+     "pede",
+     "pedir"
+    ],
+    "render": [
+     "espera",
+     "process",
+     "carreg",
+     "render",
+     "gerando"
+    ],
+    "pilha_eco": [
+     "@lista"
+    ],
+    "explosao": [
+     "absurdo",
+     "inacredit",
+     "brincando"
+    ]
+   }
+  },
+  {
+   "id": "vector-motion",
+   "nome": "Vector motion",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Cada frase vira uma metáfora visual simples em preto e branco, o protagonista brilhando contra o resto.",
+   "quando": "frase de efeito, motivacional, mentalidade, hábito, comportamento",
+   "gifs": [
+    "presets/vector-motion/exemplos/a_destaque.gif",
+    "presets/vector-motion/exemplos/b_bolhas.gif",
+    "presets/vector-motion/exemplos/c_grade.gif",
+    "presets/vector-motion/exemplos/d_objetos.gif"
+   ],
+   "nichos": [
+    "motivac",
+    "mentalidade",
+    "habito",
+    "disciplina",
+    "produtividade",
+    "sucesso",
+    "desenvolvimento pessoal"
+   ],
+   "sinais": [
+    "enquanto todos",
+    "a maioria",
+    "todo mundo",
+    "voce",
+    "disciplin",
+    "habito",
+    "rotina",
+    "foco",
+    "sucesso",
+    "sonho",
+    "objetivo",
+    "mentalidade",
+    "diferente",
+    "desist",
+    "persist",
+    "caminho",
+    "jornada"
+   ],
+   "padroes": {
+    "efeito": 3
+   },
+   "cenas": {
+    "frase": [],
+    "um_entre_muitos": [
+     "enquanto todos",
+     "a maioria",
+     "todo mundo",
+     "diferente",
+     "so voce",
+     "poucos"
+    ],
+    "multidao": [
+     "multidao",
+     "pessoas",
+     "milhares"
+    ],
+    "caminho": [
+     "caminho",
+     "jornada",
+     "passo",
+     "chegar"
+    ],
+    "calendario": [
+     "dia",
+     "semana",
+     "mes",
+     "rotina",
+     "todo dia",
+     "calendario"
+    ],
+    "porta": [
+     "oportunidad",
+     "porta",
+     "nova fase",
+     "comeco"
+    ],
+    "heroi": [
+     "venc",
+     "consegu",
+     "conquist",
+     "sucesso"
+    ],
+    "forma_vira": [
+     "transform",
+     "mudar",
+     "mudanca",
+     "virar",
+     "tornar"
+    ],
+    "sobe_da_pilha": [
+     "destac",
+     "sair da media",
+     "acima",
+     "melhor que"
+    ]
+   }
+  },
+  {
+   "id": "point-cloud",
+   "nome": "Point cloud",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Milhares de pontos desenham fotos reais, texto 3D e formas (galáxia, esfera) e migram entre cenas.",
+   "quando": "curiosidade, história, filosofia, ciência, pessoa ou obra histórica, abertura contemplativa",
+   "nichos": [
+    "ciencia",
+    "historia",
+    "filosof",
+    "curiosidad",
+    "universo",
+    "espaco"
+   ],
+   "sinais": [
+    "voce sabia",
+    "curiosid",
+    "universo",
+    "estrela",
+    "galaxia",
+    "cientist",
+    "filosof",
+    "seculo",
+    "historia",
+    "misterio",
+    "atomo",
+    "cerebro",
+    "einstein",
+    "newton",
+    "descobr"
+   ],
+   "padroes": {
+    "pergunta": 1,
+    "historico": 2
+   },
+   "cenas": {
+    "texto": [],
+    "galaxia": [
+     "universo",
+     "galaxia",
+     "estrela",
+     "cosmo",
+     "comeco",
+     "tudo comeca"
+    ],
+    "imagem": [
+     "@pessoa_historica"
+    ],
+    "esfera": [
+     "mundo",
+     "planeta",
+     "terra",
+     "global"
+    ]
+   }
+  },
+  {
+   "id": "gravura",
+   "nome": "Gravura",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Prancha de gravura em cobre se gravando sozinha, título cortado letra a letra e aquarela no que importa.",
+   "quando": "história, Bíblia, fé, tradição, época antiga, herança de marca, objeto com história",
+   "nichos": [
+    "biblia",
+    "igreja",
+    "fe",
+    "deus",
+    "crist",
+    "historia",
+    "tradic",
+    "antig",
+    "missao",
+    "evangel"
+   ],
+   "sinais": [
+    "biblia",
+    "deus",
+    "jesus",
+    "senhor",
+    "profeta",
+    "apostol",
+    "versiculo",
+    "antig",
+    "seculo",
+    "tradic",
+    "heranca",
+    "lamparina",
+    "barco",
+    "pergaminho",
+    "mapa",
+    "reino",
+    "missao",
+    "atos ",
+    "genesis",
+    "evangel"
+   ],
+   "padroes": {
+    "historico": 2
+   },
+   "cenas": {}
+  },
+  {
+   "id": "sketch",
+   "nome": "Sketch",
+   "categoria": "lista",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Tudo vira esboço de marcador se desenhando: cabeçalho A → B, grade de apps, fluxo ferramenta → resultado, lista com check.",
+   "quando": "tutorial, 'X apps/ferramentas que...', passo a passo, tecnologia, IA, produtividade",
+   "nichos": [
+    "tutorial",
+    "ferramenta",
+    "app",
+    "ia",
+    "produtividade",
+    "tecnolog"
+   ],
+   "sinais": [
+    "tutorial",
+    "passo a passo",
+    "ferramenta",
+    "apps",
+    "aplicativo",
+    "site que",
+    "extensao",
+    "plugin",
+    "como fazer",
+    "aprenda",
+    "use o",
+    "usando o",
+    "gratis"
+   ],
+   "padroes": {
+    "lista": 2,
+    "ferramenta": 3
+   },
+   "cenas": {
+    "frase": [],
+    "cabecalho": [
+     "->",
+     " para ",
+     "antes e depois",
+     "de ",
+     "virar"
+    ],
+    "grade": [
+     "@lista",
+     "apps",
+     "ferramentas",
+     "sites"
+    ],
+    "numero": [
+     "primeiro",
+     "segundo",
+     "terceiro",
+     "numero",
+     "passo"
+    ],
+    "fluxo": [
+     "faz ",
+     "gera",
+     "cria",
+     "transforma",
+     "resultado"
+    ],
+    "lista": [
+     "checklist",
+     "beneficio",
+     "passos"
+    ]
+   }
+  },
+  {
+   "id": "tela-dividida",
+   "nome": "Tela dividida",
+   "categoria": "apresentador",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "gif": "presets/tela-dividida/guia.png",
+   "resumo": "Painel de motion em cima e o apresentador embaixo, legenda-etiqueta na emenda.",
+   "quando": "talking head explicativo que cita app, site, número, marca ou passo a passo (40-60 s)",
+   "nichos": [
+    "tutorial",
+    "explica",
+    "dica"
+   ],
+   "sinais": [
+    "site",
+    "app",
+    "ferramenta",
+    "passo",
+    "entra no",
+    "clica",
+    "baixa"
+   ],
+   "padroes": {
+    "marca": 2,
+    "numero": 1,
+    "ferramenta": 2
+   },
+   "cenas": {}
+  },
+  {
+   "id": "serif-azul",
+   "nome": "Serif azul",
+   "categoria": "apresentador",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Editorial: legenda sans com a palavra-chave em serifada itálica azul, passos 1-2-3 e cenas em papel claro.",
+   "quando": "talking head de lista ou método ('3 erros', '5 passos'), dica de especialista, marca premium",
+   "nichos": [
+    "consultor",
+    "especialista",
+    "metodo",
+    "premium",
+    "design",
+    "edicao"
+   ],
+   "sinais": [
+    "erro",
+    "passo",
+    "metodo",
+    "iniciante",
+    "profission",
+    "dica",
+    "segredo",
+    "nivel"
+   ],
+   "padroes": {
+    "lista": 3
+   },
+   "cenas": {}
+  },
+  {
+   "id": "lume",
+   "nome": "Lume",
+   "categoria": "apresentador",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Palavra-chave brilhando letra a letra atrás da mão, mesa vista de cima com a etapa como objeto, luz vazada.",
+   "quando": "bastidor ou processo ('como a gente faz'), números de produção, etapa que vira objeto",
+   "nichos": [
+    "bastidor",
+    "processo",
+    "producao",
+    "criador",
+    "agencia"
+   ],
+   "sinais": [
+    "bastidor",
+    "processo",
+    "como a gente",
+    "como eu",
+    "meses",
+    "roteiro",
+    "ideia",
+    "publicar",
+    "gravar",
+    "produz"
+   ],
+   "padroes": {
+    "numero": 1
+   },
+   "cenas": {}
+  },
+  {
+   "id": "glass",
+   "nome": "Glass",
+   "categoria": "apresentador",
+   "papel": "linguagem",
+   "formato": [
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "YouTube 16:9: vidro escuro com aurora, título metálico, prints reais com o número destacado, cartão de inscreva-se.",
+   "quando": "YouTube explicativo com webcam e tela (marketing, negócio, tecnologia), print de painel/resultado",
+   "nichos": [
+    "youtube",
+    "marketing",
+    "negocio",
+    "trafego",
+    "vendas"
+   ],
+   "sinais": [
+    "print",
+    "resultado",
+    "painel",
+    "faturamento",
+    "vendas",
+    "campanha",
+    "inscrev",
+    "capitulo"
+   ],
+   "padroes": {
+    "numero": 1,
+    "dinheiro": 1
+   },
+   "cenas": {}
+  },
+  {
+   "id": "destaque",
+   "nome": "Destaque (CENA)",
+   "categoria": "apresentador",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Legenda palavra por palavra com a palavra-chave grande amarela ou em serifa, pílula com marca-texto.",
+   "quando": "depoimento, opinião, bastidor, 'eu fiz/aprendi', criador falando direto pra câmera sem material de apoio",
+   "nichos": [
+    "depoimento",
+    "opiniao",
+    "criador",
+    "pessoal"
+   ],
+   "sinais": [
+    "eu ",
+    "minha",
+    "aprendi",
+    "descobri",
+    "acho que",
+    "na minha opiniao",
+    "verdade",
+    "sinceramente",
+    "confesso"
+   ],
+   "padroes": {
+    "primeira_pessoa": 2
+   },
+   "cenas": {},
+   "combina": [
+    "palco",
+    "orbita",
+    "lente"
+   ]
+  },
+  {
+   "id": "palco",
+   "nome": "Palco (CENA)",
+   "categoria": "apresentador",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "A palavra dita aparece gigante ATRÁS da pessoa (recorte automático).",
+   "quando": "nome, palavra de impacto ou título dito pelo apresentador",
+   "sinais": [
+    "meu nome",
+    "eu sou",
+    "bem-vindo",
+    "regra",
+    "segredo",
+    "nunca",
+    "sempre"
+   ],
+   "padroes": {
+    "curta": 2,
+    "marca": 1
+   },
+   "cenas": {}
+  },
+  {
+   "id": "orbita",
+   "nome": "Órbita (CENA)",
+   "categoria": "apresentador",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Cartões de vidro em volta da pessoa: checklist com check na fala, barra 'pronto 100%', caixa de comentário digitando.",
+   "quando": "lista falada, progresso, CTA 'comenta X'",
+   "sinais": [
+    "comenta",
+    "comente",
+    "pronto",
+    "checklist",
+    "conclu"
+   ],
+   "padroes": {
+    "lista": 2,
+    "cta": 2
+   },
+   "cenas": {}
+  },
+  {
+   "id": "lente",
+   "nome": "Lente (CENA)",
+   "categoria": "apresentador",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Zoom rápido no rosto na palavra forte.",
+   "quando": "palavra forte, revelação, ênfase do apresentador",
+   "sinais": [
+    "olha",
+    "presta atencao",
+    "isso aqui",
+    "agora",
+    "importante",
+    "cuidado"
+   ],
+   "padroes": {
+    "exclamacao": 2
+   },
+   "cenas": {}
+  },
+  {
+   "id": "grafico",
+   "nome": "Gráfico",
+   "categoria": "dados",
+   "papel": "trecho",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Barras, linha, rosca ou comparação com o valor exato aprovado e a fonte na tela.",
+   "quando": "número, porcentagem, crescimento, comparação com dado de fonte",
+   "sinais": [
+    "pesquisa",
+    "segundo o",
+    "segundo a",
+    "dados",
+    "estudo",
+    "ibge",
+    "por cento",
+    "porcento",
+    "comparad",
+    "cresceu",
+    "caiu",
+    "aumentou",
+    "diminuiu"
+   ],
+   "padroes": {
+    "porcentagem": 3,
+    "numero": 2,
+    "comparacao": 2,
+    "fonte": 3
+   },
+   "cenas": {
+    "barras": [],
+    "linha": [
+     "cresc",
+     "ao longo",
+     "anos",
+     "evolu"
+    ],
+    "rosca": [
+     "%",
+     "por cento",
+     "parte",
+     "metade",
+     "dos brasileiros"
+    ],
+    "comparacao": [
+     "contra",
+     "versus",
+     " vs ",
+     "enquanto",
+     "comparad"
+    ]
+   }
+  },
+  {
+   "id": "marco",
+   "nome": "Marco",
+   "categoria": "dados",
+   "papel": "trecho",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Milhares de pontos se juntam e desenham o número do marco ('10 mil', '1 milhão', '+10 anos').",
+   "quando": "a fala celebra um número só, grande",
+   "sinais": [
+    "chegamos",
+    "batemos",
+    "alcanc",
+    "mil alunos",
+    "mil seguidores",
+    "milhao",
+    "milhoes",
+    "anos de",
+    "marca de",
+    "recorde"
+   ],
+   "padroes": {
+    "numero_grande": 3
+   },
+   "cenas": {}
+  },
+  {
+   "id": "ranking",
+   "nome": "Ranking",
+   "categoria": "lista",
+   "papel": "trecho",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Tier list S-D ou pódio top 3 se montando na fala; cada item assenta e fica.",
+   "quando": "ranking, tier list, 'do pior ao melhor', top 3, comparação com veredito",
+   "sinais": [
+    "tier",
+    "ranking",
+    "top 3",
+    "top 5",
+    "top tres",
+    "do pior",
+    "do melhor",
+    "nota ",
+    "podio",
+    "campea",
+    "primeiro lugar",
+    "ultimo lugar"
+   ],
+   "padroes": {
+    "ranking": 4
+   },
+   "cenas": {
+    "tier": [
+     "tier",
+     "nota"
+    ],
+    "top3": [
+     "top",
+     "primeiro lugar",
+     "podio"
+    ]
+   }
+  },
+  {
+   "id": "respostas",
+   "nome": "Respostas",
+   "categoria": "lista",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Faixa no topo com '?' que viram ícone + palavra no instante de cada resposta.",
+   "quando": "'3 regras para...', 'N coisas que...', entrevista de rua com respostas curtas",
+   "sinais": [
+    "regras para",
+    "coisas que",
+    "o que voce levaria",
+    "o que voce faria",
+    "3 regras",
+    "tres regras",
+    "dicas para"
+   ],
+   "padroes": {
+    "lista_anunciada": 4
+   },
+   "cenas": {}
+  },
+  {
+   "id": "comentario",
+   "nome": "Comentário",
+   "categoria": "social",
+   "papel": "trecho",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Card do comentário de seguidor com @, curtidas e a palavra-chave marcada.",
+   "quando": "'respondendo comentário', pergunta de seguidor, prova social em texto",
+   "sinais": [
+    "comentou",
+    "comentario",
+    "me perguntaram",
+    "perguntou",
+    "pergunta de",
+    "seguidor",
+    "respondendo",
+    "mandaram"
+   ],
+   "padroes": {
+    "comentario": 4
+   },
+   "cenas": {}
+  },
+  {
+   "id": "cartoes",
+   "nome": "Cartões",
+   "categoria": "social",
+   "papel": "trecho",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Cartões de prova (números, depoimentos, prints) empilhando em profundidade e abrindo em leque.",
+   "quando": "prova acumulada: resultados, depoimentos, 'olha quanta gente'",
+   "sinais": [
+    "depoiment",
+    "resultado",
+    "aluno",
+    "cliente",
+    "prova",
+    "olha quanta",
+    "mais de",
+    "transformou",
+    "feedback"
+   ],
+   "padroes": {
+    "numero": 1,
+    "prova": 3
+   },
+   "cenas": {}
+  },
+  {
+   "id": "podcast",
+   "nome": "Podcast",
+   "categoria": "social",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "precisa",
+   "resumo": "Duas pessoas em tela dividida, legenda karaokê na cor de quem fala, abaixo do queixo.",
+   "quando": "corte de podcast ou entrevista com DUAS pessoas",
+   "sinais": [
+    "podcast",
+    "entrevista",
+    "convidado",
+    "episodio",
+    "bate-papo"
+   ],
+   "padroes": {
+    "dois_falantes": 6
+   },
+   "cenas": {}
+  },
+  {
+   "id": "logo-reveal",
+   "nome": "Logo reveal",
+   "categoria": "marca",
+   "papel": "abertura",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Abertura de marca de 5-8 s: o logo nascendo do escuro em luz, linhas ou pontos.",
+   "quando": "abertura ou fecho de marca, vinheta de canal, 'abre com o logo'",
+   "sinais": [
+    "vinheta",
+    "abertura",
+    "logo",
+    "intro",
+    "assinatura da marca"
+   ],
+   "padroes": {},
+   "cenas": {
+    "luz": [],
+    "linhas": [
+     "linha",
+     "tecnic"
+    ],
+    "pontos": [
+     "ponto",
+     "digital",
+     "tecnolog"
+    ]
+   }
+  },
+  {
+   "id": "lottie",
+   "nome": "Lottie",
+   "categoria": "marca",
+   "papel": "entrega",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Não é vídeo: .json leve de carregando, sucesso, curtir e botão para site e app.",
+   "quando": "animação para site ou app (carregando, botão, ícone, sucesso)",
+   "sinais": [
+    "lottie",
+    "site",
+    "carregando",
+    "loading",
+    "botao",
+    "icone animado",
+    "webflow",
+    "app"
+   ],
+   "padroes": {},
+   "cenas": {}
+  }
+ ],
+ "pedidos": [
+  {
+   "rota": "fluxo:arte_animada",
+   "guia": "docs/etapas/arte_animada.md",
+   "sinais": [
+    "anima essa arte",
+    "anima esse flyer",
+    "anima esse post",
+    "anima o psd",
+    "animar a arte",
+    "psd",
+    "canva",
+    "flyer",
+    "arte estatica",
+    "anima essa imagem",
+    "anima esse design"
+   ]
+  },
+  {
+   "rota": "fluxo:fabrica_cortes",
+   "guia": "docs/etapas/davinci.md",
+   "sinais": [
+    "cortes dessa",
+    "cortes desse",
+    "faz cortes",
+    "tira cortes",
+    "cortes da live",
+    "cortes do podcast",
+    "cortes da aula",
+    "recortes",
+    "clipes da live"
+   ],
+   "extra": {
+    "se": [
+     "podcast",
+     "entrevista",
+     "duas pessoas"
+    ],
+    "preset": "podcast"
+   }
+  },
+  {
+   "rota": "preset:logo-reveal",
+   "sinais": [
+    "abertura com o logo",
+    "abre com o logo",
+    "vinheta",
+    "logo reveal",
+    "intro do canal",
+    "animacao do logo"
+   ]
+  },
+  {
+   "rota": "preset:lottie",
+   "sinais": [
+    "lottie",
+    "animacao para o site",
+    "animacao pro site",
+    "animacao para o app",
+    "loading",
+    "icone animado",
+    "botao animado",
+    "carregando",
+    "pro site",
+    "para o site",
+    "para site",
+    "pro app",
+    "animacao de sucesso"
+   ]
+  },
+  {
+   "rota": "preset:painel",
+   "sinais": [
+    "app de financas",
+    "fintech",
+    "banco digital",
+    "app de investimento",
+    "controle de gastos",
+    "dashboard",
+    "painel de dados"
+   ]
+  },
+  {
+   "rota": "preset:launch",
+   "sinais": [
+    "video de lancamento",
+    "lancamento do produto",
+    "apresentando o produto",
+    "apresentar o produto",
+    "apresentar o app",
+    "apresentar o site",
+    "apresentar o curso",
+    "video do produto",
+    "lancamento do app",
+    "lancamento do curso"
+   ]
+  },
+  {
+   "rota": "preset:grafico",
+   "sinais": [
+    "grafico",
+    "dado animado",
+    "animar esse dado",
+    "porcentagem animada"
+   ]
+  },
+  {
+   "rota": "preset:ranking",
+   "sinais": [
+    "tier list",
+    "ranking",
+    "top 3",
+    "top 5",
+    "do pior ao melhor"
+   ]
+  },
+  {
+   "rota": "preset:comentario",
+   "sinais": [
+    "respondendo comentario",
+    "responder comentario",
+    "card de comentario"
+   ]
+  },
+  {
+   "rota": "preset:podcast",
+   "sinais": [
+    "corte de podcast",
+    "podcast com duas",
+    "entrevista com duas"
+   ]
+  },
+  {
+   "rota": "fluxo:carrossel",
+   "guia": "instagram/carrossel/CARROSSEL.md",
+   "sinais": [
+    "carrossel"
+   ],
+   "extra": {
+    "se": [
+     "motion",
+     "animado",
+     "video"
+    ],
+    "guia": "instagram/carrossel_motion/CARROSSEL_MOTION.md"
+   }
+  },
+  {
+   "rota": "fluxo:so_motion",
+   "guia": "docs/etapas/so_motion.md",
+   "sinais": [
+    "so motion",
+    "sem narracao",
+    "so com musica",
+    "motion com musica",
+    "video de motion"
+   ]
+  },
+  {
+   "rota": "preset:gravura",
+   "sinais": [
+    "estilo gravura",
+    "estilo antigo",
+    "video sobre a biblia",
+    "historia biblica"
+   ]
+  },
+  {
+   "rota": "preset:glass",
+   "sinais": [
+    "video do youtube 16:9",
+    "youtube horizontal",
+    "video longo do youtube"
+   ]
+  },
+  {
+   "rota": "preset:sketch",
+   "sinais": [
+    "tutorial de apps",
+    "apps que",
+    "ferramentas que",
+    "sites que"
+   ]
+  }
+ ],
+ "fora_do_seletor": [
+  "cena",
+  "bancada",
+  "efeitos"
+ ]
+}

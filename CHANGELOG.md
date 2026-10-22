@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-4 (22/10/2026)
+- **O Gab escolhe o preset sozinho e diz por quê:** lê o seu pedido (anima arte, cortes, abertura de logo, lançamento, animação para site...) e o roteiro frase por frase, escolhe o estilo do vídeo pelo assunto e coloca o preset certo em cada trecho (gráfico no dado, ranking, comentário, marco...).
+- **Seletor de presets com GIF:** se preferir escolher você, peça "quero escolher o preset" (ou `/ogab seletor`). Abre uma página com a prévia animada de cada preset; clique no trecho, depois na miniatura, e confirme. O Gab segue com a sua escolha.
+
 ## 2026.10.22-3 (22/10/2026)
 - **Termos de uso:** para instalar e usar o Gab agora é preciso aceitar os termos (digitando ACEITO). Quem já usa vai ver os termos na próxima vez que abrir o Gab. Eles explicam a licença de uso e que o Gab envia ao Gabriel, de forma anônima, os erros que corrigir e a estrutura dos motions novos (nunca vídeo, roteiro, cliente ou dado pessoal). Texto completo em `docs/TERMOS.md`.
 - A apresentação ao Gabriel agora pede só o nome.
