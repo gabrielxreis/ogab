@@ -15,6 +15,29 @@ no repositório e todo mundo recebe no próximo auto-update.
   com a biblioteca e com o que já foi enviado; semelhança >= 70% (`LIMIAR_PARECIDO`) não manda. Trocar texto, fonte,
   cor, tempo, posição, uma animação ou o número de linhas não conta como motion novo. A coluna `correcao` traz
   "novidade X% (mais parecido: ...)". Conferir à mão: `relatar.py parecido <pasta do modelo>`.
+  **HyperFrames** (`"motor": "hyperframes"`, spec vazio): vai o PACOTE dos arquivos de texto da pasta do modelo
+  (PRESET.md, gerar.py, kit/*.css|js, index.html, hyperframes.json) em até 4 relatos de ~45 mil caracteres (a célula
+  da planilha aguenta 50 mil): cores viram cinza da mesma luminosidade, texto visível vira "Texto", data: URIs e
+  libs minificadas saem, binários só na lista. A semelhança compara o código (tags, props do GSAP, eases, técnicas,
+  CSS) com os presets/ da skill. Remontar: colar as partes num .txt e `relatar.py desempacotar <txt> <pasta>`.
+
+  **Varredura (22/10/2026):** o usuário não precisa lembrar de salvar na biblioteca. Toda vez que o Gab abre,
+  `relatar.py enviar` primeiro roda `varrer`: acha as pastas novas em `presets/` (criadas nesta máquina, fora do git)
+  e os modelos de `biblioteca_motions_local/`, e registra os que mudaram desde a última varredura e são bem
+  diferentes do banco. Variação de preset que já existe (cópia com outra cor ou texto) fica de fora.
+
+## Banco de presets da comunidade (lado do dono)
+
+`scripts/banco_presets.py` (`/ogab presets`) transforma os motions que chegam em presets publicados:
+
+1. `puxar`: lê a planilha (gws logado; ou `--csv` baixado no Chrome em `.../export?format=csv&gid=<aba_gid>`),
+   pega só `tipo` preset ainda não resolvido, junta as partes pela assinatura, remonta a pasta em
+   `~/.claude/ogab_relatos/candidatos/<id>/` e recalcula a novidade contra o banco ATUAL.
+2. `listar` / `ver <id>` / `previa <id>`: avaliar (a prévia sai em cinza e com textos genéricos, de propósito).
+3. `aceitar <id> --nome <nome>`: entra em `biblioteca_motions/<nome>/` com "autor": "comunidade", refaz o
+   catálogo `biblioteca_motions/CATALOGO.md`, commit + push, `relatos.py resolver`. Todos recebem no auto-update.
+   `recusar <id> "motivo"`: marca resolvido e apaga o candidato.
+4. Apagar da planilha as linhas que o comando lista.
 
 **Dono: ler tudo antes de qualquer commit na skill** (o pre-commit trava; `relatos.py hook`, `relatos.py lido`).
 

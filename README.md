@@ -567,6 +567,12 @@ Modelos prontos em [`biblioteca_motions/`](biblioteca_motions) (cada um com `mod
 python3 ~/.claude/skills/ogab/scripts/biblioteca_motions.py listar
 ```
 
+### Banco de presets da comunidade
+
+A biblioteca cresce com quem usa o Gab. Quando você cria um motion novo (um preset a partir de uma referência ou um modelo salvo na biblioteca), o Gab compara com tudo o que já existe. Se for **bem diferente** e você tiver respondido "sim" aos relatos anônimos, ele vai para o Gabriel avaliar só com a estrutura: sem cor da marca, sem texto do cliente, sem nome nem pasta. Os aprovados entram para todo mundo no próximo update, com o selo "comunidade". Uma cópia com outra cor ou outro texto não conta como motion novo.
+
+O banco inteiro, com prévia de cada motion: [`biblioteca_motions/CATALOGO.md`](biblioteca_motions/CATALOGO.md).
+
 
 # ÁUDIO E EXPORT
 

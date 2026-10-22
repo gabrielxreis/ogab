@@ -1,4 +1,12 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-1 (22/10/2026)
+- **Banco de presets da comunidade:** os motions que você cria (preset novo a partir de uma referência ou modelo salvo na biblioteca) são encontrados sozinhos e, se forem bem diferentes do que já existe e você tiver dito "sim" aos relatos, vão anônimos para o Gabriel avaliar. Os aprovados entram para todo mundo no próximo update. O banco inteiro fica em `biblioteca_motions/CATALOGO.md`.
+- **Grade com palavras para estudar referência:** `grade.py <video> --transcrever --cortes` mostra os quadros do vídeo com a palavra falada embaixo de cada um e os cortes marcados, para ver em que palavra cada texto ou motion entra e sai.
+- **Duração do roteiro antes da voz:** `estimar.py --arquivo roteiro.txt` diz quantos segundos cada trecho vai durar (sílabas do português). Depois do primeiro vídeo, `estimar.py calibrar` aprende o ritmo da voz e acerta ainda mais.
+- **Plano preso à palavra:** SFX e motions guardam em que palavra entram (`ancorar.py`). Regravou a narração ou trocou a voz? Tudo se reposiciona sozinho na fala nova.
+- **Correções que vieram dos relatos:** Premiere coloca a música no tempo certo mesmo com ponto de entrada no meio da faixa, volta a ter a curva de volume (`envelope_volume`, para abaixar a música sob a fala) e a legenda entra em timeline ainda sem vídeo.
+- **Variações de gancho para anúncio:** o mesmo vídeo com 3 a 5 ganchos diferentes, uma timeline por gancho e o corpo aninhado (mexeu no corpo, muda em todas). `variantes.py`.
+
 ## 2026.10.20-3 (20/10/2026)
 - **Efeitos sonoros grátis do Pixabay:** quem não tem Artlist nem Envato (ou quando eles não acham o som) agora recebe SFX do Pixabay, sem conta e com uso comercial liberado. O Gab busca pelo navegador, baixa em WAV pronto para o DaVinci e anota a licença de cada som.
 
@@ -10,6 +18,9 @@
 - **Novo preset GRAVURA:** cada frase vira uma prancha de gravura em cobre que se grava sozinha (contorno, hachura, título cortado letra a letra, nota em cursiva e aquarela só no que importa). Para história, fé, tradição e herança de marca. Peça "no preset gravura". Motor do lemo-opuscar (MIT).
 - **Revisor mede o tempo de leitura:** lê o texto de cada quadro (OCR do Mac) e avisa quando uma frase sai da tela antes de dar tempo de ler.
 - **Voz IA ouvida de volta:** a conferência final transcreve a narração e compara com o roteiro aprovado, apontando palavra, número ou nome falado errado com o tempo.
+
+## 2026.10.19-6 (19/10/2026)
+- **Motion HyperFrames da comunidade chega inteiro:** ao salvar um motion HyperFrames na biblioteca (`biblioteca_motions.py salvar modelo.json --pasta <pasta do motion>`), os arquivos do motion vão junto, e o relato anônimo leva esses arquivos (sem cor da marca, sem texto do cliente, sem nome nem pasta) para o Gabriel renderizar e publicar para todos. Só sai motion bem diferente dos presets que já existem.
 
 ## 2026.10.19-5 (19/10/2026)
 - **Premiere: motion MOV sem áudio volta a entrar na timeline.** No Premiere 26.5 o motion (MOV com alfa, sem trilha de áudio) dava "startTime must be less than endTime"; agora o Gab confere se o arquivo tem áudio e, se não tem, coloca direto.

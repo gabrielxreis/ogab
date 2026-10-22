@@ -3,7 +3,7 @@
   python3 biblioteca_motions.py listar [--tag lista]
   python3 biblioteca_motions.py ver <modelo>
   python3 biblioteca_motions.py aplicar <modelo> valores.json [--saida spec.json]     # spec pronto para ae_lib.motion
-  python3 biblioteca_motions.py salvar modelo.json [--previa previa.png]               # guarda (e publica, no dono)
+  python3 biblioteca_motions.py salvar modelo.json [--previa previa.png] [--pasta <pasta do motion>]   # guarda (e publica, no dono)
 
 Onde ficam:
   biblioteca_motions/<nome>/modelo.json (+ previa.png)  -> no GitHub, criados pelo dono (config.json "dono_biblioteca": true)
@@ -19,6 +19,10 @@ Formato do modelo.json:
   Números podem vir de campo ("ate": "{{valor}}") e tempos relativos ao fim ("saida_em": "fim-0.5").
   O bloco é centralizado em y = h/2 automaticamente ("centralizar": false no spec desliga).
   As cores NÃO ficam no modelo: vêm do cliente na hora de aplicar (principal, destaque, texto, fundo).
+
+Modelo HyperFrames ("motor": "hyperframes"): o motion é a PASTA (PRESET.md, gerar.py, kit/*.css|js, index.html,
+hyperframes.json), não um spec. Salvar SEMPRE com --pasta <pasta do preset/projeto>: os arquivos vão para dentro do
+modelo (sem node_modules, renders, snapshots nem vídeo). Sem eles o modelo não pode ser recriado e o salvar recusa.
 """
 import copy, json, os, re, shutil, subprocess, sys, datetime
 
@@ -100,6 +104,8 @@ def aplicar(nome, valores, cores=None, nome_comp=None):
     m = modelos().get(nome)
     if not m:
         raise SystemExit(f"modelo não encontrado: {nome}. Disponíveis: {', '.join(modelos())}")
+    if m.get("motor") == "hyperframes":
+        raise SystemExit(f"modelo HyperFrames: copiar a pasta {m['_pasta']} para o projeto e seguir o PRESET.md dela")
     for c, d in m.get("campos", {}).items():
         if c not in valores:
             raise SystemExit(f"falta o campo '{c}' ({d.get('tipo')}), ex.: {d.get('exemplo')}")
@@ -125,21 +131,60 @@ def aplicar(nome, valores, cores=None, nome_comp=None):
     return spec
 
 
-def salvar(modelo, previa=None):
+PULAR_DIRS = {"node_modules", "renders", "snapshots", ".git", "__pycache__", ".hyperframes", "dist"}
+PULAR_EXT = {".mp4", ".mov", ".webm", ".mkv", ".wav", ".mp3", ".aac", ".m4a", ".pyc", ".zip"}
+CODIGO_HF = (".html", ".js", ".css", ".py")
+
+
+def _copiar_pasta(origem, destino):
+    """Copia a pasta do motion HyperFrames para dentro do modelo (sem dependências, renders, vídeos nem arquivos >5 MB)."""
+    n = 0
+    for raiz, dirs, arqs in os.walk(origem):
+        dirs[:] = [d for d in dirs if d not in PULAR_DIRS and not d.startswith(".")]
+        for a in arqs:
+            f = os.path.join(raiz, a)
+            if a.startswith(".") or a == "modelo.json" or os.path.splitext(a)[1].lower() in PULAR_EXT \
+                    or os.path.getsize(f) > 5_000_000:
+                continue
+            alvo = os.path.join(destino, os.path.relpath(f, origem))
+            os.makedirs(os.path.dirname(alvo), exist_ok=True)
+            shutil.copy(f, alvo); n += 1
+    return n
+
+
+def _tem_codigo(pasta):
+    return any(a.endswith(CODIGO_HF) for _, _, arqs in os.walk(pasta) for a in arqs)
+
+
+def salvar(modelo, previa=None, pasta_motion=None, publicar=True):
     """Guarda o modelo. No dono (config "dono_biblioteca": true) vai para biblioteca_motions/ e é publicado
-    (commit + push); nos outros usuários fica em biblioteca_motions_local/ (fora do git, não trava o update)."""
+    (commit + push); nos outros usuários fica em biblioteca_motions_local/ (fora do git, não trava o update).
+    HyperFrames ("motor": "hyperframes"): pasta_motion é copiada para dentro do modelo (é ela que recria o motion).
+    publicar=False (no dono): só grava, sem commit/push."""
+    hf = modelo.get("motor") == "hyperframes"
+    if hf:
+        modelo.setdefault("spec", {})
     for k in ("nome", "descricao", "campos", "spec"):
         if k not in modelo:
             raise SystemExit(f"modelo sem '{k}'")
+    if hf and pasta_motion and not os.path.isdir(pasta_motion):
+        raise SystemExit(f"pasta do motion não existe: {pasta_motion}")
     nome = re.sub(r"[^a-z0-9-]", "-", modelo["nome"].lower()).strip("-")
     modelo["nome"] = nome
     modelo.setdefault("criado", datetime.date.today().isoformat())
     dono = bool(_cfg().get("dono_biblioteca"))
     pasta = os.path.join(PUBLICA if dono else LOCAL, nome)
+    if hf and not ((pasta_motion and _tem_codigo(pasta_motion)) or (os.path.isdir(pasta) and _tem_codigo(pasta))):
+        raise SystemExit("modelo HyperFrames sem os arquivos do motion: salvar com --pasta <pasta do preset/projeto> "
+                         "(PRESET.md, gerar.py, kit/*.css|js, index.html)")
     os.makedirs(pasta, exist_ok=True)
+    if hf and pasta_motion:
+        _copiar_pasta(pasta_motion, pasta)
     json.dump(modelo, open(os.path.join(pasta, "modelo.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     if previa and os.path.exists(previa):
         shutil.copy(previa, os.path.join(pasta, "previa.png"))
+    if dono and not publicar:   # quem chamou faz o commit (banco_presets.py aceitar: junto com o catálogo)
+        return f"{pasta} (salvo, sem commit)"
     if dono:
         g = ["git", "-C", RAIZ]
         subprocess.run(g + ["add", pasta], check=True)
@@ -166,7 +211,8 @@ def main(a):
             if tag and tag not in m.get("tags", []):
                 continue
             campos = ", ".join(f"{c} ({d.get('tipo')})" for c, d in m.get("campos", {}).items())
-            print(f"- {n} [{m['_origem']}] {m.get('descricao', '')}\n    campos: {campos}  tags: {', '.join(m.get('tags', []))}")
+            motor = " hyperframes" if m.get("motor") == "hyperframes" else ""
+            print(f"- {n} [{m['_origem']}{motor}] {m.get('descricao', '')}\n    campos: {campos}  tags: {', '.join(m.get('tags', []))}")
     elif cmd == "ver":
         m = modelos()[a[1]]
         print(json.dumps({k: v for k, v in m.items() if not k.startswith("_")}, ensure_ascii=False, indent=1))
@@ -181,7 +227,8 @@ def main(a):
             print(texto)
     elif cmd == "salvar":
         previa = a[a.index("--previa") + 1] if "--previa" in a else None
-        print(salvar(json.load(open(a[1], encoding="utf-8")), previa))
+        pasta_motion = a[a.index("--pasta") + 1] if "--pasta" in a else None
+        print(salvar(json.load(open(a[1], encoding="utf-8")), previa, pasta_motion))
     else:
         raise SystemExit(__doc__)
 

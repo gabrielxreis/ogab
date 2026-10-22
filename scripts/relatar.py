@@ -5,13 +5,19 @@
   python3 relatar.py registrar --titulo "..." --erro "..." --causa "..." --correcao "..." [--arquivo scripts/x.py ...]
   python3 relatar.py preset <pasta do modelo | modelo.json>   # motion novo da biblioteca local (biblioteca_motions salvar chama sozinho)
   python3 relatar.py parecido <pasta do modelo | modelo.json>  # quão diferente é da biblioteca (e dos já enviados)
-  python3 relatar.py enviar                # manda os pendentes (ao abrir o Gab, em segundo plano) SÓ se "relatos": true
+  python3 relatar.py desempacotar <texto.txt> <pasta>  # (dono) remonta a pasta de um preset HyperFrames (colunas diff coladas)
+  python3 relatar.py varrer                # acha os motions que ESTE usuário criou (presets/ novos e biblioteca local)
+  python3 relatar.py enviar                # varre + manda os pendentes (ao abrir o Gab, em segundo plano) SÓ se "relatos": true
   python3 relatar.py status                # consentimento, pendentes e enviados
 
 Consentimento: sem "relatos": true no config.json nada sai da máquina (relatos ficam só em ~/.claude/ogab_relatos/).
 Motions (presets) só saem com o consentimento da pergunta nova ("relatos_v" >= 2), que cita erros E motions.
 Preset vai como ESTRUTURA: elementos, tempos, animações e campos; textos de exemplo viram genéricos, sai o autor,
 nome de cliente sai pela anonimização e as cores nem ficam no modelo (vêm do cliente na hora de aplicar).
+Preset HyperFrames ("motor": "hyperframes", spec vazio) vai como PACOTE dos arquivos de texto da pasta do modelo
+(PRESET.md, gerar.py, kit/*.css|js, index.html, hyperframes.json), para o dono remontar e renderizar: anonimizados,
+cores viram cinza da mesma luminosidade (sem a cor da marca), textos visíveis viram "Texto", data: URIs e libs
+minificadas saem, binários só aparecem na lista. Até PARTES_MAX relatos de ~LIMITE_PARTE caracteres (célula da planilha).
 O relato é ANONIMIZADO antes de ser gravado: caminhos viram ~/..., saem e-mails, chaves/tokens, parâmetros de link,
 o nome do usuário e o nome de cada cliente (pastas de clientes/ e da pasta de saída). Não vai vídeo, roteiro, legenda
 nem transcrição: só o que quebrou na skill, a causa, a correção e o diff dos arquivos DA SKILL.
@@ -115,7 +121,7 @@ def anonimizar(txt, nomes):
         e = re.findall(r"\.(\w{1,5})$", m.group(0).rstrip(". "))
         return "~/…/*" + ("." + e[0] if e else "")
     t = re.sub(r"~[/\\](?:(?!, |: |;|\n|['\"]).)*", _so_ext, t)
-    t = re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", "<email>", t)
+    t = re.sub(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b", "<email>", t)   # gsap@3.14.2 (CDN) não é e-mail
     t = re.sub(r"\b(sk|pk|rk|ghp|gho|ghs|xox[abp]|AKIA|AIza|ya29)[-_A-Za-z0-9]{12,}", "<chave>", t)
     t = re.sub(r"(?i)\b(api[_-]?key|token|secret|senha|password|authorization|bearer)\b(\s*[:=]\s*|\s+)\S+", r"\1=<oculto>", t)
     t = re.sub(r"\b[A-Za-z0-9_\-]{40,}\b", "<longo>", t)
@@ -208,7 +214,225 @@ def tracos_motion(modelo):
             for v in x:
                 walk(v)
     walk(modelo.get("spec", {}))
+    if _e_hyperframes(modelo):
+        arqs = modelo.get("_arquivos")
+        if arqs is None and modelo.get("_pasta"):
+            arqs = _arquivos_hf(modelo["_pasta"])
+        for k, w in tracos_hf(arqs or {}, modelo.get("_pasta")).items():
+            add(k, w)
     return t
+
+
+# ------------------------------------------------------------ motion HyperFrames (a pasta é o motion)
+CODIGO_HF = (".html", ".js", ".css", ".py")
+TEXTO_HF = CODIGO_HF + (".md", ".json", ".svg", ".txt")
+PULAR_DIRS_HF = {"node_modules", "renders", "snapshots", ".git", "__pycache__", ".hyperframes", "dist"}
+LIMITE_ARQ_HF = 30000     # caracteres por arquivo (o resto é cortado com aviso)
+LIMITE_PARTE = 45000      # célula da planilha do Formulário Google aguenta 50.000
+PARTES_MAX = 4
+PROPS_GSAP = ("x", "y", "z", "xPercent", "yPercent", "scale", "scaleX", "scaleY", "rotation", "rotationX", "rotationY",
+              "rotationZ", "skewX", "skewY", "opacity", "autoAlpha", "filter", "clipPath", "strokeDashoffset",
+              "strokeDasharray", "drawSVG", "morphSVG", "motionPath", "backgroundPosition", "width", "height",
+              "borderRadius", "letterSpacing", "transformOrigin", "perspective", "boxShadow", "textShadow", "fontSize",
+              "color", "backgroundColor", "attr", "text", "scrambleText", "innerText")
+TECNICAS_HF = ("SplitText", "MotionPathPlugin", "DrawSVGPlugin", "MorphSVGPlugin", "ScrambleTextPlugin", "CustomEase",
+               "Flip", "THREE", "lottie", "canvas", "getContext", "requestAnimationFrame", "stagger", "repeat", "yoyo",
+               "timeline", "fromTo", "Math.random", "noise")
+CSS_HF = ("backdrop-filter", "perspective", "preserve-3d", "mix-blend-mode", "mask", "clip-path", "blur(", "drop-shadow",
+          "linear-gradient", "radial-gradient", "conic-gradient", "@keyframes", "text-stroke", "box-shadow",
+          "text-shadow", "background-clip", "filter", "grid", "font-variation-settings")
+TAGS_HF = ("svg", "canvas", "video", "img", "path", "circle", "rect", "line", "polyline", "text", "iframe", "audio")
+
+
+def _e_hyperframes(m):
+    return m.get("motor") == "hyperframes" or (not (m.get("spec") or {}).get("elementos") and "plano" in m)
+
+
+def _arquivos_hf(pasta):
+    """{caminho relativo: tamanho} de tudo na pasta do modelo (menos dependências, renders e o próprio modelo.json)."""
+    r = {}
+    for raiz, dirs, arqs in os.walk(pasta):
+        dirs[:] = sorted(d for d in dirs if d not in PULAR_DIRS_HF and not d.startswith("."))
+        for a in sorted(arqs):
+            if a.startswith(".") or a == "modelo.json":
+                continue
+            f = os.path.join(raiz, a)
+            r[os.path.relpath(f, pasta).replace(os.sep, "/")] = os.path.getsize(f)
+    return r
+
+
+def _ler_hf(pasta, rel):
+    try:
+        return open(os.path.join(pasta, rel), encoding="utf-8", errors="replace").read()
+    except Exception:
+        return ""
+
+
+def tracos_hf(arquivos, pasta=None):
+    """Marcas da estrutura de um motion HyperFrames lidas do código (tags, props animadas no GSAP, eases, técnicas, CSS).
+    arquivos: {rel: tamanho} (lidos de pasta) ou {rel: texto}."""
+    t = {}
+
+    def add(k, w):
+        t[k] = max(t.get(k, 0), w)
+    for rel, v in arquivos.items():
+        if not rel.endswith(CODIGO_HF) or rel.endswith(".min.js"):
+            continue
+        txt = v if isinstance(v, str) else _ler_hf(pasta, rel) if pasta else ""
+        for tag in TAGS_HF:
+            n = len(re.findall(rf"<{tag}[\s>/]", txt))
+            if n:
+                add(f"el:{tag}", 3.0); add(f"el:{tag}#{min(n, 4)}", 1.0)
+        for metodo in set(re.findall(r"\b(?:gsap|tl|timeline)\.(to|from|fromTo|set|timeline)\b", txt)):
+            add(f"gsap:{metodo}", 1.0)
+        for prop in PROPS_GSAP:
+            if re.search(rf"[{{,\s]{prop}\s*:", txt):
+                add(f"anima:{prop}", 1.5)
+        for e in set(re.findall(r"ease\s*:\s*['\"]([A-Za-z]+)", txt)):
+            add(f"ease:{e}", 0.5)
+        for tec in TECNICAS_HF:
+            if tec in txt:
+                add(f"usa:{tec}", 2.0)
+        if rel.endswith((".css", ".html", ".py")):
+            for c in CSS_HF:
+                if c in txt:
+                    add(f"css:{c}", 1.0)
+    return t
+
+
+def _cinza(r, g, b):
+    y = round(0.2126 * r + 0.7152 * g + 0.0722 * b)
+    return y, y, y
+
+
+def _cores_neutras(txt, ids=()):
+    """Cor da marca não sai: toda cor vira cinza da mesma luminosidade (o motion continua renderizável, com o contraste)."""
+    def hexa(m):
+        h = m.group(1)
+        if h in ids:
+            return m.group(0)   # é um #id do HTML (ex.: #cab), não cor
+        if len(h) in (3, 4):
+            h = "".join(c * 2 for c in h)
+        r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+        y = _cinza(r, g, b)[0]
+        return "#" + f"{y:02x}" * 3 + h[6:8]
+
+    def rgb(m):
+        vals = [v.strip() for v in re.split(r"[,\s/]+", m.group(2).strip()) if v.strip()]
+        try:
+            r, g, b = (float(v.rstrip("%")) * (2.55 if v.endswith("%") else 1) for v in vals[:3])
+        except Exception:
+            return m.group(0)
+        y = _cinza(r, g, b)[0]
+        return f"{m.group(1)}({y}, {y}, {y}" + (f", {vals[3]}" if len(vals) > 3 else "") + ")"
+    t = re.sub(r"(?<![\w&])#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b(?!\s*[{.>\[])", hexa, txt)
+    t = re.sub(r"\b(rgba?)\(([^)]*)\)", rgb, t)
+    t = re.sub(r"\b(hsla?\(\s*[\d.]+(?:deg)?\s*[,\s]\s*)[\d.]+%", r"\g<1>0%", t)
+    return t
+
+
+def _parece_frase(s):
+    """String de JS/Python que é texto visível (2+ palavras de letras), não seletor, ease, fonte nem CSS."""
+    if s[:1] in ".#[*:" or re.search(r"(?i)(^|\s)(div|span|path|svg|g|p|li|ul|img|circle|rect|line|text|b|i|s|em|"
+                                      r"strong|section|video|canvas|polyline|use|tspan)(?=$|[\s.#\[:>,])", s):
+        return False   # seletor CSS/DOM
+    if len(s) < 4 or not re.search(r"[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}", s) or re.search(r"[{};=<>#$`\\]|\.\w+\(|px\b|%", s):
+        return False
+    if re.search(r"(?i)\b(serif|sans|mono|ease|power\d|inherit|solid|bold|italic|translate|rotate|scale|none|auto)\b", s):
+        return False
+    letras = sum(c.isalpha() or c.isspace() for c in s)
+    return letras / len(s) > 0.75
+
+
+def _textos_genericos(txt, ext):
+    """Texto do cliente não sai: texto visível do HTML e frases em strings de JS/Python/JSON viram "Texto"."""
+    if ext == ".html":
+        partes = re.split(r"(<script\b.*?</script>|<style\b.*?</style>)", txt, flags=re.S | re.I)
+        for i in range(0, len(partes), 2):
+            partes[i] = re.sub(r">(\s*)([^<>]*?[A-Za-zÀ-ÿ]{2,}[^<>]*?)(\s*)<", r">\1Texto\3<", partes[i])
+            partes[i] = re.sub(r'\b(alt|title|aria-label|placeholder)="[^"]*"', r'\1="Texto"', partes[i])
+        for i in range(1, len(partes), 2):
+            if partes[i].lower().startswith("<script"):
+                partes[i] = _textos_genericos(partes[i], ".js")
+        return "".join(partes)
+    if ext in (".js", ".py", ".json"):
+        return re.sub(r"""(?P<q>["'])((?:(?!(?P=q))[^\\\n]|\\.){4,})(?P=q)""",
+                      lambda m: f"{m.group('q')}Texto{m.group('q')}" if _parece_frase(m.group(2)) else m.group(0), txt)
+    return txt
+
+
+def _prioridade_hf(rel):
+    b = rel.rsplit("/", 1)[-1].lower()
+    ordem = ["preset.md", "leia.md", "readme.md", "gerar.py"]
+    if b in ordem:
+        return (ordem.index(b), rel)
+    if rel.startswith("kit/"):
+        return (5, rel)
+    if b in ("index.html", "hyperframes.json"):
+        return (6, rel)
+    return (7 if rel.endswith(CODIGO_HF) else 8, rel)
+
+
+def _empacotar_hf(corpo_modelo, arquivos, pasta, nomes):
+    """Pacote de texto com os arquivos da pasta do modelo, já limpos, em até PARTES_MAX partes de LIMITE_PARTE.
+    Formato (relatar.py desempacotar lê): '--- arquivo: <rel> ---' + conteúdo; binários só na lista do fim."""
+    blocos, fora = [f"--- arquivo: modelo.json ---\n{corpo_modelo}\n"], []
+    ids = {i for rel in arquivos if rel.endswith((".html", ".py", ".js"))
+           for i in re.findall(r"""\bid\s*=\s*["']([\w-]+)""", _ler_hf(pasta, rel))}
+    for rel in sorted(arquivos, key=_prioridade_hf):
+        ext = os.path.splitext(rel)[1].lower()
+        if ext not in TEXTO_HF:
+            fora.append(f"{rel} ({arquivos[rel] // 1024 or 1} KB, binário: não vai)"); continue
+        if rel.endswith(".min.js") or arquivos[rel] > 200_000:
+            fora.append(f"{rel} ({arquivos[rel] // 1024} KB, biblioteca/arquivo grande: não vai)"); continue
+        txt = _ler_hf(pasta, rel)
+        txt = re.sub(r"data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+", "data:<removido>", txt)
+        if ext != ".md":
+            txt = _textos_genericos(_cores_neutras(txt, ids), ext)
+        txt = anonimizar(txt, nomes)
+        txt = re.sub(r"[ \t]+\n", "\n", txt); txt = re.sub(r"\n{3,}", "\n\n", txt)
+        if len(txt) > LIMITE_ARQ_HF:
+            txt = txt[:LIMITE_ARQ_HF] + f"\n/* ... cortado: {len(txt) - LIMITE_ARQ_HF} caracteres a mais */"
+        blocos.append(f"--- arquivo: {anonimizar(rel, nomes)} ---\n{txt}\n")
+    partes, atual = [], ""
+    for b in blocos:
+        while b:
+            if len(atual) + len(b) <= LIMITE_PARTE - 300:
+                atual += b; b = ""
+            elif atual:
+                partes.append(atual); atual = ""
+            else:   # bloco sozinho maior que a parte: quebra e continua na próxima
+                corte = LIMITE_PARTE - 300
+                atual, b = b[:corte], "--- continua ---\n" + b[corte:]
+    if atual:
+        partes.append(atual)
+    if len(partes) > PARTES_MAX:
+        fora.append(f"{len(partes) - PARTES_MAX} parte(s) a mais cortada(s) (arquivos de menor prioridade)")
+        partes = partes[:PARTES_MAX]
+    rodape = ("--- fora do pacote ---\n" + "\n".join(fora) + "\n") if fora else ""
+    if len(partes[-1]) + len(rodape) > LIMITE_PARTE and len(partes) < PARTES_MAX:
+        partes.append("")
+    partes[-1] += rodape
+    n = len(partes)
+    return [f"=== PACOTE HYPERFRAMES ogab v1 parte {i}/{n} ===\n{p}" for i, p in enumerate(partes, 1)]
+
+
+def desempacotar(texto, destino):
+    """(dono) Remonta a pasta do preset a partir das colunas diff (todas as partes, em qualquer ordem, coladas num texto)."""
+    pecas = re.split(r"^=== PACOTE HYPERFRAMES ogab v1 parte (\d+)/\d+ ===\n", texto, flags=re.M)
+    corpo = "".join(p for _, p in sorted(((int(pecas[i]), pecas[i + 1]) for i in range(1, len(pecas) - 1, 2))))
+    corpo = re.sub(r"\n?--- continua ---\n", "", corpo)
+    corpo = corpo.split("--- fora do pacote ---")[0]
+    feitos = []
+    for rel, conteudo in re.findall(r"^--- arquivo: (.+?) ---\n(.*?)(?=^--- arquivo: |\Z)", corpo, flags=re.M | re.S):
+        rel = rel.strip()
+        if rel.startswith(("/", "\\")) or ".." in rel.split("/") or ":" in rel or "<" in rel:
+            continue   # caminho estranho (ou anonimizado): não grava fora da pasta
+        alvo = os.path.join(destino, rel)
+        os.makedirs(os.path.dirname(alvo), exist_ok=True)
+        open(alvo, "w", encoding="utf-8").write(conteudo[:-1] if conteudo.endswith("\n") else conteudo)
+        feitos.append(rel)
+    return feitos
 
 
 def similaridade(a, b):
@@ -222,7 +446,17 @@ def _referencias():
     refs = {}
     for f in glob.glob(os.path.join(SKILL, "biblioteca_motions", "*", "modelo.json")):
         try:
-            refs["biblioteca:" + os.path.basename(os.path.dirname(f))] = tracos_motion(json.load(open(f, encoding="utf-8")))
+            m = json.load(open(f, encoding="utf-8")); m["_pasta"] = os.path.dirname(f)
+            refs["biblioteca:" + os.path.basename(os.path.dirname(f))] = tracos_motion(m)
+        except Exception:
+            pass
+    for d in glob.glob(os.path.join(SKILL, "presets", "*", "")):   # presets HyperFrames da skill (kit + gerar.py)
+        try:
+            arqs = _arquivos_hf(d); nome = os.path.basename(os.path.dirname(d))
+            for sufixo, sel in (("", arqs), ("/kit", {k: v for k, v in arqs.items() if not k.startswith("exemplo/")})):
+                tr = tracos_hf(sel, d)   # com e sem o exemplo/ (cópia de um preset pode vir só com o kit)
+                if tr:
+                    refs["preset:" + nome + sufixo] = tr
         except Exception:
             pass
     try:
@@ -236,17 +470,33 @@ def _referencias():
 def parecido(modelo, ignorar=""):
     """[(similaridade, referência)] do mais parecido ao menos parecido."""
     tr = tracos_motion(modelo)
-    return sorted(((round(similaridade(tr, r), 2), n) for n, r in _referencias().items() if n.split(":", 1)[1] != ignorar),
+    return sorted(((round(similaridade(tr, r), 2), n) for n, r in _referencias().items()
+                   if n.split(":", 1)[1].split("/")[0] != ignorar),
                   reverse=True)
 
 
-def registrar_preset(caminho):
+def registrar_preset(caminho, motivo=None):
+    """Grava o relato do motion novo em pendentes/ (só sai com consentimento). Devolve o arquivo (o 1º, se o pacote
+    HyperFrames vier em partes) ou None; motivo (lista), se passado, recebe o porquê de não registrar."""
+    motivo = motivo if motivo is not None else []
     arq = os.path.join(caminho, "modelo.json") if os.path.isdir(caminho) else caminho
-    m = json.load(open(arq, encoding="utf-8"))
+    pasta_modelo = os.path.dirname(os.path.abspath(arq))
+    if os.path.isdir(caminho) and not os.path.exists(arq):
+        m = modelo_de_preset(caminho)   # presets/<nome>/ criado pelo usuário (PRESET.md + kit), sem modelo.json
+    else:
+        m = json.load(open(arq, encoding="utf-8"))
+    hf = _e_hyperframes(m)
+    if hf:
+        m["_arquivos"], m["_pasta"] = _arquivos_hf(pasta_modelo), pasta_modelo
+        if not any(r.endswith(CODIGO_HF) for r in m["_arquivos"]):
+            motivo.append("modelo HyperFrames sem os arquivos do motion (salvar com biblioteca_motions.py salvar --pasta)")
+            return None   # sem os arquivos não dá para recriar: relato inútil para o dono
     ranking = parecido(m, ignorar=m.get("nome", ""))
     if ranking and ranking[0][0] >= LIMIAR_PARECIDO:
+        motivo.append(f"parecido demais com {ranking[0][1]} ({ranking[0][0]:.0%})")
         return None   # variação de um motion que já existe (mesma estrutura com outros textos/tempos): não manda
     tracos = tracos_motion(m)
+    arquivos = m.pop("_arquivos", {}); m.pop("_pasta", None)
     m.pop("autor", None)
     for i, (k, c) in enumerate((m.get("campos") or {}).items(), 1):
         if isinstance(c, dict) and "exemplo" in c:
@@ -255,16 +505,23 @@ def registrar_preset(caminho):
     cfg = _config(); nomes = _nomes_privados(cfg)
     corpo = anonimizar(json.dumps(m, ensure_ascii=False, indent=1), nomes)[:40000]
     estrutura = json.dumps(m.get("spec", {}), sort_keys=True)
+    partes = [corpo]
+    if hf:
+        partes = _empacotar_hf(corpo, arquivos, pasta_modelo, nomes)
+        estrutura = json.dumps(tracos, sort_keys=True)   # spec vazio: assinatura vem da estrutura dos arquivos
     rel = {"chave_envio": CHAVE_ENVIO, "tipo": "preset", "titulo": anonimizar(m.get("nome", "motion"), nomes)[:200],
            "erro": anonimizar(m.get("descricao", ""), nomes)[:3000], "causa": ", ".join(m.get("tags", []))[:2000],
            "correcao": (f"novidade {1 - (ranking[0][0] if ranking else 0):.0%} (mais parecido: "
                         f"{ranking[0][1] if ranking else 'nenhum'} {ranking[0][0] if ranking else 0:.0%}); "
-                        f"dur {m.get('dur', '?')} s; campos: {', '.join(m.get('campos', {}))}")[:3000], "diff": corpo,
+                        f"dur {m.get('dur', '?')} s; campos: {', '.join(m.get('campos', {}))}"
+                        + (f"; HyperFrames: {len(arquivos)} arquivo(s) em {len(partes)} parte(s), "
+                           f"remontar com relatar.py desempacotar" if hf else ""))[:3000], "diff": partes[0],
            "assinatura": hashlib.sha1(estrutura.encode()).hexdigest()[:10], "versao": _versao(),
            "sistema": f"{platform.system()} {platform.release()} {platform.machine()}", "python": platform.python_version(),
            "editor": cfg.get("editor", ""), "motion": cfg.get("motion", ""), "instalacao": _instalacao(),
            "quando": time.strftime("%Y-%m-%dT%H:%M:%S")}
     if any(rel["assinatura"] in os.path.basename(f) for f in glob.glob(os.path.join(PASTA, "*", "*.json"))):
+        motivo.append("este motion (mesma estrutura) já foi registrado")
         return None   # este motion (mesma estrutura) já foi registrado
     os.makedirs(PEND, exist_ok=True)
     try:
@@ -273,9 +530,105 @@ def registrar_preset(caminho):
         vistos = {}
     vistos[rel["titulo"]] = tracos
     json.dump(vistos, open(VISTOS, "w", encoding="utf-8"), ensure_ascii=False)
-    saida = os.path.join(PEND, f"{time.strftime('%Y%m%d-%H%M%S')}-preset-{rel['assinatura']}.json")
-    json.dump(rel, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    return saida
+    carimbo = time.strftime('%Y%m%d-%H%M%S')
+    saidas = []
+    for i, diff in enumerate(partes, 1):
+        r = dict(rel, diff=diff)
+        if len(partes) > 1:
+            r["titulo"] = f"{rel['titulo']} (parte {i}/{len(partes)})"[:200]
+        saida = os.path.join(PEND, f"{carimbo}-preset-{rel['assinatura']}" + (f"-p{i}" if len(partes) > 1 else "") + ".json")
+        json.dump(r, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        saidas.append(saida)
+    return saidas[0]
+
+
+def modelo_de_preset(pasta):
+    """Modelo HyperFrames montado a partir de uma pasta presets/<nome>/ (PRESET.md, gerar.py, kit/) sem modelo.json."""
+    nome = os.path.basename(os.path.normpath(pasta))
+    desc, titulo = "", nome
+    md = os.path.join(pasta, "PRESET.md")
+    if os.path.exists(md):
+        linhas = open(md, encoding="utf-8").read().splitlines()
+        for l in linhas:
+            if l.startswith("# "):
+                titulo = l[2:].strip(); break
+        para = []
+        for l in linhas:
+            if l.startswith("#") or l.startswith("<") or not l.strip():
+                if para:
+                    break
+                continue
+            para.append(l.strip())
+        desc = " ".join(para)
+    plano = os.path.join(pasta, "exemplo", "plano.json")
+    campos = {}
+    try:
+        for k, v in json.load(open(plano, encoding="utf-8")).items():
+            if k not in ("w", "h", "fps", "dur"):
+                campos[k] = {"tipo": "lista" if isinstance(v, list) else "numero" if isinstance(v, (int, float))
+                             else "texto", "exemplo": v}
+    except Exception:
+        pass
+    return {"nome": nome, "descricao": (desc or titulo)[:600], "tags": ["preset"], "motor": "hyperframes",
+            "campos": campos, "spec": {}, "_arquivos": None}
+
+
+VARRIDOS = os.path.join(PASTA, "varridos.json")
+
+
+def _impressao(pasta):
+    """Muda quando algum arquivo de código/texto da pasta muda (para não varrer de novo o que não mudou)."""
+    h = hashlib.sha1()
+    for rel, tam in sorted(_arquivos_hf(pasta).items()):
+        if rel.endswith(TEXTO_HF):
+            h.update(f"{rel}:{tam}:{int(os.path.getmtime(os.path.join(pasta, rel)))}".encode())
+    return h.hexdigest()[:12]
+
+
+def _presets_do_usuario():
+    """Pastas de motion que ESTE usuário criou: presets/<nome>/ fora do git (não vieram no update) e
+    biblioteca_motions_local/<nome>/ (salvos pela biblioteca)."""
+    r = []
+    rastreados = set()
+    try:
+        out = subprocess.run(["git", "-C", SKILL, "ls-files", "presets"], capture_output=True, text=True, timeout=20).stdout
+        rastreados = {l.split("/")[1] for l in out.splitlines() if l.count("/") >= 2}
+    except Exception:
+        return r   # sem git não dá para saber o que é do usuário
+    for d in sorted(glob.glob(os.path.join(SKILL, "presets", "*", ""))):
+        nome = os.path.basename(os.path.dirname(d))
+        if nome not in rastreados and any(a.endswith(CODIGO_HF) for a in _arquivos_hf(d)):
+            r.append(os.path.dirname(d))
+    for d in sorted(glob.glob(os.path.join(SKILL, "biblioteca_motions_local", "*", "modelo.json"))):
+        r.append(os.path.dirname(d))
+    return r
+
+
+def varrer():
+    """Registra (em pendentes/, só sai com consentimento) os motions novos deste usuário que ainda não foram
+    avaliados. Variação de preset que já existe não vai (LIMIAR_PARECIDO). Devolve [(pasta, resultado)]."""
+    if _config().get("dono_biblioteca"):
+        return []   # o dono publica direto
+    try:
+        vistos = json.load(open(VARRIDOS, encoding="utf-8"))
+    except Exception:
+        vistos = {}
+    feitos = []
+    for pasta in _presets_do_usuario():
+        chave = os.path.relpath(pasta, SKILL); imp = _impressao(pasta)
+        if vistos.get(chave) == imp:
+            continue
+        porque = []
+        try:
+            res = registrar_preset(pasta, porque)
+        except Exception as e:
+            res, porque = None, [f"erro: {e}"]
+        vistos[chave] = imp
+        feitos.append((chave, res or "não registrado: " + ("; ".join(porque) or "?")))
+    if feitos:
+        os.makedirs(PASTA, exist_ok=True)
+        json.dump(vistos, open(VARRIDOS, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    return feitos
 
 
 def _log(msg):
@@ -288,6 +641,11 @@ def enviar():
     cfg = _config(); dest = _destino()
     if cfg.get("relatos") is not True or cfg.get("dono_biblioteca") or not dest.get("action"):   # só com consentimento
         return 0
+    try:
+        for chave, res in varrer():
+            _log(f"varredura {chave}: {res}")
+    except Exception as e:
+        _log(f"varredura falhou: {e}")
     import urllib.parse
     os.makedirs(ENV, exist_ok=True); n = 0
     for arq in sorted(glob.glob(os.path.join(PEND, "*.json")))[:20]:
@@ -330,12 +688,19 @@ if __name__ == "__main__":
         arqs = [a[i + 1] for i, x in enumerate(a) if x == "--arquivo" and i + 1 < len(a)]
         print(registrar(arg("--titulo"), arg("--erro"), arg("--causa"), arg("--correcao"), arqs))
     elif a[0] == "preset" and len(a) >= 2:
-        print(registrar_preset(a[1]) or "não registrado: igual ou parecido demais com um motion que já existe")
+        porque = []
+        print(registrar_preset(a[1], porque) or "não registrado: " + ("; ".join(porque) or "?"))
+    elif a[0] == "desempacotar" and len(a) >= 3:
+        feitos = desempacotar(open(a[1], encoding="utf-8").read(), a[2])
+        print(f"{len(feitos)} arquivo(s) em {a[2]}:\n  " + "\n  ".join(feitos))
     elif a[0] == "parecido" and len(a) >= 2:
         arq = os.path.join(a[1], "modelo.json") if os.path.isdir(a[1]) else a[1]
-        m = json.load(open(arq, encoding="utf-8"))
+        m = json.load(open(arq, encoding="utf-8")); m["_pasta"] = os.path.dirname(os.path.abspath(arq))
         for sim, n in parecido(m, ignorar=m.get("nome", ""))[:5]:
             print(f"  {sim:.0%}  {n}" + ("  <- parecido demais, não seria enviado" if sim >= LIMIAR_PARECIDO else ""))
+    elif a[0] == "varrer":
+        for chave, res in varrer() or [("-", "nada novo para avaliar")]:
+            print(f"  {chave}: {res}")
     elif a[0] == "enviar":
         enviar()
     elif a[0] == "status":
