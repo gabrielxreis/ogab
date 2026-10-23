@@ -15,9 +15,11 @@ nome próprio, todos rodando por este motor:
 Não confundir com VITRINE (já existia: cartões de produto) nem com TELA DIVIDIDA (painel de motion em cima).
 
 ## Exemplo
-`exemplo/fazer.py <pasta>` monta tudo com um apresentador ILUSTRADO (ninguém real no repositório): a "gravação", o
-recorte direto do desenho e o `"rosto"` fixo no plano, e corta o `exemplo.gif` de cada preset. Os GIFs do README saem
-daí; nunca usar vídeo de cliente ou aluno no repositório público.
+`exemplo/fazer.py <pasta>` baixa um take REAL de banco gratuito (Mixkit, licença livre: `exemplo/CREDITOS.md`), faz a
+"gravação" 9:16 (vai e volta para durar a fala), deixa o `gerar.py` fazer o recorte e o rosto como num vídeo de verdade e
+corta o `exemplo.gif` de cada preset. O vídeo bruto nunca entra no git (só os GIFs). Regras: nada de personagem
+ilustrado, nunca vídeo de cliente ou aluno no repositório público, e a cabeça e o rosto nunca saem cortados em nenhum
+quadro (zoom e enquadramento com folga acima da cabeça).
 
 ## Como gerar
 1. Transcrição com tempo por palavra (`palavras.json`: `[{"w","ini","fim"}]`).

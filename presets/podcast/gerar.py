@@ -1,5 +1,6 @@
 """Preset PODCAST: corte de podcast/entrevista com DUAS pessoas em tela dividida (uma em cima, outra embaixo) e
-legenda karaokê com a cor de quem fala, ancorada logo abaixo do queixo de quem está falando.
+legenda karaokê com a cor de quem fala, centrada na linha que divide os dois vídeos (pedido do usuário, 23/10/2026:
+ali dá para ler e não atrapalha a imagem).
 
   python3 gerar.py plano.json <pasta_saida> [--render saida.mp4] [--gif]
 
@@ -7,6 +8,7 @@ plano.json:
 { "w": 1080, "h": 1920, "fps": 30, "dur": 7,
   "cor": "#F2B33D"  (cor da marca: falante 1, emenda),  "cor2": "#4FD1C5" (cor do falante 2),
   "maxPalavras": 3  (por linha de legenda, 3 ou 4),  "maxCaracteres": 20,  "fonte": "Poppins",  "caixaAlta": true,
+  "legenda": "emenda" (padrão: sobre a linha que divide; "rosto" = modo antigo, abaixo do queixo de quem fala),
   "nomes": false    (etiqueta com o nome de cada um junto da emenda),  "escurece": 0.34 (quanto a metade de quem
                     está calado escurece),  "audio": "podcast.wav" (opcional: som do corte; sem ele, os vídeos ficam mudos),
   "falantes": [   (o 1º vai em cima, o 2º embaixo)
@@ -23,7 +25,8 @@ plano.json:
                 depois desta palavra)}, ... ]  (tempos em segundos DO CORTE, já descontado o início) }
 
 Legenda: grupos de até maxPalavras palavras do mesmo falante, quebra na pontuação e nas pausas, nunca termina em
-palavra fraca (que, de, o, com...). Ela fica abaixo do queixo, dentro da metade de quem fala, presa às bordas; sem
+palavra fraca (que, de, o, com...). Padrão: centrada na emenda, metade em cada vídeo; o gerar avisa se o queixo de
+quem está em cima ou a cabeça de quem está embaixo encostam nela. Com "legenda": "rosto", ela fica abaixo do queixo, dentro da metade de quem fala, presa às bordas; sem
 espaço embaixo, sobe para cima da cabeça; nunca cobre o rosto. Sem trilha, posição fixa da metade (legendaY).
 Exceção à legenda fixa da /ogab: SÓ podcast/entrevista com duas pessoas (ver PRESET.md).
 """
@@ -212,6 +215,24 @@ def conferir_espaco(plano):
     alt_leg = 1.32 * plano.get("tamLegenda", 66) * U; margem, vao = 44 * U, 22 * U
     limite = [HH - margem, min(HH - margem, H * .84 - HH)]
     problemas = 0
+    if plano.get("legenda", "emenda") != "rosto":   # legenda na emenda: rosto nenhum pode encostar na faixa dela
+        faixa = alt_leg / 2 + vao * .5
+        for i, f in enumerate(plano["_falantes"]):
+            if not f["trilha"]:
+                continue
+            t = 0.0
+            while t <= dur + 1e-6:
+                z = 1 + .035 * t / dur; x, y, e = amostrar([[p[0], p[1], p[2], p[3]] for p in f["trilha"]], t)
+                y = HH / 2 + (y - HH / 2) * z; alt = f["rostoAlt"] * e * z
+                if y - .80 * alt < 0:
+                    print(f'AVISO: {t:.2f} s ({f["nome"]}): topo da cabeça sai da metade; trocar por um take com folga acima da cabeça')
+                    problemas += 1; break
+                if (i == 0 and y + .62 * alt > HH - faixa) or (i == 1 and y - .80 * alt < faixa):
+                    print(f'AVISO: {t:.2f} s ({f["nome"]}): rosto encosta na legenda da emenda; '
+                          'reenquadrar (recorte.y / recorte.zoom) ou baixar tamLegenda')
+                    problemas += 1; break
+                t += 1 / 15
+        return problemas
     for g in plano["_grupos"]:
         f = plano["_falantes"][g["falante"]]
         if not f["trilha"]:
@@ -222,6 +243,10 @@ def conferir_espaco(plano):
             y = HH / 2 + (y - HH / 2) * z; alt = f["rostoAlt"] * e * z
             qmax, cmin = max(qmax, y + .62 * alt), min(cmin, y - .80 * alt); t += 1 / 15
         i = g["falante"]
+        if cmin < 0:   # regra do usuário: nunca cortar a cabeça nem o rosto
+            problemas += 1
+            print(f'AVISO: {g["ini"]:.2f}-{g["fim"]:.2f} s ({f["nome"]}): topo da cabeça sai da metade; '
+                  'baixar o rosto (recorte.y / recorte.zoom menor) ou trocar por um take com folga acima da cabeça')
         if qmax + vao * .5 + alt_leg > limite[i] and cmin - vao - alt_leg < margem:
             problemas += 1
             print(f'AVISO: {g["ini"]:.2f}-{g["fim"]:.2f} s ({f["nome"]}): sem espaço fora do rosto para a legenda; '
@@ -266,7 +291,7 @@ def midias_html(fal, plano):
 def gerar(plano, pasta, base="."):
     plano = json.loads(json.dumps(plano))
     for k, v in (("w", 1080), ("h", 1920), ("fps", 30), ("cor", "#F2B33D"), ("cor2", "#4FD1C5"), ("maxPalavras", 3),
-                 ("maxCaracteres", 20), ("fonte", "Poppins"), ("caixaAlta", True), ("nomes", False), ("escurece", .34)):
+                 ("maxCaracteres", 20), ("fonte", "Poppins"), ("caixaAlta", True), ("nomes", False), ("escurece", .34), ("legenda", "emenda")):
         plano.setdefault(k, v)
     if len(plano.get("falantes") or []) != 2:
         raise SystemExit('O preset podcast pede exatamente 2 "falantes" (o 1º em cima, o 2º embaixo).')

@@ -1,13 +1,14 @@
 # Preset PODCAST (duas pessoas em tela dividida, legenda na cor de quem fala)
 
-Corte de podcast ou entrevista com DUAS pessoas: uma em cima, outra embaixo (1080x960 cada), com uma emenda fina na cor da marca. A legenda é karaokê por palavra: cada pessoa tem a sua cor (a da marca e uma secundária), a palavra falada acende e o bloco fica logo abaixo do queixo de quem está falando, acompanhando a cabeça quando há trilha de rastreio. A metade de quem está calado escurece um pouco. Ideia inspirada no repositório hypit; o código é todo nosso.
+Corte de podcast ou entrevista com DUAS pessoas: uma em cima, outra embaixo (1080x960 cada), com uma emenda fina na cor da marca. A legenda é karaokê por palavra: cada pessoa tem a sua cor (a da marca e uma secundária), a palavra falada acende e o bloco fica centrado na linha que divide os dois vídeos (metade em cada um): ali dá para ler e não atrapalha a imagem. A metade de quem está calado escurece um pouco. Ideia inspirada no repositório hypit; o código é todo nosso.
 
-<img src="exemplo.gif" width="200" alt="Exemplo do preset podcast (pessoas ilustradas, fala fictícia)">
+<img src="exemplo.gif" width="200" alt="Exemplo do preset podcast (vídeo de banco gratuito da Mixkit, fala fictícia)">
 
 ## Quando usar
 - **Só podcast/entrevista com duas pessoas.** Nos outros vídeos, a legenda é a fixa da /ogab (Y 724, `docs/etapas/legenda.md`).
-- Esta é a ÚNICA exceção à legenda fixa, e mesmo aqui a legenda **nunca cobre o rosto**: fica abaixo do queixo, dentro da metade de quem fala, presa às bordas para não sair do quadro. Sem espaço embaixo, ela sobe para cima da cabeça (decidido uma vez por bloco, sem pular no meio). Embaixo, ela não entra na faixa da UI do Instagram (abaixo de y ≈ 1613).
-- Sem trilha de rastreio, a legenda fica numa posição fixa da metade de quem fala (`legendaY`, padrão 62 % da altura da metade). Conferir num quadro que o rosto está acima dela.
+- Esta é a ÚNICA exceção à legenda fixa: aqui a legenda fica **sempre na linha que divide os dois vídeos** (`"legenda": "emenda"`, padrão; pedido do usuário, 23/10/2026), centrada, metade em cada vídeo. Ela **nunca cobre o rosto**: enquadrar com o queixo de quem está em cima e a cabeça de quem está embaixo longe da emenda (o gerar avisa se encostar; corrigir com `recorte` ou `tamLegenda`).
+- **Nunca cortar a cabeça nem o rosto** (regra do usuário): take com folga acima da cabeça em todos os quadros; o gerar avisa quando o topo da cabeça sai da metade.
+- Modo antigo, só se pedirem: `"legenda": "rosto"` (abaixo do queixo de quem fala, acompanhando a cabeça; sem trilha, `legendaY`).
 
 ## Regras
 - **Duas pessoas, nesta ordem:** o 1º falante vai em cima, o 2º embaixo. Cores: `cor` (marca) para o 1º e para a emenda, `cor2` para o 2º (ou `cor` dentro de cada falante).
@@ -35,7 +36,7 @@ python3 gerar.py plano.json <pasta> [--render podcast.mp4 --gif]
 ```
 - O gerar lista os blocos de legenda (conferir quebras) e avisa quando algum bloco não cabe fora do rosto: aí reenquadrar (`recorte`) ou baixar `tamLegenda`.
 - Depois: storyboard, aprovação, render e revisor (`docs/etapas/revisor.md`). Olhar 4 a 6 quadros: legenda nunca no rosto, nunca cortada.
-- Exemplo: `exemplo/plano.json` com pessoas ILUSTRADAS (`exemplo/fazer.py` refaz a mídia e a trilha sintética). Fala rápida gera blocos curtos: o revisor dá aviso de leitura (texto repete a fala, então pode) e ERRO abaixo de ~0,7 s; nesse caso, `maxPalavras` 4.
+- Exemplo: `exemplo/plano.json` com duas pessoas reais de banco gratuito (Mixkit, `exemplo/CREDITOS.md`); `exemplo/fazer.py` baixa os clipes e rastreia os rostos. Fala rápida gera blocos curtos: o revisor dá aviso de leitura (texto repete a fala, então pode) e ERRO abaixo de ~0,7 s; nesse caso, `maxPalavras` 4.
 
 ## Limitações
 - Exatamente duas pessoas, sempre em cima e embaixo (sem tela cheia de uma só, sem três pessoas).

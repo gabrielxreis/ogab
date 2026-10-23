@@ -91,6 +91,12 @@
       sp.style.transform = `translateY(${(1 - rr) * 115}%)`; sp.style.opacity = cl(rr * 2);
     });
   });
+  // "centro": true (só no exemplo/prévia, ou quando o vídeo não tem pessoa): pergunta + faixa no meio do quadro.
+  if (P.centro) {
+    const alt = topo + VH - 140, desloc = L((1920 - alt) / 2 - 140);
+    [cam, faixa].filter(e => !(e !== cam && cam.contains(e))).forEach(e => { e.style.top = desloc + "px"; e.style.bottom = -desloc + "px"; });
+    ["foco", "nevoa"].forEach(id => { const e = document.getElementById(id); if (e) e.style.marginTop = desloc + "px"; });
+  }
   const nevoa = document.getElementById("nevoa");
   anima.push(t => {
     cam.style.transform = `scale(${1.02 - .02 * Math.min(1, t / dur)})`;   // câmera contínua bem lenta

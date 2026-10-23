@@ -1,6 +1,6 @@
 // Preset PODCAST: duas pessoas em tela dividida (1º em cima, 2º embaixo), emenda fina na cor da marca, metade de
-// quem está calado escurece um pouco, legenda karaokê na cor de quem fala, ancorada abaixo do queixo dele e
-// acompanhando a cabeça (trilha do rastrear.py convertida pelo gerar.py para px da metade). Campos: ver gerar.py.
+// quem está calado escurece um pouco, legenda karaokê na cor de quem fala, centrada na emenda (padrão)
+// ou, com P.legenda "rosto", abaixo do queixo acompanhando a cabeça (trilha do rastrear.py). Campos: ver gerar.py.
 (async function () {
   const P = window.PLANO, W = P.w, H = P.h, HH = H / 2, U = W / 1080, dur = P.dur;
   const F = P._falantes, G = P._grupos, T = P._turnos, fam = `'${P.fonte || "Poppins"}'`;
@@ -23,7 +23,8 @@
     const caixa = document.getElementById("etiquetas");
     F.forEach((f, i) => {
       const e = mk("div", "etiqueta", caixa, { fontSize: 26 * U + "px", left: MARGEM + "px" });
-      e.style[i === 0 ? "bottom" : "top"] = (i === 0 ? H - HH + 26 * U : HH + 26 * U) + "px";
+      const af = (P.legenda === "rosto" ? 26 : 26 + .66 * (P.tamLegenda || 66) + 8) * U;   // na emenda: longe da legenda
+      e.style[i === 0 ? "bottom" : "top"] = (i === 0 ? H - HH + af : HH + af) + "px";
       mk("i", "", e, { background: f.cor }); mk("span", "", e).textContent = f.nome;
       etiquetas.push(e);
     });
@@ -77,6 +78,7 @@
   };
   legs.forEach(L => {
     const f = F[L.g.falante], i = L.g.falante;
+    if (P.legenda !== "rosto") { L.lado = "emenda"; return; }   // padrão: sobre a linha que divide os dois vídeos
     if (!f.trilha) { L.lado = "fixo"; return; }
     let queixoMax = -1e9, cabecaMin = 1e9;
     for (let t = L.g.ini; t <= L.g.fim + 1e-6; t += 1 / 15) { const r = rostoEm(f, t); queixoMax = Math.max(queixoMax, r.queixo); cabecaMin = Math.min(cabecaMin, r.cabeca); }
@@ -87,6 +89,7 @@
   const posicao = (L, t) => {
     const f = F[L.g.falante], i = L.g.falante;
     let cx = W / 2, top;
+    if (L.lado === "emenda") return [W / 2 - L.w / 2, HH - L.h / 2];
     if (L.lado === "fixo") top = f.legendaY * HH - L.h / 2;
     else {
       const r = rostoEm(f, t); cx = r.x;

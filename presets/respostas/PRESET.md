@@ -10,7 +10,7 @@ Faixa no topo do quadro para entrevista de rua, "3 regras para...", "o que você
 - **Duração:** último `em` + 2,5 s (padrão); costuma ser o trecho inteiro da lista.
 - **Campos:** `pergunta` (opcional, `*palavra*` na cor), `itens` [{`icone`, `rotulo`, `em`}], `cor`, `letra` (`inter` | `bebas`), `fundo` (`escuro` | `transparente`). Formato completo no docstring do `gerar.py`.
 - **Ícone:** imagem ou SVG no traço da marca é o padrão (`"icone": "icones/cofre.svg"`). Emoji só quando o usuário pedir (`motion_proibidos.md`).
-- **Espaço:** faixa de y ~140 a ~420, centrada em x 540. Rótulo de 1-3 palavras; todos com o mesmo corpo de letra.
+- **Espaço:** faixa de y ~140 a ~420, centrada em x 540 (`"centro": true` põe pergunta e faixa no meio do quadro: só para prévia ou vídeo sem pessoa). Rótulo de 1-3 palavras; todos com o mesmo corpo de letra.
 
 ## Como fazer
 ```

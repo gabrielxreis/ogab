@@ -1,13 +1,14 @@
-"""Exemplo dos presets da família CENA com um apresentador ILUSTRADO (ninguém real no repositório público).
+"""Exemplo dos presets da família CENA com uma pessoa REAL de banco gratuito (Mixkit, licença Free; CREDITOS.md).
 
   python3 presets/cena/exemplo/fazer.py <pasta_trabalho>
 
-Gera a fala (tempos por palavra), renderiza o apresentador com fundo (a "gravação") e sozinho com alfa (o "recorte",
-direto do desenho), roda o gerar.py com DESTAQUE + PALCO + ÓRBITA + LENTE e corta um exemplo.gif para cada preset.
+Gera a fala (tempos por palavra), baixa o vídeo da pessoa, faz a "gravação" vertical, roda o gerar.py (que recorta a
+pessoa e acha o rosto sozinho) com DESTAQUE + PALCO + ÓRBITA + LENTE e corta um exemplo.gif para cada preset.
 """
-import json, os, shutil, subprocess, sys
+import json, os, shutil, subprocess, sys, urllib.request
 
 AQUI = os.path.dirname(os.path.abspath(__file__)); CENA = os.path.dirname(AQUI); PRESETS = os.path.dirname(CENA)
+VIDEO = "https://assets.mixkit.co/videos/4834/4834-720.mp4"   # pessoa falando para a câmera (Mixkit, licença Free)
 FALA = ["Esse é o Gab.", "Ele edita o seu vídeo", "com destaque, palco e órbita.", "Cartões girando em volta de você,",
         "barra de progresso pronta,", "e zoom na palavra certa.", "Sempre um passo à frente.", "Comenta GAB."]
 PAUSA = {"Gab.": .55, "órbita.": 1.3, "você,": .9, "pronta,": 1.2, "certa.": .7, "frente.": .9}
@@ -38,16 +39,21 @@ def main(trab):
     os.makedirs(trab, exist_ok=True)
     pal, dur = palavras()
     json.dump(pal, open(os.path.join(trab, "palavras.json"), "w"), ensure_ascii=False)
-    html = open(os.path.join(AQUI, "apresentador", "index.html")).read()
-    for modo, fundo, fmt, saida in (("base", "block", "mp4", "gravacao.mp4"), ("pessoa", "none", "mov", "recorte.mov")):
-        proj = os.path.join(trab, f"ap_{modo}"); os.makedirs(proj, exist_ok=True)
-        open(os.path.join(proj, "index.html"), "w").write(
-            html.replace("%FUNDO%", fundo).replace("%DUR%", str(dur)).replace("%PALAVRAS%", json.dumps(pal)))
-        subprocess.run(["npx", "--yes", "hyperframes", "render", proj, "--format", fmt, "--fps", "24",
-                        "-o", os.path.join(trab, saida)], check=True)
+    # pessoa REAL de banco gratuito (regra do usuário, 23/10/2026: nada de personagem ilustrado nos exemplos).
+    # Mixkit 4834 (licença Free, CREDITOS.md): o arquivo original não vai para o repositório, é baixado aqui.
+    orig = os.path.join(trab, "mixkit_4834.mp4")
+    if not os.path.exists(orig):
+        req = urllib.request.Request(VIDEO, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=120) as r, open(orig, "wb") as fh:
+            fh.write(r.read())
+    # vertical 9:16 do meio do quadro; ida e volta (o clipe tem 15 s e a fala ~25 s); escala para 1080x1920 no fim
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", orig, "-filter_complex",
+                    "[0:v]crop=405:720:(iw-405)/2:0,fps=30,split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1[c];"
+                    "[c]scale=1080:1920:flags=lanczos,format=yuv420p[v]", "-map", "[v]", "-t", str(dur),
+                    "-c:v", "libx264", "-crf", "16", os.path.join(trab, "gravacao.mp4")], check=True)
     q = lambda w, n=1: quando(pal, w, n)
     plano = {
-        "video": "gravacao.mp4", "palavras": "palavras.json", "recorte": "recorte.mov", "rosto": [340, 610, 740, 1100],
+        "video": "gravacao.mp4", "palavras": "palavras.json",   # recorte e rosto: o gerar.py faz (recorte.py, rosto.py)
         "destaque": {"y": 1180, "enfase": {"gab": "grande", "órbita": "serifa", "palavra certa": "marca"},
                      "empilhadas": [{"de": q("Sempre")["ini"] - .05, "ate": q("frente")["fim"] + .8,
                                      "linhas": [["Sempre", "pequena"], ["um passo", "grande"], ["à frente.", "serifa"]]}]},
@@ -66,15 +72,19 @@ def main(trab):
     json.dump(plano, open(os.path.join(trab, "plano.json"), "w"), ensure_ascii=False, indent=1)
     subprocess.run([sys.executable, os.path.join(CENA, "gerar.py"), os.path.join(trab, "plano.json"), os.path.join(trab, "saida")], check=True)
     prev = os.path.join(trab, "saida", "previa.mp4")
-    gifs = {"palco": (q("Esse")["ini"] - .3, 2.6), "destaque": (q("Sempre")["ini"] - .2, 2.8),
-            "orbita": (q("Cartões")["ini"] - .1, q("você")["fim"] + .8 - q("Cartões")["ini"]),
-            "lente": (q("zoom")["ini"] - .6, 2.4)}
+    # trecho que mostra o efeito INTEIRO de cada preset (entrada, momento cheio e saída)
+    gifs = {"palco": (q("Esse")["ini"] - .25, q("Gab")["fim"] + .9 - q("Esse")["ini"] + .25),
+            "destaque": (q("Sempre")["ini"] - .25, q("frente")["fim"] + 1.0 - q("Sempre")["ini"] + .25),
+            "orbita": (q("Ele")["ini"] - .2, q("órbita")["fim"] + 1.2 - q("Ele")["ini"] + .2),
+            "lente": (q("zoom")["ini"] - .7, q("certa")["fim"] + 1.0 - q("zoom")["ini"] + .7)}
+    # vídeo real pesa muito em GIF: tira o ruído, 12 qps e 320 px (cada GIF fica em ~3-5 MB)
+    filtro = ("hqdn3d=3:3:5:5,fps=12,scale=320:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=112[p];"
+              "[b][p]paletteuse=dither=bayer:bayer_scale=4")
     for preset, (de, d) in gifs.items():
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(max(0, de)), "-t", str(d), "-i", prev, "-vf",
-                        "fps=15,scale=300:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4",
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(max(0, de)), "-t", str(d), "-i", prev, "-vf", filtro,
                         os.path.join(PRESETS, preset, "exemplo.gif")], check=True)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "0", "-i", prev, "-vf",
-                    "fps=12,scale=240:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4",
+                    "hqdn3d=3:3:5:5,fps=10,scale=220:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4",
                     os.path.join(CENA, "exemplo.gif")], check=True)
     print("ok:", prev)
 

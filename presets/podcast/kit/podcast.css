@@ -1,4 +1,4 @@
-/* Preset PODCAST: duas pessoas em tela dividida, legenda karaokê na cor de quem fala, abaixo do queixo dele. */
+/* Preset PODCAST: duas pessoas em tela dividida, legenda karaokê na cor de quem fala, na emenda. */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0b0c; }
 #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #0b0b0c;
