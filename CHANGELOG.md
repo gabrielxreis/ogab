@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-9 (23/10/2026)
+- **Ícones das plataformas no menu:** as abas e os cartões do passo de formato mostram o ícone do Instagram, TikTok, YouTube, Facebook, LinkedIn e Anúncios.
 ## 2026.10.23-8 (23/10/2026)
 - **Menu mais fácil:** a legenda nativa agora se chama "Padrão do DaVinci" (ou do seu editor); a música é escolhida pelo sentimento, com exemplos de uso e um botão ▶ para ouvir uma amostra do clima; os estilos dos motions vêm em abas por tipo de conteúdo, com uma aba "Sugeridos"; cartões maiores, e quando não cabe tudo o passo vira páginas (‹ 1/2 ›) em vez de letra miúda.
 - **Nada passa em branco:** o "Avançar" só libera depois de marcar uma opção ou apertar "Automático neste passo".
