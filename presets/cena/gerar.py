@@ -237,16 +237,30 @@ def render(proj, saida, fps):
 
 
 # ------------------------------------------------------------ LENTE
-def lente_filtro(lente, w, h, rampa=.14):
+def lente_filtro(lente, w, h, rampa=.14, fps="24"):
+    """Zoom da LENTE no rosto. zoompan (recalcula a cada quadro): scale+crop não servia, porque o crop guarda o tamanho
+    do 1º quadro e recortava sempre do canto de cima (zoom fora do rosto, relato do usuário 23/10/2026)."""
     zooms = (lente or {}).get("zoom") or []
     if not zooms:
         return None
-    z = "1+" + "+".join(f"({x.get('escala', 1.2) - 1:.3f})*clip((t-{x['de']})/{rampa},0,1)*clip(({x['ate']}-t)/{rampa},0,1)"
-                        for x in zooms)
-    cy = lambda x: x.get("centro_y", .42)   # foco um pouco acima do meio (rosto)
-    fy = "+".join(f"({cy(x) - .5:.3f})*clip((t-{x['de']})/{rampa},0,1)*clip(({x['ate']}-t)/{rampa},0,1)" for x in zooms)
-    return (f"scale=w='trunc({w}*({z})/2)*2':h='trunc({h}*({z})/2)*2':eval=frame,"
-            f"crop={w}:{h}:(in_w-{w})/2:'max(0,min(in_h-{h},(in_h-{h})/2+({fy})*in_h))'")
+    k = lambda x: f"clip((in_time-{x['de']})/{rampa},0,1)*clip(({x['ate']}-in_time)/{rampa},0,1)"
+    z = "1+" + "+".join(f"({x.get('escala', 1.2) - 1:.3f})*{k(x)}" for x in zooms)
+    cx = ".5+" + "+".join(f"({x.get('centro_x', .5) - .5:.4f})*{k(x)}" for x in zooms)
+    cy = ".5+" + "+".join(f"({x.get('centro_y', .42) - .5:.4f})*{k(x)}" for x in zooms)
+    return (f"zoompan=z='{z}':x='clip(({cx})*iw-iw/zoom/2,0,iw-iw/zoom)':y='clip(({cy})*ih-ih/zoom/2,0,ih-ih/zoom)'"
+            f":d=1:s={w}x{h}:fps={fps}")
+
+
+def lente_no_rosto(lente, cx, w, h):
+    """Zoom da LENTE sem centro_x/centro_y: centra no rosto (mediana das caixas no trecho do zoom)."""
+    for x in (lente or {}).get("zoom") or []:
+        if "centro_x" in x and "centro_y" in x:
+            continue
+        bs = [b for t_, b in cx.items() if b and x["de"] - .25 <= t_ <= x["ate"] + .25] or [b for b in cx.values() if b]
+        if not bs:
+            continue
+        mx = sorted((b[0] + b[2]) / 2 for b in bs)[len(bs) // 2]; my = sorted((b[1] + b[3]) / 2 for b in bs)[len(bs) // 2]
+        x.setdefault("centro_x", round(mx / w, 4)); x.setdefault("centro_y", round(my / h, 4))
 
 
 def luz_fundo(video, t, y0, y1, w, h):
@@ -261,11 +275,12 @@ def rosto_lente(c, t, lente, w, h, rampa=.14):
     """Caixa do rosto depois do zoom da LENTE no tempo t (mesma conta do lente_filtro)."""
     if not c:
         return c
-    z, fy = 1.0, 0.0
+    z, cx, cy = 1.0, .5, .5
     for x in (lente or {}).get("zoom") or []:
         k = max(0, min(1, (t - x["de"]) / rampa)) * max(0, min(1, (x["ate"] - t) / rampa))
-        z += (x.get("escala", 1.2) - 1) * k; fy += (x.get("centro_y", .42) - .5) * k
-    ih = h * z; oy = max(0, min(ih - h, (ih - h) / 2 + fy * ih)); ox = (w * z - w) / 2
+        z += (x.get("escala", 1.2) - 1) * k; cx += (x.get("centro_x", .5) - .5) * k; cy += (x.get("centro_y", .42) - .5) * k
+    x0 = max(0, min(w - w / z, cx * w - w / z / 2)); y0 = max(0, min(h - h / z, cy * h - h / z / 2))
+    ox, oy = x0 * z, y0 * z
     return (c[0] * z - ox, c[1] * z - oy, c[2] * z - ox, c[3] * z - oy)
 
 
@@ -303,7 +318,8 @@ def proteger_rosto(cx, w, h, lente, legenda, cartoes):
         if c["tipo"] == "cta" and r[3] + 120 + alto < h * .92:   # CTA desce em vez de ir para trás
             c["y"] = int(r[3] + 120); fica.append(c); continue
         atras.append(c); print(f"  rosto: {c['tipo']} {c['de']:.1f}s bateria no rosto -> vai para trás da pessoa")
-    cartoes[:] = fica
+    if cartoes is not None:   # plano sem órbita (só destaque/palco/lente)
+        cartoes[:] = fica
     for a in avisos:
         print("  AVISO", a)
     return atras, avisos
@@ -351,6 +367,8 @@ def gerar(plano, pasta, fazer_render=True):
         if "v" not in _cx:
             _cx["v"] = caixas_rosto(plano, video, w, h, dur)
         return _cx["v"]
+    if (plano.get("lente") or {}).get("zoom"):   # zoom vai no rosto (regra do usuário, 23/10/2026)
+        lente_no_rosto(plano["lente"], rosto_cx(), w, h)
     giros = [c for c in frente.get("orbita", []) if c["tipo"] == "giro"]
     if giros:
         frente["orbita"] = [c for c in frente["orbita"] if c["tipo"] != "giro"]
@@ -366,7 +384,7 @@ def gerar(plano, pasta, fazer_render=True):
         comum["rostos"] = [[t_, *map(int, b)] for t_, b in sorted(rosto_cx().items()) if b]
         frente["rostos"] = comum["rostos"]
     precisa = {p for x in est_frente + est_atras for p in (x.get("_precisa") or [])}
-    lf0 = lente_filtro(plano.get("lente"), w, h)
+    lf0 = lente_filtro(plano.get("lente"), w, h, fps=fps)
     if "video" in precisa:   # o vídeo da pessoa (com a lente) dentro da camada: P.video = "video.mp4"
         vproj = os.path.join(pasta, "_video_estilos.mp4"); os.makedirs(pasta, exist_ok=True)
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video] + (["-vf", lf0] if lf0 else []) +
@@ -410,7 +428,7 @@ def gerar(plano, pasta, fazer_render=True):
         return pasta
     for nome, proj in projs.items():
         render(proj, os.path.join(pasta, f"{nome}.mov"), fps)
-    lf = lente_filtro(plano.get("lente"), w, h)
+    lf = lente_filtro(plano.get("lente"), w, h, fps=fps)
     bf = ",".join(x for x in (lf, base_fx_filtro(est_fx["base"])) if x) or None   # base: lente + sala desfocada/escura
     pfx = est_fx["pessoa"]
     rec = None

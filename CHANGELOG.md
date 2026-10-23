@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-25 (23/10/2026)
+- **Zoom no rosto:** o zoom da Lente agora vai certo no rosto da pessoa (antes recortava do canto de cima).
+- **Destaque, Palco e Lente sem erro:** esses motions voltaram a funcionar quando o vídeo não tem cartões da Órbita.
 ## 2026.10.23-24 (23/10/2026)
 - **Cada estilo com uma pessoa diferente:** as prévias dos estilos no menu agora usam um vídeo real diferente para cada estilo (banco de vídeos gratuitos filtrado: rosto de frente, nítido e sem ficar claro demais).
 ## 2026.10.23-24 (23/10/2026)
