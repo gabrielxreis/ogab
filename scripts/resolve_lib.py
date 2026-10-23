@@ -143,6 +143,7 @@ def _no_pool(mp, caminho):
 
 
 def importar(mp, caminho, bin_nome, permitir_render=False):
+    if _gerado_pelo_gab(caminho): proibido_render(f"mídia renderizada pelo Gab: {os.path.basename(caminho)}", permitir_render)
     if bin_nome.upper() in ("BROLLS", "BROLL", "FOOTAGES", "TAKES"): checar_take_original(caminho, permitir_render)
     ja = _no_pool(mp, caminho)   # ImportMedia sempre cria item novo: reimportar duplicava o clipe (relato 16/10/2026)
     if ja: return ja
@@ -299,23 +300,18 @@ def checar_take_original(arq, permitir_render=False):
 FOTO_EXT = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".tif", ".tiff")
 
 
-def foto_em_mov(img, dur, fps=30):
-    """Foto -> MOV H.264 PARADO com `dur` s (orientação EXIF aplicada), em <pasta da foto>/_fotos_mov/. Reaproveita se já existe.
-    NUNCA pôr zoom/pan aqui (zoompan, scale animado): o movimento da foto é SEMPRE keyframe no editor (zoom_leve_foto),
-    regra do usuário 23/10/2026 ("o zoom nas fotos não pode ser renderizado, sempre sempre sempre")."""
-    import subprocess
-    from PIL import Image, ImageOps
-    pasta = os.path.join(os.path.dirname(img), "_fotos_mov"); os.makedirs(pasta, exist_ok=True)
-    base = os.path.splitext(os.path.basename(img))[0]
-    out = os.path.join(pasta, f"{base}_{dur:.1f}s.mov")
-    if os.path.exists(out): return out
-    tmp = os.path.join(pasta, base + "_orient.png")
-    ImageOps.exif_transpose(Image.open(img)).convert("RGB").save(tmp)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-loop", "1", "-framerate", str(fps), "-t", f"{dur:.3f}", "-i", tmp,
-                    "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p", "-c:v", "libx264", "-crf", "12",
-                    "-preset", "veryfast", "-tune", "stillimage", out], check=True)
-    os.remove(tmp)
-    return out
+def proibido_render(o_que, permitir=False):
+    """PROIBIDO renderizar mídia para a timeline (regra do usuário, 23/10/2026: "você está renderizando movs em vez de
+    encaixar eles na timeline e modificar lá; é proibido até que eu peça"). Foto, texto, legenda, zoom, duração: tudo
+    entra como arquivo ORIGINAL e é ajustado NO EDITOR. Só com permitir=True, quando o usuário pediu com essas palavras."""
+    if not permitir:
+        raise RuntimeError(f"RENDER PROIBIDO ({o_que}): encaixar o arquivo original na timeline e ajustar lá. "
+                           "Só renderizar se o usuário pedir explicitamente (permitir=True).")
+
+
+def _gerado_pelo_gab(caminho):
+    n = caminho.replace(os.sep, "/")
+    return "/_fotos_mov/" in n or bool(re.search(r"/lb_\d{3}_[^/]*\.mov$", n))
 
 
 def zoom_leve_foto(item, dur, intensidade=0.05, entrando=True):
@@ -344,16 +340,20 @@ def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, 
         if respeitar_inicio: cur = max(cur, S + round(ini * F))
         nxt = S + round(takes[k + 1][1] * F) if k + 1 < len(takes) else fim_f
         foto = os.path.splitext(arq)[1].lower() in FOTO_EXT
-        if foto:   # foto parada ignora endFrame e entra com 5 s: vira MOV com a duração do trecho (davinci_api.md)
-            arq = foto_em_mov(arq, (nxt - cur) / F + 1.0, F)
-        else:
-            checar_take_original(arq, permitir_render)
+        if not foto: checar_take_original(arq, permitir_render)
         it = importar(mp, arq, "BROLLS", permitir_render or foto)
-        sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
-        e0 = min(int(round(entrada * sf)), mx - 1)
-        n = min(mx - e0, math.ceil((nxt - cur) * sf / F))
-        x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": e0, "endFrame": e0 + n, "mediaType": 1,
-                                  "trackIndex": trilha, "recordFrame": cur}])[0]
+        if foto:   # foto ORIGINAL na timeline (sem MOV); a duração é a de still do DaVinci: ajustar NA timeline
+            x = (mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 1, "trackIndex": trilha, "recordFrame": cur}]) or [None])[0]
+            if not x: raise RuntimeError(f"foto não entrou na timeline: {arq}")
+            if abs(x.GetEnd() - nxt) > 1:
+                print(f"AVISO: {os.path.basename(arq)} entrou com {(x.GetEnd() - x.GetStart()) / F:.1f} s (duração de still do "
+                      f"DaVinci); o trecho pede {(nxt - cur) / F:.1f} s: ajustar a borda na timeline")
+        else:
+            sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
+            e0 = min(int(round(entrada * sf)), mx - 1)
+            n = min(mx - e0, math.ceil((nxt - cur) * sf / F))
+            x = mp.AppendToTimeline([{"mediaPoolItem": it, "startFrame": e0, "endFrame": e0 + n, "mediaType": 1,
+                                      "trackIndex": trilha, "recordFrame": cur}])[0]
         z = zoom * (_zoom_preencher(it, t) if preencher else 1.0)
         if z != 1.0: x.SetProperty("ZoomX", z); x.SetProperty("ZoomY", z)
         if foto and foto_zoom:   # foto nunca parada (regra do usuário, 23/10/2026): zoom leve por keyframe, editável no Fusion

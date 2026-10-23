@@ -123,7 +123,7 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 - **Mas nem sempre (19/10/2026, ep. 2 no mesmo projeto):** o vídeo posto por `AppendToTimeline` com `startFrame`/`endFrame` entrou no TEMPO REAL (12253 quadros da fonte viraram 12266 na timeline), e a conversão acima adiantou tudo 0,5 s no fim. Antes de converter tempos, comparar `GetDuration()` do item com `endFrame - startFrame` (iguais = quadro a quadro; maior = tempo real) ou comparar quadros do export com o original em 3 pontos. No tempo real: posição = t do original e música sem `atempo`.
 - Mudança pela API numa timeline que NÃO está aberta pode sumir ao salvar: sempre `p.SetCurrentTimeline(t)` antes de mexer, e conferir as trilhas DEPOIS de `salvar`.
 - `AppendToTimeline`: `endFrame` é exclusivo (passar `sf + n`, não `sf + n - 1`, senão sobra vão de 1 quadro entre clipes).
-- Imagem parada (PNG) ignora `endFrame` e entra com 5 s: para overlay com duração exata, converter em MOV (QuickTime Animation `qtrle` com alfa; "PNG dentro de MOV" falha no render).
+- Imagem parada (PNG/JPG) ignora `endFrame` e entra com a duração de still do DaVinci: colocar a ORIGINAL e ajustar a borda na timeline. Converter em MOV é PROIBIDO sem pedido do usuário (SKILL.md 1h3).
 - Arquivo substituído no mesmo caminho fica "quebrado" na timeline (o DaVinci guarda a duração antiga): usar `MediaPoolItem.ReplaceClip(novo_caminho)` com nome novo; troca a mídia sem mexer nos cortes do usuário.
 - Cartão e tarja na mesma trilha: quando se encostam, o append corta o começo do outro. Overlays de tipos diferentes em trilhas próprias.
 

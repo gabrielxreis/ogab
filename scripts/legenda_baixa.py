@@ -30,6 +30,10 @@ def png(texto, y_centro, arq, W=1080, H=1920, k=4):
 
 
 def clipe(texto, dur, fps, y, pasta, i):
+    # PROIBIDO sem pedido do usuário (23/10/2026): renderiza cada legenda num MOV em vez de ajustar a legenda no editor
+    if "--permitir-render" not in sys.argv:
+        raise SystemExit("RENDER PROIBIDO: legenda_baixa.py renderiza cada legenda em MOV. Ajustar a legenda NO DaVinci; "
+                         "rodar com --permitir-render só se o usuário pedir explicitamente.")
     os.makedirs(pasta, exist_ok=True)
     p = os.path.join(pasta, f"lb_{i:03d}.png"); m = os.path.join(pasta, f"lb_{i:03d}_{re.sub(r'[^a-z0-9]+', '_', texto.lower())[:24]}.mov")
     png(texto, 1920 - y, p)
@@ -42,6 +46,8 @@ def cobertos(t, minimo=0.3):
     F = float(t.GetSetting("timelineFrameRate")); S = t.GetStartFrame(); sec = lambda f: (f - S) / F
     tampa = [(sec(x.GetStart()), sec(x.GetEnd())) for k in range(2, t.GetTrackCount("video") + 1) if t.GetTrackName("video", k) != TRILHA
              for x in t.GetItemListInTrack("video", k) or [] if MOTION.search(x.GetName())
+             or (t.GetTrackName("video", k) or "").upper() == "MOTIONS"   # trilha de colocar_motions (relato 22/10/2026)
+             or "/motions/" in ((x.GetMediaPoolItem() and x.GetMediaPoolItem().GetClipProperty("File Path")) or "")
              or not (x.GetMediaPoolItem() and x.GetMediaPoolItem().GetClipProperty("File Path"))]
     out = []
     for x in t.GetItemListInTrack("subtitle", 1) or []:
