@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-18 (23/10/2026)
+- **Prévias em vídeo:** no menu, a prévia de cada estilo agora é um vídeo curto em loop com pessoa real (mais nítido e bem mais leve que GIF). Estilos com prévia de apresentador desenhado saíram do menu e voltam conforme ganham a prévia com take real.
 ## 2026.10.23-17 (23/10/2026)
 - **Prévias dos estilos com pessoa de verdade:** os GIFs do menu agora mostram cada estilo sobre um vídeo real de uma pessoa falando para a câmera (banco de vídeo com licença livre), em vez do apresentador desenhado.
 ## 2026.10.23-21 (23/10/2026)

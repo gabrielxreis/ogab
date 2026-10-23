@@ -1,7 +1,7 @@
 # ESTILOS: efeitos curtos e trocáveis sobre o vídeo da pessoa (motor CENA)
 
 Cada estilo é uma peça pequena (gancho, legenda, layout, prova, batida, b-roll animado, efeito, ritmo ou cor) que o Gab
-coloca num trecho do vídeo. O usuário escolhe no `/ogab menu` (o menu lê esta pasta sozinho: estilo com `exemplo.gif`
+coloca num trecho do vídeo. O usuário escolhe no `/ogab menu` (o menu lê esta pasta sozinho: estilo com `exemplo.mp4`
 aparece no grupo dele). Criados em 23/10/2026 a partir de IDEIAS de estilos de edição populares: **nada é copiado de
 pacotes de terceiros** (nem texto, nem desenho, nem código, nem nome); cada estilo é desenhado do zero aqui, com nome,
 descrição e animação nossos.
@@ -10,7 +10,7 @@ descrição e animação nossos.
 `presets/estilos/<grupo>/<id>/` com:
 - `estilo.json`: metadados (abaixo).
 - `<id>.js`: a animação (motor `cena`, padrão) OU o que o `motor` do estilo pedir (ritmo/cor, ver no fim).
-- `exemplo.gif`: prévia em loop gerada SÓ pela sessão principal com `python3 presets/estilos/exemplo/fazer.py <id>` sobre um
+- `exemplo.mp4`: prévia em loop gerada SÓ pela sessão principal com `python3 presets/estilos/exemplo/fazer.py <id>` sobre um
   TAKE REAL de pessoa (vídeo de banco com licença livre, Pexels). Proibido apresentador ilustrado/bonequinho (regra do
   usuário, 23/10/2026) e nunca cliente.
 
@@ -72,7 +72,7 @@ ESTILO["meu-estilo"] = (it, C) => {          // it = item do plano (de, ate + ca
 
 ## Testar
 1. `python3 presets/estilos/exemplo/fazer.py <id>` (render sobre o take real, cache em ~/.cache/ogab_estilos_real).
-2. Olhar 2 a 3 quadros do GIF (`ffmpeg -i exemplo.gif -vf "select=eq(n\,30)" -frames:v 1 q.png`): rosto livre, nada
+2. Olhar 2 a 3 quadros da prévia (`ffmpeg -i exemplo.mp4 -vf "select=eq(n\,30)" -frames:v 1 q.png`): rosto livre, nada
    cortado, texto legível, cor da marca.
 3. Plano real: `"estilos": [{"id": "...", "de": 1.0, "ate": 3.5, ...campos}]` no plano do `presets/cena/gerar.py`.
 

@@ -1,12 +1,12 @@
-"""Prévia (exemplo.gif) de cada ESTILO sobre um TAKE REAL de pessoa (vídeo de banco com licença livre; nunca apresentador
+"""Prévia (exemplo.mp4) de cada ESTILO sobre um TAKE REAL de pessoa (vídeo de banco com licença livre; nunca apresentador
 ilustrado, regra do usuário 23/10/2026). O take fica só no cache; no repositório vai só o GIF pequeno.
 
   python3 presets/estilos/exemplo/fazer.py <id> [<id> ...] [--trab <pasta>] [--todos] [--faltando]
 
 Monta uma vez a "gravação" e o "recorte" do take real (cache em --trab, padrão ~/.cache/ogab_estilos_real),
 aplica o estilo com os campos de exemplo do estilo.json (tempos em "exemplo": {"de", "ate"}) pelo motor CENA
-(presets/cena/gerar.py) e grava presets/estilos/<grupo>/<id>/exemplo.gif (loop, 300 px, 15 fps).
---todos refaz todos; --faltando só os que ainda não têm exemplo.gif.
+(presets/cena/gerar.py) e grava presets/estilos/<grupo>/<id>/exemplo.mp4 (360 px, sem som; o menu toca em loop).
+--todos refaz todos; --faltando só os que ainda não têm exemplo.mp4.
 """
 import glob, json, os, subprocess, sys
 
@@ -56,10 +56,14 @@ def fazer(eid, pasta_estilo, trab):
     saida = os.path.join(trab, f"saida_{eid}")
     subprocess.run([sys.executable, os.path.join(CENA, "gerar.py"), arq, saida], check=True)
     de, d = max(0, ex["de"] - .2), ex["ate"] - ex["de"] + .5
-    gif = os.path.join(pasta_estilo, "exemplo.gif")
+    mp4 = os.path.join(pasta_estilo, "exemplo.mp4")   # vídeo real em GIF pesa ~1 MB; MP4 curto ~150 KB e mais nítido
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(de), "-t", str(d), "-i", os.path.join(saida, "previa.mp4"), "-vf",
-                    "fps=15,scale=300:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse=dither=bayer:bayer_scale=4",
-                    "-loop", "0", gif], check=True)
+                    "fps=24,scale=360:-2:flags=lanczos", "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "28",
+                    "-pix_fmt", "yuv420p", "-movflags", "+faststart", mp4], check=True)
+    velho = os.path.join(pasta_estilo, "exemplo.gif")
+    if os.path.exists(velho):
+        os.remove(velho)   # GIF antigo do apresentador ilustrado
+    gif = mp4
     print("ok:", gif)
 
 
@@ -71,7 +75,7 @@ if __name__ == "__main__":
     if "--todos" in a:
         ids = list(todos)
     if "--faltando" in a:
-        ids = [i for i in todos if not os.path.exists(os.path.join(todos[i], "exemplo.gif"))]
+        ids = [i for i in todos if not os.path.exists(os.path.join(todos[i], "exemplo.mp4"))]
     if not ids:
         raise SystemExit(__doc__)
     gravacao(trab)
