@@ -119,13 +119,13 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur, extras=()):
     for m in modulos:
         shutil.copy(os.path.join(PRESETS, m, f"{m}.js"), proj)
     plano_js = dict(plano_js)
-    for k, nome in (("_video", "video.mp4"), ("_silhueta", "recorte.webm")):   # vídeo/silhueta para os estilos que pedem
-        orig = plano_js.pop(k, None)
+    for k, arq in (("_video", "video.mp4"), ("_silhueta", "recorte.webm")):   # vídeo/silhueta para os estilos que pedem
+        orig = plano_js.pop(k, None)   # (não usar "nome" aqui: é o nome da camada, que vai no plano.js)
         if orig and plano_js.get("estilos"):
-            shutil.copy(orig, os.path.join(proj, nome)); plano_js[k[1:]] = nome
+            shutil.copy(orig, os.path.join(proj, arq)); plano_js[k[1:]] = arq
     for c in plano_js.get("estilos") or []:   # imagens/logos dos campos dos estilos
-        for orig, nome in c.get("_copiar", []):
-            os.makedirs(os.path.join(proj, "img"), exist_ok=True); shutil.copy(orig, os.path.join(proj, "img", nome))
+        for orig, arq in c.get("_copiar", []):
+            os.makedirs(os.path.join(proj, "img"), exist_ok=True); shutil.copy(orig, os.path.join(proj, "img", arq))
     for x in extras:   # módulos dos ESTILOS (presets/estilos/<grupo>/<id>/<id>.js), carregados antes do despachante
         shutil.copy(x, proj)
     for c in plano_js.get("orbita") or []:
@@ -330,11 +330,20 @@ def preparar_giros(giros, cx, w, h, lente, absp):
     from rosto import no_trecho
     for c in giros:
         c.setdefault("voltas", 1); c.setdefault("fase", 0.6)
-        c.setdefault("cw", int(w * .30)); c.setdefault("ch", int(c["cw"] * (16 / 9 if any(k.get("img") for k in c["cartoes"]) else .62)))
-        c.setdefault("rx", int(w * .38)); c.setdefault("cx", w // 2)
         r = no_trecho({t: rosto_lente(b, t, lente, w, h) for t, b in cx.items()}, c["de"], c["ate"]) if cx else None
-        # volta inclinada: atrás passa na altura do rosto (some atrás da cabeça), na frente passa abaixo do queixo
-        tras = (r[1] + r[3]) / 2 if r else h * .3
+        # a volta tem que ficar mais LARGA que a cabeça: o cartão some atrás dela e reaparece inteiro do outro lado
+        # (relato do usuário 23/10/2026: "não passa para trás"). Cartão e raio saem do espaço que sobra dos lados.
+        meio = int((r[0] + r[2]) / 2) if r else w // 2
+        cab = ((r[2] - r[0]) / 2 * 1.1) if r else w * .15        # meia largura da cabeça com cabelo
+        livre = min(meio, w - meio) - cab                          # parede de cada lado da cabeça
+        if livre < w * .14:
+            print(f"  AVISO giro: take fechado demais para órbita (cabeça {2 * cab / w:.0%} da largura); use a pessoa menor no quadro")
+        c.setdefault("cw", int(max(w * .2, min(w * .34, livre * 1.15))))
+        c.setdefault("ch", int(c["cw"] * (16 / 9 if any(k.get("img") for k in c["cartoes"]) else .62)))
+        c.setdefault("rx", int(min(w * .5 - c["cw"] * .3, cab + c["cw"] * .62))); c.setdefault("cx", meio)
+        tras = max(c["ch"] * .6 + 40, (r[1] if r else h * .2) - c["ch"] * .28)
+        # atrás passa POR CIMA da cabeça (só a ponta de baixo entra atrás do cabelo): o cartão nunca some, gira à vista
+        # (pedido do usuário 23/10/2026: "não pode esconder, tem que girar mesmo")
         frente_y = (r[3] if r else h * .45) + 40 + c["ch"] / 2
         c.setdefault("cy", int((tras + frente_y) / 2)); c.setdefault("ry", int((frente_y - tras) / 2))
         c["_base"] = int(c["cy"] + c["ry"] + c["ch"] / 2)   # embaixo do cartão da frente (a legenda desce para cá)

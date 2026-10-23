@@ -67,9 +67,9 @@ CENA.mod.orbita = function (cartoes, C) {
       const ent = Math.min(1, tt / .45), sai = Math.max(0, Math.min(1, (dur - tt) / .35)), p = tt / dur;
       const th = c.fase + i * 2 * Math.PI / n + p * 2 * Math.PI * c.voltas, z = Math.sin(th);
       const vis = atras ? z < 0 : z >= 0;
-      return { x: c.cx + c.rx * Math.cos(th), y: c.cy + c.ry * z, scale: (.72 + .28 * (z + 1) / 2) * (.6 + .4 * ent),
+      return { x: c.cx + c.rx * Math.cos(th), y: c.cy + c.ry * z, scale: (.62 + .38 * (z + 1) / 2) * (.6 + .4 * ent),
                rotationY: -Math.cos(th) * 28, rotation: Math.cos(th) * -6,
-               opacity: vis ? Math.min(ent, sai) * (atras ? .85 : 1) : 0, filter: atras ? "blur(1.5px)" : "blur(0px)" };
+               opacity: vis ? Math.min(ent, sai) : 0, filter: atras ? "blur(1.2px) brightness(.72)" : "blur(0px) brightness(1)" };
     };
     els.forEach((e, i) => {
       tl.set(e, Object.assign(estado(i, 0), { opacity: 0 }), 0);

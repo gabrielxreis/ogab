@@ -108,7 +108,7 @@ def main(trab, quais):
             plano["palco"] = [{"texto": "EDITOR", "de": q("Esse")["ini"], "ate": q("Gab")["fim"] + .5, "sub": "COM IA",
                                "y": TAKES["palco"].get("palco_y", int(1920 * .17))}]   # alto: a cabeça cobre só um pedaço
         elif preset == "orbita":
-            plano["orbita"] = [{"tipo": "giro", "de": max(0, q("Cartões")["ini"] - .1), "ate": dur - .1, "voltas": 1.25, "cw": 300,
+            plano["orbita"] = [{"tipo": "giro", "de": max(0, q("Cartões")["ini"] - .1), "ate": dur - .1, "voltas": 1.25,
                                 "cartoes": [{"texto": "DESTAQUE", "sub": "LEGENDA"}, {"texto": "PALCO", "sub": "ATRÁS"},
                                             {"texto": "ÓRBITA", "sub": "CARTÕES"}, {"texto": "LENTE", "sub": "ZOOM"}]}]
         elif preset == "lente":
