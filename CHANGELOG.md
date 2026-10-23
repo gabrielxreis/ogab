@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-37 (23/10/2026)
+- **Nova ordem da edição:** depois dos cortes vêm lettering e motions, depois música, SFX, takes e cor, e só então a legenda (que já desce para baixo dos motions numa passada só). Antes de renderizar, o Gab mostra uma folha com os quadros-chave para você validar a timeline no editor.
+- **Conferência por quadros em PNG:** `conferir.py chave` exporta do DaVinci só os quadros que importam (cortes, entrada/meio/saída de lettering, motion e b-roll, marcadores) numa folha; se você apontar um problema, `conferir.py trecho --em <segundo>` mostra só aquele trecho. Nada de re-renderizar o vídeo inteiro para conferir.
 ## 2026.10.23-36 (23/10/2026)
 - **Órbita:** o texto de cada cartão agora acompanha o tamanho dele (não estoura mais a borda em take fechado); prévia refeita com o cartão "Letreiro".
 - **Prévias mais robustas:** se o cache de vídeos for apagado (limpeza de disco), os takes escolhidos são baixados de novo sozinhos.

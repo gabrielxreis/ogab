@@ -7,7 +7,7 @@
   python3 projeto.py memoria <pasta_da_empresa> ["nota"] [--tipo pedido|aprendizado|proxima|feito]
         (memória da marca: cria <pasta>/<Empresa>.md na 1ª vez e mostra; com nota, anota com a data na seção do tipo)
 
-Etapas (edição): cortes, silencios, legenda, legenda_validada, broll, cor, letterings, motions, musica, sfx, abas, qc, export.
+Etapas (edição): cortes, silencios, letterings, motions, musica, sfx, broll, cor, legenda, legenda_validada (validação visual), abas, qc, export.
 cor = todos os takes da V1 com PowerGrade (nó > 1) ou LUT no nó 1 (detectado); letterings = título Fusion acima da V1 (detectado);
 motions = item na trilha MOTIONS ou nome de motion (detectado); abas = timelines abertas em abas (marcar depois de abrir_em_abas).
 Na criação (existe roteiro.txt) entram antes: roteiro, voz.
@@ -17,14 +17,15 @@ fora da pasta) é marcado com `marcar`. Estado em <pasta>/status.json. O bloco "
 import glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "silêncios (transcrição do DaVinci)", "legenda": "legenda", "legenda_validada": "validar a legenda",
+ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "silêncios (transcrição do DaVinci)", "legenda": "legenda", "legenda_validada": "validação visual no editor (você valida)",
           "broll": "b-roll/takes", "cor": "cor (PowerGrade)", "letterings": "letterings", "abas": "abas abertas", "motions": "motions", "musica": "música", "sfx": "efeitos sonoros", "qc": "QC final", "export": "export"}
 DEPENDE_DO_USUARIO = {"roteiro", "voz", "legenda_validada"}
 MOTION = re.compile(r"(^x\d\d-|motion|cta|lettering)", re.I)
 
 
 def etapas(pasta):
-    base = ["cortes", "silencios", "legenda", "legenda_validada", "broll", "cor", "letterings", "motions", "musica", "sfx", "abas", "qc", "export"]
+    # ordem do usuário (23/10/2026): cortes, lettering/motions, música/SFX/takes/cor, legenda, validação visual, render
+    base = ["cortes", "silencios", "letterings", "motions", "musica", "sfx", "broll", "cor", "legenda", "legenda_validada", "abas", "qc", "export"]
     return (["roteiro", "voz"] if os.path.exists(os.path.join(pasta, "roteiro.txt")) else []) + base
 
 

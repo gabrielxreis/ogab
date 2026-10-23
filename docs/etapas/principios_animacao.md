@@ -1,7 +1,7 @@
 # Princípios de animação, ritmo e recriação de referência
 
 Aprendido com o Rick (@rick.motion_, motion designer) usando o /ogab no After Effects, 12 a 14/10/2026. Vale para
-QUALQUER motion (HyperFrames ou After Effects). Ler ao planejar motions (etapa 8) e ao receber uma referência.
+QUALQUER motion (HyperFrames ou After Effects). Ler ao planejar motions (etapa 5) e ao receber uma referência.
 
 ## 1. Referência = linguagem, não elementos
 

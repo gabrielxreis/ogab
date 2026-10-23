@@ -36,7 +36,7 @@
    Falta: efeitos sonoros, QC final
    Próximo: efeitos sonoros (esperando seu ok)
    ```
-   Etapas que contam: cortes, legenda, legenda validada, b-roll/takes, lettering/motions, música, efeitos sonoros, QC, export (na criação, antes: roteiro e voz). Algo que depende do usuário entra no "Próximo" com "(esperando seu ok)". Manter a mesma lista no `PROJETO.md`.
+   Etapas que contam (ordem de 23/10/2026): cortes, lettering/motions, música, efeitos sonoros, b-roll/takes, cor, legenda, validação visual no editor, QC, export (na criação, antes: roteiro e voz). Algo que depende do usuário entra no "Próximo" com "(esperando seu ok)". Manter a mesma lista no `PROJETO.md`.
 2. **Tudo via MCP/API, só download pelo navegador** (Claude in Chrome logado nas contas do usuário). Ver `navegador/downloads.md`.
 3. **Economizar créditos e tokens**: 1 geração por vez, sem variações extras; estimar custo antes (ElevenLabs `estimate_only`); gerar takes **só em modo ilimitado** (Magnific pelo site); buscas com `perPage` pequeno; no navegador, JS enxuto e zoom pequeno em vez de screenshot grande; não reler arquivos grandes. **Tokens no navegador e nos MCPs (12/10/2026):** juntar cliques/digitação/espera em UM `browser_batch` e tirar só 1 screenshot no fim, sempre com `scale` 0,5; achar elemento com `find`/JS em vez de screenshot; acompanhar geração pelo MCP (`show_generations` com `size:1`) e não por screenshot repetido; nunca listar catálogo/histórico inteiro (paginação pequena); seguir os mapas de tela de `navegador/downloads.md` em vez de explorar o site; ler arquivo com `grep`/trecho, não inteiro; geração em fila e downloads mecânicos podem ir para subagente Sonnet/Haiku.
 4. **Provedores**: usar os da lista de `config.json` na ordem, **pulando o que não estiver conectado** (conferir com a ferramenta de status de conectores / ToolSearch). Se nenhum provedor de uma etapa estiver disponível, avisar e oferecer alternativa (ex.: o usuário baixa à mão e coloca na pasta).
@@ -46,7 +46,7 @@
 7a. **Lettering vem do pacote de títulos instalado no DaVinci, nunca do HyperFrames (regra do usuário, 23/10/2026).** HyperFrames só quando o usuário pedir motion.
 8. Sem travessão (em dash) nos textos para o usuário e nas legendas.
 9. **Diário do projeto: `PROJETO.md` na pasta de cada vídeo** (`<pasta_saida>/<Empresa>/<Assunto> - <Empresa>/PROJETO.md`). Criar logo que a pasta nasce e **atualizar ao fim de cada etapa** (curto, em tópicos, sem copiar roteiro nem transcrição inteiros, que já estão nos seus arquivos):
-   - **Status:** etapa atual e o que falta (checklist das etapas 1 a 9, com a 4b da legenda).
+   - **Status:** etapa atual e o que falta (checklist das etapas 1 a 11: legenda na 9, validação visual na 10).
    - **Decisões do usuário:** roteiro aprovado (versão), voz escolhida (nome e id), música, origem dos takes, lettering, motions, o que ele pediu para mudar e por quê.
    - **DaVinci:** nome do projeto e da timeline, fps/resolução, o que está em cada trilha (V1 takes, V2 lettering, MOTIONS, A1 narração, A2 música, A3 sfx, legenda), backups criados.
    - **Arquivos:** caminhos dos arquivos-chave (narração, transcrição, SRT da versão atual, motions, projeto HyperFrames) e o que cada versão mudou.

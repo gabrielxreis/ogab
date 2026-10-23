@@ -7,7 +7,7 @@ e voltam para a timeline como clipes por cima da V1 (a V1 nunca é tocada; regra
 **Quando usar (só onde rende, não no vídeo todo):** o GANCHO (primeiros 3-5 s) e 1-2 frases de efeito, num trecho com
 UMA pessoa e sem corte de cena no meio (se tiver corte, dividir em trechos). Nunca em cima de b-roll/motion.
 **Como:**
-1. Legenda validada (4b) e trecho escolhido: tempos de início/fim tirados da legenda.
+1. Legenda pronta (etapa 9) e trecho escolhido: tempos de início/fim tirados da legenda.
 2. `resolve_lib.renderizar_trecho(p, <pasta>/extras, "atras_<n>", ini, fim)` exporta só a V1 daquele trecho (desliga
    por um instante as outras trilhas e a legenda, renderiza, religa tudo).
 3. Skill `embedded-captions` com esse MP4 e as palavras da legenda validada (mesmo texto, mesmos tempos); fonte Poppins

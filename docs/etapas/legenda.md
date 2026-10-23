@@ -1,8 +1,8 @@
 <!-- Movido do SKILL.md em 12/10/2026 (texto completo, sem cortes). Ler só na etapa. -->
 
-## 4b. Legenda (logo depois da narração/cortes; PARAR para o usuário validar antes de takes e motions)
+## 9. Legenda (depois de lettering, motions, música, takes e cor; regra do usuário 23/10/2026)
 
-Vem ANTES de takes, lettering e motions nos dois fluxos (criação e edição): o tempo de cada take e motion é medido na legenda. Depois de colocar e revisar, mostrar ao usuário e **esperar a validação**, avisando: "se a legenda estiver no tempo errado, o motion sai fora de tempo".
+Vem DEPOIS de lettering, motions, música, takes e cor (ordem do usuário, 23/10/2026; antes era logo depois dos cortes). O tempo de takes e motions sai da fala (transcrição do DaVinci), não da legenda, e os motions deixam livre a faixa da legenda. Como tudo já está na timeline, a legenda desce para baixo dos motions numa passada só (`legenda_baixa.py`). Sem parada aqui: a validação da legenda é na etapa 10 (validação visual no editor, `conferir.py chave`), junto com o resto.
 
 **ORDEM DA LEGENDA (regra do usuário, 12/10/2026), sempre sobre a timeline ATUAL (o usuário mexe nos cortes):** 1) **Create Subtitles from Audio** da própria timeline (`Timeline.CreateSubtitlesFromAudio`, 1 linha, até 25 caracteres) para os tempos baterem com a fala que está na timeline agora; 2) **métrica** (`legendas.py metrica`/reflow: 0 problema, grafia do cliente); 3) **preset GAB USA** (trilha do modelo/`timeline_do_modelo` ou `legenda_ui.py --preset`). Nunca reaproveitar SRT gerado antes de uma edição da timeline. Antes de entregar, conferir que cada legenda bate com a fala (a 1ª e a última, e uma amostra no meio).
 
