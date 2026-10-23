@@ -300,7 +300,9 @@ FOTO_EXT = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".tif", ".tiff")
 
 
 def foto_em_mov(img, dur, fps=30):
-    """Foto -> MOV H.264 parado com `dur` s (orientação EXIF aplicada), em <pasta da foto>/_fotos_mov/. Reaproveita se já existe."""
+    """Foto -> MOV H.264 PARADO com `dur` s (orientação EXIF aplicada), em <pasta da foto>/_fotos_mov/. Reaproveita se já existe.
+    NUNCA pôr zoom/pan aqui (zoompan, scale animado): o movimento da foto é SEMPRE keyframe no editor (zoom_leve_foto),
+    regra do usuário 23/10/2026 ("o zoom nas fotos não pode ser renderizado, sempre sempre sempre")."""
     import subprocess
     from PIL import Image, ImageOps
     pasta = os.path.join(os.path.dirname(img), "_fotos_mov"); os.makedirs(pasta, exist_ok=True)
