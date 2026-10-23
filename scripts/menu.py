@@ -106,6 +106,25 @@ def presets_do_usuario(C):
     return r
 
 
+def estilos_prontos():
+    """{grupo: [itens]} dos ESTILOS (presets/estilos/<grupo>/<id>/) que já têm exemplo.gif: o menu mostra só o que funciona."""
+    import glob
+    r = {}
+    for j in sorted(glob.glob(os.path.join(SKILL, "presets", "estilos", "*", "*", "estilo.json"))):
+        try:
+            m = json.load(open(j, encoding="utf-8"))
+        except Exception:
+            continue
+        pasta = os.path.dirname(j)
+        if not os.path.exists(os.path.join(pasta, "exemplo.gif")) or m.get("id", "").startswith("_"):
+            continue
+        rel = os.path.relpath(pasta, SKILL).replace(os.sep, "/")
+        r.setdefault(m.get("grupo", ""), []).append(it(m["id"], m["nome"]["pt"], m["nome"].get("en", m["nome"]["pt"]),
+            m["desc"]["pt"], m["desc"].get("en", m["desc"]["pt"]), gif=rel + "/exemplo.gif",
+            extra={"estilo": True, "aba": m.get("grupo", "")}))
+    return r
+
+
 def grupos(formato, lettering, editor_nome="DaVinci"):
     """lettering = [(id_template, nome visível)] do editor da pessoa (lettering_do_editor)."""
     C = catalogo()
@@ -114,6 +133,9 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
               gif=p.get("gif") or None, extra={"aba": p["categoria"], "cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
               "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or []}) for p in presets]
     est += presets_do_usuario(C)
+    EST = estilos_prontos()
+    est += EST.get("batida", []) + EST.get("broll", [])   # batidas e b-roll animado: abas no passo de estilo dos motions
+    sem = lambda pt, en: it("sem", pt, en, "", "", "none")
     def anim_let(n):
         n = n.lower()
         for k, a in (("palavra", "let-word"), ("blur up", "let-blurup"), ("blur", "let-blur"), ("acima", "let-up"), ("abaixo", "let-down"),
@@ -163,11 +185,28 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("equilibrado", "Equilibrado", "Balanced", "Nos momentos que pedem imagem, com respiro de pessoa falando.", "Where an image helps, with talking breathers.", "dens d2"),
             it("muitos", "Muitos", "Lots", "Uma ideia, uma imagem: quase o vídeo todo.", "One idea, one image: almost the whole video.", "dens d3"),
             it("sem", "Sem motion", "No motion", "Só a pessoa, legenda e lettering.", "Just the person, captions and lettering.", "none")]},
-        {"id": "estilo", "letra": "E", "unico": False, "max": 3, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
-         "abas": [{"id": "todos", "nome": {"pt": "Todos", "en": "All"}}, {"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [{"id": c, "nome": {"pt": C["categorias"][c], "en": CAT_EN.get(c, c)}}
+        {"id": "estilo", "letra": "E", "unico": False, "max": 6, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
+         "abas": [{"id": "todos", "nome": {"pt": "Todos", "en": "All"}}, {"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [x for x in (
+                  {"id": "batida", "nome": {"pt": "Batidas visuais", "en": "Visual beats"}}, {"id": "broll", "nome": {"pt": "B-roll animado", "en": "Animated b-roll"}})
+                  if EST.get(x["id"])] + [{"id": c, "nome": {"pt": C["categorias"][c], "en": CAT_EN.get(c, c)}}
                   for c in ("apresentador", "ideia", "lista", "dados", "produto", "social", "marca") if c in C["categorias"]],
-         "sub": {"pt": "Como os motions vão parecer. Até 3; eles se misturam trecho a trecho.", "en": "How the motion graphics will look. Up to 3; they mix section by section."},
+         "sub": {"pt": "Como os motions vão parecer: presets, batidas visuais e b-roll animado. Eles se misturam trecho a trecho.", "en": "How the motion graphics will look: presets, visual beats and animated b-roll. They mix section by section."},
          "itens": est},
+        *[g for g in (
+            {"id": "gancho", "letra": "G", "unico": False, "max": 2, "nome": {"pt": "Gancho", "en": "Hook"},
+             "sub": {"pt": "O que aparece nos primeiros 1 a 3 segundos para segurar quem está rolando.", "en": "What shows in the first 1 to 3 seconds to stop the scroll."},
+             "itens": [sem("Sem gancho especial", "No special hook")] + EST.get("gancho", [])},
+            {"id": "layout", "letra": "Q", "unico": False, "max": 3, "nome": {"pt": "Layout", "en": "Layout"},
+             "sub": {"pt": "Como você e os gráficos dividem o quadro.", "en": "How you and the graphics share the frame."},
+             "itens": [sem("Quadro normal", "Normal frame")] + EST.get("layout", [])},
+            {"id": "prova", "letra": "P", "unico": False, "max": 4, "nome": {"pt": "Prova", "en": "Proof"},
+             "sub": {"pt": "Como mostrar que é verdade: prints, números, posts, arquivo pessoal.", "en": "How to show it's real: screenshots, numbers, posts, personal archive."},
+             "itens": [sem("Sem prova na tela", "No on-screen proof")] + EST.get("prova", [])},
+            {"id": "efeitos", "letra": "Z", "unico": False, "max": 4, "nome": {"pt": "Efeitos", "en": "Effects"},
+             "sub": {"pt": "Efeitos de destaque de cerca de 1 segundo, um por ideia, e movimentos de câmera e transições.", "en": "About one-second showpiece effects, one per idea, plus camera moves and transitions."},
+             "abas": [x for x in ({"id": "efeito", "nome": {"pt": "Efeitos", "en": "Effects"}}, {"id": "ritmo", "nome": {"pt": "Câmera e transições", "en": "Camera and transitions"}}) if EST.get(x["id"])],
+             "itens": [dict(sem("Sem efeitos", "No effects"), aba="efeito")] + EST.get("efeito", []) + EST.get("ritmo", [])},
+        ) if len(g["itens"]) > 1],
         {"id": "legenda", "letra": "L", "unico": True, "nome": {"pt": "Legenda", "en": "Captions"},
          "sub": {"pt": "Como a fala aparece. Nunca em cima do rosto.", "en": "How the words show up. Never over the face."},
          "abas": [{"id": "editor", "nome": {"pt": f"No editor ({editor_nome})", "en": f"In the editor ({editor_nome})"}},
@@ -181,7 +220,8 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("destaque", "Destaque palavra por palavra", "Word-by-word highlight", "Palavra-chave grande amarela ou em serifa (render em motion).", "Big yellow or serif keyword (rendered as motion).", "cap-hl", extra={"aba": "animada"}),
             it("serif_azul", "Serif azul", "Blue serif", "Sans com a palavra-chave em serifada itálica azul.", "Sans with the keyword in blue serif italic.", "cap-serif", extra={"aba": "animada"}),
             it("lume", "Lume (duas camadas)", "Lume (two layers)", "Linha fina + palavra que brilha em amarelo.", "Thin line + a word that glows yellow.", "cap-lume", extra={"aba": "animada"}),
-            it("podcast", "Cor por quem fala", "Colour per speaker", "Para podcast e entrevista com duas pessoas.", "For podcasts and two-person interviews.", "cap-pod", extra={"aba": "animada"})]},
+            it("podcast", "Cor por quem fala", "Colour per speaker", "Para podcast e entrevista com duas pessoas.", "For podcasts and two-person interviews.", "cap-pod", extra={"aba": "animada"})]
+            + [dict(x, aba="animada") for x in EST.get("legenda", [])]},
         {"id": "lettering", "letra": "T", "unico": False, "nome": {"pt": f"Lettering (títulos do {editor_nome})", "en": f"Lettering ({editor_nome} titles)"},
          "sub": {"pt": f"Palavras-chave na tela com os títulos que o seu {editor_nome} tem. Marque os que pode usar.", "en": f"On-screen keywords with the titles your {editor_nome} has. Tick the ones it may use."},
          "itens": [it("sem", "Sem lettering", "No lettering", "Só legenda e motions.", "Only captions and motion.", "none")] + let},
@@ -218,7 +258,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
          "sub": {"pt": "Acabamento de cor em todos os takes.", "en": "Colour finish on every shot."}, "itens": [
             it("lut_gab", "LUT do Gab", "Gab's LUT", "O PowerGrade/LUT da instalação.", "The PowerGrade/LUT from the install.", "col c1"),
             it("natural", "Natural", "Natural", "Só correção, sem estilo.", "Correction only, no look.", "col c2"),
-            it("pb", "Preto e branco", "Black and white", "Neutro, com contraste.", "Neutral, with contrast.", "col c3")]},
+            it("pb", "Preto e branco", "Black and white", "Neutro, com contraste.", "Neutral, with contrast.", "col c3")] + EST.get("cor", [])},
         {"id": "extras", "letra": "X", "unico": False, "nome": {"pt": "Extras", "en": "Extras"},
          "sub": {"pt": "Marque o que quer a mais.", "en": "Tick what you want on top."}, "itens": [
             it("atras_pessoa", "Motion atrás da pessoa", "Motion behind the person", "Magic Mask no Fusion: texto e objetos passam atrás de você.", "Magic Mask in Fusion: text and objects go behind you.", "behind"),
@@ -562,7 +602,7 @@ function render() {
   $("#pl").classList.toggle("ativo", passo >= 1 && passo <= N && !!autoPasso[D.grupos[passo - 1].id]);
   scrollTo(0, 0);
 }
-function pula(p) { const g = D.grupos[p - 1]; return g && g.id === "estilo" && sel.motions && sel.motions.has("sem"); }
+function pula(p) { const g = D.grupos[p - 1]; return g && ["estilo", "gancho", "layout", "prova", "efeitos"].includes(g.id) && sel.motions && sel.motions.has("sem"); }
 // cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; mede quantas colunas e linhas cabem e,
 // se não couber tudo, divide em páginas (‹ 1/2 ›) em vez de rolar ou encolher.
 function ajustar() {

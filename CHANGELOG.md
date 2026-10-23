@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-13 (23/10/2026)
+- **Estilos novos no menu:** passos novos Gancho, Layout, Prova e Efeitos, e as abas Batidas visuais e B-roll animado nos estilos dos motions; legendas animadas e looks de cor novos entram nos passos que já existem. Cada estilo aparece assim que fica pronto, com a prévia em loop (os passos sem nenhum estilo ainda ficam escondidos).
 ## 2026.10.23-12 (23/10/2026)
 - **Estilos novos (base):** nasceu a família de estilos curtos para o vídeo da pessoa (gancho, legenda, layout, prova, batidas, b-roll animado, efeitos, ritmo e cor), cada um com prévia em loop. Os primeiros: título atrás da cabeça, notificação do celular e notas na parede. Os próximos chegam nos próximos updates e aparecem sozinhos no menu.
 ## 2026.10.23-13 (23/10/2026)
