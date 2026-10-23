@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-15 (23/10/2026)
+- **Barra de rolagem do menu redesenhada:** fina, com a alça em degradê verde da /ogab.
 ## 2026.10.23-14 (23/10/2026)
 - **Menu com rolagem:** quando um passo tem muitas opções, os cartões ficam num tamanho confortável e você rola para baixo para ver os outros (sem as setas de página).
 ## 2026.10.23-13 (23/10/2026)

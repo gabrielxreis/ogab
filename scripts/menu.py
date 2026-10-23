@@ -366,7 +366,14 @@ kbd{min-width:58px;height:58px;padding:0 12px;border-radius:12px;background:#F2F
 h2{font-weight:800;font-size:clamp(24px,3.2vw,34px);letter-spacing:-.03em;line-height:1.1;margin:4px 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;font-size:18px;box-shadow:0 0 14px rgba(43,255,136,.45)}
 .sub{color:var(--mu);font-size:14.5px;margin-bottom:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:stretch;overflow-y:auto;padding:2px 2px 8px;scrollbar-width:thin}
+/* barra de rolagem na ID da /ogab: fina, trilho discreto, alça em degradê verde */
+.grid,.rgrid,#msgprev{scrollbar-width:thin;scrollbar-color:#2BFF88 rgba(255,255,255,.04)}
+.grid::-webkit-scrollbar,.rgrid::-webkit-scrollbar,#msgprev::-webkit-scrollbar{width:8px;height:8px}
+.grid::-webkit-scrollbar-track,.rgrid::-webkit-scrollbar-track,#msgprev::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:99px;margin:6px 0}
+.grid::-webkit-scrollbar-thumb,.rgrid::-webkit-scrollbar-thumb,#msgprev::-webkit-scrollbar-thumb{background:linear-gradient(#9CFFC9,#14E070);border-radius:99px;border:2px solid transparent;background-clip:padding-box;box-shadow:0 0 8px rgba(43,255,136,.35)}
+.grid::-webkit-scrollbar-thumb:hover,.rgrid::-webkit-scrollbar-thumb:hover{background:linear-gradient(#C9FFE2,#2BFF88);background-clip:padding-box}
+.grid{padding-right:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:stretch;overflow-y:auto;padding:2px 2px 8px}
 .card{position:relative;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s;text-align:left;color:inherit;font:inherit;padding:0}
 .card:hover{transform:translateY(-2px);border-color:rgba(43,255,136,.4)}
 .card[aria-pressed=true]{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.35)}
