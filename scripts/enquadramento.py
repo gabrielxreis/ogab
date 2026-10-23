@@ -50,7 +50,7 @@ def main():
     mot = [((x.GetStart() - S) / F, (x.GetEnd() - S) / F) for k in range(1, t.GetTrackCount("video") + 1)
            if "MOTION" in (t.GetTrackName("video", k) or "").upper() for x in t.GetItemListInTrack("video", k) or []]
     w, h = [int(v) for v in subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
-                                            "-of", "csv=p=0", video], capture_output=True, text=True).stdout.strip().split(",")[:2]]
+                                            "-of", "csv=p=0", video], capture_output=True, text=True).stdout.split()[0].split(",")[:2]]   # ffprobe pode repetir a linha (MP4 do DaVinci 21)
     tmp = tempfile.mkdtemp(); ruins = []; imgs = []
     for k, ini, fim, nm in sorted(pedacos, key=lambda z: z[1]):
         meio = (ini + fim) / 2

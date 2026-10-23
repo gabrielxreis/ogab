@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-6 (23/10/2026)
+- **Ajuste de enquadramento não quebra mais com vídeo do DaVinci 21:** o `enquadramento.py` lia o tamanho do vídeo errado em alguns MP4 exportados e parava. Não precisa fazer nada.
+- **Trocar os títulos duas vezes na mesma timeline:** a segunda troca do lettering parava com erro; agora a timeline auxiliar ganha um nome livre ("(titulos via API 2)") e, se o DaVinci recusar, o Gab avisa com clareza.
 ## 2026.10.23-5 (23/10/2026)
 - **Revisão do menu redesenhada:** anel com quantas escolhas são suas e quantas ficaram no automático, e um cartão por passo com a prévia em loop do que você marcou (clique para mudar).
 - **Confirmar volta para o Claude:** ao confirmar, o Gab recebe as escolhas na hora, o Claude vem para a frente e a mensagem já fica copiada; se precisar, é só colar (Cmd+V) no Claude.

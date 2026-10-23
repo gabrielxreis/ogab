@@ -853,7 +853,17 @@ def trocar_pela_copia(p, mp, t):
     composição dos títulos na cópia (nada de GetFusionCompByIndex/_textos/ajustar_titulo/checar_fades antigo).
     A cópia já leva os fades do bloco (conferido). Devolve a cópia com o nome original."""
     nome, vi = t.GetName(), t.GetVoiceIsolationState(1)
-    t.SetName(nome + " (titulos via API)"); d = t.DuplicateTimeline(nome); p.SetCurrentTimeline(d)
+    # 2a troca na mesma timeline: "(titulos via API)" já existe, o SetName falha calado e a cópia volta None (relato 23/10/2026)
+    usados = {p.GetTimelineByIndex(i).GetName() for i in range(1, p.GetTimelineCount() + 1)}
+    alvo, n = nome + " (titulos via API)", 2
+    while alvo in usados:
+        alvo, n = f"{nome} (titulos via API {n})", n + 1
+    if not t.SetName(alvo):
+        raise RuntimeError(f"não consegui renomear '{nome}' para '{alvo}'")
+    d = t.DuplicateTimeline(nome)
+    if not d:
+        raise RuntimeError(f"DuplicateTimeline('{nome}') falhou")
+    p.SetCurrentTimeline(d)
     if vi and vi.get("isEnabled") and not d.GetVoiceIsolationState(1).get("isEnabled"): d.SetVoiceIsolationState(1, vi)
     for j in range(2, d.GetTrackCount("video") + 1):          # título = item sem MediaPoolItem (não abre a composição)
         for x in d.GetItemListInTrack("video", j) or []:
