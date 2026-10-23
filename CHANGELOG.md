@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-13 (23/10/2026)
+- **Link para abrir o menu:** quando o Gab abre o `/ogab menu`, ele mostra na conversa um link "Abrir o menu do vídeo" e explica o que fazer, para o caso de o navegador não abrir sozinho.
 ## 2026.10.23-12 (23/10/2026)
 - **Seus presets no menu:** o preset que o Gab cria para você aparece no `/ogab menu` (estilo dos motions, com o selo "seu" e a prévia em GIF) depois de enviado à comunidade. O Gab acha sozinho tudo que o preset precisa para funcionar (imagens de fora da pasta, fontes, bibliotecas) e manda completo; se for grande demais, avisa em vez de mandar pela metade. `meus_presets.py listar` mostra o estado de cada um.
 ## 2026.10.23-11 (23/10/2026)
