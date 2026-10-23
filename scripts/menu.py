@@ -86,6 +86,26 @@ def fmt(id, plat, pt, en, prop, res, dpt, den):
     return it(id, pt, en, f"{prop} · {res} · {dpt}", f"{prop} · {res} · {den}", f"fmt {prop}", extra={"aba": plat, "proporcao": prop, "resolucao": res})
 
 
+def presets_do_usuario(C):
+    """Presets que a pessoa criou (meus_presets.py): entram no passo de estilo só depois de enviados COMPLETOS à
+    comunidade (no dono, sempre) e com prévia. id 'local:<id>' = preset em presets/<id>/ (ou biblioteca_motions_local/)."""
+    try:
+        import meus_presets
+        locais = meus_presets.listar()
+    except Exception:
+        return []
+    r = []
+    for p in locais:
+        if not p.get("no_menu"):
+            continue
+        cat = p.get("categoria") or "ideia"
+        r.append(it("local:" + p["id"], p["nome"], p["nome"], p.get("resumo") or "", p.get("resumo") or "",
+                    gif=(p["pasta"] + "/" + p["gif"]) if p.get("gif") else None,
+                    extra={"aba": cat, "cat": cat, "catn": {"pt": C["categorias"].get(cat, ""), "en": CAT_EN.get(cat, "")},
+                           "formato": p.get("formato") or [], "seu": True, "pasta": p["pasta"]}))
+    return r
+
+
 def grupos(formato, lettering, editor_nome="DaVinci"):
     """lettering = [(id_template, nome visível)] do editor da pessoa (lettering_do_editor)."""
     C = catalogo()
@@ -93,6 +113,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
     est = [it(p["id"], p["nome"], p["nome"].replace(" (CENA)", " (SCENE)"), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
               gif=p.get("gif") or None, extra={"aba": p["categoria"], "cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
               "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or []}) for p in presets]
+    est += presets_do_usuario(C)
     def anim_let(n):
         n = n.lower()
         for k, a in (("palavra", "let-word"), ("blur up", "let-blurup"), ("blur", "let-blur"), ("acima", "let-up"), ("abaixo", "let-down"),
@@ -438,11 +459,11 @@ const T = {
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
-  ouvir:"Ouvir o clima",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
+  ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
-  sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",passo:(i,n)=>`Step ${i} of ${n}`,
+  sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",seu:"yours",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
   resumo_t:"Here is your video",resumo_p:"Click a card to go back and change it.",resumo_rot:"Review",suas:"yours",escolhas_suas:"your picks",no_auto:"on automatic",passos_auto:"steps on automatic",editar:"Click to change",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
   ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",erro:"Couldn't save. Is Gab still open?"}};
@@ -508,7 +529,7 @@ function render() {
       ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "todos" || (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id)) && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${ic(x.id)}${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
       <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
-      <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
+      <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}${i.seu ? `<span class="tag">${T[L].seu}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div><div class="pager" id="pager"></div>`;
   } else {
     const man = D.grupos.filter(g => sel[g.id].size).length, tot = D.grupos.length, pct = auto ? 0 : man / tot;
@@ -646,6 +667,8 @@ def main(a):
             p = unquote(self.path.split("?")[0])
             if p in ("/", "/index.html"):
                 return self._envia(200, html, "text/html; charset=utf-8")
+            if p.startswith("/arquivo/biblioteca_motions_local/"):
+                return self._arquivo(os.path.realpath(os.path.join(SKILL, "biblioteca_motions_local")), p[len("/arquivo/biblioteca_motions_local/"):])
             if p.startswith("/arquivo/presets/"):
                 return self._arquivo(presets, p[len("/arquivo/presets/"):])
             if p.startswith("/fonte/"):

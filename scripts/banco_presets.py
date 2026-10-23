@@ -130,7 +130,7 @@ def puxar(csv_arq=None):
         if os.path.isdir(pasta):
             shutil.rmtree(pasta)
         os.makedirs(pasta)
-        completo = len(g["partes"]) >= g["total"]
+        completo = partes_ok = len(g["partes"]) >= g["total"]
         corpo = "".join(g["partes"][k] for k in sorted(g["partes"]))
         if g["tipo"] == "invencao":   # script novo ou melhoria na skill: o dono lê, testa e incorpora à mão
             texto = re.sub(r"^=== PACOTE INVENCAO ogab v1 parte \d+/\d+ ===\n", "", corpo, flags=re.M)
@@ -138,6 +138,9 @@ def puxar(csv_arq=None):
             arqs = ["pacote.txt"]
         elif corpo.startswith("=== PACOTE HYPERFRAMES"):
             arqs = relatar.desempacotar(corpo, pasta)
+            if completo:   # todas as partes chegaram: confere arquivo por arquivo contra o manifesto do envio
+                completo, problemas = relatar.conferir_pacote(pasta)
+                g["problemas"] = problemas
         else:   # motion do After Effects: a coluna diff é o próprio modelo.json
             open(os.path.join(pasta, "modelo.json"), "w", encoding="utf-8").write(corpo)
             arqs = ["modelo.json"]
@@ -145,6 +148,7 @@ def puxar(csv_arq=None):
                 "vezes": len(g["linhas"]) // max(1, g["total"]), "maquinas": len(g["instalacoes"]),
                 "linhas_planilha": sorted(g["linhas"]), "completo": completo,
                 "partes": f"{len(g['partes'])}/{g['total']}", "arquivos": arqs, "versao": g["versao"],
+                "problemas": ([] if partes_ok else [f"chegaram {len(g['partes'])} de {g['total']} parte(s)"]) + g.get("problemas", []),
                 "puxado": time.strftime("%Y-%m-%d %H:%M")}
         if g["tipo"] == "invencao":
             meta["novidade"], meta["mais_parecido"] = 1.0, "invenção (ler pacote.txt)"
@@ -329,7 +333,8 @@ def main(a):
                       f"\n    ler: {os.path.join(CAND, c['id'], 'pacote.txt')} (testar, incorporar à mão e `recusar <id> \"incorporado\"`)")
                 continue
             print(f"- {c['id']}  novidade {c.get('novidade', 0):.0%} (mais parecido: {c.get('mais_parecido')})"
-                  f"  {c['maquinas']} máquina(s)  partes {c['partes']}{alerta}\n    {c['titulo']}: {_curto(c['descricao'], 140)}"
+                  f"  {c['maquinas']} máquina(s)  partes {c['partes']}{alerta}{'' if c.get('completo') else '  INCOMPLETO: ' + '; '.join(c.get('problemas', [])[:3])}"
+                  f"\n    {c['titulo']}: {_curto(c['descricao'], 140)}"
                   + (f"\n    PROBLEMA: {c['problema']}" if c.get("problema") else ""))
     elif cmd == "ver" and len(a) >= 2:
         pasta, meta = _cand(a[1])

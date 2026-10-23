@@ -232,7 +232,9 @@ TEXTO_HF = CODIGO_HF + (".md", ".json", ".svg", ".txt")
 PULAR_DIRS_HF = {"node_modules", "renders", "snapshots", ".git", "__pycache__", ".hyperframes", "dist"}
 LIMITE_ARQ_HF = 30000     # caracteres por arquivo (o resto é cortado com aviso)
 LIMITE_PARTE = 45000      # célula da planilha do Formulário Google aguenta 50.000
-PARTES_MAX = 4
+PARTES_MAX = 8            # pacote maior que isso NÃO vai pela metade: o envio é recusado com o motivo
+BIN_MAX = 60_000          # binário até esse tamanho vai embutido em base64; maior vai só pelo nome (fonte, mídia de exemplo)
+PREVIAS_HF = ("exemplo.gif", "exemplo.mp4")   # prévia o dono renderiza de novo: não vai no pacote
 PROPS_GSAP = ("x", "y", "z", "xPercent", "yPercent", "scale", "scaleX", "scaleY", "rotation", "rotationX", "rotationY",
               "rotationZ", "skewX", "skewY", "opacity", "autoAlpha", "filter", "clipPath", "strokeDashoffset",
               "strokeDasharray", "drawSVG", "morphSVG", "motionPath", "backgroundPosition", "width", "height",
@@ -376,27 +378,43 @@ def _prioridade_hf(rel):
     return (7 if rel.endswith(CODIGO_HF) else 8, rel)
 
 
+class PacoteGrande(Exception):
+    """O pacote não cabe em PARTES_MAX partes: não manda pela metade."""
+
+
 def _empacotar_hf(corpo_modelo, arquivos, pasta, nomes):
-    """Pacote de texto com os arquivos da pasta do modelo, já limpos, em até PARTES_MAX partes de LIMITE_PARTE.
-    Formato (relatar.py desempacotar lê): '--- arquivo: <rel> ---' + conteúdo; binários só na lista do fim."""
-    blocos, fora = [f"--- arquivo: modelo.json ---\n{corpo_modelo}\n"], []
+    """Pacote de texto COMPLETO com os arquivos da pasta do modelo, já limpos, em até PARTES_MAX partes de LIMITE_PARTE.
+    Formato (relatar.py desempacotar lê): '--- arquivo: <rel> ---' + conteúdo; '--- binario: <rel> (base64) ---' para
+    binário pequeno; '--- manifesto ---' com o sha1 de cada arquivo COMO FOI ENVIADO (o dono confere que chegou tudo).
+    Não corta: se não couber, levanta PacoteGrande. Binário grande e biblioteca pública minificada vão pelo nome."""
+    import base64
+    blocos, fora, manifesto = [f"--- arquivo: modelo.json ---\n{corpo_modelo}\n"], [], {}
+    manifesto["modelo.json"] = hashlib.sha1(corpo_modelo.encode()).hexdigest()
     ids = {i for rel in arquivos if rel.endswith((".html", ".py", ".js"))
            for i in re.findall(r"""\bid\s*=\s*["']([\w-]+)""", _ler_hf(pasta, rel))}
     for rel in sorted(arquivos, key=_prioridade_hf):
-        ext = os.path.splitext(rel)[1].lower()
+        ext = os.path.splitext(rel)[1].lower(); rel_env = anonimizar(rel, nomes)
+        if rel.rsplit("/", 1)[-1] in PREVIAS_HF or rel.startswith("renders/") or rel in ("manifesto.json",):
+            continue
         if ext not in TEXTO_HF:
-            fora.append(f"{rel} ({arquivos[rel] // 1024 or 1} KB, binário: não vai)"); continue
-        if rel.endswith(".min.js") or arquivos[rel] > 200_000:
-            fora.append(f"{rel} ({arquivos[rel] // 1024} KB, biblioteca/arquivo grande: não vai)"); continue
+            if arquivos[rel] <= BIN_MAX:
+                dados = open(os.path.join(pasta, rel), "rb").read()
+                manifesto[rel_env] = hashlib.sha1(dados).hexdigest()
+                blocos.append(f"--- binario: {rel_env} (base64) ---\n{base64.b64encode(dados).decode()}\n")
+            else:
+                fora.append(f"{rel} ({arquivos[rel] // 1024} KB, binário grande: vai pelo nome)")
+            continue
+        if rel.endswith(".min.js"):
+            fora.append(f"{rel} ({arquivos[rel] // 1024} KB, biblioteca minificada: o dono usa a pública pelo nome)"); continue
         txt = _ler_hf(pasta, rel)
         txt = re.sub(r"data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+", "data:<removido>", txt)
-        if ext != ".md":
+        if ext != ".md" and rel not in ("preset.json",):
             txt = _textos_genericos(_cores_neutras(txt, ids), ext)
         txt = anonimizar(txt, nomes)
         txt = re.sub(r"[ \t]+\n", "\n", txt); txt = re.sub(r"\n{3,}", "\n\n", txt)
-        if len(txt) > LIMITE_ARQ_HF:
-            txt = txt[:LIMITE_ARQ_HF] + f"\n/* ... cortado: {len(txt) - LIMITE_ARQ_HF} caracteres a mais */"
-        blocos.append(f"--- arquivo: {anonimizar(rel, nomes)} ---\n{txt}\n")
+        manifesto[rel_env] = hashlib.sha1(txt.encode()).hexdigest()
+        blocos.append(f"--- arquivo: {rel_env} ---\n{txt}\n")
+    blocos.append("--- manifesto ---\n" + json.dumps({"arquivos": manifesto, "por_nome": fora}, ensure_ascii=False) + "\n")
     partes, atual = [], ""
     for b in blocos:
         while b:
@@ -410,32 +428,65 @@ def _empacotar_hf(corpo_modelo, arquivos, pasta, nomes):
     if atual:
         partes.append(atual)
     if len(partes) > PARTES_MAX:
-        fora.append(f"{len(partes) - PARTES_MAX} parte(s) a mais cortada(s) (arquivos de menor prioridade)")
-        partes = partes[:PARTES_MAX]
-    rodape = ("--- fora do pacote ---\n" + "\n".join(fora) + "\n") if fora else ""
-    if len(partes[-1]) + len(rodape) > LIMITE_PARTE and len(partes) < PARTES_MAX:
-        partes.append("")
-    partes[-1] += rodape
+        raise PacoteGrande(f"o preset precisa de {len(partes)} partes e o limite é {PARTES_MAX}: "
+                           "tire mídias de exemplo grandes da pasta (vão pelo nome) ou divida o preset")
     n = len(partes)
     return [f"=== PACOTE HYPERFRAMES ogab v1 parte {i}/{n} ===\n{p}" for i, p in enumerate(partes, 1)]
 
 
 def desempacotar(texto, destino):
-    """(dono) Remonta a pasta do preset a partir das colunas diff (todas as partes, em qualquer ordem, coladas num texto)."""
+    """(dono) Remonta a pasta do preset a partir das colunas diff (todas as partes, em qualquer ordem, coladas num texto).
+    Binários em base64 voltam a ser arquivos; o manifesto vai para manifesto_envio.json (conferir com conferir_pacote)."""
+    import base64
     pecas = re.split(r"^=== PACOTE (?:HYPERFRAMES|INVENCAO) ogab v1 parte (\d+)/\d+ ===\n", texto, flags=re.M)
     corpo = "".join(p for _, p in sorted(((int(pecas[i]), pecas[i + 1]) for i in range(1, len(pecas) - 1, 2))))
     corpo = re.sub(r"\n?--- continua ---\n", "", corpo)
     corpo = corpo.split("--- fora do pacote ---")[0]
+    manifesto = None
+    if "\n--- manifesto ---\n" in "\n" + corpo:
+        corpo, _, resto = ("\n" + corpo).partition("\n--- manifesto ---\n"); corpo = corpo[1:]
+        try:
+            manifesto = json.loads(resto.strip())
+        except Exception:
+            manifesto = {"ilegivel": True}
     feitos = []
-    for rel, conteudo in re.findall(r"^--- arquivo: (.+?) ---\n(.*?)(?=^--- arquivo: |\Z)", corpo, flags=re.M | re.S):
+    for tipo, rel, conteudo in re.findall(r"^--- (arquivo|binario): (.+?)(?: \(base64\))? ---\n(.*?)(?=^--- (?:arquivo|binario): |\Z)",
+                                          corpo, flags=re.M | re.S):
         rel = rel.strip()
         if rel.startswith(("/", "\\")) or ".." in rel.split("/") or ":" in rel or "<" in rel:
             continue   # caminho estranho (ou anonimizado): não grava fora da pasta
         alvo = os.path.join(destino, rel)
-        os.makedirs(os.path.dirname(alvo), exist_ok=True)
-        open(alvo, "w", encoding="utf-8").write(conteudo[:-1] if conteudo.endswith("\n") else conteudo)
+        os.makedirs(os.path.dirname(alvo) or destino, exist_ok=True)
+        conteudo = conteudo[:-1] if conteudo.endswith("\n") else conteudo
+        if tipo == "binario":
+            open(alvo, "wb").write(base64.b64decode(conteudo.strip()))
+        else:
+            open(alvo, "w", encoding="utf-8").write(conteudo)
         feitos.append(rel)
+    if manifesto is not None:
+        json.dump(manifesto, open(os.path.join(destino, "manifesto_envio.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return feitos
+
+
+def conferir_pacote(pasta):
+    """(dono) Confere a pasta remontada contra o manifesto_envio.json: devolve (completo, [problemas])."""
+    m = os.path.join(pasta, "manifesto_envio.json")
+    if not os.path.exists(m):
+        return False, ["pacote sem manifesto (enviado por versão antiga da skill: pode estar incompleto)"]
+    try:
+        man = json.load(open(m, encoding="utf-8"))
+    except Exception:
+        return False, ["manifesto ilegível"]
+    prob = []
+    for rel, sha in (man.get("arquivos") or {}).items():
+        p = os.path.join(pasta, rel)
+        if not os.path.exists(p):
+            prob.append(f"faltou: {rel}"); continue
+        dados = open(p, "rb").read()
+        if hashlib.sha1(dados).hexdigest() != sha:
+            prob.append(f"diferente do enviado: {rel}")
+    prob += [f"por nome: {x}" for x in man.get("por_nome", [])]
+    return not any(x.startswith(("faltou", "diferente")) for x in prob), prob
 
 
 def similaridade(a, b):
@@ -478,7 +529,7 @@ def parecido(modelo, ignorar=""):
                   reverse=True)
 
 
-def registrar_preset(caminho, motivo=None):
+def registrar_preset(caminho, motivo=None, saidas=None, destino=None, forcar=False):
     """Grava o relato do motion novo em pendentes/ (só sai com consentimento). Devolve o arquivo (o 1º, se o pacote
     HyperFrames vier em partes) ou None; motivo (lista), se passado, recebe o porquê de não registrar."""
     motivo = motivo if motivo is not None else []
@@ -510,7 +561,10 @@ def registrar_preset(caminho, motivo=None):
     estrutura = json.dumps(m.get("spec", {}), sort_keys=True)
     partes = [corpo]
     if hf:
-        partes = _empacotar_hf(corpo, arquivos, pasta_modelo, nomes)
+        try:
+            partes = _empacotar_hf(corpo, arquivos, pasta_modelo, nomes)
+        except PacoteGrande as e:
+            motivo.append(str(e)); return None
         estrutura = json.dumps(tracos, sort_keys=True)   # spec vazio: assinatura vem da estrutura dos arquivos
     rel = {"chave_envio": CHAVE_ENVIO, "tipo": "preset", "titulo": anonimizar(m.get("nome", "motion"), nomes)[:200],
            "erro": anonimizar(m.get("descricao", ""), nomes)[:3000], "causa": ", ".join(m.get("tags", []))[:2000],
@@ -523,23 +577,25 @@ def registrar_preset(caminho, motivo=None):
            "sistema": f"{platform.system()} {platform.release()} {platform.machine()}", "python": platform.python_version(),
            "editor": cfg.get("editor", ""), "motion": cfg.get("motion", ""), "instalacao": _instalacao(),
            "quando": time.strftime("%Y-%m-%dT%H:%M:%S")}
-    if any(rel["assinatura"] in os.path.basename(f) for f in glob.glob(os.path.join(PASTA, "*", "*.json"))):
+    if not forcar and any(rel["assinatura"] in os.path.basename(f) for f in glob.glob(os.path.join(PASTA, "*", "*.json"))):
         motivo.append("este motion (mesma estrutura) já foi registrado")
         return None   # este motion (mesma estrutura) já foi registrado
-    os.makedirs(PEND, exist_ok=True)
-    try:
-        vistos = json.load(open(VISTOS, encoding="utf-8"))
-    except Exception:
-        vistos = {}
-    vistos[rel["titulo"]] = tracos
-    json.dump(vistos, open(VISTOS, "w", encoding="utf-8"), ensure_ascii=False)
+    dest = destino or PEND
+    os.makedirs(dest, exist_ok=True)
+    if not destino:   # simulação (destino próprio) não conta como visto
+        try:
+            vistos = json.load(open(VISTOS, encoding="utf-8"))
+        except Exception:
+            vistos = {}
+        vistos[rel["titulo"]] = tracos
+        json.dump(vistos, open(VISTOS, "w", encoding="utf-8"), ensure_ascii=False)
     carimbo = time.strftime('%Y%m%d-%H%M%S')
-    saidas = []
+    saidas = saidas if saidas is not None else []
     for i, diff in enumerate(partes, 1):
         r = dict(rel, diff=diff)
         if len(partes) > 1:
             r["titulo"] = f"{rel['titulo']} (parte {i}/{len(partes)})"[:200]
-        saida = os.path.join(PEND, f"{carimbo}-preset-{rel['assinatura']}" + (f"-p{i}" if len(partes) > 1 else "") + ".json")
+        saida = os.path.join(dest, f"{carimbo}-preset-{rel['assinatura']}" + (f"-p{i}" if len(partes) > 1 else "") + ".json")
         json.dump(r, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         saidas.append(saida)
     return saidas[0]
@@ -621,11 +677,24 @@ def varrer():
         chave = os.path.relpath(pasta, SKILL); imp = _impressao(pasta)
         if vistos.get(chave) == imp:
             continue
-        porque = []
+        porque, arqs = [], []
         try:
-            res = registrar_preset(pasta, porque)
+            import meus_presets   # acha e resolve tudo que o preset precisa (arquivos de fora, manifesto, preset.json)
+            prep = meus_presets.preparar(pasta, render=False)
+            if prep["manifesto"]["faltando"]:
+                raise ValueError("faltando arquivo: " + ", ".join(prep["manifesto"]["faltando"][:5]))
+            res = registrar_preset(pasta, porque, saidas=arqs)
         except Exception as e:
             res, porque = None, [f"erro: {e}"]
+        try:
+            import meus_presets
+            est = meus_presets._estado()
+            est[chave] = ({"estado": "na fila", "arquivos": arqs, "impressao": _impressao(pasta)} if res
+                          else {"estado": "não enviado: " + ("; ".join(porque) or "?")})
+            meus_presets._salvar_estado(est)
+        except Exception:
+            pass
+        imp = _impressao(pasta)   # preparar pode ter mudado a pasta (assets/, preset.json)
         vistos[chave] = imp
         feitos.append((chave, res or "não registrado: " + ("; ".join(porque) or "?")))
     porque = []
