@@ -20,7 +20,7 @@ TAKES = {   # banco aprovado pelo takes.py (presets/estilos/exemplo); pessoas es
 }
 LUMA_ALVO = 118   # exposição média do take (0-255); acima de ~140 fica claro demais
 
-FALA = ["Esse é o Gab.", "Ele edita o seu vídeo", "com destaque, palco e órbita.", "Cartões girando em volta de você,",
+FALA = ["Esse é o Gab.", "Ele edita o seu vídeo", "com destaque, letreiro e órbita.", "Cartões girando em volta de você,",
         "barra de progresso pronta,", "e zoom na palavra certa.", "Sempre um passo à frente.", "Comenta GAB."]
 PAUSA = {"Gab.": .55, "órbita.": 1.3, "você,": .9, "pronta,": 1.2, "certa.": .7, "frente.": .9}
 
@@ -109,7 +109,7 @@ def main(trab, quais):
                                "y": TAKES["palco"].get("palco_y", int(1920 * .17))}]   # alto: a cabeça cobre só um pedaço
         elif preset == "orbita":
             plano["orbita"] = [{"tipo": "giro", "de": max(0, q("Cartões")["ini"] - .1), "ate": dur - .1, "voltas": 1.25,
-                                "cartoes": [{"texto": "DESTAQUE", "sub": "LEGENDA"}, {"texto": "PALCO", "sub": "ATRÁS"},
+                                "cartoes": [{"texto": "DESTAQUE", "sub": "LEGENDA"}, {"texto": "LETREIRO", "sub": "ATRÁS"},
                                             {"texto": "ÓRBITA", "sub": "CARTÕES"}, {"texto": "LENTE", "sub": "ZOOM"}]}]
         elif preset == "lente":
             de, ate = q("zoom")["ini"], q("certa")["fim"] + .5

@@ -770,7 +770,7 @@
   },
   {
    "id": "destaque",
-   "nome": "Destaque (CENA)",
+   "nome": "Destaque",
    "categoria": "apresentador",
    "papel": "linguagem",
    "formato": [
@@ -808,7 +808,7 @@
   },
   {
    "id": "palco",
-   "nome": "Palco (CENA)",
+   "nome": "Letreiro",
    "categoria": "apresentador",
    "papel": "trecho",
    "formato": [
@@ -834,7 +834,7 @@
   },
   {
    "id": "orbita",
-   "nome": "Órbita (CENA)",
+   "nome": "Órbita",
    "categoria": "apresentador",
    "papel": "trecho",
    "formato": [
@@ -858,7 +858,7 @@
   },
   {
    "id": "lente",
-   "nome": "Lente (CENA)",
+   "nome": "Lente",
    "categoria": "apresentador",
    "papel": "trecho",
    "formato": [

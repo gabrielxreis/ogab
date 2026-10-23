@@ -56,6 +56,9 @@ CAT_EN = {"dados": "Numbers, charts and milestones", "produto": "Product, app an
           "marca": "Opener, brand and web delivery"}
 
 
+NOME_EN = {"Destaque": "Highlight", "Letreiro": "Big word behind", "Órbita": "Orbit", "Lente": "Lens"}   # nome em inglês no menu
+
+
 def it(id, pt, en, dpt, den, anim=None, gif=None, extra=None):
     d = {"id": id, "nome": {"pt": pt, "en": en}, "desc": {"pt": dpt, "en": den}, "anim": anim, "gif": gif}
     if extra: d.update(extra)
@@ -131,7 +134,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
     """lettering = [(id_template, nome visível)] do editor da pessoa (lettering_do_editor)."""
     C = catalogo()
     presets = [p for p in C["presets"] if p["id"] not in FORA_DO_MENU]
-    est = [it(p["id"], p["nome"], p["nome"].replace(" (CENA)", " (SCENE)"), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
+    est = [it(p["id"], p["nome"], NOME_EN.get(p["nome"], p["nome"]), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
               gif=p.get("gif") or None, extra={"aba": p["categoria"], "cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
               "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or []}) for p in presets]
     est += presets_do_usuario(C)

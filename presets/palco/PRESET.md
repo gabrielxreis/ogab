@@ -1,4 +1,4 @@
-# Preset PALCO (texto gigante atrás da pessoa)
+# Preset LETREIRO (texto gigante atrás da pessoa; id interno "palco")
 
 Família CENA (motor em `presets/cena`). A palavra dita aparece GIGANTE atrás da cabeça e das mãos dele: a pessoa é
 recortada do fundo (`cena/recorte.py`, segmentação da Apple, grátis e local) e vai por cima do texto.
