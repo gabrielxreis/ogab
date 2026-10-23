@@ -70,7 +70,7 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 - **Silêncio:** "Remove Silent Portions" (transcrição > ⋯) e "Ripple Delete Silence" (Clip > Audio Operations) só pela
   tela. O Gab corta silêncio pela transcrição (`silencios.py`).
 - **Render in Place, gerar proxy/optimized media, Smart Bins, renomear pasta do Media Pool:** só pela tela.
-- **Magic Mask:** `CreateMagicMask` só rastreia uma máscara que o usuário já marcou com cliques.
+- **Magic Mask:** `CreateMagicMask` só rastreia uma máscara que o usuário já marcou com cliques. No Fusion também: o traço entra por script, o rastreio não (ver "Pessoa na frente").
 
 ## Testado no Gab em 15/10/2026 (projeto NBA, Studio 21.1)
 
@@ -126,3 +126,24 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 - Imagem parada (PNG) ignora `endFrame` e entra com 5 s: para overlay com duração exata, converter em MOV (QuickTime Animation `qtrle` com alfa; "PNG dentro de MOV" falha no render).
 - Arquivo substituído no mesmo caminho fica "quebrado" na timeline (o DaVinci guarda a duração antiga): usar `MediaPoolItem.ReplaceClip(novo_caminho)` com nome novo; troca a mídia sem mexer nos cortes do usuário.
 - Cartão e tarja na mesma trilha: quando se encostam, o append corta o começo do outro. Overlays de tipos diferentes em trilhas próprias.
+
+
+## Pessoa na frente: máscara no Fusion por script (engenharia reversa em 22/10/2026, Studio 21.1.1)
+
+Pedido do usuário: "o /ogab aprender a fazer máscara no Fusion para colocar objetos ou motions atrás, pelo próprio software". Função: `R.pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, corte=None, borda=0.0, desfoque=1.0, metodo="profundidade")`.
+
+**Como ficou:** cópia do trecho da V1 (só vídeo, mesmo enquadramento ZoomX/Pan/Tilt/crop) numa trilha NOVA "PESSOA NA FRENTE" logo acima do motion (`AddTrack("video", {"index": n})`), clipe rosa, com a composição `MediaIn1 > Profundidade (DepthMap) > Recorte (MatteControl) > MediaOut1`. O Edit compõe o alfa do Fusion por cima das trilhas de baixo: tudo entre a V1 e o recorte fica atrás da pessoa. Testado com 10 s de talking head (mão mexendo na frente do corpo): borda do cabelo cacheado limpa, sem pincelada e sem rastreio.
+
+**O que a engenharia reversa achou** (`strings` em `Libraries/Fusion/libfusionoperators.dylib` + `GetInputList` ao vivo):
+- `MagicMask` existe no Fusion (Tools/Matte). Entradas: `Input`, `Strokes` (tipo `MagicMaskStrokes`), botões `TrackForward`, `TrackReverse`, `TrackBidirectional`, `StopTracking`, `ClearAll`..., `ReferenceTime` (desligado), `ProcessedFramesLow/High`, cache em `~/Library/.../Fusion/DiskCache/MagicMaskCache/`.
+- Formato dos traços (aceito por `tool.LoadSettings(arquivo.setting)` e devolvido igual pelo `SaveSettings`): `Strokes = Input { Value = MagicMaskStrokes { PosStrokes = { { x1, y1, x2, y2, ... } }, NegStrokes = {...} } }`, cada traço uma lista PLANA de pontos normalizados (0-1, y de baixo para cima); número ímpar de valores ganha um 0 no fim.
+- **O rastreio não anda por script:** `SetInput("TrackForward", 1)` (com ou sem tempo), `comp:Execute` em Lua (`tool.TrackForward = 1`, `SetInput`) e `TrackBidirectional` não mudam `ProcessedFrames` nem criam cache. Sem rastreio o MagicMask devolve alfa cheio (sem máscara), mesmo no quadro do traço. Por isso `metodo="magicmask"` só monta o nó e para: o usuário pinta e clica em rastrear.
+- `DepthMap` (Fusion, IA de profundidade) roda sozinho em cada quadro. Entradas úteis: `DepthMapPreview` (1 = sai o mapa em cinza: perto claro, longe escuro), `NearLimit`/`FarLimit`, `IsolateSpecificDepth`/`TargetDepth`/`Tolerance`/`Softness`, `ContractExpand`, `Blur`. Também existem `SurfaceTracker` e `Relight`.
+- **MatteControl:** a `Solid.Matte` só deixa áreas OPACAS (com o MediaIn já opaco, não recorta nada). Para recortar: mapa na `Garbage.Matte` com `Garbage.MaskInverted = 1`, `Garbage.MaskChannel = 0`, `Garbage.MaskLow/High` = corte, `PostMultiplyImage = 1`. Ligar entrada com ponto no nome funciona: `ConnectInput("Garbage.Matte", tool)`.
+- **Corte automático (`_calibrar_corte`):** duas fotos do mesmo quadro (`ExportCurrentFrameAsStill`, saída no MediaIn e depois no mapa), rosto pela Vision da Apple (`presets/cena/rosto.py`), profundidade do rosto = mediana do miolo da caixa, fundo = percentil 90 das faixas de cima e dos lados; corte = fundo + 30%..60% da diferença. No teste: rosto 0,54-0,58, tronco 0,65, fundo 0,13-0,42, corte (0,358; 0,438). Diferença < 0,08 = a profundidade não separa: erro pedindo o Magic Mask.
+
+**Armadilhas desta rodada:**
+- `ExportCurrentFrameAsStill` exporta o que a cabeça de leitura mostra, mas `SetCurrentTimecode` nem sempre move o quadro exportado (3 tempos saíram iguais): para conferir movimento, renderizar (`renderizar_trecho(..., so_v1=False)`) e tirar quadros do MP4.
+- `DeleteFusionCompByName` devolve False na ÚLTIMA composição do clipe: para limpar, apagar os nós e ligar `MediaOut1` direto no `MediaIn1`.
+- `tool.LoadSettings` funciona com um `.setting` escrito à mão (o caminho para mandar dados complexos a um nó); `comp.Paste` precisa de tabela Lua, que o Python não monta.
+- Com o DaVinci em outra mesa e o usuário numa tela cheia, o controle de tela não alcança o visualizador do Fusion: mais um motivo para tudo por script.

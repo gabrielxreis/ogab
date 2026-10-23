@@ -1328,3 +1328,104 @@ def animar_clipe(item, chaves, fps_arquivo=None, nome="AnimGab"):
         if "giro" in c: tf.SetInput("Angle", c["giro"], f)
         if "x" in c or "y" in c: tf.SetInput("Center", {1: c.get("x", 0.5), 2: c.get("y", 0.5)}, f)
     return tf.Name
+
+
+# ---------------------------------------------------------------- pessoa na frente (máscara no Fusion, 22/10/2026)
+# Engenharia reversa do DaVinci 21.1 (libfusionoperators): o Fusion tem MagicMask (traços PosStrokes/NegStrokes =
+# listas planas x,y normalizadas) mas o RASTREIO só anda pelos botões da tela (SetInput("TrackForward") e Lua não
+# disparam) e sem rastreio ele não gera máscara. O DepthMap do Fusion (IA de profundidade) calcula sozinho em cada
+# quadro, sem traço nem rastreio: a pessoa perto da câmera sai clara e o fundo escuro. Com o MatteControl
+# (Garbage Matte INVERTIDA ligada no mapa; a Solid Matte só deixa opaco e não recorta) vira o recorte da pessoa.
+
+def _calibrar_corte(r, p, t, comp, quadro, pasta=None):
+    """Mede a profundidade do rosto e do fundo no quadro e devolve (baixo, alto) do corte.
+    ExportCurrentFrameAsStill pega o quadro da cabeça de leitura (que às vezes não anda): as duas fotos saem do
+    MESMO quadro, então a comparação vale."""
+    import tempfile
+    from PIL import Image
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "presets", "cena"))
+    import rosto as _rosto
+    pasta = pasta or tempfile.mkdtemp(prefix="gab_corte_")
+    mi, mo, dm, mc = (comp.FindTool(n) for n in ("MediaIn1", "MediaOut1", "Profundidade", "Recorte"))
+    fotos = {}
+    for nome, fonte in (("cor", mi), ("prof", dm)):
+        r.OpenPage("fusion"); comp.Lock(); mo.ConnectInput("Input", fonte); comp.Unlock()
+        r.OpenPage("edit"); t.SetCurrentTimecode(_tc(t, quadro)); time.sleep(5)
+        fotos[nome] = os.path.join(pasta, f"corte_{nome}.png")
+        if not p.ExportCurrentFrameAsStill(fotos[nome]):
+            raise RuntimeError("ExportCurrentFrameAsStill falhou (a página Edit precisa estar aberta)")
+    r.OpenPage("fusion"); comp.Lock(); mo.ConnectInput("Input", mc); comp.Unlock(); r.OpenPage("edit")
+    cor = Image.open(fotos["cor"]); W, H = cor.size
+    caixas = _rosto._caixa_vision(fotos["cor"], W, H) if sys.platform == "darwin" else []
+    if not caixas:
+        raise RuntimeError("nenhum rosto no quadro de calibração: passe corte=(baixo, alto) à mão")
+    x0, y0, x1, y1 = max(caixas, key=lambda c: (c[2] - c[0]) * (c[3] - c[1]))
+    prof = Image.open(fotos["prof"]).convert("L")
+    def vals(caixa):
+        return sorted(prof.crop(tuple(int(v) for v in caixa)).getdata())
+    cx0, cx1 = x0 + (x1 - x0) * .25, x1 - (x1 - x0) * .25
+    face = vals((cx0, y0 + (y1 - y0) * .3, cx1, y1 - (y1 - y0) * .2))
+    face = face[len(face) // 2] / 255
+    fw = x1 - x0   # fundo: faixa de cima e laterais na altura do rosto, longe da pessoa
+    fundo = vals((0, 0, W, max(2, y0 - fw * .6))) + vals((0, y0, max(2, x0 - fw * .9), y1)) + vals((min(W - 2, x1 + fw * .9), y0, W, y1))
+    fundo = fundo[int(len(fundo) * .9)] / 255
+    if face - fundo < .08:
+        raise RuntimeError(f"profundidade não separa a pessoa do fundo (rosto {face:.2f}, fundo {fundo:.2f}): "
+                           "use o Magic Mask pintado à mão no Fusion")
+    return round(fundo + .3 * (face - fundo), 3), round(fundo + .6 * (face - fundo), 3)
+
+
+def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, corte=None, borda=0.0, desfoque=1.0, metodo="profundidade"):
+    """Recorta a pessoa da V1 no trecho [ini_s, fim_s] (segundos da timeline) e põe o recorte numa trilha NOVA,
+    logo acima de `acima_da_trilha` (padrão: no topo). Tudo que está entre a V1 e o recorte (motion, lettering,
+    objeto) fica ATRÁS da pessoa. A V1 não é tocada; o recorte é uma cópia do mesmo trecho com o mesmo
+    enquadramento e uma composição Fusion (MediaIn > DepthMap > MatteControl > MediaOut), editável no Fusion.
+    corte=(baixo, alto): limites do mapa de profundidade (0-1); sem ele, calibra pelo rosto (_calibrar_corte).
+    borda: MatteContractExpand (negativo encolhe a borda); desfoque: MatteBlur. Devolve (item, corte).
+    metodo="magicmask": quando a profundidade não separa (pessoa encostada na parede, fundo na mesma distância),
+    monta MediaIn > MagicMask > MediaOut e PARA: o usuário pinta a pessoa no Fusion e clica em rastrear (o
+    rastreio do Magic Mask não anda por script). Devolve (item, None)."""
+    pagina_edit()
+    F = fps_tl(t); S = t.GetStartFrame(); a = S + round(ini_s * F); b = S + round(fim_s * F)
+    base = next((x for x in (t.GetItemListInTrack("video", 1) or []) if x.GetStart() <= a < x.GetEnd()), None)
+    if not base or not base.GetMediaPoolItem():
+        raise RuntimeError(f"nenhum clipe de vídeo na V1 em {ini_s:.2f} s")
+    b = min(b, base.GetEnd())
+    m = base.GetMediaPoolItem(); r_ = float(m.GetClipProperty("FPS")) / F
+    src = round((base.GetLeftOffset() + a - base.GetStart()) * r_)
+    if acima_da_trilha is None:
+        t.AddTrack("video"); trilha = t.GetTrackCount("video")
+    else:
+        t.AddTrack("video", {"index": acima_da_trilha + 1}); trilha = acima_da_trilha + 1
+    t.SetTrackName("video", trilha, "PESSOA NA FRENTE")
+    # endFrame é EXCLUSIVO (ver montar_takes); só vídeo (mediaType 1) para não duplicar o áudio
+    mp.AppendToTimeline([{"mediaPoolItem": m, "startFrame": src, "endFrame": src + round((b - a) * r_),
+                          "recordFrame": a, "trackIndex": trilha, "mediaType": 1}])
+    novo = next((x for x in (t.GetItemListInTrack("video", trilha) or []) if abs(x.GetStart() - a) <= 1), None)
+    if not novo:
+        raise RuntimeError("a cópia da pessoa não entrou na trilha (AppendToTimeline descartou sem erro)")
+    for k in ("ZoomX", "ZoomY", "Pan", "Tilt", "RotationAngle", "FlipX", "FlipY", "CropLeft", "CropRight",
+              "CropTop", "CropBottom", "CropSoftness", "AnchorPointX", "AnchorPointY", "Pitch", "Yaw"):
+        v = base.GetProperty(k)
+        if v is not None: novo.SetProperty(k, v)
+    comp = novo.AddFusionComp()
+    mi, mo = comp.FindTool("MediaIn1"), comp.FindTool("MediaOut1")
+    novo.SetClipColor("Pink")
+    if metodo == "magicmask":
+        comp.Lock(); mm = comp.AddTool("MagicMask", -32768, -32768); mm.SetAttrs({"TOOLS_Name": "PintarPessoa"})
+        mm.ConnectInput("Input", mi); mo.ConnectInput("Input", mm); comp.Unlock()
+        return novo, None
+    comp.Lock()   # travar SÓ para criar e ligar: valor gravado dentro do Lock não sai no render (davinci_api.md)
+    dm = comp.AddTool("DepthMap", -32768, -32768); dm.SetAttrs({"TOOLS_Name": "Profundidade"})
+    mc = comp.AddTool("MatteControl", -32768, -32768); mc.SetAttrs({"TOOLS_Name": "Recorte"})
+    dm.ConnectInput("Input", mi)
+    mc.ConnectInput("Background", mi); mc.ConnectInput("Garbage.Matte", dm)
+    mo.ConnectInput("Input", mc)
+    comp.Unlock()
+    dm.SetInput("DepthMapPreview", 1)
+    mc.SetInput("Garbage.MaskInverted", 1); mc.SetInput("Garbage.MaskChannel", 0)
+    mc.SetInput("PostMultiplyImage", 1); mc.SetInput("MatteContractExpand", borda); mc.SetInput("MatteBlur", desfoque)
+    if corte is None:
+        corte = _calibrar_corte(r, p, t, comp, a + min(12, (b - a) // 2))
+    mc.SetInput("Garbage.MaskLow", corte[0]); mc.SetInput("Garbage.MaskHigh", corte[1])
+    return novo, corte

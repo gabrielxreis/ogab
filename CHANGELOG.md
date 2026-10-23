@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-8 (22/10/2026)
+- **Motion atrás da pessoa, direto no DaVinci:** o Gab recorta a pessoa no Fusion com a IA de profundidade do próprio DaVinci (sem pintar e sem rastrear) e coloca o recorte numa trilha acima do motion; o motion, o lettering ou o objeto ficam atrás da pessoa e continuam editáveis na timeline. O corte é calibrado sozinho pelo rosto. Quando a pessoa está encostada no fundo, ele monta o Magic Mask para você só pintar e clicar em rastrear.
 ## 2026.10.22-7 (22/10/2026)
 - **Menos tokens com imagens:** o Gab passa a olhar quadros, prints e fotos numa cópia de até 1024 px (o arquivo original não muda), o que gasta cerca de 60% menos por imagem. O `doctor` liga isso sozinho no Mac e no Windows; abra o Claude Code de novo depois de atualizar. Para ver um detalhe em tamanho cheio: `scripts/olhar.py recorte`.
 ## 2026.10.22-5 (22/10/2026)
