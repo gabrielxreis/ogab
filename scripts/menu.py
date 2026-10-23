@@ -603,25 +603,27 @@ function render() {
   scrollTo(0, 0);
 }
 function pula(p) { const g = D.grupos[p - 1]; return g && ["estilo", "gancho", "layout", "prova", "efeitos"].includes(g.id) && sel.motions && sel.motions.has("sem"); }
-// cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; mede quantas colunas e linhas cabem e,
-// se não couber tudo, divide em páginas (‹ 1/2 ›) em vez de rolar ou encolher.
+// cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; se todas as opções couberem, sem rolagem;
+// se não couberem, cartões de ~220 px e a grade rola para baixo (pedido do usuário: rolar em vez de páginas).
 function ajustar() {
   const g = $(".grid"), pager = $("#pager"); if (!g) return;
   const cards = [...g.children]; cards.forEach(c => c.style.display = "");
   const n = cards.length, gap = 12, W = g.clientWidth;
-  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 58;
+  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 24;
   const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (160 + gap)));
-  let esc_ = null;
+  let col = null;
+  g.style.maxHeight = "none"; g.style.overflowY = "visible";
   for (let c = ini; c <= fim; c++) {
     g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
-    const alt = Math.max(...cards.slice(0, c).map(x => x.offsetHeight)) || 300, linhas = Math.max(1, Math.floor((H + gap) / (alt + gap)));
-    esc_ = {c, cap: c * linhas}; if (c * linhas >= n) break;
+    const alt = Math.max(...cards.slice(0, c).map(x => x.offsetHeight)) || 300, linhas = Math.ceil(n / c);
+    if (linhas * alt + (linhas - 1) * gap <= H) { col = c; break; }
   }
-  g.style.gridTemplateColumns = `repeat(${esc_.c}, 1fr)`; g.style.maxHeight = "none"; g.style.overflow = "visible";
-  const gid = D.grupos[passo - 1].id, paginas = Math.ceil(n / esc_.cap);
-  pag[gid] = Math.max(0, Math.min(paginas - 1, pag[gid] || 0));
-  if (paginas > 1) cards.forEach((c, k) => { if (k < pag[gid] * esc_.cap || k >= (pag[gid] + 1) * esc_.cap) c.style.display = "none"; });
-  pager.innerHTML = paginas > 1 ? `<button data-pg="-1" ${pag[gid] ? "" : "disabled"}>‹</button><span>${pag[gid] + 1} / ${paginas}</span><button data-pg="1" ${pag[gid] < paginas - 1 ? "" : "disabled"}>›</button>` : "";
+  if (!col) {   // não cabe: rola
+    col = Math.min(fim, Math.max(ini, Math.floor((W + gap) / (220 + gap))));
+    g.style.maxHeight = Math.max(240, H) + "px"; g.style.overflowY = "auto";
+  }
+  g.style.gridTemplateColumns = `repeat(${col}, 1fr)`;
+  if (pager) pager.innerHTML = "";
 }
 addEventListener("resize", ajustar);
 function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }

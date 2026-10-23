@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-14 (23/10/2026)
+- **Menu com rolagem:** quando um passo tem muitas opções, os cartões ficam num tamanho confortável e você rola para baixo para ver os outros (sem as setas de página).
 ## 2026.10.23-13 (23/10/2026)
 - **Estilos novos no menu:** passos novos Gancho, Layout, Prova e Efeitos, e as abas Batidas visuais e B-roll animado nos estilos dos motions; legendas animadas e looks de cor novos entram nos passos que já existem. Cada estilo aparece assim que fica pronto, com a prévia em loop (os passos sem nenhum estilo ainda ficam escondidos).
 ## 2026.10.23-12 (23/10/2026)
