@@ -207,10 +207,6 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             {"id": "prova", "letra": "P", "unico": False, "max": 4, "nome": {"pt": "Prova", "en": "Proof"},
              "sub": {"pt": "Como mostrar que é verdade: prints, números, posts, arquivo pessoal.", "en": "How to show it's real: screenshots, numbers, posts, personal archive."},
              "itens": [sem("Sem prova na tela", "No on-screen proof")] + EST.get("prova", [])},
-            {"id": "efeitos", "letra": "Z", "unico": False, "max": 4, "nome": {"pt": "Efeitos", "en": "Effects"},
-             "sub": {"pt": "Efeitos de destaque de cerca de 1 segundo, um por ideia, e movimentos de câmera e transições.", "en": "About one-second showpiece effects, one per idea, plus camera moves and transitions."},
-             "abas": [x for x in ({"id": "efeito", "nome": {"pt": "Efeitos", "en": "Effects"}}, {"id": "ritmo", "nome": {"pt": "Câmera e transições", "en": "Camera and transitions"}}) if EST.get(x["id"])],
-             "itens": [dict(sem("Sem efeitos", "No effects"), aba="efeito")] + EST.get("efeito", []) + EST.get("ritmo", [])},
         ) if len(g["itens"]) > 1],
         {"id": "legenda", "letra": "L", "unico": True, "nome": {"pt": "Legenda", "en": "Captions"},
          "sub": {"pt": "Como a fala aparece. Nunca em cima do rosto.", "en": "How the words show up. Never over the face."},
@@ -614,7 +610,7 @@ function render() {
   $("#pl").classList.toggle("ativo", passo >= 1 && passo <= N && !!autoPasso[D.grupos[passo - 1].id]);
   scrollTo(0, 0);
 }
-function pula(p) { const g = D.grupos[p - 1]; return g && ["estilo", "gancho", "layout", "prova", "efeitos"].includes(g.id) && sel.motions && sel.motions.has("sem"); }
+function pula(p) { const g = D.grupos[p - 1]; return g && ["estilo", "gancho", "layout", "prova"].includes(g.id) && sel.motions && sel.motions.has("sem"); }
 // cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; se todas as opções couberem, sem rolagem;
 // se não couberem, cartões de ~220 px e a grade rola para baixo (pedido do usuário: rolar em vez de páginas).
 function ajustar() {

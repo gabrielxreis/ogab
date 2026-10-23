@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-34 (23/10/2026)
+- **Menu mais curto:** o passo "Efeitos" saiu do menu, junto com o preset Salta do celular.
 ## 2026.10.23-33 (23/10/2026)
 - **Nomes mais claros:** o preset "Palco" agora se chama **Letreiro**, e Destaque, Órbita e Lente saíram sem o "(CENA)" no menu.
 ## 2026.10.23-32 (23/10/2026)
