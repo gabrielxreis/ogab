@@ -14,7 +14,7 @@ ESTILO["grafico-neon"] = (it, C) => {
           text-shadow:0 4px 18px rgba(0,0,0,.5)}`);
   // pontos da curva: começa embaixo à esquerda, oscila, sobe forte e termina no alto à direita (acima da cabeça)
   const topoN = S.topo + 40, fim = [W - S.lado - 70, Math.min(r[1] - 120, topoN + 170)];
-  const base = Math.min(H - S.baixo, r[3] + 60), pts = [[-30, base], [W * .18, base - 70], [W * .33, base - 30], [W * .5, base - 190],
+  const base = Math.min(H - S.baixo, r[3] - (r[3] - r[1]) * .15), pts = [[-30, base], [W * .18, base - 70], [W * .33, base - 30], [W * .5, base - 190],
     [W * .62, base - 150], [W * .76, (base + fim[1]) / 2 + 40], fim];
   let dpath = `M${pts[0]}`;
   for (let i = 1; i < pts.length; i++) { const a = pts[i - 1], b = pts[i], mx = (a[0] + b[0]) / 2; dpath += ` C${mx},${a[1]} ${mx},${b[1]} ${b[0]},${b[1]}`; }
