@@ -7,8 +7,15 @@ ESTILO["titulo-atras"] = (it, C) => {
     .ta-t{font-weight:900;letter-spacing:-.045em;line-height:.86;color:var(--dest);-webkit-text-stroke:6px rgba(20,16,12,.85);paint-order:stroke fill;
           text-shadow:0 18px 50px rgba(0,0,0,.45)}
     .ta-t span{display:inline-block}`);
-  const tit = String(it.titulo || "").toUpperCase(), tam = Math.min(W * .94 / Math.max(3, tit.length) / .82, P.h * .17);
-  const fh = r[3] - r[1], topo = Math.max(C.seguro.topo, r[1] - fh * .55);
+  const tit = String(it.titulo || "").toUpperCase();
+  // a cabeça cobre só a base das letras (~15%): a palavra se lê inteira e ainda fica atrás da pessoa.
+  // Sem parede acima da cabeça, o título diminui para caber (relatos do usuário 23/10/2026: "oculta muito").
+  const topoCab = r[1] - (r[3] - r[1]) * .18;                 // alto da cabeça com folga para cabelo volumoso
+  const espaco = topoCab - 40;                                // do alto do quadro até o alto da cabeça
+  const cabe = espaco / (.71 + (it.linha ? .375 : 0) + .05);   // maior tamanho que deixa só 15% atrás do cabelo
+  const tam = Math.max(P.h * .055, Math.min(W * .94 / Math.max(3, tit.length) / .82, P.h * .17, cabe));
+  const linha = it.linha ? tam * .3 * 1.25 : 0;
+  const topo = Math.max(40, topoCab + tam * .15 - tam * .86 - linha);
   const box = C.el("div", "ta-box"); box.style.top = topo + "px";
   const l = C.el("div", "ta-l", box, C.esc(it.linha || "")); l.style.fontSize = Math.round(tam * .3) + "px";
   const t = C.el("div", "ta-t", box, [...tit].map(c => `<span>${c === " " ? "&nbsp;" : C.esc(c)}</span>`).join(""));
