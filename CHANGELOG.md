@@ -1,5 +1,7 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.23-3 (23/10/2026)
+- **`/ogab menu`:** antes de criar um vídeo, o Gab pergunta se você quer escolher no menu ou deixar no automático. O menu abre no navegador com a cara da /ogab, em português ou inglês, um passo por tela (formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras), com prévias em loop e um check em cada opção. O que você não marcar, o Gab escolhe; no automático, ele decide tudo pelo que já sabe de você e da marca.
+## 2026.10.23-3 (23/10/2026)
 - **Modo sem editor:** quem não tem editor de vídeo escolhe "Nenhum" na instalação (ou `/ogab config editor nenhum`) e o Gab faz o vídeo inteiro aqui no Claude, entregando o MP4 pronto (roteiro, voz, legenda, música, SFX e motions). Ele recomenda instalar pelo menos o CapCut (grátis) para você poder mudar o que quiser; se instalar depois, `capcut.py levar` leva os vídeos já feitos para o CapCut. Quem escolheu um editor continua tendo tudo montado nele.
 ## 2026.10.23-2 (23/10/2026)
 - **Lettering volta a sair do seu pacote de títulos do DaVinci:** pedido de lettering, palavra-chave ou texto na tela usa os títulos animados que o instalador colocou no DaVinci (editáveis no Inspector). O HyperFrames só entra quando você pede motion. O Gab não pergunta mais do título OGraf; ele só é usado se você pedir.
