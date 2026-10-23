@@ -10,8 +10,9 @@ descrição e animação nossos.
 `presets/estilos/<grupo>/<id>/` com:
 - `estilo.json`: metadados (abaixo).
 - `<id>.js`: a animação (motor `cena`, padrão) OU o que o `motor` do estilo pedir (ritmo/cor, ver no fim).
-- `exemplo.gif`: prévia em loop gerada por `python3 presets/estilos/exemplo/fazer.py <id>` (apresentador ILUSTRADO, nunca
-  pessoa real nem cliente).
+- `exemplo.gif`: prévia em loop gerada SÓ pela sessão principal com `python3 presets/estilos/exemplo/fazer.py <id>` sobre um
+  TAKE REAL de pessoa (vídeo de banco com licença livre, Pexels). Proibido apresentador ilustrado/bonequinho (regra do
+  usuário, 23/10/2026) e nunca cliente.
 
 Grupos (pasta): `gancho`, `legenda`, `layout`, `prova`, `batida`, `broll`, `efeito`, `ritmo`, `cor`.
 
@@ -70,7 +71,7 @@ ESTILO["meu-estilo"] = (it, C) => {          // it = item do plano (de, ate + ca
 6. Visual: limpo, sem clichês de `docs/etapas/motion_proibidos.md`.
 
 ## Testar
-1. `python3 presets/estilos/exemplo/fazer.py <id>` (render do apresentador ilustrado com cache em ~/.cache/ogab_estilos).
+1. `python3 presets/estilos/exemplo/fazer.py <id>` (render sobre o take real, cache em ~/.cache/ogab_estilos_real).
 2. Olhar 2 a 3 quadros do GIF (`ffmpeg -i exemplo.gif -vf "select=eq(n\,30)" -frames:v 1 q.png`): rosto livre, nada
    cortado, texto legível, cor da marca.
 3. Plano real: `"estilos": [{"id": "...", "de": 1.0, "ate": 3.5, ...campos}]` no plano do `presets/cena/gerar.py`.
@@ -79,8 +80,8 @@ ESTILO["meu-estilo"] = (it, C) => {          // it = item do plano (de, ate + ca
 - `ritmo` (zoom, punch-in, transição): `"motor": "lente"` usa a LENTE do motor cena (zoom no ffmpeg) ou
   `"motor": "davinci"` com `R.animar_clipe` (keyframes no editor). Prévia: o mesmo `fazer.py`.
 - `cor` (acabamento): `"motor": "lut"` com um `.cube` gerado em Python dentro da pasta do estilo; no DaVinci entra com
-  `Graph.SetLUT` (a LUT precisa ir para a pasta MASTER de LUTs: `davinci_api.md`). Prévia: aplicar a LUT na gravação
-  ilustrada com ffmpeg `lut3d` e cortar o GIF.
+  `Graph.SetLUT` (a LUT precisa ir para a pasta MASTER de LUTs: `davinci_api.md`). Prévia: aplicar a LUT no take
+  real com ffmpeg `lut3d` e cortar o GIF.
 
 ## Arquivos que só a sessão principal muda
 `presets/cena/gerar.py`, `presets/estilos/estilos.js`, `presets/estilos/exemplo/fazer.py`, `scripts/menu.py`,

@@ -7,7 +7,7 @@ ESTILO["titulo-atras"] = (it, C) => {
     .ta-t{font-weight:900;letter-spacing:-.045em;line-height:.86;color:var(--dest);-webkit-text-stroke:6px rgba(20,16,12,.85);paint-order:stroke fill;
           text-shadow:0 18px 50px rgba(0,0,0,.45)}
     .ta-t span{display:inline-block}`);
-  const tit = String(it.titulo || "").toUpperCase(), tam = Math.min(W * .94 / Math.max(3, tit.length) / .6, P.h * .17);
+  const tit = String(it.titulo || "").toUpperCase(), tam = Math.min(W * .94 / Math.max(3, tit.length) / .82, P.h * .17);
   const fh = r[3] - r[1], topo = Math.max(C.seguro.topo, r[1] - fh * .55);
   const box = C.el("div", "ta-box"); box.style.top = topo + "px";
   const l = C.el("div", "ta-l", box, C.esc(it.linha || "")); l.style.fontSize = Math.round(tam * .3) + "px";
