@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-38 (23/10/2026)
+- **README novo no topo:** a claquete 3D saiu e entrou o vídeo de apresentação da /ogab (o mesmo publicado no LinkedIn).
 ## 2026.10.23-37 (23/10/2026)
 - **Nova ordem da edição:** depois dos cortes vêm lettering e motions, depois música, SFX, takes e cor, e só então a legenda (que já desce para baixo dos motions numa passada só). Antes de renderizar, o Gab mostra uma folha com os quadros-chave para você validar a timeline no editor.
 - **Conferência por quadros em PNG:** `conferir.py chave` exporta do DaVinci só os quadros que importam (cortes, entrada/meio/saída de lettering, motion e b-roll, marcadores) numa folha; se você apontar um problema, `conferir.py trecho --em <segundo>` mostra só aquele trecho. Nada de re-renderizar o vídeo inteiro para conferir.

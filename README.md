@@ -21,9 +21,9 @@
 
 <div align="center">
 
-<img src=".github/claquete_3d.gif" width="640" alt="Claquete 3D com /ogab renderizada no Blender">
+<img src=".github/ogab_linkedin.gif" width="640" alt="Vídeo de apresentação da /ogab">
 
-<sub><b>3D de verdade no Blender:</b> claquete com a marca em metal, chão espelhado e câmera em movimento (<code>tresd/cenas/claquete.py</code>).</sub>
+<sub><b>O Gab em 35 segundos:</b> do prompt à timeline pronta no DaVinci, Premiere, CapCut ou Final Cut (vídeo de apresentação feito com a própria /ogab).</sub>
 
 <br>
 
