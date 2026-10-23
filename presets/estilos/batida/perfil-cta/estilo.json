@@ -1,0 +1,10 @@
+{
+ "id": "perfil-cta", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Comentar e seguir", "en": "Comment and follow"},
+ "desc": {"pt": "Uma tela escura de rede social na frente do peito: a palavra é digitada e postada com coração, a tela vira o perfil e o botão seguir é tocado.",
+          "en": "A dark social app screen in front of the chest: the word is typed and posted with a heart, it slides to the profile and the follow button gets tapped."},
+ "quando": "fecho com chamada dupla: 'comenta X e me segue', 'deixa o comentário e segue para a parte 2'",
+ "campos": {"palavra": {"tipo": "texto", "exemplo": "EDITAR"}, "usuario": {"tipo": "texto", "exemplo": "estudio.nordica"},
+            "nome": {"tipo": "texto", "exemplo": "Estúdio Nórdica"}, "seguidores": {"tipo": "texto", "exemplo": "12,4 mil"}},
+ "exemplo": {"de": 0.3, "ate": 4.4}
+}

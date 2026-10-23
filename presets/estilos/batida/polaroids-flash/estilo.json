@@ -1,0 +1,10 @@
+{
+ "id": "polaroids-flash", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "imagem"],
+ "nome": {"pt": "Polaroids com flash", "en": "Polaroids with flash"},
+ "desc": {"pt": "Fotos reais caem como polaroids em volta da pessoa, cada uma com um flash de câmera ao pousar.",
+          "en": "Real photos drop in as polaroids around the person, each one landing with a camera flash."},
+ "quando": "fala que mostra momentos ou provas em foto: 'olha como era', 'os bastidores', 'clientes que já atendi', 'a viagem'",
+ "campos": {"imagens": {"tipo": "imagens", "exemplo": []},
+            "legendas": {"tipo": "lista", "exemplo": ["dia 1", "dia 30", "hoje"]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

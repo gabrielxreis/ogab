@@ -1,0 +1,9 @@
+{
+ "id": "logo-brilho", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "logo"],
+ "nome": {"pt": "Logo com brilho", "en": "Glowing logo"},
+ "desc": {"pt": "Logo e nome surgem de um brilho branco suave, um ponto de luz passa e um reflexo corre pelas letras, sem cartão.",
+          "en": "Logo and name rise from a soft white glow, a spark passes by and a light sweep runs across the letters, no card."},
+ "quando": "fala que cita uma marca, empresa, ferramenta ou produto pelo nome ('eu uso o X', 'a X lançou')",
+ "campos": {"logo": {"tipo": "imagem", "exemplo": ""}, "nome": {"tipo": "texto", "exemplo": "Nórdica"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

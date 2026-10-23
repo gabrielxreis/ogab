@@ -1,0 +1,10 @@
+{
+ "id": "cta-comentario", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Comente a palavra", "en": "Comment the keyword"},
+ "desc": {"pt": "Cartão branco com anel em degradê digita 'Comente' e mostra a palavra-chave grande em degradê, e segura.",
+          "en": "A white card with a gradient ring types 'Comment' and shows the keyword large in a gradient, and holds."},
+ "quando": "chamada para comentar uma palavra e receber algo: 'comenta EDITAR que eu te mando', 'escreve QUERO aqui embaixo'",
+ "campos": {"acao": {"tipo": "texto", "exemplo": "Comente"}, "palavra": {"tipo": "texto", "exemplo": "EDITAR"},
+            "sub": {"tipo": "texto", "exemplo": "e receba o guia"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

@@ -1,0 +1,9 @@
+{
+ "id": "comentario-fixo", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Recado fixo no topo", "en": "Pinned handwritten note"},
+ "desc": {"pt": "Uma linha manuscrita fica fixa no topo durante o vídeo inteiro, com a chamada (ex.: 'comenta QUERO').",
+          "en": "A handwritten line stays pinned at the top for the whole video, carrying the call to action."},
+ "quando": "vídeo inteiro com uma chamada que precisa ficar visível: 'comenta X', 'parte 2 no perfil', 'salva esse vídeo'",
+ "campos": {"texto": {"tipo": "texto", "exemplo": "comenta QUERO que eu te mando o guia"}},
+ "exemplo": {"de": 0.3, "ate": 4.5}
+}

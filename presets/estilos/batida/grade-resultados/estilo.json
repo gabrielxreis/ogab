@@ -1,0 +1,11 @@
+{
+ "id": "grade-resultados", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "imagem"],
+ "nome": {"pt": "Grade de resultados", "en": "Results grid"},
+ "desc": {"pt": "Duas fileiras de resultados (prints reais) empilhadas fora do rosto, trocando a cada segundo com um giro rápido.",
+          "en": "Two stacked rows of results (real screenshots) outside the face, swapping every second with a quick flip."},
+ "quando": "fala de prova em volume: 'olha os resultados', 'alunos que já conseguiram', 'mais de 100 depoimentos'",
+ "campos": {"imagens": {"tipo": "imagens", "exemplo": []},
+            "valores": {"tipo": "lista", "exemplo": ["+R$ 4.120", "+38%", "312 vendas", "+2,1 mil", "R$ 9.870", "+64%",
+                                                       "1.204 leads", "+R$ 780", "+91%", "47 clientes", "R$ 15 mil", "+120%"]}},
+ "exemplo": {"de": 0.3, "ate": 3.9}
+}

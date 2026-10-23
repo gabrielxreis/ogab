@@ -1,0 +1,10 @@
+{
+ "id": "setas-manuscritas", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Notas com seta à mão", "en": "Handwritten arrow notes"},
+ "desc": {"pt": "Notinhas manuscritas em caixa alta aparecem com uma seta desenhada à mão apontando para algo no quadro.",
+          "en": "Small all-caps handwritten notes pop up with a hand-drawn arrow pointing at something in the frame."},
+ "quando": "fala que aponta algo visível: 'esse aqui atrás', 'olha meu setup', 'eu no primeiro dia', 'esse produto'",
+ "campos": {"itens": {"tipo": "lista", "exemplo": [{"texto": "eu no 1º dia", "alvo": [0.5, 0.42], "em": 0.5},
+                                                   {"texto": "o setup todo", "alvo": [0.86, 0.6], "em": 1.6}]}},
+ "exemplo": {"de": 0.3, "ate": 3.8}
+}

@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-20 (23/10/2026)
+- **11 batidas visuais novas (estilos, parte 2):** logo com brilho, cronômetro em anel, calendário voltando no tempo, botões do celular desligando, comente a palavra, polaroids com flash, comentar e seguir, contador de série, notas com seta à mão, recado fixo no topo e grade de resultados. Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-19 (23/10/2026)
 - **8 layouts novos (estilos):** recorte com cartões flutuando e a sala desfocada, canvas colagem azul com vídeos e adesivos, gráficos no espaço acima da cabeça, faixa no topo para citação, foto de arquivo e número, lousa acima da cabeça, rodízio de três (prova em cima, palavra grande, prova em tela cheia), polaroid narrador (você numa polaroid no canto ao lado do print) e antes e depois. Aparecem no passo Layout do menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-18 (23/10/2026)

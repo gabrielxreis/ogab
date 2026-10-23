@@ -1,0 +1,10 @@
+{
+ "id": "central-controle", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "palavras"],
+ "nome": {"pt": "Botões do celular desligando", "en": "Phone toggles switching off"},
+ "desc": {"pt": "Botões redondos de celular (Wi-Fi, sinal, avião, som) desligam um a um na palavra dita, num painel de vidro.",
+          "en": "Round phone toggles (Wi-Fi, signal, airplane, sound) switch off one by one on the spoken word, in a glass panel."},
+ "quando": "fala de desconectar ou ficar sem algo: 'sem internet, sem telefone', 'desliguei tudo', 'modo avião', 'sem notificação'",
+ "campos": {"itens": {"tipo": "lista", "exemplo": [{"icone": "wifi", "rotulo": "Wi-Fi", "palavra": "estilo"},
+                                                   {"icone": "telefone", "rotulo": "Celular", "palavra": "seu"}]}},
+ "exemplo": {"de": 0.3, "ate": 3.4}
+}

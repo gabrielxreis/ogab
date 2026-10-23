@@ -1,0 +1,11 @@
+{
+ "id": "contador-serie", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Contador de série", "en": "List counter"},
+ "desc": {"pt": "Título fixo da série no topo ('10 ferramentas') com um contador 01/10 pequeno e um rótulo grande para cada item.",
+          "en": "Fixed series title at the top ('10 tools') with a small 01/10 counter and a big label for each item."},
+ "quando": "vídeo de lista numerada: 'X ferramentas', 'Y erros', 'Z dicas'; cada item ganha seu rótulo quando é citado",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "10 ferramentas"}, "total": {"tipo": "numero", "exemplo": 10},
+            "inicio": {"tipo": "numero", "exemplo": 1},
+            "itens": {"tipo": "lista", "exemplo": [{"texto": "Agenda", "em": 0.5}, {"texto": "Notas", "em": 1.7}, {"texto": "Planilha", "em": 2.9}]}},
+ "exemplo": {"de": 0.3, "ate": 4.2}
+}

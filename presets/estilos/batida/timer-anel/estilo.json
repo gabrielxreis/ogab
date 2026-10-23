@@ -1,0 +1,9 @@
+{
+ "id": "timer-anel", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Cronômetro em anel", "en": "Ring timer"},
+ "desc": {"pt": "Um cronômetro em anel de vidro aparece no espaço livre, conta até o número dito em uns 2 segundos e some.",
+          "en": "A glass ring timer appears in the free space, counts up to the spoken number in about 2 seconds and fades."},
+ "quando": "fala com tempo ou quantidade curta: '10 minutos por dia', 'em 30 segundos', '5 passos', '3 horas'",
+ "campos": {"numero": {"tipo": "numero", "exemplo": 30}, "unidade": {"tipo": "texto", "exemplo": "segundos"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

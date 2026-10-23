@@ -1,0 +1,10 @@
+{
+ "id": "calendario-ano", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Calendário voltando no tempo", "en": "Calendar rewinding years"},
+ "desc": {"pt": "Um widget branco de calendário vira o ano para trás em saltos até a data dita e mostra 'há X anos'.",
+          "en": "A white calendar widget flips the year backwards in jumps to the spoken date and shows 'X years ago'."},
+ "quando": "fala que volta no tempo: 'há 10 anos', 'em 2015 eu...', 'quando eu comecei', 'faz 5 anos'",
+ "campos": {"ano": {"tipo": "numero", "exemplo": 2026}, "anos": {"tipo": "numero", "exemplo": 10},
+            "rotulo": {"tipo": "texto", "exemplo": "há 10 anos"}, "mes": {"tipo": "texto", "exemplo": "Outubro"}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}
