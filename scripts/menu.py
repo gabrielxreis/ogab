@@ -288,7 +288,17 @@ header{display:flex;align-items:center;justify-content:space-between;gap:16px;pa
 .lang button[aria-pressed=true]{background:var(--grad);color:var(--ink);box-shadow:0 0 10px rgba(43,255,136,.5)}
 h1{font-weight:800;font-size:clamp(28px,4vw,42px);letter-spacing:-.035em;line-height:1.08;margin:24px 0 8px}
 .lead{color:var(--mu);max-width:720px}
-.fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim div{max-width:460px;padding:24px}.fim b{font-size:30px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px;background:var(--grad);-webkit-background-clip:text;color:transparent}
+.fimbox{max-width:560px;width:calc(100% - 32px);padding:28px;border-radius:20px;background:var(--card);backdrop-filter:blur(14px);border:1px solid rgba(43,255,136,.4);box-shadow:0 0 40px rgba(43,255,136,.18);text-align:center}
+.fimbox .ok{width:64px;height:64px;margin:0 auto;border-radius:50%;background:var(--grad);color:var(--ink);display:grid;place-items:center;font:800 32px "Inter Tight";box-shadow:0 0 24px rgba(43,255,136,.6)}
+.cole{margin:18px 0 12px;padding:18px;border-radius:16px;background:rgba(43,255,136,.1);border:2px solid var(--g);animation:brilha 1.4s ease-in-out infinite alternate}
+@keyframes brilha{from{box-shadow:0 0 0 rgba(43,255,136,0)}to{box-shadow:0 0 26px rgba(43,255,136,.55)}}
+.cole .rot{font:800 26px "Inter Tight";letter-spacing:-.02em;color:var(--g)}
+.teclas{display:flex;justify-content:center;align-items:center;gap:10px;margin:12px 0}.teclas span{font:800 22px "Inter Tight";color:var(--mu)}
+kbd{min-width:58px;height:58px;padding:0 12px;border-radius:12px;background:#F2F7F3;color:var(--ink);font:800 26px "Inter Tight";display:grid;place-items:center;box-shadow:0 5px 0 #9DB3A6}
+.cole ol{text-align:left;margin:6px auto 0;max-width:340px;color:var(--tx);font:500 15px "Inter Tight";padding-left:22px}.cole li{margin:4px 0}
+#msgprev{text-align:left;white-space:pre-wrap;font:500 12.5px ui-monospace,Menlo,monospace;color:var(--mu);background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:12px;max-height:150px;overflow:auto;margin:0 0 12px}
+#copiar{width:100%;height:46px;border:0;cursor:pointer}.fimbox .nota{color:var(--mu);font-size:13px;margin-top:10px}
+.fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim b{font-size:30px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px;background:var(--grad);-webkit-background-clip:text;color:transparent}
 .sabe{margin:16px 0 4px;padding:16px;border-radius:16px;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);font-size:14px;text-align:left}.sabe b{font:800 10.5px "Inter Tight";letter-spacing:.12em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:6px}.sabe li{color:var(--mu);margin-left:18px}
 .prog{display:flex;gap:5px;margin:20px 0 0;padding:3px;border-radius:999px;background:rgba(255,255,255,.06)}.prog i{flex:1;height:6px;border-radius:9px;background:transparent}.prog i.on{background:var(--grad);box-shadow:0 0 8px rgba(43,255,136,.5)}
 .passo{font:800 10.5px "Inter Tight";color:var(--mu);letter-spacing:.12em;text-transform:uppercase;margin-top:18px}
@@ -343,7 +353,7 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 .barra button[hidden]{display:none}
 .go:disabled{animation:none;opacity:.35;cursor:not-allowed;filter:grayscale(.6)}
 .pl.ativo{background:var(--amb)!important;color:var(--ink)!important}
-.fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim div{max-width:460px;padding:24px}.fim b{font-size:26px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px}
+.fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim b{font-size:26px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px}
 @media (max-width:640px){.inicio{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.resumo b{min-width:110px}.barra .codes{display:none}}
 /* ---------- prévias em loop (opções sem GIF) ---------- */
 .an{width:100%;height:100%;position:relative;display:grid;place-items:center;font-family:"Inter Tight";overflow:hidden;background:radial-gradient(circle at 50% 30%,#13241A,#050806 70%)}
@@ -412,7 +422,13 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 <div id="tela"></div>
 </div>
 <div class="barra"><div class="wrap"><button class="bk" id="bk" data-t="voltar"></button><span class="codes" id="codes"></span><button class="pl" id="pl" data-t="pular"></button><button class="go" id="go"></button></div></div>
-<div class="fim" id="fim"><div><b data-t="fim_t"></b><p data-t="fim_p" style="color:var(--mu)"></p></div></div>
+<div class="fim" id="fim"><div class="fimbox">
+  <div class="ok">✓</div><b data-t="fim_t"></b>
+  <div class="cole"><div class="rot" data-t="cole_rot"></div><div class="teclas"><kbd id="kmod">⌘</kbd><span>+</span><kbd>V</kbd></div>
+    <ol><li data-t="cole_1"></li><li data-t="cole_2"></li></ol></div>
+  <pre id="msgprev"></pre>
+  <button class="go" id="copiar" data-t="copiar"></button>
+  <p class="nota" data-t="fim_p"></p></div></div>
 <script>
 const D = __DADOS__;
 const T = {
@@ -422,14 +438,14 @@ const T = {
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
-  ouvir:"Ouvir o clima",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto!",fim_p:"O Gab já recebeu as suas escolhas e o Claude está voltando para a frente. Se não voltar, cole no Claude (Cmd+V / Ctrl+V): a mensagem já está copiada.",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
+  ouvir:"Ouvir o clima",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
   resumo_t:"Here is your video",resumo_p:"Click a card to go back and change it.",resumo_rot:"Review",suas:"yours",escolhas_suas:"your picks",no_auto:"on automatic",passos_auto:"steps on automatic",editar:"Click to change",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
-  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done!",fim_p:"Gab already has your choices and Claude is coming back to the front. If it doesn\'t, paste into Claude (Cmd+V / Ctrl+V): the message is already copied.",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",erro:"Couldn't save. Is Gab still open?"}};
+  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
@@ -577,6 +593,8 @@ $("#go").onclick = async () => {
       const its = g.itens.filter(i => sel[g.id].has(i.id)).map(i => (g.id === "formato" ? (g.abas.find(x => x.id === i.aba) || {nome: {}}).nome[L] + " " : "") + i.nome[L] + (i.proporcao ? ` (${i.proporcao})` : ""));
       return `- ${g.nome[L]}: ${its.length ? its.join(", ") : T[L].auto_l}`; })).join("\n");
     try { await navigator.clipboard.writeText(msg); } catch (e) {}
+    $("#msgprev").textContent = msg; $("#kmod").textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl";
+    $("#copiar").onclick = async () => { try { await navigator.clipboard.writeText(msg); } catch (e) {} $("#copiar").textContent = T[L].copiado; setTimeout(() => $("#copiar").textContent = T[L].copiar, 1500); };
     $("#fim").style.display = "grid";
   } catch (e) { alert(T[L].erro); }
 };

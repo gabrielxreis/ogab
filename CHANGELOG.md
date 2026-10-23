@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-11 (23/10/2026)
+- **O Gab abre o menu sozinho:** quando você pede para criar ou editar um vídeo (ou manda o arquivo), ele pergunta só o que faltar (marca, assunto, objetivo) e já abre o menu para você escolher os detalhes ou apertar Automático.
+- **Tela final do menu mais clara:** um bloco grande "Cole no Claude" com as teclas ⌘ + V (Ctrl + V no Windows), os dois passos, a prévia da mensagem e um botão para copiar de novo.
 ## 2026.10.23-10 (23/10/2026)
 - **Menu:** os estilos dos motions abrem na aba "Todos"; a música ficou só com o sentimento e os exemplos de uso (sem o botão de amostra), e os cartões cabem melhor numa página só.
 ## 2026.10.23-9 (23/10/2026)
