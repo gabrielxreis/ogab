@@ -2,7 +2,7 @@
 """/ogab menu: painel local (PT/EN) para a pessoa escolher o que vai no vídeo antes de criar, ou deixar no automático.
 
   python3 menu.py [--pasta <pasta do vídeo>] [--cliente <empresa>] [--pedido "texto"] [--roteiro roteiro.txt]
-                  [--formato vertical|horizontal] [--lingua pt|en] [--porta 0] [--sem-abrir] [--timeout 1800]
+                  [--formato vertical|horizontal] [--editor davinci|premiere|capcut|finalcut|nenhum] [--lingua pt|en] [--porta 0] [--sem-abrir] [--timeout 1800]
 
 - Cada opção tem um check: marcou, entra no vídeo. Grupo sem nada marcado = o Gab escolhe aquele grupo.
 - "Automático": o Gab escolhe TUDO pelo que já sabe da pessoa e da marca (estilo.md do cliente, memória da marca,
@@ -60,7 +60,32 @@ def it(id, pt, en, dpt, den, anim=None, gif=None, extra=None):
     return d
 
 
-def grupos(formato, lettering):
+def lettering_do_editor(editor, cfg):
+    """(nome do editor, [(id_template, nome visível)]) com os títulos que o editor da pessoa tem."""
+    if editor == "premiere":
+        d = os.path.join(SKILL, "premiere", "assets", "mogrt")
+        nomes = sorted(os.path.splitext(f)[0] for f in os.listdir(d) if f.endswith(".mogrt")) if os.path.isdir(d) else []
+        return "Premiere", [(n, n.replace("-", " ").capitalize()) for n in nomes]
+    if editor == "capcut":
+        try:
+            c = json.load(open(os.path.join(SKILL, "capcut", "catalogo.json"), encoding="utf-8"))["texto_entrada"]
+        except Exception:
+            c = {}
+        return "CapCut", [(k, v.get("nome", k)) for k, v in c.items() if not v.get("vip")]
+    if editor == "finalcut":
+        return "Final Cut", [("Basic Title", "Basic Title")]
+    if editor == "nenhum":
+        return "Gab", [("texto", "Texto simples")]
+    lt = (cfg.get("lettering") or {}).get("templates_disponiveis") or []
+    return "DaVinci", [(n, n.replace("@gabrielxreis_ ", "")) for n in lt]
+
+
+def fmt(id, plat, pt, en, prop, res, dpt, den):
+    return it(id, pt, en, f"{prop} · {res} · {dpt}", f"{prop} · {res} · {den}", f"fmt {prop}", extra={"aba": plat, "proporcao": prop, "resolucao": res})
+
+
+def grupos(formato, lettering, editor_nome="DaVinci"):
+    """lettering = [(id_template, nome visível)] do editor da pessoa (lettering_do_editor)."""
     C = catalogo()
     presets = [p for p in C["presets"] if p["id"] not in FORA_DO_MENU]
     est = [it(p["id"], p["nome"], p["nome"].replace(" (CENA)", " (SCENE)"), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
@@ -72,40 +97,69 @@ def grupos(formato, lettering):
                      ("direita", "let-right"), ("esquerda", "let-left"), ("brilho", "let-glow"), ("flick", "let-flick"), ("corte", "let-cut"),
                      ("cinematic", "let-cine"), ("gira", "let-spin"), ("zoom", "let-zoom"), ("sublinh", "let-under"), ("gold", "let-gold"),
                      ("silver", "let-silver"), ("slide", "let-right"), ("surgir", "let-blurup"), ("reveal", "let-cut"), ("destac", "let-hl"),
-                     ("moderno", "let-up")):
+                     ("moderno", "let-up"), ("typewriter", "let-word"), ("fade", "let-blur"), ("up", "let-up"), ("down", "let-down"),
+                     ("left", "let-left"), ("right", "let-right"), ("spin", "let-spin"), ("rotat", "let-spin"), ("glow", "let-glow"),
+                     ("shine", "let-glow"), ("flash", "let-flick"), ("zoom", "let-zoom"), ("scale", "let-zoom"), ("wipe", "let-cut"),
+                     ("lista", "let-word"), ("contador", "let-zoom"), ("frase", "let-up")):
             if k in n: return a + (" fast" if "rápido" in n else "")
         return "let-blurup"
-    let = [it("t%02d" % i, n.replace("@gabrielxreis_ ", ""), n.replace("@gabrielxreis_ ", ""),
-              "Título do seu pacote no DaVinci, editável no Inspector.", "Title from your DaVinci pack, editable in the Inspector.",
-              anim=anim_let(n), extra={"template": n}) for i, n in enumerate(lettering, 1)]
+    let = [it("t%02d" % i, nome, nome, f"Título do {editor_nome}, editável no próprio editor.", f"{editor_nome} title, editable in the editor itself.",
+              anim=anim_let(nome), extra={"template": tid}) for i, (tid, nome) in enumerate(lettering, 1)]
     G = [
-        {"id": "formato", "letra": "F", "unico": True, "nome": {"pt": "Formato", "en": "Format"},
-         "sub": {"pt": "Onde o vídeo vai ser postado.", "en": "Where the video will be posted."}, "itens": [
-            it("reels", "Reels / TikTok 9:16", "Reels / TikTok 9:16", "Vertical, 60-90 s.", "Vertical, 60-90 s.", "fmt v"),
-            it("shorts", "YouTube Shorts", "YouTube Shorts", "Vertical, até 60 s.", "Vertical, up to 60 s.", "fmt v"),
-            it("youtube", "YouTube 16:9", "YouTube 16:9", "Horizontal, vídeo longo.", "Horizontal, long video.", "fmt h"),
-            it("ads", "Anúncio (Meta Ads)", "Ad (Meta Ads)", "15, 30 ou 60 s, com variações de gancho.", "15, 30 or 60 s, with hook variations.", "fmt v ad")]},
-        {"id": "estilo", "letra": "E", "unico": False, "max": 3, "nome": {"pt": "Estilo do vídeo (presets)", "en": "Video style (presets)"},
-         "sub": {"pt": "A linguagem visual. Até 3; eles se misturam trecho a trecho.", "en": "The visual language. Up to 3; they mix section by section."},
-         "itens": est},
-        {"id": "legenda", "letra": "L", "unico": True, "nome": {"pt": "Legenda", "en": "Captions"},
-         "sub": {"pt": "Como a fala aparece. Nunca em cima do rosto.", "en": "How the words show up. Never over the face."}, "itens": [
-            it("gab_usa", "GAB USA (padrão)", "GAB USA (default)", "Uma linha, do primeiro ao último segundo, desce sob lettering e motion.",
-               "One line, first to last second, moves down under titles and motion.", "cap-gab"),
-            it("destaque", "Destaque palavra por palavra", "Word-by-word highlight", "Palavra-chave grande amarela ou em serifa.", "Big yellow or serif keyword.", "cap-hl"),
-            it("serif_azul", "Serif azul", "Blue serif", "Sans com a palavra-chave em serifada itálica azul.", "Sans with the keyword in blue serif italic.", "cap-serif"),
-            it("lume", "Lume (duas camadas)", "Lume (two layers)", "Linha fina + palavra que brilha em amarelo.", "Thin line + a word that glows yellow.", "cap-lume"),
-            it("podcast", "Cor por quem fala", "Colour per speaker", "Para podcast e entrevista com duas pessoas.", "For podcasts and two-person interviews.", "cap-pod"),
-            it("sem", "Sem legenda", "No captions", "Quadro limpo, só títulos e gráficos.", "Clean frame, only titles and graphics.", "none")]},
-        {"id": "lettering", "letra": "T", "unico": False, "nome": {"pt": "Lettering (títulos do DaVinci)", "en": "Lettering (DaVinci titles)"},
-         "sub": {"pt": "Palavras-chave na tela com os títulos do seu pacote. Marque os que pode usar.", "en": "On-screen keywords with your title pack. Tick the ones it may use."},
-         "itens": [it("sem", "Sem lettering", "No lettering", "Só legenda e motions.", "Only captions and motion.", "none")] + let},
+        {"id": "formato", "letra": "F", "unico": False, "nome": {"pt": "Formato", "en": "Format"},
+         "sub": {"pt": "Escolha a plataforma e marque os formatos. Pode marcar vários: o vídeo sai em cada um.",
+                 "en": "Pick the platform and tick the formats. You can tick several: the video is exported in each."},
+         "abas": [{"id": "instagram", "nome": {"pt": "Instagram", "en": "Instagram"}}, {"id": "tiktok", "nome": {"pt": "TikTok", "en": "TikTok"}},
+                  {"id": "youtube", "nome": {"pt": "YouTube", "en": "YouTube"}}, {"id": "facebook", "nome": {"pt": "Facebook", "en": "Facebook"}},
+                  {"id": "linkedin", "nome": {"pt": "LinkedIn", "en": "LinkedIn"}}, {"id": "ads", "nome": {"pt": "Anúncios", "en": "Ads"}}],
+         "itens": [
+            fmt("ig_reels", "instagram", "Reels", "Reels", "9:16", "1080x1920", "Vertical em tela cheia, até 3 min.", "Full-screen vertical, up to 3 min."),
+            fmt("ig_feed45", "instagram", "Feed vertical", "Vertical feed", "4:5", "1080x1350", "Ocupa mais tela no feed.", "Takes more of the feed."),
+            fmt("ig_feed11", "instagram", "Feed quadrado", "Square feed", "1:1", "1080x1080", "Clássico do feed.", "Classic feed post."),
+            fmt("ig_stories", "instagram", "Stories", "Stories", "9:16", "1080x1920", "Até 60 s por story, cortado em partes.", "Up to 60 s per story, split in parts."),
+            fmt("tt_video", "tiktok", "Vídeo TikTok", "TikTok video", "9:16", "1080x1920", "Vertical, legenda fora da área da interface.", "Vertical, captions clear of the app UI."),
+            fmt("yt_video", "youtube", "Vídeo do YouTube", "YouTube video", "16:9", "1920x1080", "Horizontal, vídeo longo (também em 4K).", "Horizontal, long video (4K too)."),
+            fmt("yt_shorts", "youtube", "Shorts", "Shorts", "9:16", "1080x1920", "Vertical, até 3 min.", "Vertical, up to 3 min."),
+            fmt("fb_reels", "facebook", "Reels do Facebook", "Facebook Reels", "9:16", "1080x1920", "Vertical em tela cheia.", "Full-screen vertical."),
+            fmt("fb_feed", "facebook", "Feed do Facebook", "Facebook feed", "4:5", "1080x1350", "Vertical no feed.", "Vertical in the feed."),
+            fmt("fb_horizontal", "facebook", "Vídeo horizontal", "Landscape video", "16:9", "1920x1080", "Vídeo longo na página.", "Long video on the page."),
+            fmt("li_quadrado", "linkedin", "Feed quadrado", "Square feed", "1:1", "1080x1080", "O que mais aparece no feed.", "Shows best in the feed."),
+            fmt("li_vertical", "linkedin", "Vertical", "Vertical", "4:5", "1080x1350", "Vertical no feed.", "Vertical in the feed."),
+            fmt("li_horizontal", "linkedin", "Horizontal", "Landscape", "16:9", "1920x1080", "Palestra, entrevista, institucional.", "Talks, interviews, corporate."),
+            fmt("ads_meta_vertical", "ads", "Meta Ads: Reels e Stories", "Meta Ads: Reels and Stories", "9:16", "1080x1920", "15, 30 ou 60 s, com variações de gancho.", "15, 30 or 60 s, with hook variations."),
+            fmt("ads_meta_feed", "ads", "Meta Ads: Feed", "Meta Ads: Feed", "4:5", "1080x1350", "Feed do Instagram e do Facebook.", "Instagram and Facebook feed."),
+            fmt("ads_tiktok", "ads", "TikTok Ads", "TikTok Ads", "9:16", "1080x1920", "Nativo, cara de conteúdo e não de anúncio.", "Native, looks like content, not an ad."),
+            fmt("ads_yt_instream", "ads", "YouTube Ads: in-stream", "YouTube Ads: in-stream", "16:9", "1920x1080", "Antes do vídeo, com gancho nos 5 s de pular.", "Before videos, hook inside the 5 s skip."),
+            fmt("ads_yt_bumper", "ads", "YouTube Ads: bumper 6 s", "YouTube Ads: 6 s bumper", "16:9", "1920x1080", "6 s sem pular: uma ideia só.", "6 s, non-skippable: one idea."),
+            fmt("ads_yt_shorts", "ads", "YouTube Ads: Shorts", "YouTube Ads: Shorts", "9:16", "1080x1920", "Entre os Shorts.", "Between Shorts."),
+            fmt("ads_linkedin", "ads", "LinkedIn Ads", "LinkedIn Ads", "1:1", "1080x1080", "Também sai em 16:9 e 9:16.", "Also in 16:9 and 9:16."),
+         ]},
         {"id": "motions", "letra": "M", "unico": True, "nome": {"pt": "Quantidade de motion", "en": "Amount of motion"},
          "sub": {"pt": "Motion = animação em HyperFrames. Lettering simples não entra aqui.", "en": "Motion = HyperFrames animation. Plain lettering is not counted here."}, "itens": [
             it("poucos", "Poucos", "A few", "Só nos números, dados e no CTA.", "Only numbers, data and the CTA.", "dens d1"),
             it("equilibrado", "Equilibrado", "Balanced", "Nos momentos que pedem imagem, com respiro de pessoa falando.", "Where an image helps, with talking breathers.", "dens d2"),
             it("muitos", "Muitos", "Lots", "Uma ideia, uma imagem: quase o vídeo todo.", "One idea, one image: almost the whole video.", "dens d3"),
             it("sem", "Sem motion", "No motion", "Só a pessoa, legenda e lettering.", "Just the person, captions and lettering.", "none")]},
+        {"id": "estilo", "letra": "E", "unico": False, "max": 3, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
+         "sub": {"pt": "Como os motions vão parecer. Até 3; eles se misturam trecho a trecho.", "en": "How the motion graphics will look. Up to 3; they mix section by section."},
+         "itens": est},
+        {"id": "legenda", "letra": "L", "unico": True, "nome": {"pt": "Legenda", "en": "Captions"},
+         "sub": {"pt": "Como a fala aparece. Nunca em cima do rosto.", "en": "How the words show up. Never over the face."},
+         "abas": [{"id": "editor", "nome": {"pt": f"No editor ({editor_nome})", "en": f"In the editor ({editor_nome})"}},
+                  {"id": "animada", "nome": {"pt": "Animada (motion)", "en": "Animated (motion)"}}],
+         "itens": [
+            it("gab_usa", "GAB USA (padrão)", "GAB USA (default)", f"Legenda nativa do {editor_nome} com o seu preset: editável na trilha de legenda, uma linha, do primeiro ao último segundo.",
+               f"Native {editor_nome} subtitles with your preset: editable on the subtitle track, one line, first to last second.", "cap-gab", extra={"aba": "editor"}),
+            it("editor_padrao", f"Legenda padrão do {editor_nome}", f"Default {editor_nome} subtitles", "Create Subtitles from Audio sem estilo extra, para você ajustar no editor.",
+               "Create Subtitles from Audio with no extra style, for you to tweak in the editor.", "cap-plain", extra={"aba": "editor"}),
+            it("sem", "Sem legenda", "No captions", "Quadro limpo, só títulos e gráficos.", "Clean frame, only titles and graphics.", "none", extra={"aba": "editor"}),
+            it("destaque", "Destaque palavra por palavra", "Word-by-word highlight", "Palavra-chave grande amarela ou em serifa (render em motion).", "Big yellow or serif keyword (rendered as motion).", "cap-hl", extra={"aba": "animada"}),
+            it("serif_azul", "Serif azul", "Blue serif", "Sans com a palavra-chave em serifada itálica azul.", "Sans with the keyword in blue serif italic.", "cap-serif", extra={"aba": "animada"}),
+            it("lume", "Lume (duas camadas)", "Lume (two layers)", "Linha fina + palavra que brilha em amarelo.", "Thin line + a word that glows yellow.", "cap-lume", extra={"aba": "animada"}),
+            it("podcast", "Cor por quem fala", "Colour per speaker", "Para podcast e entrevista com duas pessoas.", "For podcasts and two-person interviews.", "cap-pod", extra={"aba": "animada"})]},
+        {"id": "lettering", "letra": "T", "unico": False, "nome": {"pt": f"Lettering (títulos do {editor_nome})", "en": f"Lettering ({editor_nome} titles)"},
+         "sub": {"pt": f"Palavras-chave na tela com os títulos que o seu {editor_nome} tem. Marque os que pode usar.", "en": f"On-screen keywords with the titles your {editor_nome} has. Tick the ones it may use."},
+         "itens": [it("sem", "Sem lettering", "No lettering", "Só legenda e motions.", "Only captions and motion.", "none")] + let},
         {"id": "takes", "letra": "B", "unico": True, "nome": {"pt": "Imagens de apoio (b-roll)", "en": "Supporting footage (b-roll)"},
          "sub": {"pt": "De onde vêm os takes que ilustram a fala.", "en": "Where the shots that illustrate the talk come from."}, "itens": [
             it("banco", "Banco de imagens", "Stock footage", "Envato, Artlist, Pexels, nas suas contas.", "Envato, Artlist, Pexels, on your accounts.", "takes t1"),
@@ -145,7 +199,7 @@ def grupos(formato, lettering):
             it("capa", "Capa + legenda do post", "Cover + post caption", "Capa PNG e texto do post prontos.", "PNG cover and post text ready.", "cover"),
             it("logo_abertura", "Logo na abertura", "Logo opener", "Abertura de marca de 5-8 s.", "5-8 s brand opener.", "logo"),
             it("cta_site", "CTA com o site", "CTA with website", "Chamada final com o site da marca.", "Final call with the brand website.", "cta"),
-            it("formatos_extras", "+ 4:5 e 16:9", "+ 4:5 and 16:9", "Sai também nos outros formatos.", "Also exported in the other formats.", "fmt multi")]},
+         ]},
     ]
     if formato == "horizontal":
         for g in G:
@@ -268,7 +322,7 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 .cap{position:absolute;left:8%;right:8%;bottom:16%;text-align:center;font-weight:800;color:#fff;font-size:15px;line-height:1.15;text-shadow:0 2px 6px #000}
 .cap i{font-style:normal;display:inline-block;opacity:0;animation:pop 3s infinite}
 .cap i:nth-child(2){animation-delay:.35s}.cap i:nth-child(3){animation-delay:.7s}.cap i:nth-child(4){animation-delay:1.05s}
-.cap .y{color:#FFD43B;font-size:24px}.cap .sf{font-family:Georgia,serif;font-style:italic;color:#5AA9FF;font-size:22px;font-weight:400}
+.cap .y{color:#FFD43B;font-size:24px}.cap .pl{color:#fff}.cap-plain .cap{font-weight:500;background:rgba(0,0,0,.55);border-radius:4px;padding:2px 4px}.cap .sf{font-family:Georgia,serif;font-style:italic;color:#5AA9FF;font-size:22px;font-weight:400}
 .cap .gl{color:#FFE45C;font-size:24px;text-shadow:0 0 12px rgba(255,228,92,.9)}
 @keyframes pop{0%,8%{opacity:0;transform:translateY(6px) scale(.9)}14%,80%{opacity:1;transform:none}92%,100%{opacity:0}}
 .pod .cap{bottom:12%}.pod .a{color:#2BFF88}.pod .b{color:#FFB84D}
@@ -295,7 +349,10 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 @keyframes lspin{0%,10%{opacity:0;transform:rotate(-90deg) scale(.5)}30%,80%{opacity:1;transform:none}95%,100%{opacity:0}}
 @keyframes lzoom{0%,10%{opacity:0;transform:scale(1.8)}30%,80%{opacity:1;transform:none}95%,100%{opacity:0}}
 .frame{border:3px solid #CFE9DA;border-radius:8px;animation:breathe 3s ease-in-out infinite}.fmt.v .frame{width:38%;aspect-ratio:9/16}.fmt.h .frame{width:74%;aspect-ratio:16/9}
-.fmt.multi .frame{width:30%;aspect-ratio:4/5;box-shadow:42px 10px 0 -3px #050806,42px 10px 0 0 var(--g)}.fmt.ad .frame::after{content:"AD";display:block;font:800 12px "Inter Tight";color:var(--g);margin:6px}
+.fmt.multi .frame{width:30%;aspect-ratio:4/5;box-shadow:42px 10px 0 -3px #050806,42px 10px 0 0 var(--g)}.fmt .frame{display:grid;place-items:center}.fmt .pr{font:800 13px "Inter Tight";color:var(--g1)}
+.abas{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}.abas button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--mu);font:800 13px "Inter Tight";padding:8px 14px;border-radius:999px;cursor:pointer}
+.abas button[aria-pressed=true]{background:var(--grad);color:var(--ink);border-color:transparent;box-shadow:0 0 10px rgba(43,255,136,.45)}.abas .n{margin-left:6px;opacity:.8}
+.fmt.ad .frame::after{content:"AD";display:block;font:800 12px "Inter Tight";color:var(--g);margin:6px}
 @keyframes breathe{50%{transform:scale(1.06)}}
 .dots{display:grid;grid-template-columns:repeat(3,22px);gap:8px}.dots span{width:22px;height:22px;border-radius:6px;background:var(--g);opacity:0;animation:pop 2.6s infinite}
 .dots span:nth-child(n){animation-delay:calc(var(--i)*.18s)}
@@ -330,21 +387,22 @@ const T = {
  pt:{menu:"Menu do vídeo",ola:"Como você quer montar este vídeo?",ola_p:"Escolha passo a passo o que entra no vídeo, ou deixe tudo com o Gab.",
   auto_t:"Automático",auto_p:"O Gab escolhe tudo pelo que já sabe de você e da marca (estilo, memória da marca, pedidos anteriores) e pelo roteiro.",
   eu_t:"Eu escolho",eu_p:"Passo a passo: formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras.",
-  sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"o Gab escolhe",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
-  voltar:"Voltar",pular:"O Gab escolhe este",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
+  sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
+  voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Confere antes de mandar",resumo_p:"Clique num item para voltar e mudar.",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
   max:n=>`até ${n}`,fim_t:"Pronto!",fim_p:"Pode voltar para o Claude: o Gab já recebeu as suas escolhas.",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
-  sabe:"What Gab already knows about this brand",gab_escolhe:"Gab picks",sug:"suggested",passo:(i,n)=>`Step ${i} of ${n}`,
-  voltar:"Back",pular:"Let Gab pick this",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
+  sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",passo:(i,n)=>`Step ${i} of ${n}`,
+  voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
   resumo_t:"Check before sending",resumo_p:"Click an item to go back and change it.",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
   max:n=>`up to ${n}`,fim_t:"Done!",fim_p:"Go back to Claude: Gab already has your choices.",erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
-const N = D.grupos.length; let passo = 0, auto = false;   // 0 = início, 1..N = grupos, N+1 = resumo
+const N = D.grupos.length; let passo = 0, auto = false; const aba = {};
+D.grupos.forEach(g => { if (g.abas) aba[g.id] = g.abas[0].id; });   // 0 = início, 1..N = grupos, N+1 = resumo
 const $ = s => document.querySelector(s), esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const CHK = '<svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="#04130A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function prev(i) {
@@ -353,14 +411,16 @@ function prev(i) {
   const w = L === "pt" ? ["isso","muda","o","JOGO"] : ["this","changes","the","GAME"];
   if (a === "none") return `<div class="an none"></div>`;
   if (a.startsWith("cap-")) {
-    const k = {"cap-gab":"", "cap-hl":"y", "cap-serif":"sf", "cap-lume":"gl"}[a] ?? "";
+    const k = {"cap-gab":"", "cap-plain":"", "cap-hl":"y", "cap-serif":"sf", "cap-lume":"gl"}[a] ?? "";
     if (a === "cap-pod") return `<div class="an pod">${P}<div class="cap"><i class="a">${w[0]} ${w[1]}</i><br><i class="b">${w[2]} ${w[3].toLowerCase()}</i></div></div>`;
-    return `<div class="an">${P}<div class="cap"><i>${w[0]}</i> <i>${w[1]}</i> <i>${w[2]}</i> <i class="${k}">${k ? w[3] : w[3].toLowerCase()}</i></div></div>`;
+    return `<div class="an ${a}">${P}<div class="cap"><i>${w[0]}</i> <i>${w[1]}</i> <i>${w[2]}</i> <i class="${k}">${k ? w[3] : w[3].toLowerCase()}</i></div></div>`;
   }
   if (a.startsWith("let-")) {
     const t = a.startsWith("let-word") ? `<i>${w[1].toUpperCase()}</i> <i>${w[2].toUpperCase()}</i> <i>${w[3]}</i>` : (a.startsWith("let-cine") ? "CINEMA" : "Lettering");
     return `<div class="an ${a}"><div class="L">${t}</div></div>`;
   }
+  if (a.startsWith("fmt ")) { const pr = a.split(" ")[1], [w, h] = pr.split(":").map(Number), wd = Math.min(74, Math.round(46 * w / h + 8));
+    return `<div class="an fmt"><div class="frame" style="width:${wd}%;aspect-ratio:${w}/${h}"><span class="pr">${pr}</span></div></div>`; }
   if (a.startsWith("fmt")) return `<div class="an ${a}"><div class="frame"></div></div>`;
   if (a.startsWith("dens")) { const n = {d1:2,d2:5,d3:9}[a.split(" ")[1]]; return `<div class="an"><div class="dots">${Array.from({length:9},(_,k)=>`<span style="--i:${k};${k<n?"":"visibility:hidden"}"></span>`).join("")}</div></div>`; }
   if (a.startsWith("bars")) { const d = {m1:"1.3s",m2:".9s",m3:"1.8s",m4:".5s",m5:"1s",m6:"2.2s"}[a.split(" ")[1]]; return `<div class="an"><div class="bars" style="--d:${d}">${"<span></span>".repeat(9)}</div></div>`; }
@@ -394,7 +454,9 @@ function render() {
     const g = D.grupos[passo - 1];
     h = `<div class="passo">${T[L].passo(passo, N)}</div><h2><span class="k">${g.letra}</span>${esc(g.nome[L])}</h2>
       <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : " · <b style='color:var(--g)'>" + T[L].gab_escolhe + "</b>"}</p>
-      <div class="grid">${g.itens.map((i, n) => `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}">
+      ${g.abas ? `<div class="abas">${g.abas.map(x => { const c = g.itens.filter(i => i.aba === x.id && sel[g.id].has(i.id)).length;
+        return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
+      <div class="grid">${g.itens.map((i, n) => (g.abas && i.aba !== aba[g.id]) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}">
       <div class="vis">${prev(i)}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div>`;
   } else {
@@ -408,10 +470,12 @@ function render() {
   $("#codes").textContent = auto ? T[L].auto_t : codigos().join("  ");
   scrollTo(0, 0);
 }
-function ir(p) { passo = Math.max(0, Math.min(N + 1, p)); render(); }
+function pula(p) { const g = D.grupos[p - 1]; return g && g.id === "estilo" && sel.motions && sel.motions.has("sem"); }
+function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }
 document.addEventListener("click", e => {
   const op = e.target.closest(".op"); if (op) { auto = op.dataset.op === "auto"; return ir(auto ? N + 1 : 1); }
   const r = e.target.closest("[data-ir]"); if (r) return ir(+r.dataset.ir);
+  const ab = e.target.closest("[data-aba]"); if (ab) { aba[D.grupos[passo - 1].id] = ab.dataset.aba; return render(); }
   const b = e.target.closest(".card"); if (b) {
     const g = D.grupos.find(x => x.id === b.dataset.g), s = sel[g.id], id = b.dataset.i;
     if (s.has(id)) s.delete(id);
@@ -452,8 +516,8 @@ def main(a):
         cfg = json.load(open(os.path.join(SKILL, "config.json"), encoding="utf-8"))
     except Exception:
         cfg = {}
-    lettering = (cfg.get("lettering") or {}).get("templates_disponiveis") or []
-    dados = {"grupos": grupos(formato, lettering), "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
+    editor_nome, lettering = lettering_do_editor(arg("--editor", cfg.get("editor", "davinci")), cfg)
+    dados = {"grupos": grupos(formato, lettering, editor_nome), "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
              "sugeridos": sugestoes(arg("--pedido"), arg("--roteiro"), formato, cliente, pasta)}
     html = PAGINA.replace("__DADOS__", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")).encode("utf-8")
     pronto = threading.Event()

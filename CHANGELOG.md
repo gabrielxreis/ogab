@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-4 (23/10/2026)
+- **Menu mais organizado:** o formato agora é escolhido por plataforma (Instagram, TikTok, YouTube, Facebook, LinkedIn e Anúncios), com proporção e resolução de cada um; dá para marcar vários. A legenda tem a opção nativa do seu editor (como o preset GAB USA do DaVinci) separada das animadas. O lettering mostra os títulos do editor que você usa (DaVinci, Premiere, CapCut ou Final Cut). O passo de estilo virou "estilo dos motions" e some se você marcar "sem motion". O botão de cada passo agora se chama "Automático neste passo".
 ## 2026.10.23-3 (23/10/2026)
 - **`/ogab menu`:** antes de criar um vídeo, o Gab pergunta se você quer escolher no menu ou deixar no automático. O menu abre no navegador com a cara da /ogab, em português ou inglês, um passo por tela (formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras), com prévias em loop e um check em cada opção. O que você não marcar, o Gab escolhe; no automático, ele decide tudo pelo que já sabe de você e da marca.
 ## 2026.10.23-3 (23/10/2026)
