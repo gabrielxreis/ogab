@@ -20,7 +20,7 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
 | Variáveis de usuário | `RESOLVE_SCRIPT_API`, `RESOLVE_SCRIPT_LIB`, `PYTHONPATH` (Modules do Resolve + `windows/py`) e `PYTHONUTF8=1` (sem isso o Python do Windows lê e grava os .json/.srt em cp1252 e estraga acentos). |
 | `windows/bin/python3` e `python3.cmd` | Os docs chamam `python3`; no Windows isso vira `py -3` (Git Bash, cmd e PowerShell). A pasta entra no começo do PATH do usuário, antes do atalho da Microsoft Store. |
 | `windows/scripts/movimentos.mjs` | Versão Windows do `scripts/movimentos.mjs` (acha o puppeteer no cache do npx e o Chrome/Edge do Windows). |
-| `~/Library/Fonts/Poppins-Bold.ttf` | Cópia que o `legenda_baixa.py` procura nesse caminho fixo (as fontes também são instaladas normalmente no Windows). |
+| `~/Library/Fonts/Poppins-Bold.ttf` | Cópia que o `legenda_baixa.py (PROIBIDO sem pedido do usuário, SKILL.md 1h3: ajustar a legenda no editor)` procura nesse caminho fixo (as fontes também são instaladas normalmente no Windows). |
 
 ## O que muda no fluxo (o Gab segue isto no Windows)
 

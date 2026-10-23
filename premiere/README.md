@@ -31,7 +31,7 @@ Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Pont
 | 1d. Voice isolation | `P.isolar_voz(seq, 0)` aplica o **Enhance Speech** ("Aprimorador de voz" no Premiere em português) em todos os clipes da trilha. Testado no 26.5.2 |
 | Cortes | `cortes.py` igual (ffmpeg). Montar os trechos com `P.colocar(seq, arq, tempo, video=0, audio=0, de=, ate=)` |
 | 4b. Legenda | `legendas.py`/`legenda_auto.py` iguais até o `.srt`. `P.importar_legenda(seq, srt)` põe o SRT no bin Legendas. **A API do 26.5 não cria trilha de legenda**: pedir ao usuário para arrastar o SRT do bin para a timeline (1 movimento) e aplicar o estilo GAB USA na trilha (Properties > Track Style). Posição Y 724 vem do estilo |
-| Legenda baixa (Y 390) | igual ao DaVinci: o `legenda_baixa.py` gera os clipes transparentes, e o Gab coloca com `P.colocar(seq, clipe, t, video=<trilha do topo>, audio=None)` e tira a legenda original do trecho |
+| Legenda baixa (Y 390) | igual ao DaVinci: o `legenda_baixa.py (PROIBIDO sem pedido do usuário, SKILL.md 1h3: ajustar a legenda no editor)` gera os clipes transparentes, e o Gab coloca com `P.colocar(seq, clipe, t, video=<trilha do topo>, audio=None)` e tira a legenda original do trecho |
 | 5. Música | `P.colocar_musica(seq, wav, inicio_faixa=hook - tempo_CTA, dur=, db=-10)`: WAV bruto na A2, fades no clipe (regra do usuário) |
 | 6. SFX | arquivos como hoje; `P.colocar(seq, sfx, t, video=None, audio=<A3..>, db=)` |
 | 7. Takes | `P.montar_takes(seq, [(arq, t0), ...], fim=, trilha=1)`: b-roll na V2, a V1 é intocável (regra 1j). Vídeo narrado (sem apresentador): `trilha=0`. O take entra **sem áudio** (subclipe "<take> (video)" criado no bin) |

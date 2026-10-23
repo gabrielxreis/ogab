@@ -75,7 +75,7 @@ Para cada frase, perguntar "que tela mostraria isso?" e montar essa tela. Nada d
 
 ## 6. Montagem no Gab
 
-1. Cortes e legenda como sempre (legenda do início ao fim; sob cartão, desce para Y 390 com `legenda_baixa.py`).
+1. Cortes e legenda como sempre (legenda do início ao fim; sob cartão, desce para Y 390 com `legenda_baixa.py (PROIBIDO sem pedido do usuário, SKILL.md 1h3: ajustar a legenda no editor)`).
 2. Plano trecho a trecho com a tabela da seção 1: uma linha por frase (tempo da fala, visual, movimentos).
 3. Motions no HyperFrames: copiar `kit/vitrine.css` e `kit/vitrine.js` para o projeto, trocar `--v-destaque` (e, se
    quiser, a fonte) pelo cliente, montar cada cena com as funções `V.*` (ver `exemplo/index.html` como modelo, cada
