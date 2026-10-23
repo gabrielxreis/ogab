@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-43 (23/10/2026)
+- **Regra de emergência:** se você mexer na timeline enquanto o Gab trabalha, ele para tudo no editor na hora e espera você avisar que pode voltar. Ele continua só o que é fora do editor (motions, downloads).
 ## 2026.10.23-42 (23/10/2026)
 - **Cor não pega mais nos motions:** se você arrastar um motion para uma trilha de takes, a LUT do Gab pula ele sozinha.
 ## 2026.10.23-41 (23/10/2026)

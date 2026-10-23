@@ -6,6 +6,12 @@
 `antes` grava <pasta>/retratos/<timeline>_<hora>.json (todas as trilhas: nome, início, fim, entrada, ligado, zoom/pan/tilt).
 `depois` compara com o retrato mais recente e lista o que mudou FORA do alvo (trilhas "video2", "audio3", "subtitle1"
 ou nomes de clipe com * no fim). Sai com código 1 se algo fora do alvo mudou: aí avisar e remontar a partir do retrato.
+`depois` também grava <timeline>_gab.json: como o Gab DEIXOU a timeline.
+
+REGRA DE EMERGÊNCIA (usuário, 23/10/2026): se o usuário mexeu na timeline, o Gab PARA TUDO e espera ele avisar.
+`antes` (e `vigiar`) compara a timeline com o _gab.json: diferente = o usuário está ajustando: imprime USUARIO_MEXEU,
+sai com código 3 e NÃO grava. Só volte com `antes ... --retomar` quando o usuário disser que pode voltar.
+  python3 retrato.py vigiar "<timeline>" <pasta_do_video>      # só confere (código 3 = parar)
 """
 import fnmatch, glob, json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -53,7 +59,7 @@ def comparar(a, b, alvos):
 
 def main():
     a = sys.argv[1:]
-    if len(a) < 3 or a[0] not in ("antes", "depois"): print(__doc__); sys.exit(2)
+    if len(a) < 3 or a[0] not in ("antes", "depois", "vigiar"): print(__doc__); sys.exit(2)
     modo, nome, pasta = a[0], a[1], a[2]
     alvos = [x.strip() for x in a[a.index("--alvo") + 1].split(",")] if "--alvo" in a else []
     r = R.conectar(); p = r.GetProjectManager().GetCurrentProject()
@@ -62,12 +68,22 @@ def main():
     d = os.path.join(pasta, "retratos"); os.makedirs(d, exist_ok=True)
     base = nome.replace("/", "-")
     agora = tirar(t)
+    gab = os.path.join(d, f"{base}_gab.json")
+    if modo in ("antes", "vigiar") and "--retomar" not in a and os.path.exists(gab):
+        mexeu = comparar(json.load(open(gab)), agora, [])
+        if mexeu:
+            print("USUARIO_MEXEU: a timeline mudou desde a última mexida do Gab. REGRA DE EMERGÊNCIA: PARAR TUDO no editor "
+                  "e esperar o usuário avisar que pode voltar (depois: retrato.py antes ... --retomar).")
+            [print("  " + x) for x in mexeu[:12]]; sys.exit(3)
+    if modo == "vigiar": print("OK: ninguém mexeu desde a última mexida do Gab"); return
     if modo == "antes":
         arq = os.path.join(d, f"{base}_{time.strftime('%Y%m%d_%H%M%S')}.json"); json.dump(agora, open(arq, "w"), ensure_ascii=False, indent=1)
+        if "--retomar" in a: json.dump(agora, open(gab, "w"), ensure_ascii=False, indent=1)
         n = sum(len(v["itens"]) for v in agora["trilhas"].values()); print(f"retrato salvo ({n} itens): {arq}"); return
     ant = sorted(glob.glob(os.path.join(d, f"{base}_*.json")))
     if not ant: sys.exit("sem retrato 'antes' desta timeline")
     difs = comparar(json.load(open(ant[-1])), agora, alvos)
+    json.dump(agora, open(gab, "w"), ensure_ascii=False, indent=1)   # como o Gab deixou a timeline
     if not difs: print(f"OK: nada fora do alvo mudou (comparado com {os.path.basename(ant[-1])})"); return
     print("ATENÇÃO, mudou fora do alvo:"); [print("  " + x) for x in difs]; sys.exit(1)
 
