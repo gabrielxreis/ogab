@@ -12,7 +12,7 @@
 Identidade visual da /ogab (logo da Apresentação ogab, 22/10/2026): fundo #070B08/#16201A, verde #2BFF88,
 degradê #9CFFC9 > #14E070, Inter Tight 800 (assets/fontes/InterTight, OFL). Só 127.0.0.1.
 """
-import json, os, re, socket, subprocess, sys, threading, time, webbrowser
+import json, os, re, socket, subprocess, sys, threading, time, urllib.request, webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote
 
@@ -341,9 +341,9 @@ PAGINA = r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta
 body{min-height:100vh;color:var(--tx);font:500 15px/1.45 "Inter Tight",system-ui,sans-serif;padding-bottom:110px;
   background:radial-gradient(520px 520px at 30% 12%,rgba(43,255,136,.16),transparent 70%),linear-gradient(135deg,#16201A,#070B08) fixed}
 .wrap{max-width:min(1680px,94vw);margin:0 auto;padding:0 24px}
-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:30px 0 6px}
-.logo{display:flex;align-items:center;gap:14px}.logo svg{width:44px;height:44px;border-radius:12px;box-shadow:0 0 20px rgba(43,255,136,.45)}
-.wm{font-weight:800;font-size:22px;letter-spacing:-.03em;line-height:1.1}.wm .s{color:var(--g)}.wm small{display:block;font-size:12px;color:var(--mu);letter-spacing:0;font-weight:500}
+header{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:14px 0 4px}
+.logo{display:flex;align-items:center;gap:14px}.logo svg{width:38px;height:38px;border-radius:12px;box-shadow:0 0 20px rgba(43,255,136,.45)}
+.wm{font-weight:800;font-size:19px;letter-spacing:-.03em;line-height:1.1}.wm .s{color:var(--g)}.wm small{display:block;font-size:12px;color:var(--mu);letter-spacing:0;font-weight:500}
 .lang{display:flex;background:rgba(255,255,255,.06);border-radius:999px;padding:3px}
 .lang button{background:none;border:0;color:var(--mu);font:800 12px "Inter Tight";padding:7px 14px;border-radius:999px;cursor:pointer;letter-spacing:.04em}
 .lang button[aria-pressed=true]{background:var(--grad);color:var(--ink);box-shadow:0 0 10px rgba(43,255,136,.5)}
@@ -361,11 +361,11 @@ kbd{min-width:58px;height:58px;padding:0 12px;border-radius:12px;background:#F2F
 #copiar{width:100%;height:46px;border:0;cursor:pointer}.fimbox .nota{color:var(--mu);font-size:13px;margin-top:10px}
 .fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim b{font-size:30px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px;background:var(--grad);-webkit-background-clip:text;color:transparent}
 .sabe{margin:16px 0 4px;padding:16px;border-radius:16px;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);font-size:14px;text-align:left}.sabe b{font:800 10.5px "Inter Tight";letter-spacing:.12em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:6px}.sabe li{color:var(--mu);margin-left:18px}
-.prog{display:flex;gap:5px;margin:20px 0 0;padding:3px;border-radius:999px;background:rgba(255,255,255,.06)}.prog i{flex:1;height:6px;border-radius:9px;background:transparent}.prog i.on{background:var(--grad);box-shadow:0 0 8px rgba(43,255,136,.5)}
-.passo{font:800 10.5px "Inter Tight";color:var(--mu);letter-spacing:.12em;text-transform:uppercase;margin-top:18px}
-h2{font-weight:800;font-size:clamp(24px,3.2vw,34px);letter-spacing:-.03em;line-height:1.1;margin:4px 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;font-size:18px;box-shadow:0 0 14px rgba(43,255,136,.45)}
-.sub{color:var(--mu);font-size:14.5px;margin-bottom:16px}
+.prog{flex:1;max-width:760px;display:flex;gap:5px;margin:0;padding:3px;border-radius:999px;background:rgba(255,255,255,.06)}.prog i{flex:1;height:6px;border-radius:9px;background:transparent}.prog i.on{background:var(--grad);box-shadow:0 0 8px rgba(43,255,136,.5)}
+.passo{font:800 10.5px "Inter Tight";color:var(--mu);letter-spacing:.12em;text-transform:uppercase;margin-top:10px}
+h2{font-weight:800;font-size:clamp(20px,2.2vw,28px);letter-spacing:-.03em;line-height:1.1;margin:4px 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h2 .k{color:var(--ink);background:var(--grad);border-radius:10px;width:32px;height:32px;display:grid;place-items:center;font-size:18px;box-shadow:0 0 14px rgba(43,255,136,.45)}
+.sub{color:var(--mu);font-size:13px;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* barra de rolagem na ID da /ogab: fina, trilho discreto, alça em degradê verde */
 .grid,.rgrid,#msgprev{scrollbar-width:thin;scrollbar-color:#2BFF88 rgba(255,255,255,.04)}
 .grid::-webkit-scrollbar,.rgrid::-webkit-scrollbar,#msgprev::-webkit-scrollbar{width:8px;height:8px}
@@ -458,7 +458,7 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 @keyframes lzoom{0%,10%{opacity:0;transform:scale(1.8)}30%,80%{opacity:1;transform:none}95%,100%{opacity:0}}
 .frame{border:3px solid #CFE9DA;border-radius:8px;animation:breathe 3s ease-in-out infinite}.fmt.v .frame{width:38%;aspect-ratio:9/16}.fmt.h .frame{width:74%;aspect-ratio:16/9}
 .fmt.multi .frame{width:30%;aspect-ratio:4/5;box-shadow:42px 10px 0 -3px #050806,42px 10px 0 0 var(--g)}.fmt .frame{display:grid;place-items:center}.fmt .pr{font:800 13px "Inter Tight";color:var(--g1)}
-.abas{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}.abas button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--mu);font:800 13px "Inter Tight";padding:8px 14px;border-radius:999px;cursor:pointer}
+.abas{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 0 10px;padding-bottom:2px}.abas::-webkit-scrollbar{display:none}.abas button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--mu);font:800 12px "Inter Tight";padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;flex:none}
 .abas button{display:inline-flex;align-items:center;gap:7px}.pi{width:15px;height:15px;fill:currentColor;flex:none}
 .pcard{position:absolute;bottom:12px;left:12px;width:32px;height:32px;fill:var(--g1);opacity:.9;z-index:2;filter:drop-shadow(0 0 6px rgba(43,255,136,.4))}
 .abas button[aria-pressed=true]{background:var(--grad);color:var(--ink);border-color:transparent;box-shadow:0 0 10px rgba(43,255,136,.45)}.abas .n{margin-left:6px;opacity:.8}
@@ -485,8 +485,7 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 <div class="wrap">
 <header><div class="logo"><svg viewBox="0 0 220 220" aria-hidden="true"><defs><linearGradient id="g6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16201A"/><stop offset="1" stop-color="#070B08"/></linearGradient><linearGradient id="v6" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9CFFC9"/><stop offset="1" stop-color="#14E070"/></linearGradient></defs><rect width="220" height="220" rx="56" fill="url(#g6)"/><rect x="1.5" y="1.5" width="217" height="217" rx="55" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="3"/><rect x="112" y="40" width="74" height="34" rx="12" fill="url(#v6)"/><rect x="73" y="93" width="74" height="34" rx="12" fill="url(#v6)" fill-opacity=".85"/><rect x="34" y="146" width="74" height="34" rx="12" fill="url(#v6)" fill-opacity=".6"/></svg>
 <div class="wm"><span class="s">/</span>ogab<small data-t="menu"></small></div></div>
-<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="pt">PT</button><button data-l="en">EN</button></div></header>
-<div class="prog" id="prog"></div>
+<div class="prog" id="prog"></div><div class="lang" role="group" aria-label="Idioma / Language"><button data-l="pt">PT</button><button data-l="en">EN</button></div></header>
 <div id="tela"></div>
 </div>
 <div class="barra"><div class="wrap"><button class="bk" id="bk" data-t="voltar"></button><span class="codes" id="codes"></span><button class="pl" id="pl" data-t="pular"></button><button class="go" id="go"></button></div></div>
@@ -616,8 +615,8 @@ function ajustar() {
   const g = $(".grid"), pager = $("#pager"); if (!g) return;
   const cards = [...g.children]; cards.forEach(c => c.style.display = "");
   const n = cards.length, gap = 12, W = g.clientWidth;
-  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 24;
-  const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (160 + gap)));
+  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 16;
+  const ini = Math.max(2, Math.ceil((W + gap) / (260 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (160 + gap)));
   let col = null;
   g.style.maxHeight = "none"; g.style.overflowY = "visible";
   for (let c = ini; c <= fim; c++) {
@@ -626,7 +625,7 @@ function ajustar() {
     if (linhas * alt + (linhas - 1) * gap <= H) { col = c; break; }
   }
   if (!col) {   // não cabe: rola
-    col = Math.min(fim, Math.max(ini, Math.floor((W + gap) / (220 + gap))));
+    col = Math.min(fim, Math.max(ini, Math.floor((W + gap) / (200 + gap))));
     g.style.maxHeight = Math.max(240, H) + "px"; g.style.overflowY = "auto";
   }
   g.style.gridTemplateColumns = `repeat(${col}, 1fr)`;
@@ -670,13 +669,46 @@ $("#go").onclick = async () => {
 };
 document.addEventListener("keydown", e => { if (e.key === "ArrowRight" && passo > 0 && passo <= N && pronto(passo)) ir(passo + 1); if (e.key === "ArrowLeft" && passo > 0) ir(auto ? 0 : passo - 1); });
 render();
+// menu sempre atualizado: se um menu novo abrir no mesmo endereço, esta aba recarrega sozinha
+let versaoAtual = null;
+setInterval(async () => {
+  try { const v = await (await fetch("/versao", {cache: "no-store"})).text();
+        if (versaoAtual && v !== versaoAtual) location.reload(); versaoAtual = v; } catch (e) {}
+}, 2000);
 </script></body></html>"""
+
+
+PORTA_FIXA = 47321   # endereço sempre igual: a aba que já está aberta recarrega sozinha com o menu novo
 
 
 def porta_livre(p):
     if p:
         return p
     s = socket.socket(); s.bind(("127.0.0.1", 0)); n = s.getsockname()[1]; s.close(); return n
+
+
+def fechar_menu_anterior():
+    """Fecha o menu que ficou aberto de antes (ele prende a porta fixa e mostraria a versão velha)."""
+    try:
+        urllib.request.urlopen(f"http://127.0.0.1:{PORTA_FIXA}/fechar", data=b"", timeout=1.5)
+    except Exception:
+        return
+    for _ in range(30):   # espera o menu velho soltar a porta (até 3 s)
+        try:
+            s = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(("127.0.0.1", PORTA_FIXA)); s.close(); return
+        except OSError:
+            time.sleep(.1)
+
+
+def porta_menu(pedida):
+    if pedida:
+        return pedida
+    fechar_menu_anterior()
+    try:
+        s = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind(("127.0.0.1", PORTA_FIXA)); s.close()
+        return PORTA_FIXA
+    except OSError:
+        return porta_livre(0)   # porta fixa ocupada por outro programa: usa uma livre
 
 
 def main(a):
@@ -694,7 +726,8 @@ def main(a):
     dados = {"icones": ICONES, "grupos": grupos(formato, lettering, editor_nome), "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
              "sugeridos": sugestoes(arg("--pedido"), arg("--roteiro"), formato, cliente, pasta)}
     html = PAGINA.replace("__DADOS__", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")).encode("utf-8")
-    pronto = threading.Event()
+    pronto, fechado, visto = threading.Event(), threading.Event(), {"aba": 0}
+    VERSAO = f"{os.getpid()}-{time.time():.0f}"
     fontes = os.path.realpath(os.path.join(SKILL, "assets", "fontes", "InterTight"))
     presets = os.path.realpath(os.path.join(SKILL, "presets"))
 
@@ -714,6 +747,9 @@ def main(a):
 
         def do_GET(self):
             p = unquote(self.path.split("?")[0])
+            if p == "/versao":   # a página pergunta a cada 2 s: id diferente = menu novo, ela recarrega
+                visto["aba"] = time.time()
+                return self._envia(200, VERSAO.encode(), "text/plain")
             if p in ("/", "/index.html"):
                 return self._envia(200, html, "text/html; charset=utf-8")
             if p.startswith("/arquivo/biblioteca_motions_local/"):
@@ -725,6 +761,8 @@ def main(a):
             self._envia(404, b"nao achei", "text/plain")
 
         def do_POST(self):
+            if self.path == "/fechar":   # um menu novo pediu a porta: este (velho) sai sem escolha
+                self._envia(200, b"ok", "text/plain"); fechado.set(); pronto.set(); return
             if self.path != "/escolha":
                 return self._envia(404, b"", "text/plain")
             try:
@@ -745,15 +783,20 @@ def main(a):
                 except Exception:
                     pass
 
-    porta = porta_livre(int(arg("--porta", 0)))
+    porta = porta_menu(int(arg("--porta", 0)))
+    ThreadingHTTPServer.allow_reuse_address = True
     srv = ThreadingHTTPServer(("127.0.0.1", porta), H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     url = f"http://127.0.0.1:{porta}/"
     print(f"menu aberto: {url}\nesperando a escolha (salva em {saida})", flush=True)
     if "--sem-abrir" not in a:
-        webbrowser.open(url)
+        time.sleep(3)   # uma aba do menu já aberta pergunta a versão a cada 2 s e recarrega sozinha: não abre outra
+        if time.time() - visto["aba"] > 3:
+            webbrowser.open(url)
     ok = pronto.wait(float(arg("--timeout", 1800)))
-    time.sleep(.4); srv.shutdown()
+    time.sleep(.2 if fechado.is_set() else .4); srv.shutdown(); srv.server_close()   # solta a porta na hora
+    if fechado.is_set():
+        raise SystemExit("menu fechado: um menu novo foi aberto no lugar")
     if not ok:
         raise SystemExit("tempo esgotado sem escolha")
     d = json.load(open(saida, encoding="utf-8"))

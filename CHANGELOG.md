@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-16 (23/10/2026)
+- **Menu sempre atualizado:** o menu abre sempre no mesmo endereço (127.0.0.1:47321); se já houver uma aba dele aberta, ela se recarrega sozinha com a versão nova em vez de abrir outra aba, e o menu antigo fecha sozinho.
+- **Mais espaço para as opções:** o topo ficou compacto (progresso na linha da logo, título menor, abas de categoria numa linha só) e cabem mais cartões na tela.
 ## 2026.10.23-15 (23/10/2026)
 - **Barra de rolagem do menu redesenhada:** fina, com a alça em degradê verde da /ogab.
 ## 2026.10.23-14 (23/10/2026)
