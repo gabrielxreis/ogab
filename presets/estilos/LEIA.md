@@ -31,6 +31,14 @@ Grupos (pasta): `gancho`, `legenda`, `layout`, `prova`, `batida`, `broll`, `efei
   trocado, canvas inteiro no lugar da sala). `atras` liga o recorte da pessoa sozinho.
 - `precisa`: `rosto` (recebe a caixa do rosto), `palavras` (recebe a transcrição com tempo), `recorte`, `imagem`, `logo`.
 - `campos`: o que o Gab preenche com o conteúdo do vídeo; `exemplo` de cada campo é usado na prévia.
+- `camada: "ambas"`: o mesmo item entra atrás E na frente da pessoa; o `.js` decide o que desenhar por `C.P.camada`
+  (`"palco"` = atrás, `"frente"` = na frente), ex.: cartões girando que passam por trás e pela frente do corpo.
+- `"base": {"desfoque": 18, "escurecer": .35}`: no trecho do estilo a sala (vídeo base) fica desfocada/escurecida.
+- `"pessoa": {"escala": .42, "x": 620, "y": 1200, "rot": 4}`: no trecho, a pessoa recortada encolhe, vai para o centro
+  (x, y) e gira (moldura, polaroid); o `.js` desenha a moldura atrás (camada `atras`). Também aceitos no item do plano.
+- Mídia: qualquer campo com caminho de arquivo de imagem/vídeo (`logo`, `imagem`, `imagens`, `img`, `foto`, `src`,
+  `video` ou extensão .png/.jpg/.webp/.gif/.svg/.mp4/.mov/.webm, em qualquer nível do item) é copiado para `img/` do
+  projeto e o valor vira `img/<nome>`; links http/data: ficam como estão. Sem arquivo, desenhar um substituto ilustrado.
 
 ## API do `<id>.js` (motor cena)
 ```js
@@ -43,7 +51,8 @@ ESTILO["meu-estilo"] = (it, C) => {          // it = item do plano (de, ate + ca
 };
 ```
 - `C.P`: `w`, `h`, `dur`, `dest` (cor da marca do cliente, também em `var(--dest)`), `rostos`, `palavras` (se precisa).
-- Fontes já no projeto: `PalcoSans` (Poppins 700/800/900) e `PalcoSerif` (Playfair Display itálico 400/600). Fonte nova:
+- Fontes já no projeto: `PalcoSans` (Poppins 700/800/900), `PalcoSerif` (Playfair Display itálico 400/600) e
+  `PalcoHand` (Patrick Hand, manuscrita). Fonte nova:
   pedir à sessão principal (o motor copia as fontes).
 - Cor de destaque SEMPRE `var(--dest)` (vem do cliente); nada de cor fixa de marca de terceiros.
 - Entrada no quadro de `it.de`, saída limpa até `it.ate`; nada de piscar nem fade do preto.

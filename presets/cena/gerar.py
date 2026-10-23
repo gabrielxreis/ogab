@@ -31,7 +31,8 @@ import glob, json, os, re, shutil, subprocess, sys, unicodedata
 
 AQUI = os.path.dirname(os.path.abspath(__file__)); PRESETS = os.path.dirname(AQUI); RAIZ = os.path.dirname(PRESETS)
 FONTES = [("Poppins", f) for f in ("Poppins-Bold.ttf", "Poppins-ExtraBold.ttf", "Poppins-Black.ttf")] + \
-         [("PlayfairDisplay", f) for f in ("PlayfairDisplay-Italic.ttf", "PlayfairDisplay-SemiBoldItalic.ttf")]
+         [("PlayfairDisplay", f) for f in ("PlayfairDisplay-Italic.ttf", "PlayfairDisplay-SemiBoldItalic.ttf")] + \
+         [("PatrickHand", "PatrickHand-Regular.ttf")]   # PalcoHand: letra manuscrita dos estilos
 ALTURA = {"grande": 150, "serifa": 120, "pilula": 84}
 
 
@@ -137,33 +138,83 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur, extras=()):
     return proj
 
 
+MIDIA = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".mp4", ".mov", ".m4v", ".webm")
+
+
 def estilos_do_plano(itens, absp=lambda p: p):
     """Separa os ESTILOS do plano por camada lendo presets/estilos/<grupo>/<id>/estilo.json.
     Devolve (frente, atras, arquivos_js, precisa_rosto)."""
     idx = {}
     for j in glob.glob(os.path.join(PRESETS, "estilos", "*", "*", "estilo.json")):
         m = json.load(open(j, encoding="utf-8")); m["_js"] = os.path.join(os.path.dirname(j), m["id"] + ".js"); idx[m["id"]] = m
-    frente, atras, js, rosto = [], [], [], False
+    frente, atras, js, rosto, fx = [], [], [], False, {"base": [], "pessoa": []}
     for it in itens or []:
         m = idx.get(it["id"])
         if not m:
             raise SystemExit(f"estilo desconhecido: {it['id']} (ver presets/estilos/LEIA.md)")
         it = dict({k: v["exemplo"] for k, v in (m.get("campos") or {}).items() if isinstance(v, dict) and "exemplo" in v}, **it)
         it["_precisa"] = m.get("precisa") or []
-        for k, c in (m.get("campos") or {}).items():   # imagens/logos do estilo vão para img/ do projeto
-            if not isinstance(c, dict) or c.get("tipo") not in ("imagem", "imagens", "logo") or not it.get(k):
-                continue
-            def traz(v):
-                if not isinstance(v, str) or re.match(r"^(https?:|data:|img/)", v) or not os.path.exists(absp(v)):
-                    return v
-                nome = re.sub(r"[^A-Za-z0-9._-]", "_", os.path.basename(v))
-                it.setdefault("_copiar", []).append((absp(v), nome)); return "img/" + nome
-            it[k] = [traz(v) for v in it[k]] if isinstance(it[k], list) else traz(it[k])
-        (atras if it.get("camada", m.get("camada", "frente")) == "atras" else frente).append(it)
+        def traz(v):   # arquivo local -> cópia em img/ do projeto (links, data: e img/ ficam como estão)
+            if not isinstance(v, str) or re.match(r"^(https?:|data:|img/)", v) or not os.path.isfile(absp(v)):
+                return v
+            nome = re.sub(r"[^A-Za-z0-9._-]", "_", os.path.basename(v))
+            it.setdefault("_copiar", []).append((absp(v), nome)); return "img/" + nome
+        tipados = {k for k, c in (m.get("campos") or {}).items() if isinstance(c, dict) and c.get("tipo") in ("imagem", "imagens", "logo", "video")}
+        CHAVES = {"logo", "logos", "imagem", "imagens", "img", "foto", "fotos", "src", "video", "videos"} | tipados
+        def anda(x, chave=None):   # percorre o item inteiro: logo/imagem/foto em qualquer nível (listas de itens, cartões...)
+            if isinstance(x, dict):
+                return {k: anda(v, k) for k, v in x.items()}
+            if isinstance(x, list):
+                return [anda(v, chave) for v in x]
+            if chave in CHAVES or (isinstance(x, str) and os.path.splitext(x)[1].lower() in MIDIA):
+                return traz(x)
+            return x
+        for k in list(it):
+            if not k.startswith("_"):
+                it[k] = anda(it[k], k)
+        cam = it.get("camada", m.get("camada", "frente"))
+        if cam in ("atras", "ambas"):
+            atras.append(it)
+        if cam in ("frente", "ambas"):
+            frente.append(it)   # "ambas": o js decide o que desenhar por C.P.camada ("palco" ou "frente")
+        b = it.get("base") if isinstance(it.get("base"), dict) else m.get("base")
+        if isinstance(b, dict):   # sala desfocada/escurecida no trecho
+            fx["base"].append(dict(b, de=it["de"], ate=it["ate"]))
+        rp = it.get("pessoa") if isinstance(it.get("pessoa"), dict) else m.get("pessoa") or (m.get("recorte") if isinstance(m.get("recorte"), dict) else None)
+        if isinstance(rp, dict):  # pessoa recortada encolhida/movida/girada no trecho (moldura, polaroid)
+            fx["pessoa"].append(dict(rp, de=it["de"], ate=it["ate"]))
         if m["_js"] not in js:
             js.append(m["_js"])
         rosto = rosto or "rosto" in (m.get("precisa") or [])
-    return frente, atras, js, rosto
+    return frente, atras, js, rosto, fx
+
+
+def base_fx_filtro(base):
+    """Desfoque/escurecimento da sala só no trecho de cada estilo ({"desfoque": px, "escurecer": 0-1})."""
+    f = []
+    for b in base:
+        en = f"enable='between(t,{b['de']},{b['ate']})'"
+        if b.get("desfoque"):
+            f.append(f"boxblur=luma_radius={int(b['desfoque'])}:luma_power=2:{en}")
+        if b.get("escurecer"):
+            f.append(f"eq=brightness={-abs(float(b['escurecer'])):.3f}:{en}")
+    return ",".join(f) or None
+
+
+def pessoa_fx_grafo(src, pessoas, w, h, saida, fps="30"):
+    """Filtro que recompõe a pessoa recortada: normal fora dos trechos e encolhida/movida/girada dentro deles
+    ({"escala": .42, "x": 620, "y": 1200, "rot": 4}; x/y = centro). Devolve [filtros] terminando em [saida]."""
+    n = len(pessoas)
+    fora = "+".join(f"between(t,{p['de']},{p['ate']})" for p in pessoas)
+    g = [f"{src}split={n + 1}[pn]" + "".join(f"[pt{i}]" for i in range(n)),
+         f"color=c=black@0:s={w}x{h}:r={fps},format=yuva444p10le[pc0]",
+         f"[pc0][pn]overlay=0:0:format=auto:shortest=1:enable='not({fora})'[pq0]"]
+    for i, p in enumerate(pessoas):
+        rot = float(p.get("rot", 0)) * 3.14159265 / 180
+        g.append(f"[pt{i}]scale=iw*{float(p.get('escala', .5))}:-2,rotate={rot:.5f}:c=none:ow=rotw({rot:.5f}):oh=roth({rot:.5f})[pr{i}]")
+        g.append(f"[pq{i}][pr{i}]overlay=x={p.get('x', w / 2)}-overlay_w/2:y={p.get('y', h / 2)}-overlay_h/2:format=auto:"
+                 f"enable='between(t,{p['de']},{p['ate']})'[{'pq' + str(i + 1) if i < n - 1 else saida}]")
+    return g
 
 
 def fps_txt(fps):
@@ -303,7 +354,7 @@ def gerar(plano, pasta, fazer_render=True):
         for g in frente.get("destaque") or []:
             if g["ini"] < c["ate"] and g["fim"] > c["de"] and g["y"] < c["_base"] + 30:
                 g["y"] = int(min(c["_base"] + 30, h * .9 - g["alto"]))
-    est_frente, est_atras, est_js, est_rosto = estilos_do_plano(plano.get("estilos"), absp)
+    est_frente, est_atras, est_js, est_rosto, est_fx = estilos_do_plano(plano.get("estilos"), absp)
     if any("palavras" in (x.get("_precisa") or []) for x in est_frente + est_atras) and plano.get("palavras"):
         comum["palavras"] = frente["palavras"] = json.load(open(absp(plano["palavras"]), encoding="utf-8"))   # legenda e batidas na fala
     if est_rosto or est_atras:   # estilos que fogem do rosto recebem a caixa dele a cada 0,5 s
@@ -339,13 +390,15 @@ def gerar(plano, pasta, fazer_render=True):
     for nome, proj in projs.items():
         render(proj, os.path.join(pasta, f"{nome}.mov"), fps)
     lf = lente_filtro(plano.get("lente"), w, h)
+    bf = ",".join(x for x in (lf, base_fx_filtro(est_fx["base"])) if x) or None   # base: lente + sala desfocada/escura
+    pfx = est_fx["pessoa"]
     rec = None
-    if "palco" in projs:
+    if "palco" in projs or pfx:
         rec = absp(plano["recorte"]) if plano.get("recorte") else os.path.join(pasta, "recorte.mov")
         if not os.path.exists(rec):
             subprocess.run([sys.executable, os.path.join(AQUI, "recorte.py"), video, rec, "--w", str(w)], check=True)
     # montagem: base(+lente) -> palco -> recorte(+lente) -> frente
-    ent = ["-i", video]; fc = [f"[0:v]{lf or 'null'}[v0]"]; ult = "v0"; n = 1
+    ent = ["-i", video]; fc = [f"[0:v]{bf or 'null'}[v0]"]; ult = "v0"; n = 1
     for arq, lent in ((os.path.join(pasta, "palco.mov") if "palco" in projs else None, False), (rec, True),
                       (os.path.join(pasta, "frente.mov") if "frente" in projs else None, False)):
         if not arq:
@@ -354,17 +407,20 @@ def gerar(plano, pasta, fazer_render=True):
         src = f"[{n}:v]"
         if lent and lf:
             fc.append(f"{src}format=yuva444p10le,{lf}[l{n}]"); src = f"[l{n}]"
+        if lent and pfx:
+            fc.extend(pessoa_fx_grafo(src, pfx, w, h, f"p{n}", fps_txt(fps))); src = f"[p{n}]"
         fc.append(f"[{ult}]{src}overlay=0:0:format=auto[v{n}]"); ult = f"v{n}"; n += 1
     fc.append(f"[{ult}]format=yuv420p[vout]")
     out = os.path.join(pasta, "previa.mp4")
     subprocess.run(["ffmpeg", "-v", "error", "-y"] + ent + ["-filter_complex", ";".join(fc), "-map", "[vout]", "-map", "0:a?",
                     "-c:v", "libx264", "-crf", "17", "-preset", "medium", "-c:a", "aac", "-b:a", "192k", "-t", str(dur), out], check=True)
-    if lf:
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video, "-vf", lf, "-c:v", "libx264", "-crf", "16", "-c:a", "copy",
+    if bf:   # base.mp4 para a V1 do editor: lente + sala desfocada/escurecida dos estilos
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video, "-vf", bf, "-c:v", "libx264", "-crf", "16", "-c:a", "copy",
                         os.path.join(pasta, "base.mp4")], check=True)
-        if rec:
-            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", rec, "-vf", f"format=yuva444p10le,{lf}", "-c:v", "prores_ks",
-                            "-profile:v", "4444", "-pix_fmt", "yuva444p10le", os.path.join(pasta, "recorte_lente.mov")], check=True)
+    if rec and (lf or pfx):   # recorte_lente.mov para a V3: com a lente e a pessoa encolhida/movida dos estilos
+        g = [f"[0:v]format=yuva444p10le{(',' + lf) if lf else ''}[r0]"] + (pessoa_fx_grafo("[r0]", pfx, w, h, "rout", fps_txt(fps)) if pfx else ["[r0]null[rout]"])
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", rec, "-filter_complex", ";".join(g), "-map", "[rout]", "-t", str(dur),
+                        "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", os.path.join(pasta, "recorte_lente.mov")], check=True)
     print("prévia:", out)
     return out
 
