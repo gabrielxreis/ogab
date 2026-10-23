@@ -13,6 +13,8 @@
     python3 capcut.py conferir "<rascunho>"                     mídia offline, efeitos sem arquivo, buracos na V1
     python3 capcut.py abrir "<rascunho>"                        põe o rascunho no topo da tela inicial e abre o CapCut
     python3 capcut.py fechar                                    fecha o CapCut (ele salva o que estiver aberto)
+    python3 capcut.py levar "<rascunho|*>" [--substituir]       modo sem editor: copia o rascunho do Gab para o CapCut
+                                                               (quem instalou o CapCut depois e quer customizar lá)
 
 Comandos rápidos (uma ação = um comando, em 1 ou vários rascunhos):
     python3 capcut.py ops                                       todas as ações com os parâmetros
@@ -41,7 +43,7 @@ um rascunho; abrir no app e exportar pelo app é um clique (o Gab faz em segundo
 A prévia do `previa` é do Gab, não do motor do CapCut: transições, efeitos, filtros e animações da loja não
 aparecem nela (são listados no fim).
 """
-import json, os, re, shutil, subprocess, sys, tempfile
+import json, os, re, shutil, subprocess, sys, tempfile, time
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
@@ -250,6 +252,41 @@ def conferir(nome):
 
 
 # ---------------------------------------------------------------- abrir / fechar
+def levar(padrao, substituir=False):
+    """Sem editor -> CapCut: copia rascunhos de RAIZ_SEM_EDITOR para a pasta do CapCut e registra na tela inicial."""
+    import fnmatch
+    if not os.path.isdir(C.RAIZ_CAPCUT):
+        raise SystemExit("CapCut não encontrado: instale (grátis, capcut.com), abra uma vez e rode de novo")
+    origem = C.RAIZ_SEM_EDITOR
+    nomes = [n for n in sorted(os.listdir(origem)) if os.path.isfile(os.path.join(origem, n, "draft_info.json"))
+             and fnmatch.fnmatchcase(n, padrao)] if os.path.isdir(origem) else []
+    if not nomes:
+        raise SystemExit(f"nenhum rascunho '{padrao}' em {origem}")
+    C.RAIZ = C.RAIZ_CAPCUT
+    for n in nomes:
+        de, para = os.path.join(origem, n), os.path.join(C.RAIZ_CAPCUT, n)
+        if os.path.exists(para):
+            if not substituir:
+                print(f"  pulado (já existe no CapCut, use --substituir): {n}"); continue
+            shutil.rmtree(para)
+        shutil.copytree(de, para)
+        for base, _, arqs in os.walk(para):
+            for a in arqs:
+                f = os.path.join(base, a)
+                try:
+                    t = open(f, encoding="utf-8").read()
+                except (UnicodeDecodeError, OSError):
+                    continue
+                t2 = t.replace(json.dumps(de)[1:-1], json.dumps(para)[1:-1]).replace(de, para)
+                t2 = t2.replace(json.dumps(origem)[1:-1], json.dumps(C.RAIZ_CAPCUT)[1:-1]).replace(origem, C.RAIZ_CAPCUT)
+                if t2 != t:
+                    open(f, "w", encoding="utf-8").write(t2)
+        d = C.abrir(n)
+        d._registrar(int(time.time() * C.US))
+        print(f"  no CapCut: {n}")
+    print("Abra o CapCut (ou `capcut.py abrir \"<rascunho>\"`) e troque o editor: /ogab config editor capcut")
+
+
 def abrir_no_app(nome):
     """Põe o rascunho no topo da lista (1a miniatura da tela inicial) e abre o CapCut. Abrir o projeto é o
     clique na 1a miniatura: o Gab faz com o computer-use em segundo plano (app_click), sem tomar a tela."""
@@ -713,6 +750,8 @@ def main(a):
         sys.exit(1 if conferir(a[1]) else 0)
     elif cmd == "abrir":
         abrir_no_app(a[1])
+    elif cmd == "levar":
+        levar(a[1], "--substituir" in a)
     elif cmd == "faz":
         faz(a[1], [x for x in a[2:] if x != "--projeto-fechado"], "--projeto-fechado" in a)
     elif cmd == "ids":

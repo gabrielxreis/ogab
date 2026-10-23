@@ -155,7 +155,7 @@ O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo �
 1. **Editor:** DaVinci Resolve, Adobe Premiere Pro, CapCut (Mac, beta) ou Final Cut Pro (Mac, beta). No Windows: DaVinci ou Premiere.
 2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).
 
-Trocar depois, sem reinstalar: `/ogab config editor davinci|premiere|capcut|finalcut` e `/ogab config motion hyperframes|aftereffects`.
+Trocar depois, sem reinstalar: `/ogab config editor davinci|premiere|capcut|finalcut|nenhum` e `/ogab config motion hyperframes|aftereffects`.
 
 O [install.sh](install.sh) pode ser rodado de novo para atualizar. Ele:
 - instala **Homebrew** (se faltar), **ffmpeg**, **yt-dlp**, **Node.js**, **Python 3**, **git** e **Pillow**;
@@ -241,7 +241,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 | `/ogab ajuda` | Mostra o que está habilitado e os provedores escolhidos |
 | `/ogab doctor` | Confere a instalação inteira, corrige o que der e guia você no resto |
 | `/ogab comecar` | Primeiro uso: roda o doctor e explica como pedir |
-| `/ogab config editor premiere` | Troca o editor (`davinci`, `premiere`, `capcut` ou `finalcut`) |
+| `/ogab config editor premiere` | Troca o editor (`davinci`, `premiere`, `capcut`, `finalcut` ou `nenhum`: sem editor, o Gab entrega o MP4 pronto) |
 | `/ogab config motion aftereffects` | Troca os motions (`hyperframes` ou `aftereffects`) |
 | `/ogab voz-local instalar\|clonar\|motores\|status` | Clonador de voz local opcional: instala, clona a sua voz, lista motores e licenças |
 | `/ogab update` | Atualiza a skill |

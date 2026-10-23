@@ -409,9 +409,13 @@ def perguntar(cfg):
     ed = os.environ.get("OGAB_EDITOR") or cfg.get("editor")
     if not ed:
         r = ler("\n  Em qual editor o Gab vai montar seus vídeos?\n    1) DaVinci Resolve Studio\n    2) Adobe Premiere Pro\n"
-                "    3) CapCut (beta)\n    4) Final Cut Pro (beta)\n  Escolha [1-4]: ", "1")
-        ed = {"2": "premiere", "3": "capcut", "4": "finalcut"}.get(r, "davinci")
-    cfg["editor"] = ed if ed in ("davinci", "premiere", "capcut", "finalcut") else "davinci"
+                "    3) CapCut (beta, grátis)\n    4) Final Cut Pro (beta)\n"
+                "    5) Nenhum: o Claude faz tudo e entrega o MP4 pronto\n  Escolha [1-5]: ", "1")
+        ed = {"2": "premiere", "3": "capcut", "4": "finalcut", "5": "nenhum"}.get(r, "davinci")
+        if ed == "nenhum":
+            print("  Ok. Dica: o CapCut é grátis (capcut.com); com ele você abre o vídeo e muda o que quiser.\n"
+                  "  Instalou depois? /ogab config editor capcut (os vídeos já feitos vão junto com capcut.py levar).")
+    cfg["editor"] = ed if ed in ("davinci", "premiere", "capcut", "finalcut", "nenhum") else "davinci"
     mo = os.environ.get("OGAB_MOTION") or cfg.get("motion")
     if not mo:
         r = ler("\n  Como o Gab faz os motions?\n    1) Automático (HyperFrames, rápido)\n"
@@ -514,7 +518,7 @@ def main():
     subprocess.run([sys.executable, str(DEST / "scripts/doctor.py"), "--corrigir"])
     print(f"""
 Pronto. Seu Gab vai editar no: {NEG(cfg.get('editor'))}   |   motions: {NEG(cfg.get('motion'))}
-(trocar a qualquer hora: /ogab config editor davinci|premiere|capcut|finalcut  e  /ogab config motion hyperframes|aftereffects)
+(trocar a qualquer hora: /ogab config editor davinci|premiere|capcut|finalcut|nenhum  e  /ogab config motion hyperframes|aftereffects)
 
 Falta só o que precisa de você (uma vez), no app que você usa:
   DaVinci:        Preferences > System > General > External scripting using: Local (e reinicie o Resolve).
@@ -522,6 +526,7 @@ Falta só o que precisa de você (uma vez), no app que você usa:
   Premiere:       Window > UXP Plugins > Gab Ponte (deixe o painel encaixado).
   CapCut:         abra o CapCut uma vez e entre na sua conta; feche o projeto quando o Gab for gravar nele.
   Final Cut Pro:  crie uma biblioteca (Arquivo > Nova > Biblioteca) e deixe aberta; dê Acessibilidade ao Terminal/Claude.
+  Sem editor:     nada: o Gab entrega o MP4 pronto (recomendado instalar o CapCut, grátis, para customizar).
   After Effects:  nada: a ponte sobe sozinha (se o AE estava aberto na instalação, feche e rode o instalador de novo).
   Todos:          conecte as SUAS contas no Claude (Configurações > Conectores): ElevenLabs, Artlist, Envato, Magnific...
                   e a extensão Claude in Chrome logada nos sites (downloads são pelo navegador).

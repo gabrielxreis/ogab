@@ -8,6 +8,11 @@ Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando 
 >
 > **Antes:** Rascunhos de teste gerados em 14/10/2026 (`GAB TESTE API` e `GAB TESTE API 2`, este com transição, animações, efeito, máscara, fundo e corte de silêncio); falta conferir dentro do CapCut que tudo abre certo. Até essa conferência, avisar o usuário que é beta.
 
+## Sem editor (`"editor": "nenhum"`, 23/10/2026)
+
+Para quem não tem nenhum editor: o mesmo motor, sem o app. Com `"editor": "nenhum"` no config, a `capcut_lib` grava os rascunhos em `~/Movies/Gab Sem Editor/Rascunhos` (a variável `GAB_RASCUNHOS` força outra pasta) e não confere se o CapCut está aberto. Monta com `capcut.py plano`, entrega com `capcut.py previa "<rascunho>" saida.mp4` (escala 1 = final). Testado 23/10/2026: vídeo com fundo desfocado + MOV com alfa (motion) + texto saiu certo. Fora do render: transição, filtro, efeito, adesivo e animação da loja (usar corte seco, keyframe e motion do HyperFrames). Funciona sem o CapCut instalado; no Windows não testado (sem `pgrep`, tratado).
+Instalou o CapCut depois: `capcut.py levar "<rascunho|*>"` copia para a pasta do CapCut, troca os caminhos e registra na tela inicial; depois `/ogab config editor capcut`. Com a tela inicial do CapCut vazia (nenhum projeto), a entrada é mínima: conferir que aparece.
+
 ## Linha de comando (`capcut.py`, 22/10/2026): o jeito padrão de mexer no CapCut
 
 Igual ao DaVinci: tudo por comando, sem clicar. O CapCut só precisa estar com ESTE projeto fechado na hora de gravar.

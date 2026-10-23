@@ -517,6 +517,8 @@ def main():
     premiere(c.get("editor") == "premiere")
     capcut(c.get("editor") == "capcut")
     finalcut(c.get("editor") == "finalcut")
+    if c.get("editor") == "nenhum":
+        item("✓", "Sem editor", "o Gab entrega o MP4 pronto (capcut.py previa); dica: CapCut grátis para customizar")
     aftereffects(c.get("motion") == "aftereffects")
     if "--json" in sys.argv:
         print(json.dumps([{"estado": e, "grupo": g, "texto": t} for e, g, t in itens], ensure_ascii=False, indent=1))

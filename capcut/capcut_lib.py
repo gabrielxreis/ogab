@@ -18,7 +18,23 @@ de BAIXO, igual à convenção da /ogab no DaVinci: legenda Y 724).
 """
 import copy, difflib, hashlib, json, math, os, re, shutil, subprocess, time, uuid
 
-RAIZ = os.path.expanduser("~/Movies/CapCut/User Data/Projects/com.lveditor.draft")
+RAIZ_CAPCUT = os.path.expanduser("~/Movies/CapCut/User Data/Projects/com.lveditor.draft")
+# modo sem editor (config.json "editor": "nenhum"): os rascunhos ficam numa pasta do Gab e a entrega é a prévia
+# renderizada (capcut.py previa). Quem instalar o CapCut depois leva o rascunho com `capcut.py levar`.
+RAIZ_SEM_EDITOR = os.path.expanduser("~/Movies/Gab Sem Editor/Rascunhos")
+
+
+def _raiz():
+    if os.environ.get("GAB_RASCUNHOS"):
+        return os.path.expanduser(os.environ["GAB_RASCUNHOS"])
+    try:
+        cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"), encoding="utf-8"))
+    except Exception:
+        cfg = {}
+    return RAIZ_SEM_EDITOR if cfg.get("editor") == "nenhum" else RAIZ_CAPCUT
+
+
+RAIZ = _raiz()
 MIDIA = os.path.expanduser("~/Movies/Gab CapCut")   # o CapCut é sandboxed: só lê ~/Movies sem pedir
 AQUI = os.path.dirname(os.path.abspath(__file__))
 MOLDE = json.load(open(os.path.join(AQUI, "molde.json")))
@@ -150,7 +166,12 @@ def _hex(cor):
 
 
 def capcut_aberto():
-    return subprocess.run(["pgrep", "-x", "CapCut"], capture_output=True).returncode == 0
+    if RAIZ != RAIZ_CAPCUT:   # sem editor: o CapCut nem lê esta pasta
+        return False
+    try:
+        return subprocess.run(["pgrep", "-x", "CapCut"], capture_output=True).returncode == 0
+    except FileNotFoundError:   # Windows
+        return False
 
 
 def fechar_capcut(espera=20):
@@ -172,6 +193,8 @@ def abrir_capcut():
 def rascunhos():
     """Lista os rascunhos: [(nome, duração s, modificado)]."""
     out = []
+    if not os.path.isdir(RAIZ):
+        return out
     for n in sorted(os.listdir(RAIZ)):
         f = os.path.join(RAIZ, n, "draft_info.json")
         if os.path.isfile(f):
@@ -1122,7 +1145,7 @@ class Rascunho:
     def _registrar(self, agora):
         """Entrada na tela inicial do CapCut (root_meta_info.json)."""
         f = os.path.join(RAIZ, "root_meta_info.json")
-        r = json.load(open(f))
+        r = json.load(open(f)) if os.path.exists(f) else {"all_draft_store": [], "draft_ids": 0, "root_path": RAIZ}
         lista = r.setdefault("all_draft_store", [])
         e = next((x for x in lista if x.get("draft_fold_path") == self.pasta), None)
         if e is None:
