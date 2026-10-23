@@ -118,6 +118,11 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur, extras=()):
         shutil.copy(os.path.join(AQUI, "kit", f), proj)
     for m in modulos:
         shutil.copy(os.path.join(PRESETS, m, f"{m}.js"), proj)
+    plano_js = dict(plano_js)
+    for k, nome in (("_video", "video.mp4"), ("_silhueta", "recorte.webm")):   # vídeo/silhueta para os estilos que pedem
+        orig = plano_js.pop(k, None)
+        if orig and plano_js.get("estilos"):
+            shutil.copy(orig, os.path.join(proj, nome)); plano_js[k[1:]] = nome
     for c in plano_js.get("estilos") or []:   # imagens/logos dos campos dos estilos
         for orig, nome in c.get("_copiar", []):
             os.makedirs(os.path.join(proj, "img"), exist_ok=True); shutil.copy(orig, os.path.join(proj, "img", nome))
@@ -360,6 +365,22 @@ def gerar(plano, pasta, fazer_render=True):
     if est_rosto or est_atras:   # estilos que fogem do rosto recebem a caixa dele a cada 0,5 s
         comum["rostos"] = [[t_, *map(int, b)] for t_, b in sorted(rosto_cx().items()) if b]
         frente["rostos"] = comum["rostos"]
+    precisa = {p for x in est_frente + est_atras for p in (x.get("_precisa") or [])}
+    lf0 = lente_filtro(plano.get("lente"), w, h)
+    if "video" in precisa:   # o vídeo da pessoa (com a lente) dentro da camada: P.video = "video.mp4"
+        vproj = os.path.join(pasta, "_video_estilos.mp4"); os.makedirs(pasta, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video] + (["-vf", lf0] if lf0 else []) +
+                       ["-an", "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", vproj], check=True)
+        comum["_video"] = frente["_video"] = vproj
+    if "silhueta" in precisa:   # a pessoa recortada com alfa (WebM VP9: o ProRes não carrega no navegador): P.silhueta
+        rec0 = absp(plano["recorte"]) if plano.get("recorte") else os.path.join(pasta, "recorte.mov")
+        if not os.path.exists(rec0):
+            os.makedirs(pasta, exist_ok=True)
+            subprocess.run([sys.executable, os.path.join(AQUI, "recorte.py"), video, rec0, "--w", str(w)], check=True)
+        sproj = os.path.join(pasta, "_silhueta_estilos.webm")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", rec0, "-vf", ",".join(x for x in ("format=yuva420p", lf0) if x),
+                        "-an", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-b:v", "2M", "-auto-alt-ref", "0", sproj], check=True)
+        comum["_silhueta"] = frente["_silhueta"] = sproj
     if est_frente:
         frente["estilos"] = est_frente; mods.append("estilos")
     atras_cart = []

@@ -13,6 +13,14 @@ window.ESTILO = window.ESTILO || {};
     return m && d < 1.5 ? m.slice(1) : null;
   };
   C.seguro = { topo: 220, baixo: 450, lado: 35 };
+  // <video> dentro da camada (P.video = vídeo da pessoa, P.silhueta = pessoa recortada com alfa), no tempo do vídeo
+  let trilha = 20;
+  C.video = (src, pai, cls) => {
+    const v = C.el("video", cls || null, pai);
+    v.src = src; v.muted = true; v.playsInline = true; v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+    v.setAttribute("data-start", "0"); v.setAttribute("data-duration", String(P.dur)); v.setAttribute("data-track-index", String(trilha++));
+    return v;
+  };
   C.mod.estilos = (lista, C) => (lista || []).forEach(it => {
     const f = window.ESTILO[it.id];
     if (f) f(it, C); else console.warn("estilo sem módulo:", it.id);

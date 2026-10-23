@@ -29,7 +29,9 @@ Grupos (pasta): `gancho`, `legenda`, `layout`, `prova`, `batida`, `broll`, `efei
 - `id`: único em todos os grupos, minúsculo-com-hífen, em português.
 - `camada`: `frente` (por cima de tudo) ou `atras` (entre o vídeo e a pessoa recortada: texto atrás da cabeça, fundo
   trocado, canvas inteiro no lugar da sala). `atras` liga o recorte da pessoa sozinho.
-- `precisa`: `rosto` (recebe a caixa do rosto), `palavras` (recebe a transcrição com tempo), `recorte`, `imagem`, `logo`.
+- `precisa`: `rosto` (caixa do rosto), `palavras` (transcrição com tempo), `video` (o vídeo da pessoa, com a lente, em
+  `C.P.video`), `silhueta` (a pessoa recortada com alfa, WebM, em `C.P.silhueta`; vale até em estilo só de frente),
+  `recorte`, `imagem`, `logo`. Para tocar vídeo na camada: `C.video(src, pai, classe)` (já no tempo do vídeo).
 - `campos`: o que o Gab preenche com o conteúdo do vídeo; `exemplo` de cada campo é usado na prévia.
 - `camada: "ambas"`: o mesmo item entra atrás E na frente da pessoa; o `.js` decide o que desenhar por `C.P.camada`
   (`"palco"` = atrás, `"frente"` = na frente), ex.: cartões girando que passam por trás e pela frente do corpo.
