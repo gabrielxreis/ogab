@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-31 (23/10/2026)
+- **Corte pelo escuro removido:** o estilo saiu do menu e da skill (não vai ser usado).
 ## 2026.10.23-30 (23/10/2026)
 - **Título atrás da cabeça melhor:** a palavra fica no alto da cabeça e a pessoa cobre só a base das letras (leva em conta cabelo volumoso); sem espaço acima da cabeça o título diminui em vez de ir para trás do rosto.
 ## 2026.10.23-29 (23/10/2026)
