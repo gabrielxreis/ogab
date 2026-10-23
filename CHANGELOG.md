@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-17 (23/10/2026)
+- **Prévias dos estilos com pessoa de verdade:** os GIFs do menu agora mostram cada estilo sobre um vídeo real de uma pessoa falando para a câmera (banco de vídeo com licença livre), em vez do apresentador desenhado.
 ## 2026.10.23-21 (23/10/2026)
 - **16 estilos novos de prova e b-roll animado:** matéria com marca-texto, selo de trecho oficial, número atrás da cabeça, post de rede social, arquivo pessoal, cursor no número, pergunta no chat, robôs conversando, link que vira evento na agenda, link que abre a planilha, conversa no celular, clique na barra de apps, aviso do personagem, pílula de produto, fila de personagens e diagrama do conceito. Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-20 (23/10/2026)
