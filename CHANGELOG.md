@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-7 (23/10/2026)
+- **Menu sem rolagem:** os cartões se ajustam ao tamanho da tela e cada passo mostra todas as opções de uma vez, inclusive em telas grandes; quando não cabe, a descrição curta vira dica ao passar o mouse.
 ## 2026.10.23-6 (23/10/2026)
 - **Ajuste de enquadramento não quebra mais com vídeo do DaVinci 21:** o `enquadramento.py` lia o tamanho do vídeo errado em alguns MP4 exportados e parava. Não precisa fazer nada.
 - **Trocar os títulos duas vezes na mesma timeline:** a segunda troca do lettering parava com erro; agora a timeline auxiliar ganha um nome livre ("(titulos via API 2)") e, se o DaVinci recusar, o Gab avisa com clareza.

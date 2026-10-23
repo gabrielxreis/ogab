@@ -272,7 +272,7 @@ PAGINA = r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta
 /* estrutura visual do Monitor de Visto (fundo com brilho radial, vidro, rótulos em caixa alta, botão que respira) com a ID da /ogab */
 body{min-height:100vh;color:var(--tx);font:500 15px/1.45 "Inter Tight",system-ui,sans-serif;padding-bottom:110px;
   background:radial-gradient(520px 520px at 30% 12%,rgba(43,255,136,.16),transparent 70%),linear-gradient(135deg,#16201A,#070B08) fixed}
-.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.wrap{max-width:min(1680px,94vw);margin:0 auto;padding:0 24px}
 header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:30px 0 6px}
 .logo{display:flex;align-items:center;gap:14px}.logo svg{width:44px;height:44px;border-radius:12px;box-shadow:0 0 20px rgba(43,255,136,.45)}
 .wm{font-weight:800;font-size:22px;letter-spacing:-.03em;line-height:1.1}.wm .s{color:var(--g)}.wm small{display:block;font-size:12px;color:var(--mu);letter-spacing:0;font-weight:500}
@@ -288,18 +288,20 @@ h1{font-weight:800;font-size:clamp(28px,4vw,42px);letter-spacing:-.035em;line-he
 h2{font-weight:800;font-size:clamp(24px,3.2vw,34px);letter-spacing:-.03em;line-height:1.1;margin:4px 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;height:40px;display:grid;place-items:center;font-size:18px;box-shadow:0 0 14px rgba(43,255,136,.45)}
 .sub{color:var(--mu);font-size:14.5px;margin-bottom:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;max-height:calc(100vh - 330px);overflow-y:auto;padding:2px 2px 8px;scrollbar-width:thin}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:stretch;overflow-y:auto;padding:2px 2px 8px;scrollbar-width:thin}
 .card{position:relative;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s;text-align:left;color:inherit;font:inherit;padding:0}
 .card:hover{transform:translateY(-2px);border-color:rgba(43,255,136,.4)}
 .card[aria-pressed=true]{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.35)}
-.vis{aspect-ratio:4/5;background:#050806;position:relative;overflow:hidden;display:grid;place-items:center}
+.vis{aspect-ratio:var(--ar,4/5);background:#050806;position:relative;overflow:hidden;display:grid;place-items:center}
+.card{display:flex;flex-direction:column}.card .tx{flex:1}
+.compacto .tx span{display:none}.compacto .tx{padding:8px 10px 10px}.compacto .tx b{font-size:13.5px}
 .vis img{width:100%;height:100%;object-fit:cover;display:block}
 .chk{position:absolute;top:9px;right:9px;width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(0,0,0,.35);display:grid;place-items:center;z-index:2}
 .card[aria-pressed=true] .chk{background:var(--g);border-color:var(--g)}
 .chk svg{width:14px;height:14px;opacity:0}.card[aria-pressed=true] .chk svg{opacity:1}
 .code{position:absolute;top:10px;left:10px;font:800 11px "Inter Tight";background:rgba(0,0,0,.55);border:1px solid var(--line);color:var(--g1);padding:2px 7px;border-radius:7px;z-index:2}
 .tag{position:absolute;bottom:9px;left:9px;font:800 10.5px "Inter Tight";letter-spacing:.06em;text-transform:uppercase;background:rgba(43,255,136,.14);border:1px solid rgba(43,255,136,.3);color:var(--g);padding:3px 9px;border-radius:999px;z-index:2;backdrop-filter:blur(6px)}
-.tx{padding:11px 12px 13px}.tx b{font-weight:800;font-size:15px;letter-spacing:-.015em;display:block}.tx span{color:var(--mu);font-size:12.5px;display:block;margin-top:3px}
+.tx{padding:11px 12px 13px}.tx b{font-weight:800;font-size:15px;letter-spacing:-.015em;display:block}.tx span{color:var(--mu);font-size:12.5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px}
 .inicio{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
 .op{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card);backdrop-filter:blur(14px);cursor:pointer;color:inherit;font:inherit;text-align:left;transition:.15s}
 .op:hover{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.3);transform:translateY(-2px)}.op b{display:block;font-weight:800;font-size:22px;letter-spacing:-.025em;margin:12px 0 6px}.op p{color:var(--mu);font-size:14px}
@@ -474,7 +476,7 @@ function render() {
       <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : " · <b style='color:var(--g)'>" + T[L].gab_escolhe + "</b>"}</p>
       ${g.abas ? `<div class="abas">${g.abas.map(x => { const c = g.itens.filter(i => i.aba === x.id && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
-      <div class="grid">${g.itens.map((i, n) => (g.abas && i.aba !== aba[g.id]) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}">
+      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && i.aba !== aba[g.id]) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
       <div class="vis">${prev(i)}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div>`;
   } else {
@@ -499,12 +501,31 @@ function render() {
     }
   }
   $("#tela").innerHTML = h;
+  ajustar();
   $("#bk").hidden = passo === 0; $("#pl").hidden = !(passo >= 1 && passo <= N); $("#go").hidden = passo === 0;
   $("#go").textContent = passo > N ? (auto ? T[L].conf_auto : T[L].confirmar) : (passo === N ? T[L].revisar : T[L].avancar);
   $("#codes").textContent = auto ? T[L].auto_t : codigos().join("  ");
   scrollTo(0, 0);
 }
 function pula(p) { const g = D.grupos[p - 1]; return g && g.id === "estilo" && sel.motions && sel.motions.has("sem"); }
+// cabe tudo na tela: mede de verdade, aumentando as colunas até todas as opções do passo caberem sem rolar;
+// se não couber, esconde a descrição (fica no title, aparece ao passar o mouse) e tenta de novo; passo enorme rola.
+function ajustar() {
+  const g = $(".grid"); if (!g) return;
+  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 14, W = g.clientWidth, gap = 12;
+  g.style.maxHeight = H + "px";
+  for (const compacto of [false, true]) {
+    g.classList.toggle("compacto", compacto);
+    const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap)));   // cartão de no máximo ~300 px
+    for (let c = ini; c <= Math.max(g.children.length, ini) + 1; c++) {
+      if ((W - gap * (c - 1)) / c < 104) break;
+      g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
+      if (g.scrollHeight <= g.clientHeight + 1) return;
+    }
+  }
+  g.style.gridTemplateColumns = "repeat(auto-fill,minmax(130px,1fr))";
+}
+addEventListener("resize", ajustar);
 function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }
 document.addEventListener("click", e => {
   const op = e.target.closest(".op"); if (op) { auto = op.dataset.op === "auto"; return ir(auto ? N + 1 : 1); }
