@@ -14,7 +14,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__)); CENA = os.path.dirname(AQUI);
 # "y" = onde fica o corte 9:16 em clipe deitado ou mais alto que 9:16 (0 topo, .5 meio).
 TAKES = {   # banco aprovado pelo takes.py (presets/estilos/exemplo); pessoas escolhidas pelo Gabriel em 23/10/2026
     "destaque": {"banco": "7644020", "de": 0},
-    "palco": {"banco": "6625050", "de": 0},
+    "palco": {"banco": "7580433", "de": 0, "palco_y": 270},   # palavra no alto: a cabeça cobre só o meio dela
     "orbita": {"banco": "7600045", "de": 0},
     "lente": {"banco": "8048476", "de": 0},
 }
@@ -105,7 +105,8 @@ def main(trab, quais):
             plano["destaque"]["empilhadas"] = [{"de": q("Sempre")["ini"] - .05, "ate": q("frente")["fim"] + .8,
                                                 "linhas": [["Sempre", "pequena"], ["um passo", "grande"], ["à frente.", "serifa"]]}]
         elif preset == "palco":
-            plano["palco"] = [{"texto": "GAB", "de": q("Esse")["ini"], "ate": q("Gab")["fim"] + .5, "sub": "EDITOR COM IA"}]
+            plano["palco"] = [{"texto": "EDITOR", "de": q("Esse")["ini"], "ate": q("Gab")["fim"] + .5, "sub": "COM IA",
+                               "y": TAKES["palco"].get("palco_y", int(1920 * .17))}]   # alto: a cabeça cobre só um pedaço
         elif preset == "orbita":
             plano["orbita"] = [{"tipo": "giro", "de": max(0, q("Cartões")["ini"] - .1), "ate": dur - .1, "voltas": 1.25, "cw": 300,
                                 "cartoes": [{"texto": "DESTAQUE", "sub": "LEGENDA"}, {"texto": "PALCO", "sub": "ATRÁS"},

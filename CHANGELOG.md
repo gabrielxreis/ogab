@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-27 (23/10/2026)
+- **Palco com pessoa real:** a prévia do Palco agora mostra a palavra gigante atrás da cabeça de uma pessoa de verdade.
 ## 2026.10.23-26 (23/10/2026)
 - **Destaque com pessoa real:** a prévia do Destaque agora mostra uma pessoa de verdade, e a legenda ganhou contorno mais forte para ler bem até em cima de roupa estampada.
 ## 2026.10.23-25 (23/10/2026)
