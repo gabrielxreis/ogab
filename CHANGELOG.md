@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-41 (23/10/2026)
+- **Fotos na timeline com movimento:** toda foto entra com um zoom bem leve por keyframe (aproxima ou afasta), para não ficar parada. Dá para ajustar no Fusion do clipe.
+- **Fotos com a duração certa:** antes a foto entrava com 5 s fixos ou travava a montagem; agora ocupa exatamente o trecho planejado.
 ## 2026.10.23-40 (23/10/2026)
 - **O menu do vídeo não fica mais de fora:** mesmo quando você começa pedindo só um roteiro ou só a voz e o pedido vira vídeo aos poucos, o Gab abre o menu antes de montar qualquer coisa. Agora é uma trava: sem o menu confirmado, nenhuma timeline, sequência ou rascunho novo é criado (DaVinci, Premiere, CapCut e Final Cut). Quer pular? É só dizer "pode fazer no automático".
 ## 2026.10.23-39 (23/10/2026)

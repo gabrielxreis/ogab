@@ -296,7 +296,36 @@ def checar_take_original(arq, permitir_render=False):
                            "se fazem no DaVinci, e só se o usuário pedir (permitir_render=True).")
 
 
-def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, preencher=True, permitir_render=False):
+FOTO_EXT = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".tif", ".tiff")
+
+
+def foto_em_mov(img, dur, fps=30):
+    """Foto -> MOV H.264 parado com `dur` s (orientação EXIF aplicada), em <pasta da foto>/_fotos_mov/. Reaproveita se já existe."""
+    import subprocess
+    from PIL import Image, ImageOps
+    pasta = os.path.join(os.path.dirname(img), "_fotos_mov"); os.makedirs(pasta, exist_ok=True)
+    base = os.path.splitext(os.path.basename(img))[0]
+    out = os.path.join(pasta, f"{base}_{dur:.1f}s.mov")
+    if os.path.exists(out): return out
+    tmp = os.path.join(pasta, base + "_orient.png")
+    ImageOps.exif_transpose(Image.open(img)).convert("RGB").save(tmp)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-loop", "1", "-framerate", str(fps), "-t", f"{dur:.3f}", "-i", tmp,
+                    "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2,format=yuv420p", "-c:v", "libx264", "-crf", "12",
+                    "-preset", "veryfast", "-tune", "stillimage", out], check=True)
+    os.remove(tmp)
+    return out
+
+
+def zoom_leve_foto(item, dur, intensidade=0.05, entrando=True):
+    """Keyframes de zoom bem leve na foto inteira (1,00 -> 1,05 ou o contrário), nó Transform "AnimGab" no Fusion."""
+    a, b = (1.0, 1.0 + intensidade) if entrando else (1.0 + intensidade, 1.0)
+    try:
+        animar_clipe(item, [(0.0, {"zoom": a}), (max(dur - 1 / 30, 0.1), {"zoom": b})], fps_arquivo=30)
+    except Exception as e:
+        print(f"AVISO: zoom leve não entrou em {item.GetName()} ({e}); fazer no Inspector")
+
+
+def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, preencher=True, permitir_render=False, foto_zoom=0.05):
     """takes = [(arquivo, inicio_s), ...] ou [(arquivo, inicio_s, entrada_s), ...] em ordem. Cada take vai até o
     início do próximo, sem buraco: encadeia pelo GetEnd() real e usa ceil (fontes 24/25 fps numa timeline 30
     deixariam 1-2 quadros pretos).
@@ -312,8 +341,12 @@ def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, 
         arq, ini = tk[0], tk[1]; entrada = tk[2] if len(tk) > 2 else 0.0
         if respeitar_inicio: cur = max(cur, S + round(ini * F))
         nxt = S + round(takes[k + 1][1] * F) if k + 1 < len(takes) else fim_f
-        checar_take_original(arq, permitir_render)
-        it = importar(mp, arq, "BROLLS", permitir_render)
+        foto = os.path.splitext(arq)[1].lower() in FOTO_EXT
+        if foto:   # foto parada ignora endFrame e entra com 5 s: vira MOV com a duração do trecho (davinci_api.md)
+            arq = foto_em_mov(arq, (nxt - cur) / F + 1.0, F)
+        else:
+            checar_take_original(arq, permitir_render)
+        it = importar(mp, arq, "BROLLS", permitir_render or foto)
         sf = float(it.GetClipProperty("FPS")); mx = int(float(it.GetClipProperty("Frames")))
         e0 = min(int(round(entrada * sf)), mx - 1)
         n = min(mx - e0, math.ceil((nxt - cur) * sf / F))
@@ -321,6 +354,8 @@ def montar_takes(t, mp, takes, fim, zoom=1.0, respeitar_inicio=False, trilha=1, 
                                   "trackIndex": trilha, "recordFrame": cur}])[0]
         z = zoom * (_zoom_preencher(it, t) if preencher else 1.0)
         if z != 1.0: x.SetProperty("ZoomX", z); x.SetProperty("ZoomY", z)
+        if foto and foto_zoom:   # foto nunca parada (regra do usuário, 23/10/2026): zoom leve por keyframe, editável no Fusion
+            zoom_leve_foto(x, (x.GetEnd() - x.GetStart()) / F, foto_zoom, entrando=len(itens) % 2 == 0)
         itens.append(x); cur = x.GetEnd()
         if x.GetEnd() < nxt: print(f"AVISO: {os.path.basename(arq)} é curto, sobra {nxt - x.GetEnd()} quadros")
     return itens
