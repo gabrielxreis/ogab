@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-1 (23/10/2026)
+- **Motion atrás da pessoa com o Magic Mask:** o Gab marca a pessoa sozinho no Magic Mask do Fusion (cabelo, mãos e objetos que ela segura, modo Faster), clica em rastrear e deixa a composição na timeline, numa trilha acima do motion, para você ajustar se precisar. A versão por profundidade virou plano B.
 ## 2026.10.22-8 (22/10/2026)
 - **Motion atrás da pessoa, direto no DaVinci:** o Gab recorta a pessoa no Fusion com a IA de profundidade do próprio DaVinci (sem pintar e sem rastrear) e coloca o recorte numa trilha acima do motion; o motion, o lettering ou o objeto ficam atrás da pessoa e continuam editáveis na timeline. O corte é calibrado sozinho pelo rosto. Quando a pessoa está encostada no fundo, ele monta o Magic Mask para você só pintar e clicar em rastrear.
 ## 2026.10.22-7 (22/10/2026)

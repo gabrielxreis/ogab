@@ -128,22 +128,36 @@ Funções escondidas que existem no binário (fora do `.pyi`): `Resolve.GetLicen
 - Cartão e tarja na mesma trilha: quando se encostam, o append corta o começo do outro. Overlays de tipos diferentes em trilhas próprias.
 
 
-## Pessoa na frente: máscara no Fusion por script (engenharia reversa em 22/10/2026, Studio 21.1.1)
+## Pessoa na frente: Magic Mask no Fusion por script (engenharia reversa 22-23/10/2026, Studio 21.1.1)
 
-Pedido do usuário: "o /ogab aprender a fazer máscara no Fusion para colocar objetos ou motions atrás, pelo próprio software". Função: `R.pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, corte=None, borda=0.0, desfoque=1.0, metodo="profundidade")`.
+Pedido do usuário: máscara no Fusion para pôr motion/objeto ATRÁS da pessoa, pelo próprio DaVinci, com o **Magic Mask** (o que ele usa: alguns cliques na pessoa, modo **Faster**, rastrear; "é rápido e funcional"). A pessoa inteira: cabelo e objetos que ela segura. A composição FICA na timeline para o usuário ajustar.
 
-**Como ficou:** cópia do trecho da V1 (só vídeo, mesmo enquadramento ZoomX/Pan/Tilt/crop) numa trilha NOVA "PESSOA NA FRENTE" logo acima do motion (`AddTrack("video", {"index": n})`), clipe rosa, com a composição `MediaIn1 > Profundidade (DepthMap) > Recorte (MatteControl) > MediaOut1`. O Edit compõe o alfa do Fusion por cima das trilhas de baixo: tudo entre a V1 e o recorte fica atrás da pessoa. Testado com 10 s de talking head (mão mexendo na frente do corpo): borda do cabelo cacheado limpa, sem pincelada e sem rastreio.
+**Função:** `item, info = R.pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=<trilha do motion>)` e depois o rastreio pela tela.
+1. Copia o trecho da V1 (só vídeo, mesmo ZoomX/Pan/Tilt/crop) numa trilha NOVA "PESSOA NA FRENTE" logo acima do motion (`AddTrack("video", {"index": n})`), clipe rosa. V1 intocada.
+2. Quadro de referência = início do trecho + 12. Foto desse quadro da FONTE (ffmpeg) > `scripts/sujeito.py` (recorte de sujeito da Apple, o "copiar sujeito" do Fotos: pessoa + cabelo + mãos + relógio/objeto) > ~28 cliques positivos em grade por dentro da pessoa + 1 no alto da cabeça e ~16 negativos no fundo.
+3. Cola `MediaIn1 > PintarPessoa (MagicMask, Faster) > MediaOut1` com os cliques num quadro-chave. A máscara do quadro de referência já sai pronta.
+4. **Rastreio (pela tela, o único passo que o script não faz):** trazer o DaVinci para a frente (`open_application`), print, e no Inspector > Tracking clicar **Track Fwd Then Reverse** (botão do meio). Na prática ele fez SÓ o sentido de trás (12 > 0) e parou: clicar então **Track Forward** (botão da direita). Conferir com `R.magic_rastreado(item)` = `(primeiro, último, True)`. Faster: ~1,6 quadro/s (240 quadros em ~2,5 min). Durante o rastreio não usar o mouse no DaVinci.
+5. Conferir num render (`renderizar_trecho(..., so_v1=False)`) e quadros do MP4, nunca por `ExportCurrentFrameAsStill` (ver armadilhas).
 
-**O que a engenharia reversa achou** (`strings` em `Libraries/Fusion/libfusionoperators.dylib` + `GetInputList` ao vivo):
-- `MagicMask` existe no Fusion (Tools/Matte). Entradas: `Input`, `Strokes` (tipo `MagicMaskStrokes`), botões `TrackForward`, `TrackReverse`, `TrackBidirectional`, `StopTracking`, `ClearAll`..., `ReferenceTime` (desligado), `ProcessedFramesLow/High`, cache em `~/Library/.../Fusion/DiskCache/MagicMaskCache/`.
-- Formato dos traços (aceito por `tool.LoadSettings(arquivo.setting)` e devolvido igual pelo `SaveSettings`): `Strokes = Input { Value = MagicMaskStrokes { PosStrokes = { { x1, y1, x2, y2, ... } }, NegStrokes = {...} } }`, cada traço uma lista PLANA de pontos normalizados (0-1, y de baixo para cima); número ímpar de valores ganha um 0 no fim.
-- **O rastreio não anda por script:** `SetInput("TrackForward", 1)` (com ou sem tempo), `comp:Execute` em Lua (`tool.TrackForward = 1`, `SetInput`) e `TrackBidirectional` não mudam `ProcessedFrames` nem criam cache. Sem rastreio o MagicMask devolve alfa cheio (sem máscara), mesmo no quadro do traço. Por isso `metodo="magicmask"` só monta o nó e para: o usuário pinta e clica em rastrear.
-- `DepthMap` (Fusion, IA de profundidade) roda sozinho em cada quadro. Entradas úteis: `DepthMapPreview` (1 = sai o mapa em cinza: perto claro, longe escuro), `NearLimit`/`FarLimit`, `IsolateSpecificDepth`/`TargetDepth`/`Tolerance`/`Softness`, `ContractExpand`, `Blur`. Também existem `SurfaceTracker` e `Relight`.
-- **MatteControl:** a `Solid.Matte` só deixa áreas OPACAS (com o MediaIn já opaco, não recorta nada). Para recortar: mapa na `Garbage.Matte` com `Garbage.MaskInverted = 1`, `Garbage.MaskChannel = 0`, `Garbage.MaskLow/High` = corte, `PostMultiplyImage = 1`. Ligar entrada com ponto no nome funciona: `ConnectInput("Garbage.Matte", tool)`.
-- **Corte automático (`_calibrar_corte`):** duas fotos do mesmo quadro (`ExportCurrentFrameAsStill`, saída no MediaIn e depois no mapa), rosto pela Vision da Apple (`presets/cena/rosto.py`), profundidade do rosto = mediana do miolo da caixa, fundo = percentil 90 das faixas de cima e dos lados; corte = fundo + 30%..60% da diferença. No teste: rosto 0,54-0,58, tronco 0,65, fundo 0,13-0,42, corte (0,358; 0,438). Diferença < 0,08 = a profundidade não separa: erro pedindo o Magic Mask.
+**Formato do traço (lido do `SaveSettings` de um clique feito pelo usuário):** a entrada `Strokes` é ANIMADA, vem de um modificador `BezierSpline`:
+```
+PintarPessoa = MagicMask { Inputs = { Mode = Input { Value = FuID { "Faster" } },
+  ReferenceTime = Input { Value = 12, Disabled = true }, UseLegacyMagicMask = Input { Value = 0, Disabled = true },
+  Strokes = Input { SourceOp = "PintarPessoaStrokes", Source = "Value" } } },
+PintarPessoaStrokes = BezierSpline { KeyFrames = { [12] = { 0, Flags = { Linear = true, LockedY = true },
+  Value = MagicMaskStrokes { PosStrokes = { { 0.47, 0.73 }, ... }, NegStrokes = { ... } } } } }
+```
+Coordenadas 0-1 da imagem do MediaIn (fonte, sem o zoom da timeline), y de baixo para cima; clique = traço de 1 ponto; traço arrastado = lista plana x1, y1, x2, y2...
+
+**Como colar:** `tool.LoadSettings` traz só a ferramenta (perde o spline: sem quadro-chave não há máscara); `dvr.readfile` converte em dict e perde `ordered()`/`FuID`/`MagicMaskStrokes`. O que funciona: texto na área de transferência (`pbcopy`) + `comp.Paste()`, **com a composição ATIVA na página Fusion** (cabeça de leitura no clipe da trilha mais alta + `OpenPage("fusion")` + `r.Fusion().GetCurrentComp()`); com a página Edit aberta o Paste devolve True e não cola. `_colar_magic_mask` guarda e devolve a área de transferência do usuário.
+
+**Tempo da composição:** começa em 0 no INÍCIO do clipe (trecho com 180 quadros de entrada deu `COMPN_RenderStart` 0); quadro da fonte = entrada do trecho + (tempo da comp x fps fonte/fps timeline).
+
+**O que NÃO dispara o rastreio:** `SetInput("TrackForward", 1)` (com ou sem tempo), `comp.Execute` em Lua (`tool.TrackForward = 1`, `SetInput`), `TrackBidirectional`. `UseLegacyMagicMask` fica travado depois que há traço (desligar antes; o nó novo já vem desligado).
+
+**Alternativa sem rastreio (`metodo="profundidade"`):** `DepthMap` (IA de profundidade, roda sozinho em cada quadro) + `MatteControl` com o mapa na `Garbage.Matte` INVERTIDA (a `Solid.Matte` só deixa opaco), corte calibrado pelo rosto (`_calibrar_corte`). Funciona, mas o usuário achou pior que o Magic Mask (23/10/2026): usar só se não der para clicar na tela.
 
 **Armadilhas desta rodada:**
-- `ExportCurrentFrameAsStill` exporta o que a cabeça de leitura mostra, mas `SetCurrentTimecode` nem sempre move o quadro exportado (3 tempos saíram iguais): para conferir movimento, renderizar (`renderizar_trecho(..., so_v1=False)`) e tirar quadros do MP4.
-- `DeleteFusionCompByName` devolve False na ÚLTIMA composição do clipe: para limpar, apagar os nós e ligar `MediaOut1` direto no `MediaIn1`.
-- `tool.LoadSettings` funciona com um `.setting` escrito à mão (o caminho para mandar dados complexos a um nó); `comp.Paste` precisa de tabela Lua, que o Python não monta.
-- Com o DaVinci em outra mesa e o usuário numa tela cheia, o controle de tela não alcança o visualizador do Fusion: mais um motivo para tudo por script.
+- `ExportCurrentFrameAsStill` exporta o que a cabeça de leitura mostra, mas `SetCurrentTimecode` nem sempre move o quadro exportado (3 tempos saíram iguais).
+- `DeleteFusionCompByName` devolve False na ÚLTIMA composição do clipe: apagar os nós e ligar `MediaOut1` no `MediaIn1`.
+- Usuário em tela cheia (ou acessando por RustDesk): o controle em segundo plano não alcança o DaVinci; pedir controle de tela cheia e usar `open_application`.

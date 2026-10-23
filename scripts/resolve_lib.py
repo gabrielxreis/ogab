@@ -1330,12 +1330,17 @@ def animar_clipe(item, chaves, fps_arquivo=None, nome="AnimGab"):
     return tf.Name
 
 
-# ---------------------------------------------------------------- pessoa na frente (máscara no Fusion, 22/10/2026)
-# Engenharia reversa do DaVinci 21.1 (libfusionoperators): o Fusion tem MagicMask (traços PosStrokes/NegStrokes =
-# listas planas x,y normalizadas) mas o RASTREIO só anda pelos botões da tela (SetInput("TrackForward") e Lua não
-# disparam) e sem rastreio ele não gera máscara. O DepthMap do Fusion (IA de profundidade) calcula sozinho em cada
-# quadro, sem traço nem rastreio: a pessoa perto da câmera sai clara e o fundo escuro. Com o MatteControl
-# (Garbage Matte INVERTIDA ligada no mapa; a Solid Matte só deixa opaco e não recorta) vira o recorte da pessoa.
+# ---------------------------------------------------------------- pessoa na frente (máscara no Fusion, 22-23/10/2026)
+# Engenharia reversa do DaVinci 21.1 (libfusionoperators + SaveSettings de um traço feito pelo usuário):
+# - MagicMask do Fusion: o traço é ANIMADO. A entrada Strokes vem de um BezierSpline com quadro-chave no quadro de
+#   referência: KeyFrames = { [ref] = { 0, Flags = {...}, Value = MagicMaskStrokes { PosStrokes = { {x, y}, ... },
+#   NegStrokes = {...} } } } + ReferenceTime = ref. Coordenadas 0-1, y de baixo para cima; clique = traço de 1 ponto.
+#   Com isso a máscara do quadro de referência sai sozinha. LoadSettings NÃO traz o spline (só a ferramenta) e
+#   dvr.readfile perde os tipos: o caminho é o texto na área de transferência + comp.Paste() (Ctrl+V do Fusion).
+# - O RASTREIO só anda pelo botão da tela (SetInput("TrackForward"), Lua e TrackBidirectional por script não fazem
+#   nada): o Gab clica "Track Fwd Then Reverse" no Inspector e confere com magic_rastreado().
+# - Alternativa sem rastreio: DepthMap (IA de profundidade) + MatteControl (metodo="profundidade"); o usuário achou
+#   pior que o Magic Mask (23/10/2026): usar só se o rastreio pela tela não for possível.
 
 def _calibrar_corte(r, p, t, comp, quadro, pasta=None):
     """Mede a profundidade do rosto e do fundo no quadro e devolve (baixo, alto) do corte.
@@ -1375,16 +1380,48 @@ def _calibrar_corte(r, p, t, comp, quadro, pasta=None):
     return round(fundo + .3 * (face - fundo), 3), round(fundo + .6 * (face - fundo), 3)
 
 
-def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, corte=None, borda=0.0, desfoque=1.0, metodo="profundidade"):
-    """Recorta a pessoa da V1 no trecho [ini_s, fim_s] (segundos da timeline) e põe o recorte numa trilha NOVA,
-    logo acima de `acima_da_trilha` (padrão: no topo). Tudo que está entre a V1 e o recorte (motion, lettering,
-    objeto) fica ATRÁS da pessoa. A V1 não é tocada; o recorte é uma cópia do mesmo trecho com o mesmo
-    enquadramento e uma composição Fusion (MediaIn > DepthMap > MatteControl > MediaOut), editável no Fusion.
-    corte=(baixo, alto): limites do mapa de profundidade (0-1); sem ele, calibra pelo rosto (_calibrar_corte).
-    borda: MatteContractExpand (negativo encolhe a borda); desfoque: MatteBlur. Devolve (item, corte).
-    metodo="magicmask": quando a profundidade não separa (pessoa encostada na parede, fundo na mesma distância),
-    monta MediaIn > MagicMask > MediaOut e PARA: o usuário pinta a pessoa no Fusion e clica em rastrear (o
-    rastreio do Magic Mask não anda por script). Devolve (item, None)."""
+def _colar_magic_mask(comp, ref, pos, neg, modo="Faster", nome="PintarPessoa"):
+    """Cola um MagicMask com os cliques no quadro `ref` (quadro-chave animado, como o traço feito na tela)."""
+    pts = lambda L: ", ".join("{ %s, %s }" % (x, y) for x, y in L)
+    txt = """{ Tools = ordered() {
+  %s = MagicMask { Inputs = {
+    Mode = Input { Value = FuID { "%s" }, },
+    ReferenceTime = Input { Value = %d, Disabled = true, },
+    UseLegacyMagicMask = Input { Value = 0, Disabled = true, },
+    Strokes = Input { SourceOp = "%sStrokes", Source = "Value", }, }, },
+  %sStrokes = BezierSpline { SplineColor = { Red = 242, Green = 186, Blue = 59 }, NameSet = true,
+    KeyFrames = { [%d] = { 0, Flags = { Linear = true, LockedY = true }, Value = MagicMaskStrokes {
+      PosStrokes = { %s }, NegStrokes = { %s } } } } } } }""" % (nome, modo, ref, nome, nome, ref, pts(pos), pts(neg))
+    antes = subprocess.run(["pbpaste"], capture_output=True).stdout
+    try:   # a área de transferência do usuário volta como estava
+        subprocess.run(["pbcopy"], input=txt.encode())
+        comp.Lock(); velho = comp.FindTool(nome); velho and velho.Delete(); comp.Paste(); comp.Unlock()
+    finally:
+        subprocess.run(["pbcopy"], input=antes)
+    mm = comp.FindTool(nome)
+    if not mm:
+        raise RuntimeError("o Fusion não colou o MagicMask (Paste da área de transferência)")
+    return mm
+
+
+def magic_rastreado(item, nome="PintarPessoa"):
+    """(primeiro, último, completo?) dos quadros com máscara depois do rastreio pela tela."""
+    comp = item.GetFusionCompByIndex(1); mm = comp.FindTool(nome); a = comp.GetAttrs()
+    lo, hi = mm.GetInput("ProcessedFramesLow"), mm.GetInput("ProcessedFramesHigh")
+    return lo, hi, lo <= a["COMPN_RenderStart"] and hi >= a["COMPN_RenderEnd"]
+
+
+def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, metodo="magicmask", modo="Faster", corte=None, borda=0.0, desfoque=1.0):
+    """Recorta a pessoa da V1 no trecho [ini_s, fim_s] (segundos da timeline) numa trilha NOVA "PESSOA NA FRENTE",
+    logo acima de `acima_da_trilha` (padrão: no topo). Tudo entre a V1 e o recorte (motion, lettering, objeto) fica
+    ATRÁS da pessoa. A V1 não é tocada: o recorte é uma cópia do trecho (só vídeo, mesmo enquadramento) com uma
+    composição Fusion que FICA na timeline para o usuário ajustar (regra do usuário, 23/10/2026).
+    metodo="magicmask" (padrão, o que o usuário usa): MediaIn > PintarPessoa (MagicMask, modo Faster) > MediaOut, com
+    cliques positivos por dentro da pessoa + cabelo + objetos que ela segura e negativos no fundo, tirados do recorte
+    de sujeito da Apple (scripts/sujeito.py) num quadro de referência. A máscara desse quadro já sai pronta; FALTA o
+    rastreio: abrir o Fusion no clipe, clicar "Track Fwd Then Reverse" no Inspector e conferir magic_rastreado().
+    metodo="profundidade": DepthMap + MatteControl, sem rastreio (corte=(baixo, alto) ou calibrado pelo rosto).
+    Devolve (item, info)."""
     pagina_edit()
     F = fps_tl(t); S = t.GetStartFrame(); a = S + round(ini_s * F); b = S + round(fim_s * F)
     base = next((x for x in (t.GetItemListInTrack("video", 1) or []) if x.GetStart() <= a < x.GetEnd()), None)
@@ -1412,9 +1449,28 @@ def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, corte=None
     mi, mo = comp.FindTool("MediaIn1"), comp.FindTool("MediaOut1")
     novo.SetClipColor("Pink")
     if metodo == "magicmask":
-        comp.Lock(); mm = comp.AddTool("MagicMask", -32768, -32768); mm.SetAttrs({"TOOLS_Name": "PintarPessoa"})
-        mm.ConnectInput("Input", mi); mo.ConnectInput("Input", mm); comp.Unlock()
-        return novo, None
+        import tempfile
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import sujeito
+        ca = comp.GetAttrs(); ini_c, fim_c = int(ca["COMPN_RenderStart"]), int(ca["COMPN_RenderEnd"])
+        # tempo da composição começa em 0 no INÍCIO do clipe (testado 23/10: trecho com 180 quadros de entrada
+        # deu RenderStart 0); a foto de referência vem do quadro da FONTE correspondente
+        ref = ini_c + min(12, (fim_c - ini_c) // 2)
+        q_fonte = src + round((ref - ini_c) * r_)
+        png = os.path.join(tempfile.mkdtemp(prefix="gab_magic_"), "ref.png")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", m.GetClipProperty("File Path"), "-vf",
+                        f"select=eq(n\\,{q_fonte})", "-frames:v", "1", png], check=True)
+        pt = sujeito.pontos(png)
+        # Paste só vale na composição ATIVA do Fusion (na timeline nova falhou com a página Edit aberta):
+        # cabeça de leitura no clipe (trilha mais alta) e página Fusion antes de colar.
+        t.SetCurrentTimecode(_tc(t, a + 1)); r.OpenPage("fusion"); time.sleep(1)
+        ativa = r.Fusion().GetCurrentComp()
+        if not ativa or ativa.GetAttrs("COMPS_Name") != comp.GetAttrs("COMPS_Name") or not ativa.FindTool("MediaIn1"):
+            raise RuntimeError("o Fusion abriu outra composição; a cópia da pessoa precisa ser a trilha mais alta no ponto")
+        comp = ativa; mi, mo = comp.FindTool("MediaIn1"), comp.FindTool("MediaOut1")
+        mm = _colar_magic_mask(comp, ref, pt["pos"], pt["neg"], modo)
+        comp.Lock(); mm.ConnectInput("Input", mi); mo.ConnectInput("Input", mm); comp.Unlock()
+        comp.CurrentTime = ref; comp.SetActiveTool(mm); comp.CurrentFrame.ViewOn(mm, 1)
+        return novo, {"ref": ref, "positivos": len(pt["pos"]), "negativos": len(pt["neg"]), "falta": "rastrear na tela"}
     comp.Lock()   # travar SÓ para criar e ligar: valor gravado dentro do Lock não sai no render (davinci_api.md)
     dm = comp.AddTool("DepthMap", -32768, -32768); dm.SetAttrs({"TOOLS_Name": "Profundidade"})
     mc = comp.AddTool("MatteControl", -32768, -32768); mc.SetAttrs({"TOOLS_Name": "Recorte"})
