@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-42 (23/10/2026)
+- **Cor não pega mais nos motions:** se você arrastar um motion para uma trilha de takes, a LUT do Gab pula ele sozinha.
 ## 2026.10.23-41 (23/10/2026)
 - **Fotos na timeline com movimento:** toda foto entra com um zoom bem leve por keyframe (aproxima ou afasta), para não ficar parada. Dá para ajustar no Fusion do clipe.
 - **Fotos com a duração certa:** antes a foto entrava com 5 s fixos ou travava a montagem; agora ocupa exatamente o trecho planejado.

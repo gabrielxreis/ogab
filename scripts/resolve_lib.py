@@ -397,6 +397,8 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1, lut=None):
     r.OpenPage("color"); res = []
     for x in t.GetItemListInTrack("video", trilha) or []:
         arq = x.GetMediaPoolItem().GetClipProperty("File Path")
+        if arq and f"{os.sep}motions{os.sep}" in arq:   # motion não recebe grade (o motion pode estar numa trilha de takes)
+            res.append((x.GetName(), "motion (pulado)", True)); continue
         iph = bool(arq and os.path.exists(arq) and eh_iphone(arq))
         if iph and drx_iphone and os.path.exists(drx_iphone):
             res.append((x.GetName(), "iphone", bool(x.GetNodeGraph().ApplyGradeFromDRX(drx_iphone, 0)))); continue
