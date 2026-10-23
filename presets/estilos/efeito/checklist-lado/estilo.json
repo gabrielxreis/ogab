@@ -1,0 +1,10 @@
+{
+ "id": "checklist-lado", "grupo": "efeito", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Checklist ao lado da cabeça", "en": "Checklist beside the head"},
+ "desc": {"pt": "Cartão escuro pequeno na parede ao lado da cabeça; cada passo ganha um check verde quando é dito.",
+          "en": "Small dark card on the wall beside the head; each step gets a green check as it is said."},
+ "quando": "3 passos curtos ditos em sequência ('primeiro, depois, por fim'), método, rotina; um item por fala",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "EM 3 PASSOS"},
+            "itens": {"tipo": "lista", "exemplo": [{"texto": "Roteiro", "em": 0.9}, {"texto": "Gravar", "em": 1.7}, {"texto": "Postar", "em": 2.5}]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

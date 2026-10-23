@@ -1,0 +1,9 @@
+{
+ "id": "mundo-interface", "grupo": "efeito", "camada": "atras", "precisa": ["recorte", "rosto"],
+ "nome": {"pt": "Você dentro do app", "en": "You inside the app"},
+ "desc": {"pt": "A sala some e vira um app de conversa claro; a barra de pergunta digita o seu pedido acima da sua cabeça.",
+          "en": "The room disappears into a light chat app; the prompt bar types your request above your head."},
+ "quando": "falar de IA, pedir algo a um assistente, 'eu só pedi isso', mostrar o comando/pergunta que a pessoa usou",
+ "campos": {"pedido": {"tipo": "texto", "exemplo": "Edita meu vídeo com legenda"}, "app": {"tipo": "texto", "exemplo": "Assistente"}},
+ "exemplo": {"de": 0.3, "ate": 3.8}
+}

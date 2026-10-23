@@ -1,0 +1,9 @@
+{
+ "id": "orbita-telas", "grupo": "efeito", "camada": "ambas", "precisa": ["recorte", "rosto", "imagem"],
+ "nome": {"pt": "Telas em órbita", "en": "Orbiting screens"},
+ "desc": {"pt": "Telas de celular com vídeos rodando giram em volta de você: passam atrás da cabeça e voltam pela frente, abaixo do queixo.",
+          "en": "Phone screens playing videos orbit around you: they pass behind your head and come back in front, below the chin."},
+ "quando": "falar de Reels/TikTok/conteúdo, 'meus vídeos', volume de postagens, 'o algoritmo', virada do gancho (1 a 3 s)",
+ "campos": {"telas": {"tipo": "lista", "exemplo": []}, "voltas": {"tipo": "numero", "exemplo": 0.6}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

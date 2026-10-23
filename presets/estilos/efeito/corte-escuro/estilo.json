@@ -1,0 +1,9 @@
+{
+ "id": "corte-escuro", "grupo": "efeito", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Corte pelo escuro", "en": "Cut through the dark"},
+ "desc": {"pt": "O quadro se fecha com força numa parte escura da imagem, fica preto por um instante e a próxima cena abre dali.",
+          "en": "The frame closes hard into a dark spot of the shot, goes black for an instant and the next scene opens from there."},
+ "quando": "transição entre cenas/assuntos, 'mas aí...', mudança de tempo ou lugar; pôr \"corte\" no segundo exato do corte do vídeo. Com zoom de verdade: somar um zoom da LENTE no mesmo trecho",
+ "campos": {"ponto": {"tipo": "xy", "exemplo": null}, "corte": {"tipo": "tempo", "exemplo": null}},
+ "exemplo": {"de": 0.6, "ate": 1.8}
+}

@@ -1,0 +1,10 @@
+{
+ "id": "quebra-moldura", "grupo": "efeito", "camada": "frente", "precisa": ["video", "silhueta", "rosto"],
+ "nome": {"pt": "Sair da tela do celular", "en": "Breaking out of the phone"},
+ "desc": {"pt": "O vídeo encolhe para dentro de uma tela de celular arredondada sobre o fundo escuro e desfocado, e a sua cabeça sai pela borda, em 3D.",
+          "en": "The video shrinks into a rounded phone screen over a dark blurred background, and your head breaks out over the edge, in 3D."},
+ "quando": "'sai da tela', virada do gancho, falar de redes/Reels/celular, momento de impacto em que a pessoa 'pula' para fora do vídeo",
+ "base": {"desfoque": 24, "escurecer": 0.22},
+ "campos": {},
+ "exemplo": {"de": 0.4, "ate": 3.2}
+}

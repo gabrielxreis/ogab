@@ -1,0 +1,9 @@
+{
+ "id": "grafico-neon", "grupo": "efeito", "camada": "atras", "precisa": ["recorte", "rosto"],
+ "nome": {"pt": "Gráfico neon atrás", "en": "Neon chart behind"},
+ "desc": {"pt": "Uma linha de gráfico brilhante atravessa a sala atrás de você subindo, e o número final acende em neon acima da cabeça.",
+          "en": "A glowing chart line crosses the room behind you, climbing, and the final number lights up in neon above your head."},
+ "quando": "resultado, crescimento, antes e depois em número ('saí de 200 para 40 mil', '+312% de alcance'), virada de curva",
+ "campos": {"numero": {"tipo": "texto", "exemplo": "+312%"}, "rotulo": {"tipo": "texto", "exemplo": "de alcance"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

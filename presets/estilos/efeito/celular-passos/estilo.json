@@ -1,0 +1,12 @@
+{
+ "id": "celular-passos", "grupo": "efeito", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Celular com passo a passo", "en": "Phone with steps"},
+ "desc": {"pt": "Um celular escuro entra pela borda ao seu lado, a lista de passos se enche e o botão é tocado até virar \"Pronto\".",
+          "en": "A dark phone slides in from the edge beside you, the step list fills up and the button is tapped until it reads \"Done\"."},
+ "quando": "tutorial rápido, 'é só fazer isso, isso e isso', processo em 2 a 4 passos que termina numa ação (publicar, enviar, comprar)",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "Seu vídeo"},
+            "passos": {"tipo": "lista", "exemplo": [{"texto": "Corta as pausas", "em": 0.9}, {"texto": "Põe a legenda", "em": 1.5}, {"texto": "Escolhe a música", "em": 2.1}]},
+            "botao": {"tipo": "texto", "exemplo": "Publicar"},
+            "pronto": {"tipo": "texto", "exemplo": "Pronto"}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}
