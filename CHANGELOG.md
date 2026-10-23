@@ -1,5 +1,7 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.23-24 (23/10/2026)
+- **Cada estilo com uma pessoa diferente:** as prévias dos estilos no menu agora usam um vídeo real diferente para cada estilo (banco de vídeos gratuitos filtrado: rosto de frente, nítido e sem ficar claro demais).
+## 2026.10.23-24 (23/10/2026)
 - **Exemplos com gente de verdade:** os GIFs dos presets Destaque, Palco, Órbita, Lente e Podcast agora mostram pessoas reais (vídeos de banco gratuito), com a cabeça e o rosto sempre inteiros. O de Respostas ficou no centro da tela.
 - **Podcast com legenda na linha do meio:** no preset de podcast a legenda agora fica sobre a linha que divide os dois vídeos, onde dá para ler sem tapar ninguém. Quem quiser o jeito antigo (abaixo do queixo) pede `"legenda": "rosto"`.
 ## 2026.10.23-23 (23/10/2026)
