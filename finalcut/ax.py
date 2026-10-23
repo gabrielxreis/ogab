@@ -79,7 +79,7 @@ def _timeline():
     fila = [AXUIElementCreateApplication(pid())]
     while fila:
         e = fila.pop(0)
-        if attr(e, "AXRole") == "AXLayoutArea" and attr(e, "AXDescription") == "Project Timeline":
+        if attr(e, "AXRole") == "AXLayoutArea" and attr(e, "AXDescription") in ("Project Timeline", "Linha do Tempo do Projeto"):   # Final Cut em inglês ou português
             return e
         fila.extend(list(attr(e, "AXChildren") or []))
     raise SystemExit("timeline não encontrada (abra um projeto)")
@@ -101,8 +101,8 @@ def itens(fps=24):
         bordas = {str(attr(h, "AXDescription")): attr(h, "AXValue") for h in (attr(e, "AXHandles") or [])}
         p = ponto(attr(e, "AXPosition"), kAXValueCGPointType); sz = ponto(attr(e, "AXSize"), kAXValueCGSizeType)
         it = {"tipo": tipo, "nome": nome, "dur": tc(attr(e, "AXValue"), fps) if attr(e, "AXValue") else None,
-              "ini": tc(bordas["Leading Edge"], fps) if bordas.get("Leading Edge") else None,
-              "fim": tc(bordas["Trailing Edge"], fps) if bordas.get("Trailing Edge") else None,
+              "ini": tc(bordas.get("Leading Edge") or bordas.get("Margem Principal"), fps) if (bordas.get("Leading Edge") or bordas.get("Margem Principal")) else None,
+              "fim": tc(bordas.get("Trailing Edge") or bordas.get("Margem Posterior"), fps) if (bordas.get("Trailing Edge") or bordas.get("Margem Posterior")) else None,
               "y": round(p.y) if p else None, "h": round(sz.height) if sz else None, "selecionado": bool(attr(e, "AXSelected")), "_e": e}
         out.append(it)
     return out

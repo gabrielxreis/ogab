@@ -24,7 +24,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 VERSAO = "1.11"
 APP = "/Applications/Final Cut Pro Creator Studio.app"
-DTD = APP + "/Contents/Frameworks/Interchange.framework/Versions/A/Resources/FCPXMLv1_11.dtd"
+DTD_REL = "/Contents/Frameworks/Interchange.framework/Versions/A/Resources/FCPXMLv1_11.dtd"   # o app pode ser "Final Cut Pro" ou "... Creator Studio"
 # Final Cut mede tamanho E posição do título numa escala de 1080 de altura: no vertical 1080x1920 tudo é x1080/1920.
 BASIC_TITLE = ".../Titles.localized/Bumper:Opener.localized/Basic Title.localized/Basic Title.moti"
 POS_KEY = "9999/999166631/999166633/1/100/101"   # parâmetro Position do Basic Title
@@ -182,7 +182,7 @@ class Projeto:
 
 def validar(arq):
     import shutil, tempfile
-    dtd = os.path.join(tempfile.gettempdir(), "FCPXMLv1_11.dtd"); shutil.copy(DTD, dtd)   # xmllint não aceita espaço no caminho
+    dtd = os.path.join(tempfile.gettempdir(), "FCPXMLv1_11.dtd"); shutil.copy(app_fcp() + DTD_REL, dtd)   # xmllint não aceita espaço no caminho
     r = subprocess.run(["xmllint", "--noout", "--dtdvalid", dtd, arq], capture_output=True, text=True)
     return r.returncode == 0, r.stderr.strip()
 
