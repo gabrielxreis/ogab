@@ -1,0 +1,24 @@
+{
+ "id": "zoom-blur",
+ "grupo": "ritmo",
+ "motor": "davinci",
+ "camada": "frente",
+ "precisa": [
+  "palavras"
+ ],
+ "nome": {
+  "pt": "Zoom com desfoque",
+  "en": "Zoom blur"
+ },
+ "desc": {
+  "pt": "Passagem de corte com zoom rápido, desfoque de movimento e uma luz quente vazando no canto.",
+  "en": "Cut transition with a fast zoom, motion blur and a warm light leak in the corner."
+ },
+ "quando": "troca de assunto, virada do gancho para o conteúdo, entrada de uma lista; no máximo 1 a cada 4-5 s",
+ "campos": {},
+ "como": "DaVinci: import ritmo (presets/estilos/ritmo/ritmo.py); ritmo.aplicar(item, \"zoom-blur\", palavras) grava keyframes num Transform do Fusion do clipe com R.animar_clipe (nunca re-renderizar o take, regra 1h2). Sem DaVinci: ritmo.chaves(...) dá os mesmos zooms para a LENTE do motor cena.",
+ "exemplo": {
+  "de": 0.2,
+  "ate": 4.6
+ }
+}

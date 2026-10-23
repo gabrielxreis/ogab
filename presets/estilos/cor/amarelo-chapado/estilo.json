@@ -1,0 +1,37 @@
+{
+ "id": "amarelo-chapado",
+ "grupo": "cor",
+ "motor": "cena",
+ "camada": "atras",
+ "precisa": [
+  "recorte",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Amarelo chapado",
+  "en": "Flat butter yellow"
+ },
+ "desc": {
+  "pt": "A sala some: você fica sobre um fundo amarelo-manteiga liso, com cartões de borda branca atrás.",
+  "en": "The room disappears: you stand on a flat butter-yellow background with white-edged cards behind you."
+ },
+ "quando": "vídeo leve e didático, dica rápida, conteúdo de marca pessoal; o vídeo inteiro (de 0 até o fim) ou um bloco",
+ "campos": {
+  "etiquetas": {
+   "tipo": "lista",
+   "exemplo": [
+    "Dica rápida",
+    "Passo 1"
+   ]
+  },
+  "fundo": {
+   "tipo": "cor",
+   "exemplo": "#F4D97E"
+  }
+ },
+ "como": "Motor cena, camada atras (liga o recorte da pessoa sozinho): \"estilos\": [{\"id\": \"amarelo-chapado\", \"de\": 0, \"ate\": <duração>}] no plano do presets/cena/gerar.py.",
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.4
+ }
+}

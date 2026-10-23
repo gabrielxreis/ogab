@@ -1,0 +1,24 @@
+{
+ "id": "pastel-azul",
+ "grupo": "cor",
+ "motor": "lut",
+ "camada": "frente",
+ "precisa": [],
+ "nome": {
+  "pt": "Pastel azulado",
+  "en": "Blue pastel"
+ },
+ "desc": {
+  "pt": "Tons pastel lavados puxando para o azul, clima leve e calmo.",
+  "en": "Washed pastel tones leaning blue, a light and calm mood."
+ },
+ "quando": "lifestyle, rotina, viagem, vídeo calmo ou de manhã; evitar quando a pele já está pálida",
+ "campos": {},
+ "lut": "presets/estilos/cor/pastel-azul/pastel-azul.cube",
+ "lut_davinci": "OGAB ESTILOS/pastel-azul.cube",
+ "como": "DaVinci: python3 presets/estilos/cor/luts.py instalar (uma vez; copia o .cube para a pasta MASTER de LUTs, subpasta OGAB ESTILOS), depois R.aplicar_grade(r, t, drx=None, lut=\"OGAB ESTILOS/pastel-azul.cube\") (Graph.SetLUT no nó 1 de cada take, no lugar da LUT DO GAB) e conferir com GetNodeGraph().GetLUT(1). Sem DaVinci: ffmpeg -vf lut3d=pastel-azul.cube.",
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.4
+ }
+}

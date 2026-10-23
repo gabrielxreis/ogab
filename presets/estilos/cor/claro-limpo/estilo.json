@@ -1,0 +1,24 @@
+{
+ "id": "claro-limpo",
+ "grupo": "cor",
+ "motor": "lut",
+ "camada": "frente",
+ "precisa": [],
+ "nome": {
+  "pt": "Claro e limpo",
+  "en": "Bright and clean"
+ },
+ "desc": {
+  "pt": "Imagem clara, contraste suave e brancos limpos, sem puxar cor.",
+  "en": "Bright image, soft contrast and clean neutral whites."
+ },
+ "quando": "tutorial, produto, saúde, beleza, ambiente claro; salva gravação um pouco escura",
+ "campos": {},
+ "lut": "presets/estilos/cor/claro-limpo/claro-limpo.cube",
+ "lut_davinci": "OGAB ESTILOS/claro-limpo.cube",
+ "como": "DaVinci: python3 presets/estilos/cor/luts.py instalar (uma vez; copia o .cube para a pasta MASTER de LUTs, subpasta OGAB ESTILOS), depois R.aplicar_grade(r, t, drx=None, lut=\"OGAB ESTILOS/claro-limpo.cube\") (Graph.SetLUT no nó 1 de cada take, no lugar da LUT DO GAB) e conferir com GetNodeGraph().GetLUT(1). Sem DaVinci: ffmpeg -vf lut3d=claro-limpo.cube.",
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.4
+ }
+}

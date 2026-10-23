@@ -1,0 +1,28 @@
+{
+ "id": "quente-cinema",
+ "grupo": "cor",
+ "motor": "lut",
+ "camada": "frente",
+ "precisa": [],
+ "nome": {
+  "pt": "Quente de cinema",
+  "en": "Warm cinema"
+ },
+ "desc": {
+  "pt": "Cor quente e leve, contraste de filme e uma vinheta discreta nas bordas.",
+  "en": "Light warm grade, film-like contrast and a subtle edge vignette."
+ },
+ "quando": "história, depoimento, bastidor, vídeo emocional; pele fica dourada sem laranja forte",
+ "campos": {},
+ "lut": "presets/estilos/cor/quente-cinema/quente-cinema.cube",
+ "lut_davinci": "OGAB ESTILOS/quente-cinema.cube",
+ "vinheta": {
+  "9x16": "presets/estilos/cor/quente-cinema/vinheta_9x16.png",
+  "16x9": "presets/estilos/cor/quente-cinema/vinheta_16x9.png"
+ },
+ "como": "DaVinci: python3 presets/estilos/cor/luts.py instalar (uma vez; copia o .cube para a pasta MASTER de LUTs, subpasta OGAB ESTILOS), depois R.aplicar_grade(r, t, drx=None, lut=\"OGAB ESTILOS/quente-cinema.cube\") (Graph.SetLUT no nó 1 de cada take, no lugar da LUT DO GAB) e conferir com GetNodeGraph().GetLUT(1). A vinheta é a imagem vinheta_9x16.png (ou 16x9) numa trilha acima de tudo, modo Normal, o vídeo inteiro. Sem DaVinci: ffmpeg -vf lut3d=quente-cinema.cube.",
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.4
+ }
+}

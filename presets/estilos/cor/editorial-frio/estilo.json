@@ -1,0 +1,28 @@
+{
+ "id": "editorial-frio",
+ "grupo": "cor",
+ "motor": "lut",
+ "camada": "frente",
+ "precisa": [],
+ "nome": {
+  "pt": "Editorial frio",
+  "en": "Cool editorial"
+ },
+ "desc": {
+  "pt": "Sala mais escura e verde-azulada, pele preservada, vinheta e nenhum grão.",
+  "en": "Darker teal-green room, skin kept natural, vignette and no grain."
+ },
+ "quando": "autoridade, negócios, análise, entrevista séria; a pele é protegida pela própria LUT",
+ "campos": {},
+ "lut": "presets/estilos/cor/editorial-frio/editorial-frio.cube",
+ "lut_davinci": "OGAB ESTILOS/editorial-frio.cube",
+ "vinheta": {
+  "9x16": "presets/estilos/cor/editorial-frio/vinheta_9x16.png",
+  "16x9": "presets/estilos/cor/editorial-frio/vinheta_16x9.png"
+ },
+ "como": "DaVinci: python3 presets/estilos/cor/luts.py instalar (uma vez; copia o .cube para a pasta MASTER de LUTs, subpasta OGAB ESTILOS), depois R.aplicar_grade(r, t, drx=None, lut=\"OGAB ESTILOS/editorial-frio.cube\") (Graph.SetLUT no nó 1 de cada take, no lugar da LUT DO GAB) e conferir com GetNodeGraph().GetLUT(1). A vinheta é a imagem vinheta_9x16.png (ou 16x9) numa trilha acima de tudo, modo Normal, o vídeo inteiro. Sem DaVinci: ffmpeg -vf lut3d=editorial-frio.cube.",
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.4
+ }
+}

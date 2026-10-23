@@ -1,0 +1,25 @@
+{
+ "id": "dois-enquadramentos",
+ "grupo": "ritmo",
+ "motor": "davinci",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Dois enquadramentos",
+  "en": "Two framings"
+ },
+ "desc": {
+  "pt": "Um take só vira duas câmeras: aberto e fechado se alternam a cada frase, com corte seco.",
+  "en": "One take becomes two cameras: wide and close alternate on every line, with hard cuts."
+ },
+ "quando": "entrevista, podcast ou fala longa num take só; precisa de resolução sobrando (4K ou 1080 com o rosto grande)",
+ "campos": {},
+ "como": "DaVinci: import ritmo (presets/estilos/ritmo/ritmo.py); ritmo.aplicar(item, \"dois-enquadramentos\", palavras) grava keyframes num Transform do Fusion do clipe com R.animar_clipe (nunca re-renderizar o take, regra 1h2). Sem DaVinci: ritmo.chaves(...) dá os mesmos zooms para a LENTE do motor cena.",
+ "exemplo": {
+  "de": 0.2,
+  "ate": 4.6
+ }
+}

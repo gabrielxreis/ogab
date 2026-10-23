@@ -1,0 +1,39 @@
+{
+ "id": "circulo-marca",
+ "grupo": "ritmo",
+ "motor": "cena",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Círculo da marca",
+  "en": "Brand circle"
+ },
+ "desc": {
+  "pt": "Um círculo na cor da marca cresce de um canto, cobre a tela com o nome da próxima parte e se abre no rosto.",
+  "en": "A brand-colour circle grows from a corner, fills the screen with the next part's name and opens on the face."
+ },
+ "quando": "passagem para a próxima parte do vídeo (capítulo, passo 2, 'agora a prática'); 1,2 a 2 s, no corte entre os blocos",
+ "campos": {
+  "texto": {
+   "tipo": "texto",
+   "exemplo": "Parte 2"
+  },
+  "linha": {
+   "tipo": "texto",
+   "exemplo": "agora vem a"
+  },
+  "ponto": {
+   "tipo": "ponto",
+   "exemplo": [
+    0.86,
+    0.78
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 1.0,
+  "ate": 2.8
+ }
+}

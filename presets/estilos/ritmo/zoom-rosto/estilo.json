@@ -1,0 +1,25 @@
+{
+ "id": "zoom-rosto",
+ "grupo": "ritmo",
+ "motor": "davinci",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Zoom no rosto",
+  "en": "Face zoom"
+ },
+ "desc": {
+  "pt": "Frase curta ganha um punch-in rápido no rosto; frase longa aproxima devagar e volta.",
+  "en": "Short lines get a quick punch-in on the face; long lines push in slowly and ease back."
+ },
+ "quando": "frase de efeito curta (punch) e explicação longa (aproximação lenta); sempre centrado no rosto",
+ "campos": {},
+ "como": "DaVinci: import ritmo (presets/estilos/ritmo/ritmo.py); ritmo.aplicar(item, \"zoom-rosto\", palavras) grava keyframes num Transform do Fusion do clipe com R.animar_clipe (nunca re-renderizar o take, regra 1h2). Sem DaVinci: ritmo.chaves(...) dá os mesmos zooms para a LENTE do motor cena.",
+ "exemplo": {
+  "de": 0.2,
+  "ate": 4.6
+ }
+}

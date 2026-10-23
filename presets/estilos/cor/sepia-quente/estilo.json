@@ -1,0 +1,24 @@
+{
+ "id": "sepia-quente",
+ "grupo": "cor",
+ "motor": "lut",
+ "camada": "frente",
+ "precisa": [],
+ "nome": {
+  "pt": "Sépia quente",
+  "en": "Warm sepia"
+ },
+ "desc": {
+  "pt": "Sépia quente e suave com pretos lavados, cara de lembrança.",
+  "en": "Soft warm sepia with lifted blacks, like a memory."
+ },
+ "quando": "memória, 'antes', história antiga, trecho de flashback; usar em trecho, não no vídeo todo",
+ "campos": {},
+ "lut": "presets/estilos/cor/sepia-quente/sepia-quente.cube",
+ "lut_davinci": "OGAB ESTILOS/sepia-quente.cube",
+ "como": "DaVinci: python3 presets/estilos/cor/luts.py instalar (uma vez; copia o .cube para a pasta MASTER de LUTs, subpasta OGAB ESTILOS), depois R.aplicar_grade(r, t, drx=None, lut=\"OGAB ESTILOS/sepia-quente.cube\") (Graph.SetLUT no nó 1 de cada take, no lugar da LUT DO GAB) e conferir com GetNodeGraph().GetLUT(1). Sem DaVinci: ffmpeg -vf lut3d=sepia-quente.cube.",
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.4
+ }
+}

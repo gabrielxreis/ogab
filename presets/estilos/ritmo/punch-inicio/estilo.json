@@ -1,0 +1,25 @@
+{
+ "id": "punch-inicio",
+ "grupo": "ritmo",
+ "motor": "davinci",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Punch no início da frase",
+  "en": "Punch at each line"
+ },
+ "desc": {
+  "pt": "Zoom seco no começo de cada frase: o plano muda sempre, sem precisar de outra câmera.",
+  "en": "A snappy zoom at the start of every line, so the shot always changes without a second camera."
+ },
+ "quando": "talking head de um take só, fala corrida, Reels e Shorts que precisam de movimento sem b-roll",
+ "campos": {},
+ "como": "DaVinci: import ritmo (presets/estilos/ritmo/ritmo.py); ritmo.aplicar(item, \"punch-inicio\", palavras) grava keyframes num Transform do Fusion do clipe com R.animar_clipe (nunca re-renderizar o take, regra 1h2). Sem DaVinci: ritmo.chaves(...) dá os mesmos zooms para a LENTE do motor cena.",
+ "exemplo": {
+  "de": 0.2,
+  "ate": 4.6
+ }
+}
