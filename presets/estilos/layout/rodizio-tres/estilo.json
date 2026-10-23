@@ -1,0 +1,12 @@
+{
+ "id": "rodizio-tres", "grupo": "layout", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Rodízio de três", "en": "Three-way rotation"},
+ "desc": {"pt": "A cada ideia o quadro alterna: prova em cima do rosto, rosto com uma palavra grande, prova em tela cheia.",
+          "en": "Each idea switches the frame: proof above your face, your face with one big word, full-screen proof."},
+ "quando": "vídeo de argumento com várias provas (prints, dados, notícias); trechos de 1 a 3 s cada, um por ideia",
+ "campos": {"trechos": {"tipo": "lista", "exemplo": [
+   {"modo": "prova", "de": 0.4, "ate": 1.8, "titulo": "Alcance do perfil", "texto": "últimos 30 dias"},
+   {"modo": "palavra", "de": 1.8, "ate": 3.0, "palavra": "TRIPLICOU"},
+   {"modo": "tela", "de": 3.0, "ate": 4.5, "titulo": "Mesma conta, mesmo nicho", "texto": "só mudou a edição"}]}},
+ "exemplo": {"de": 0.4, "ate": 4.5}
+}

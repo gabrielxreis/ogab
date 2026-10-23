@@ -1,0 +1,12 @@
+{
+ "id": "faixa-topo", "grupo": "layout", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Faixa no topo", "en": "Top band"},
+ "desc": {"pt": "Uma faixa clara desce até acima da sua cabeça e troca citação, foto de arquivo e número de prova; o rosto fica livre.",
+          "en": "A clean band drops down to just above your head and cycles a quote, an archive photo and a proof number; your face stays clear."},
+ "quando": "história com fonte, citação de alguém, dado ou resultado, foto antiga; vídeos de explicação e documentário curto",
+ "campos": {"itens": {"tipo": "lista", "exemplo": [
+   {"tipo": "citacao", "texto": "Quem edita rápido posta todo dia.", "autor": "um editor cansado", "em": 0.6},
+   {"tipo": "foto", "legenda": "Rio de Janeiro, 1998", "em": 1.6},
+   {"tipo": "numero", "valor": "+312%", "texto": "de alcance em 30 dias", "em": 2.5}]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

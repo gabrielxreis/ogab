@@ -1,0 +1,10 @@
+{
+ "id": "lousa-acima", "grupo": "layout", "camada": "atras", "precisa": ["recorte", "rosto"],
+ "nome": {"pt": "Lousa acima da cabeça", "en": "Wall above the head"},
+ "desc": {"pt": "Todo o texto vive na parede vazia acima de você, frase por frase, passando atrás do cabelo; nada no corpo.",
+          "en": "All the text lives on the empty wall above you, line by line, tucked behind your hair; nothing on your body."},
+ "quando": "vídeo inteiro de fala com parede livre; frases-chave curtas; marque a palavra forte entre *asteriscos*",
+ "campos": {"frases": {"tipo": "lista", "exemplo": [{"texto": "Edição boa é *invisível*", "em": 0.5}, {"texto": "o público só *sente*", "em": 1.9}]},
+            "cor": {"tipo": "texto", "exemplo": "#ffffff"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

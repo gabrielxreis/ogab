@@ -1,0 +1,10 @@
+{
+ "id": "espaco-acima", "grupo": "layout", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Espaço acima da cabeça", "en": "Headroom graphics"},
+ "desc": {"pt": "O plano fica como está e um cartão com título e etiquetas flutua no espaço livre acima da sua cabeça.",
+          "en": "The shot stays as is and a card with a title and tags floats in the free space above your head."},
+ "quando": "qualquer fala com um ponto-chave; plano com sobra de parede acima da cabeça; reforço sem tirar o rosto do centro",
+ "campos": {"linha": {"tipo": "texto", "exemplo": "passo 1"}, "titulo": {"tipo": "texto", "exemplo": "Corte o silêncio"},
+            "itens": {"tipo": "lista", "exemplo": [{"texto": "pausas", "em": 1.1}, {"texto": "respiros", "em": 1.3}, {"texto": "erros", "em": 1.5}]}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

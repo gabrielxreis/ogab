@@ -1,0 +1,62 @@
+{
+ "id": "recorte-cartoes",
+ "grupo": "layout",
+ "camada": "atras",
+ "precisa": [
+  "recorte",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Recorte com cartões",
+  "en": "Cutout with cards"
+ },
+ "desc": {
+  "pt": "A sala atrás de você desfoca e escurece, com bolhas de luz; um título, cartões e selos flutuam entre a sala e você.",
+  "en": "The room behind you blurs and dims with soft light orbs; a title, cards and badges float between the room and you."
+ },
+ "quando": "apresentação de tema, lista de ferramentas ou marcas, 'o que você vai aprender', abertura de vídeo explicativo",
+ "campos": {
+  "titulo": {
+   "tipo": "texto",
+   "exemplo": "3 apps que editam por você"
+  },
+  "destaque": {
+   "tipo": "texto",
+   "exemplo": "editam"
+  },
+  "cartoes": {
+   "tipo": "lista",
+   "exemplo": [
+    {
+     "texto": "Cortes automáticos",
+     "em": 0.7
+    },
+    {
+     "texto": "Legenda pronta",
+     "em": 1.0
+    }
+   ]
+  },
+  "logos": {
+   "tipo": "lista",
+   "exemplo": [
+    {
+     "texto": "Nuvem",
+     "em": 1.3
+    },
+    {
+     "texto": "Faro",
+     "em": 1.5
+    }
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.6
+ },
+ "base": {
+  "desfoque": 18,
+  "escurecer": 0.3
+ }
+}

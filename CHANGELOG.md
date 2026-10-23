@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-19 (23/10/2026)
+- **8 layouts novos (estilos):** recorte com cartões flutuando e a sala desfocada, canvas colagem azul com vídeos e adesivos, gráficos no espaço acima da cabeça, faixa no topo para citação, foto de arquivo e número, lousa acima da cabeça, rodízio de três (prova em cima, palavra grande, prova em tela cheia), polaroid narrador (você numa polaroid no canto ao lado do print) e antes e depois. Aparecem no passo Layout do menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-18 (23/10/2026)
 - **11 batidas visuais novas (estilos):** logos com o papel de cada um, logos ligados por setas, palavra única na virada, roleta de logos, pilha de comparação de produtos, palavra clímax atrás da pessoa, frase cinética em tela cheia com ícones, citação no topo, rótulo de montagem, interface plana de patrocínio e cabeçalho de progresso da lista. Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-17 (23/10/2026)

@@ -1,0 +1,10 @@
+{
+ "id": "antes-depois", "grupo": "layout", "camada": "frente", "precisa": ["imagem"],
+ "nome": {"pt": "Antes e depois", "en": "Before and after"},
+ "desc": {"pt": "Tela cheia com cabeçalho: o Antes pequeno e apagado à esquerda e o Depois grande à direita, sobre um fundo com padrão suave.",
+          "en": "Full screen with a header: a small faded Before on the left and a big After on the right, over a soft patterned background."},
+ "quando": "transformação, resultado de cliente, versão velha e nova, ajuste de edição/cor/design; 2 a 4 s",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "A mesma cena, editada"},
+            "antes": {"tipo": "imagem", "exemplo": {"rotulo": "Antes"}}, "depois": {"tipo": "imagem", "exemplo": {"rotulo": "Depois"}}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

@@ -1,0 +1,11 @@
+{
+ "id": "canvas-colagem", "grupo": "layout", "camada": "atras", "precisa": ["recorte", "rosto"],
+ "nome": {"pt": "Canvas colagem", "en": "Collage canvas"},
+ "desc": {"pt": "A sala vira um fundo azul suave com cartões de vídeo inclinados, borda branca e adesivos em volta de você.",
+          "en": "The room becomes a soft blue canvas with tilted white-bordered video cards and stickers around you."},
+ "quando": "mostrar vários exemplos, bastidores, portfólio, 'olha o que dá para fazer', antes de um tutorial",
+ "campos": {"midias": {"tipo": "lista", "exemplo": [{"legenda": "Reels", "em": 0.6}, {"legenda": "Shorts", "em": 0.8},
+                                                       {"legenda": "Anúncio", "em": 1.0}, {"legenda": "Aula", "em": 1.2}]},
+            "adesivos": {"tipo": "lista", "exemplo": [{"texto": "UAU", "em": 1.5}, {"texto": "+ views", "em": 1.7}, {"texto": "feito hoje", "em": 1.9}]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

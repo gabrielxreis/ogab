@@ -1,0 +1,10 @@
+{
+ "id": "polaroid-narrador", "grupo": "layout", "camada": "frente", "precisa": ["video", "rosto", "imagem"],
+ "nome": {"pt": "Polaroid narrador", "en": "Polaroid narrator"},
+ "desc": {"pt": "O print ocupa a tela como cartão principal e você narra de dentro de uma polaroid pequena e inclinada no canto.",
+          "en": "The screenshot fills the screen as the main card and you narrate from a small tilted polaroid in the corner."},
+ "quando": "reagir ou comentar um print, post, notícia, site ou app; tutorial de tela com a pessoa explicando",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "seusite.com/precos"}, "imagem": {"tipo": "imagem", "exemplo": ""},
+            "legenda": {"tipo": "texto", "exemplo": "olha isso"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}
