@@ -195,7 +195,11 @@ if __name__ == "__main__":
     a = sys.argv[1:]
     if len(a) < 2:
         raise SystemExit(__doc__)
-    plano = json.load(open(a[0], encoding="utf-8")); x = Projeto(plano).xml()
+    plano = json.load(open(a[0], encoding="utf-8"))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
+    import portao_menu   # portão do menu (23/10/2026): projeto novo só com o menu_escolha.json do vídeo
+    portao_menu.checar(plano.get("pasta") or os.path.dirname(os.path.abspath(a[0])), plano.get("sem_menu"))
+    x = Projeto(plano).xml()
     open(a[1], "w", encoding="utf-8").write(x); print("ok", a[1])
     if "--validar" in a:
         ok, err = validar(a[1]); print("DTD ok" if ok else "DTD FALHOU:\n" + err)

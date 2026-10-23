@@ -22,14 +22,23 @@ def norm(s):
     return re.sub(r"[^a-z0-9]+", "", s)
 
 
+def _seg(v, fps):
+    """Segundos de um tempo da transcrição: número ou timecode HH:MM:SS:FF do DaVinci (motor davinci)."""
+    if isinstance(v, str) and v.count(":") == 3:
+        h, m, sec, fr = (int(x) for x in v.split(":"))
+        return h * 3600 + m * 60 + sec + fr / fps
+    return float(v)
+
+
 def palavras(trans):
     d = json.load(open(trans))
+    fps = float(d.get("fps", 30))
     ws = []
     for s in d["segments"]:
         for w in s.get("words", []):
             t = w.get("text", w.get("word", ""))
             if norm(t):
-                ws.append({"t": t.strip(), "n": norm(t), "s": float(w["start"]), "e": float(w["end"])})
+                ws.append({"t": t.strip(), "n": norm(t), "s": _seg(w["start"], fps), "e": _seg(w["end"], fps)})
     return ws
 
 

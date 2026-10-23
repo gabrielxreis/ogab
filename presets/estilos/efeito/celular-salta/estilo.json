@@ -1,0 +1,10 @@
+{
+ "id": "celular-salta", "grupo": "efeito", "camada": "frente", "precisa": [],
+ "nome": {"pt": "Salta do celular (motion)", "en": "Pops out of the phone (motion)"},
+ "desc": {"pt": "Motion puro: um celular entra em 3D e um cartão com o número ou a frase salta para fora da tela, por cima da borda.",
+          "en": "Pure motion: a phone tilts in and a card with the number or phrase pops out of the screen, over the edge."},
+ "quando": "resultado, número, notificação ou print que 'sai da tela'; abertura de assunto de redes/Reels; cobre a tela inteira (fundo próprio), então serve de inserto entre falas",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "+312%"}, "sub": {"tipo": "texto", "exemplo": "de alcance em 30 dias"},
+            "imagem": {"tipo": "imagem", "exemplo": null}},
+ "exemplo": {"de": 0.2, "ate": 3.4}
+}

@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-40 (23/10/2026)
+- **O menu do vídeo não fica mais de fora:** mesmo quando você começa pedindo só um roteiro ou só a voz e o pedido vira vídeo aos poucos, o Gab abre o menu antes de montar qualquer coisa. Agora é uma trava: sem o menu confirmado, nenhuma timeline, sequência ou rascunho novo é criado (DaVinci, Premiere, CapCut e Final Cut). Quer pular? É só dizer "pode fazer no automático".
 ## 2026.10.23-39 (23/10/2026)
 - **README atualizado:** novidades do menu, da nova ordem da edição com validação por quadros, das prévias com pessoas reais e dos presets Letreiro, Órbita e Lente; print do menu e fluxo novo.
 ## 2026.10.23-38 (23/10/2026)
@@ -42,8 +44,6 @@
 ## 2026.10.23-23 (23/10/2026)
 - **Estilo dos motions em pé:** nesse passo do menu as prévias agora são verticais (9:16), do jeito que o vídeo fica; os outros passos continuam como antes.
 - **Prévia mais bonita:** o vídeo de exemplo dos estilos trocou por um take claro e nítido (o anterior era escuro e desfocado).
-## 2026.10.23-22 (23/10/2026)
-- **16 estilos novos de gancho e legenda:** adesivos empilhados, caixa de 3 segundos, pergunta com logos, rótulo à mão, riscado vs novo, dois pesos, creme contornado e serifa arredondada (ganchos); frase com palavra-chave brilhando, uma palavra por vez, pequena e grande, pílula na palavra-chave, linha e soco, espaçada com serifa, legenda sob o queixo e escada (legendas). Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-22 (23/10/2026)
 - **11 estilos novos de ritmo e cor:** punch no início da frase, zoom com desfoque e luz quente, dois enquadramentos num take só, zoom no rosto, círculo da marca para trocar de parte, e os acabamentos quente de cinema, claro e limpo, pastel azulado, sépia quente, editorial frio (LUTs próprias para o DaVinci) e amarelo chapado. Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-18 (23/10/2026)
@@ -108,6 +108,9 @@
 - **Motion atrás da pessoa, direto no DaVinci:** o Gab recorta a pessoa no Fusion com a IA de profundidade do próprio DaVinci (sem pintar e sem rastrear) e coloca o recorte numa trilha acima do motion; o motion, o lettering ou o objeto ficam atrás da pessoa e continuam editáveis na timeline. O corte é calibrado sozinho pelo rosto. Quando a pessoa está encostada no fundo, ele monta o Magic Mask para você só pintar e clicar em rastrear.
 ## 2026.10.22-7 (22/10/2026)
 - **Menos tokens com imagens:** o Gab passa a olhar quadros, prints e fotos numa cópia de até 1024 px (o arquivo original não muda), o que gasta cerca de 60% menos por imagem. O `doctor` liga isso sozinho no Mac e no Windows; abra o Claude Code de novo depois de atualizar. Para ver um detalhe em tamanho cheio: `scripts/olhar.py recorte`.
+## 2026.10.22-6 (22/10/2026)
+- **Cortes de gravação com a transcrição do DaVinci:** o `cortes.py plano` agora lê a transcrição feita pelo próprio DaVinci (antes quebrava com erro de número). Não precisa fazer nada.
+
 ## 2026.10.22-5 (22/10/2026)
 - **CapCut pela linha de comando:** `capcut/capcut.py` faz no CapCut o que o Gab já fazia no DaVinci, sem clicar: monta ou edita um rascunho a partir de um plano, lista e confere rascunhos (mídia offline, efeito sem arquivo, buraco na V1) e abre o projeto em 1o na tela inicial.
 - **Prévia do CapCut sem o CapCut:** `capcut.py previa` renderiza o rascunho em MP4 direto (vídeo, fundo desfocado, textos, áudio), com o tamanho do texto medido no motor do CapCut. Exportar pelo próprio CapCut continua sendo um clique seu (o diálogo de exportação só aceita comando com o app na frente).
@@ -139,8 +142,9 @@
 - **Storyboard:** não quebra mais quando o texto de uma cena vem em lista (linhas, palavras, grupos).
 
 ## 2026.10.22-2 (22/10/2026)
+- **Preset launch, cenas de texto mais vivas:** `flutuantes` (lista de imagens) espalha cartões nas bordas, atrás da frase, com profundidade e paralaxe. O fecho aceita `tamLogo`.
 - **Preset launch na batida:** `batida` no plano dá um pulso às cenas a cada compasso da música; a lista aceita `cada`/`inicio` para cada item entrar na batida.
-- **Preset launch com vídeo no painel:** a cena `tela` aceita `video` (um MP4 tocando dentro do vidro, por exemplo um mosaico de motions rodando ou uma análise quadro a quadro).
+- **Preset launch com vídeo no painel:** a cena `tela` aceita `quadros` (uma sequência de JPGs que toca dentro do vidro, por exemplo um mosaico de motions rodando ou uma análise quadro a quadro). `<video>` dentro do painel 3D sai deslocado no render, por isso a sequência.
 - **Preset launch, cena nova `editor`:** um DaVinci simulado montando a timeline (voz, takes, legenda, música, b-roll, motion e SFX entrando um por um, com aviso do que a IA está fazendo). Ideal para apresentar produto de edição.
 - **Preset launch:** o fecho agora aceita `tam` como as outras cenas, para a letra ficar grande em vídeo 16:9; o logo aceita `tamFrase` para a frase embaixo dele; e o fundo já começa aceso no primeiro quadro.
 - **Launch, gancho em batidas:** a palavra em destaque da primeira frase agora sai junto com ela (antes ficava por cima da frase seguinte).

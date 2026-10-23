@@ -71,6 +71,9 @@ def plano(arq, projeto_fechado=False):
     p = json.load(open(arq))
     nome = p["nome"]
     existe = any(n == nome for n, *_ in C.rascunhos())
+    if p.get("substituir") or not existe:   # rascunho NOVO: portão do menu (23/10/2026)
+        sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "scripts")); import portao_menu
+        portao_menu.checar(p.get("pasta") or os.path.dirname(os.path.abspath(arq)), p.get("sem_menu"))
     if p.get("substituir") or not existe:
         d = C.novo(nome, p.get("w", 1080), p.get("h", 1920), p.get("fps", 30), substituir=bool(p.get("substituir")))
     else:

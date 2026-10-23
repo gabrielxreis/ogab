@@ -72,7 +72,7 @@ def criar(base_nome, corte_s, ganchos, nomes=None):
             raise SystemExit(f"gancho não é timeline do projeto nem arquivo: {g}")
         if not g_item or g_dur <= 0:
             raise SystemExit(f"não achei a duração do gancho: {g}")
-        t = R.criar_timeline(p, mp, alvo, w, h, fps)
+        t = R.criar_timeline(p, mp, alvo, w, h, fps, sem_menu="variação de gancho de vídeo já montado")
         S = t.GetStartFrame()
         ok_g = mp.AppendToTimeline([{"mediaPoolItem": g_item, "recordFrame": S}])
         corpo_ok = False

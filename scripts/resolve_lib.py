@@ -3,7 +3,7 @@
 Uso típico (python3 com as variáveis de ambiente do Resolve, ver ambiente()):
     from resolve_lib import *
     p, mp = criar_projeto("Assunto - Empresa", 1080, 1920, 30)
-    t = criar_timeline(p, mp, "Reels 60s")
+    t = criar_timeline(p, mp, "Reels 60s", pasta=".../Assunto - Empresa")   # exige o menu_escolha.json
     colocar_narracao(t, mp, ".../narracoes/narracao.wav", db=5)
     colocar_musica(t, mp, ".../musica/faixa.wav", inicio_faixa=64.0, dur=48.4, db=-10, fade=2.5)
     montar_takes(t, mp, [(".../brolls/take_01.mp4", 0.0), (".../brolls/take_02.mp4", 5.1), ...], fim=48.4)
@@ -111,7 +111,10 @@ def _bin(mp, nome):
     return mp.SetCurrentFolder(mp.AddSubFolder(mp.GetRootFolder(), nome))
 
 
-def criar_timeline(p, mp, nome, w=None, h=None, fps=None):
+def criar_timeline(p, mp, nome, w=None, h=None, fps=None, pasta=None, sem_menu=None):
+    """Timeline NOVA. Portão do menu (regra do usuário, 23/10/2026): exige o menu_escolha.json da `pasta` do vídeo,
+    ou `sem_menu="motivo"` (pessoa não quer menu, variação de vídeo já aprovado). Ver scripts/portao_menu.py."""
+    import portao_menu; portao_menu.checar(pasta, sem_menu)
     t = mp.CreateEmptyTimeline(nome); p.SetCurrentTimeline(t)
     if w and h:
         t.SetSetting("useCustomSettings", "1")
@@ -1144,13 +1147,14 @@ def renderizar_trecho(p, pasta, nome, ini, fim, so_v1=True):
         if presas: print("AVISO: trilhas continuam desligadas, religar à mão:", presas)
 
 
-def timeline_com_letterings(p, mp, nome, lista, w=1080, h=1920, fps=30):
+def timeline_com_letterings(p, mp, nome, lista, w=1080, h=1920, fps=30, pasta=None, sem_menu=None):
     """Timeline NOVA (do modelo GAB USA) com os letterings EDITÁVEIS (Fusion Title do pacote) já animados, sem UI.
     Por quê (12/10/2026): título inserido numa timeline que já tem mídia entra SECO (sem animação) e a API só insere na V1;
     numa timeline vazia ele anima. Então: insere os títulos primeiro na V1 vazia, em ordem, e cria uma trilha de vídeo na
     posição 1 (os títulos sobem para a V2 = LETTERING). Depois montar takes na V1, motions acima, áudio e legenda.
     lista = [(TEXTO, inicio_s, template[, centro_y]), ...]."""
-    t = timeline_do_modelo(p, mp, nome, w, h, fps) or criar_timeline(p, mp, nome, w, h, fps)
+    import portao_menu; portao_menu.checar(pasta, sem_menu)
+    t = timeline_do_modelo(p, mp, nome, w, h, fps) or criar_timeline(p, mp, nome, w, h, fps, sem_menu="portão já conferido")
     p.SetCurrentTimeline(t); S = t.GetStartFrame(); F = fps_tl(t)
     # o modelo traz uma V2 "BROLL" DESLIGADA (e a API não religa): apagar toda trilha de vídeo além da V1 antes
     for v in range(t.GetTrackCount("video"), 1, -1): t.DeleteTrack("video", v)

@@ -220,8 +220,11 @@ def abrir_projeto(caminho=None):
     """, "abrir projeto", caminho=caminho, existe=bool(caminho and os.path.exists(caminho)), pastas=PASTAS)
 
 
-def criar_sequencia(nome, midia_base, w=1080, h=1920, fps=30):
-    """Cria a sequência a partir da gravação (herda áudio e cor) e força o quadro w x h e o fps do vídeo."""
+def criar_sequencia(nome, midia_base, w=1080, h=1920, fps=30, pasta=None, sem_menu=None):
+    """Cria a sequência a partir da gravação (herda áudio e cor) e força o quadro w x h e o fps do vídeo.
+    Portão do menu (23/10/2026): exige o menu_escolha.json da `pasta` do vídeo ou sem_menu="motivo"."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
+    import portao_menu; portao_menu.checar(pasta or os.path.dirname(os.path.abspath(midia_base)), sem_menu)
     return js("""
       const p = await proj();
       for (const s of await p.getSequences()) if (s.name === args.nome) { await p.setActiveSequence(s); return s.name; }
