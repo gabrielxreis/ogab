@@ -4,6 +4,6 @@
  "desc": {"pt": "A parede atrás de você se enche de um mosaico de miniaturas, posts e prints, do centro para as bordas.",
           "en": "The wall behind you fills with a mosaic of thumbnails, posts and screenshots, from the centre outwards."},
  "quando": "volume de trabalho ('já fiz mais de 300 vídeos'), portfólio, prova social, 'todo mundo está postando isso', antes de uma virada",
- "campos": {"imagens": {"tipo": "lista", "exemplo": []}},
+ "campos": {"imagens": {"tipo": "imagens", "exemplo": []}},
  "exemplo": {"de": 0.4, "ate": 3.4}
 }
