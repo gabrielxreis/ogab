@@ -1,0 +1,31 @@
+{
+ "id": "pilula-chave",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Pílula na palavra-chave",
+  "en": "Key word pill"
+ },
+ "desc": {
+  "pt": "Frases curtas em até duas linhas; a palavra-chave entra dentro de uma pílula branca no momento em que é dita.",
+  "en": "Short phrases in up to two lines; the key word lands inside a white pill the moment it is spoken."
+ },
+ "quando": "legenda limpa e moderna para tutoriais, dicas e falas de produto",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

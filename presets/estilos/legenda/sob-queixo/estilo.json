@@ -1,0 +1,32 @@
+{
+ "id": "sob-queixo",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Sob o queixo",
+  "en": "Under the chin"
+ },
+ "desc": {
+  "pt": "Uma linha curta em caixa alta pequena colada logo abaixo do queixo, acompanhando o rosto.",
+  "en": "One short small all-caps line sitting right under the chin, following the face."
+ },
+ "quando": "close de rosto, conversa intimista, quando a legenda não pode competir com o resto do quadro",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ],
+   "obs": "opcional"
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "id": "dois-pesos",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Dois pesos",
+  "en": "Two weights"
+ },
+ "desc": {
+  "pt": "Uma linha em caixa alta bem grossa sobre outra em serifa fina, centradas no topo; sobem por máscara e saem em uns 3 segundos.",
+  "en": "A heavy all-caps line over a thin serif line, centred at the top; they rise through a mask and leave after about 3 seconds."
+ },
+ "quando": "gancho em duas partes: ordem + complemento ('PARE DE EDITAR / do jeito difícil')",
+ "campos": {
+  "linha1": {
+   "tipo": "texto",
+   "exemplo": "Pare de editar"
+  },
+  "linha2": {
+   "tipo": "texto",
+   "exemplo": "do jeito difícil"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.4
+ }
+}

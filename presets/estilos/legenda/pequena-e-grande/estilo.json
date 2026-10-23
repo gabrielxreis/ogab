@@ -1,0 +1,31 @@
+{
+ "id": "pequena-e-grande",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Pequena e grande",
+  "en": "Small and big"
+ },
+ "desc": {
+  "pt": "Palavras pequenas em minúsculas e, no meio delas, a palavra-chave da frase bem grande na cor da marca.",
+  "en": "Small lowercase words and, between them, the phrase's key word set very large in the brand colour."
+ },
+ "quando": "falas com um termo que precisa ficar na cabeça (número, nome, benefício)",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

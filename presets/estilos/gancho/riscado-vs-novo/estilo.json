@@ -1,0 +1,39 @@
+{
+ "id": "riscado-vs-novo",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Riscado vs novo",
+  "en": "Crossed out vs new"
+ },
+ "desc": {
+  "pt": "Dois ícones lado a lado no topo: o antigo leva um X vermelho desenhado e apaga, o novo ganha destaque.",
+  "en": "Two icons side by side at the top: the old one gets a hand-drawn red X and fades, the new one lights up."
+ },
+ "quando": "troca de ferramenta, hábito ou método ('larguei X, agora uso Y', 'pare de usar X')",
+ "campos": {
+  "antigo": {
+   "tipo": "texto",
+   "exemplo": "Planilha"
+  },
+  "novo": {
+   "tipo": "texto",
+   "exemplo": "Kora"
+  },
+  "logo_antigo": {
+   "tipo": "logo",
+   "obs": "opcional"
+  },
+  "logo_novo": {
+   "tipo": "logo",
+   "obs": "opcional"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.4
+ }
+}

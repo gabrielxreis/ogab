@@ -1,0 +1,36 @@
+{
+ "id": "rotulo-manuscrito",
+ "grupo": "gancho",
+ "camada": "atras",
+ "precisa": [
+  "recorte",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Rótulo à mão",
+  "en": "Handwritten label"
+ },
+ "desc": {
+  "pt": "O fundo vira uma cor chapada com um rótulo pequeno à mão e um título grande em minúsculas; a sala fica num cartão logo abaixo.",
+  "en": "The background turns into a flat colour with a small handwritten label and a big lowercase title; the room becomes a card underneath."
+ },
+ "quando": "abertura de aula, dica ou série ('antes de gravar', 'erro nº 1'); funciona melhor com a pessoa centralizada",
+ "campos": {
+  "rotulo": {
+   "tipo": "texto",
+   "exemplo": "antes de gravar"
+  },
+  "titulo": {
+   "tipo": "texto",
+   "exemplo": "faça isso primeiro"
+  },
+  "fundo": {
+   "tipo": "cor",
+   "obs": "opcional; padrão a cor da marca"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.6
+ }
+}

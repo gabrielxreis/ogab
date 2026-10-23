@@ -1,0 +1,31 @@
+{
+ "id": "frase-chave-brilho",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Frase com chave brilhante",
+  "en": "Phrase with shining key word"
+ },
+ "desc": {
+  "pt": "Frases curtas aparecendo palavra por palavra; em cada frase uma palavra-chave na cor da marca recebe um reflexo de luz.",
+  "en": "Short phrases appearing word by word; in each one a key word in the brand colour catches a sweep of light."
+ },
+ "quando": "legenda do vídeo inteiro ou de um trecho; falas explicativas com uma ideia central por frase",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

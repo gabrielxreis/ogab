@@ -1,0 +1,31 @@
+{
+ "id": "escada",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Escada",
+  "en": "Staircase"
+ },
+ "desc": {
+  "pt": "As palavras descem em diagonal como degraus no espaço vazio do quadro; a palavra-chave vem em serifa itálica grande e ganha um sublinhado desenhado.",
+  "en": "Words step down diagonally like stairs in the empty part of the frame; the key word comes in a large italic serif and gets a hand-drawn underline."
+ },
+ "quando": "trechos curtos e marcantes com espaço livre no quadro; poucas palavras por vez",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "id": "caixa-3s",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Caixa de 3 segundos",
+  "en": "3-second box"
+ },
+ "desc": {
+  "pt": "Um bloco chapado na cor da marca com a frase do gancho; some sozinho aos 3 segundos e deixa o quadro limpo.",
+  "en": "A flat block in the brand colour with the hook line; it disappears on its own at 3 seconds, leaving a clean frame."
+ },
+ "quando": "gancho escrito que resume a promessa do vídeo; abertura de qualquer assunto",
+ "campos": {
+  "texto": {
+   "tipo": "texto",
+   "exemplo": "Ninguém te conta isso sobre edição"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.6
+ }
+}

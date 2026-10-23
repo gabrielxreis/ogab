@@ -1,0 +1,31 @@
+{
+ "id": "serifa-arredondada",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Serifa e arredondada",
+  "en": "Serif and rounded"
+ },
+ "desc": {
+  "pt": "Uma linha fina em serifa itálica sobre uma palavra grossa e redonda, tudo em minúsculas, com ar de capa de revista.",
+  "en": "A thin italic serif line over one heavy rounded word, all lowercase, with a magazine-cover feel."
+ },
+ "quando": "gancho que termina numa palavra forte (tema, promessa, verbo); tom elegante",
+ "campos": {
+  "linha": {
+   "tipo": "texto",
+   "exemplo": "o jeito mais simples de"
+  },
+  "palavra": {
+   "tipo": "texto",
+   "exemplo": "começar"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.4
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "id": "pergunta-logos",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto",
+  "palavras"
+ ],
+ "nome": {
+  "pt": "Pergunta com logos",
+  "en": "Question with logos"
+ },
+ "desc": {
+  "pt": "A pergunta que você faz fica no topo desde o primeiro quadro, os logos pipocam juntos na palavra-chave e tudo sai no corte.",
+  "en": "The question you ask sits at the top from the first frame, logos pop in together on the key word and everything leaves on the cut."
+ },
+ "quando": "abertura em forma de pergunta que cita marcas, apps ou ferramentas ('qual desses...?', 'X ou Y?')",
+ "campos": {
+  "pergunta": {
+   "tipo": "texto",
+   "exemplo": "Qual desses apps vale a pena?"
+  },
+  "logos": {
+   "tipo": "lista",
+   "exemplo": [
+    {
+     "nome": "Lumo"
+    },
+    {
+     "nome": "Brisa"
+    },
+    {
+     "nome": "Kora"
+    }
+   ],
+   "obs": "cada item: nome e logo (arquivo oficial)"
+  },
+  "chave": {
+   "tipo": "texto",
+   "exemplo": "estilo",
+   "obs": "palavra falada em que os logos entram (ou 'em': segundo do vídeo)"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.4
+ }
+}

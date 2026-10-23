@@ -1,0 +1,31 @@
+{
+ "id": "espacada-serifa",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Espaçada e serifa",
+  "en": "Spaced and serif"
+ },
+ "desc": {
+  "pt": "Linha pequena em caixa alta bem espaçada e, embaixo, a palavra forte em serifa itálica grande subindo de uma máscara.",
+  "en": "A small, widely spaced all-caps line and, under it, the strong word in a large italic serif rising from a mask."
+ },
+ "quando": "tom elegante ou reflexivo: moda, beleza, fé, imóveis, depoimentos",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

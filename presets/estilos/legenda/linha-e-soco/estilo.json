@@ -1,0 +1,31 @@
+{
+ "id": "linha-e-soco",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Linha e soco",
+  "en": "Line and punch"
+ },
+ "desc": {
+  "pt": "Uma linha branca pequena com a fala e, embaixo, as palavras de impacto maiores na cor da marca, saindo do desfoque.",
+  "en": "A small white line with the speech and, below it, the impact words bigger in the brand colour, coming out of a blur."
+ },
+ "quando": "falas com virada ou conclusão forte ('e o resultado foi...', 'isso muda tudo')",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}

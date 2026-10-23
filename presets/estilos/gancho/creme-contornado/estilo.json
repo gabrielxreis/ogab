@@ -1,0 +1,31 @@
+{
+ "id": "creme-contornado",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Creme contornado",
+  "en": "Outlined cream"
+ },
+ "desc": {
+  "pt": "Título em caixa alta creme com contorno marrom e uma linha de apoio caramelo; clima quente e acolhedor.",
+  "en": "An all-caps cream title with a brown outline and a caramel support line; a warm, cosy feel."
+ },
+ "quando": "conteúdo de rotina, comida, casa, família, fé; gancho com tom próximo",
+ "campos": {
+  "titulo": {
+   "tipo": "texto",
+   "exemplo": "Isso mudou minha rotina"
+  },
+  "apoio": {
+   "tipo": "texto",
+   "exemplo": "e leva 5 minutos por dia"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.4
+ }
+}

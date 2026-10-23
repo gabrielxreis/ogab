@@ -1,0 +1,40 @@
+{
+ "id": "adesivos-empilhados",
+ "grupo": "gancho",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Adesivos empilhados",
+  "en": "Stacked stickers"
+ },
+ "desc": {
+  "pt": "Pílulas brancas de borda grossa caem uma sobre a outra acima da sua cabeça, cada uma com um nome em cor e lugar para logo.",
+  "en": "Thick-bordered white pills stack up above your head, each with a coloured name and room for a logo."
+ },
+ "quando": "comparação ou lista curta de opções (marcas, apps, planos) nos primeiros segundos; até 4 itens",
+ "campos": {
+  "itens": {
+   "tipo": "lista",
+   "exemplo": [
+    {
+     "nome": "Lumo",
+     "cor": "#E4473C"
+    },
+    {
+     "nome": "Brisa",
+     "cor": "#2C6BEB"
+    },
+    {
+     "nome": "Kora"
+    }
+   ],
+   "obs": "cada item: nome, cor (opcional, padrão a cor da marca escurecida), logo (opcional, arquivo oficial)"
+  }
+ },
+ "exemplo": {
+  "de": 0.3,
+  "ate": 3.6
+ }
+}

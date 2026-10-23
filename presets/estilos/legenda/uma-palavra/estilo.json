@@ -1,0 +1,32 @@
+{
+ "id": "uma-palavra",
+ "grupo": "legenda",
+ "camada": "frente",
+ "precisa": [
+  "palavras",
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Uma palavra por vez",
+  "en": "One word at a time"
+ },
+ "desc": {
+  "pt": "Cada palavra aparece sozinha, grande, em caixa alta e com sombra suave; as palavras-chave na cor da marca.",
+  "en": "Each word shows up alone, big, all caps with a soft shadow; key words in the brand colour."
+ },
+ "quando": "fala rápida e enérgica, trechos curtos de impacto, vídeos de ritmo acelerado",
+ "campos": {
+  "chave": {
+   "tipo": "lista",
+   "exemplo": [
+    "estilo",
+    "funciona"
+   ],
+   "obs": "opcional"
+  }
+ },
+ "exemplo": {
+  "de": 0.25,
+  "ate": 4.95
+ }
+}
