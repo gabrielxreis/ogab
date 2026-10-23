@@ -43,6 +43,7 @@
 5. **Sem green screen** nem elemento isolado/canal alfa nos takes. Conferir a miniatura antes de baixar.
 6. **Pessoas reais**: nunca gerar rosto realista de pessoa real em cena inventada; usar símbolo, pessoa de costas, foto real fornecida pelo usuário ou ilustração. Voz clonada só se for do próprio usuário/cliente ou autorizada.
 7. **Movimentos nos takes e lettering no gancho: perguntar** antes (a não ser que `config` diga `sempre`/`nunca`).
+7a. **Lettering vem do pacote de títulos instalado no DaVinci, nunca do HyperFrames (regra do usuário, 23/10/2026).** HyperFrames só quando o usuário pedir motion.
 8. Sem travessão (em dash) nos textos para o usuário e nas legendas.
 9. **Diário do projeto: `PROJETO.md` na pasta de cada vídeo** (`<pasta_saida>/<Empresa>/<Assunto> - <Empresa>/PROJETO.md`). Criar logo que a pasta nasce e **atualizar ao fim de cada etapa** (curto, em tópicos, sem copiar roteiro nem transcrição inteiros, que já estão nos seus arquivos):
    - **Status:** etapa atual e o que falta (checklist das etapas 1 a 9, com a 4b da legenda).

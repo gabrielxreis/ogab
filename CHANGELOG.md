@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-2 (23/10/2026)
+- **Lettering volta a sair do seu pacote de títulos do DaVinci:** pedido de lettering, palavra-chave ou texto na tela usa os títulos animados que o instalador colocou no DaVinci (editáveis no Inspector). O HyperFrames só entra quando você pede motion. O Gab não pergunta mais do título OGraf; ele só é usado se você pedir.
 ## 2026.10.23-1 (23/10/2026)
 - **Motion atrás da pessoa com o Magic Mask:** o Gab marca a pessoa sozinho no Magic Mask do Fusion (cabelo, mãos e objetos que ela segura, modo Faster), clica em rastrear e deixa a composição na timeline, numa trilha acima do motion, para você ajustar se precisar. A versão por profundidade virou plano B.
 ## 2026.10.22-8 (22/10/2026)
