@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-26 (23/10/2026)
+- **Destaque com pessoa real:** a prévia do Destaque agora mostra uma pessoa de verdade, e a legenda ganhou contorno mais forte para ler bem até em cima de roupa estampada.
 ## 2026.10.23-25 (23/10/2026)
 - **Zoom no rosto:** o zoom da Lente agora vai certo no rosto da pessoa (antes recortava do canto de cima).
 - **Destaque, Palco e Lente sem erro:** esses motions voltaram a funcionar quando o vídeo não tem cartões da Órbita.
