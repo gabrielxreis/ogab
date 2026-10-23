@@ -143,7 +143,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("muitos", "Muitos", "Lots", "Uma ideia, uma imagem: quase o vídeo todo.", "One idea, one image: almost the whole video.", "dens d3"),
             it("sem", "Sem motion", "No motion", "Só a pessoa, legenda e lettering.", "Just the person, captions and lettering.", "none")]},
         {"id": "estilo", "letra": "E", "unico": False, "max": 3, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
-         "abas": [{"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [{"id": c, "nome": {"pt": C["categorias"][c], "en": CAT_EN.get(c, c)}}
+         "abas": [{"id": "todos", "nome": {"pt": "Todos", "en": "All"}}, {"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [{"id": c, "nome": {"pt": C["categorias"][c], "en": CAT_EN.get(c, c)}}
                   for c in ("apresentador", "ideia", "lista", "dados", "produto", "social", "marca") if c in C["categorias"]],
          "sub": {"pt": "Como os motions vão parecer. Até 3; eles se misturam trecho a trecho.", "en": "How the motion graphics will look. Up to 3; they mix section by section."},
          "itens": est},
@@ -172,8 +172,8 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("real", "Material real", "Real footage", "Vídeo público e acervo (fatos, pessoas, lugares reais).", "Public video and archives (real facts, people, places).", "takes t4"),
             it("sem", "Sem b-roll", "No b-roll", "Só a gravação.", "Only the recording.", "none")]},
         {"id": "musica", "letra": "A", "unico": True, "nome": {"pt": "Música", "en": "Music"},
-         "sub": {"pt": "Escolha pelo sentimento. Toque ▶ para ouvir uma amostra do clima (a música de verdade vem do seu Artlist ou Envato). Na dúvida, deixe no automático: o Gab escolhe pelo assunto.",
-                 "en": "Pick by feeling. Tap ▶ to hear a sketch of the mood (the real track comes from your Artlist or Envato). Not sure? Leave it on automatic: Gab picks by topic."}, "itens": [
+         "sub": {"pt": "Escolha pelo sentimento que o vídeo deve passar (a música vem do seu Artlist ou Envato). Na dúvida, deixe no automático: o Gab escolhe pelo assunto.",
+                 "en": "Pick the feeling the video should carry (the track comes from your Artlist or Envato). Not sure? Leave it on automatic: Gab picks by topic."}, "itens": [
             it("emotiva", "Emocionante", "Moving", "Boa para: história de vida, depoimento, conquista.", "Good for: life story, testimonial, achievement.", "bars m1", extra={"som": "emotiva"}),
             it("epica", "Épica, de cinema", "Epic, cinematic", "Boa para: grande revelação, trailer, momento histórico.", "Good for: big reveal, trailer, historic moment.", "bars m2", extra={"som": "epica"}),
             it("tensa", "Suspense, mistério", "Suspense, mystery", "Boa para: curiosidade, 'você sabia', caso misterioso.", "Good for: curiosity, 'did you know', mystery story.", "bars m3", extra={"som": "tensa"}),
@@ -301,8 +301,6 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 .card[aria-pressed=true]{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.35)}
 .vis{aspect-ratio:var(--ar,4/5);background:#050806;position:relative;overflow:hidden;display:grid;place-items:center}
 .card{display:flex;flex-direction:column}.card .tx{flex:1}
-.play{position:absolute;bottom:10px;right:10px;width:38px;height:38px;border-radius:50%;background:var(--grad);color:var(--ink);display:grid;place-items:center;font-size:14px;z-index:3;box-shadow:0 0 14px rgba(43,255,136,.5);cursor:pointer}
-.play.on{animation:breathe .6s infinite}
 .pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px;font:800 13px "Inter Tight";color:var(--mu)}
 .pager button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--tx);font:800 18px "Inter Tight";cursor:pointer}.pager button:disabled{opacity:.3;cursor:default}
 .vis img{width:100%;height:100%;object-fit:cover;display:block}
@@ -437,7 +435,7 @@ try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
 const N = D.grupos.length; let passo = 0, auto = false; const aba = {};
 const pag = {}, autoPasso = {};   // autoPasso[g] = a pessoa apertou 'Automático neste passo'
-D.grupos.forEach(g => { if (g.abas) aba[g.id] = (g.abas[0].id === "sugeridos" && !D.sugeridos.length) ? g.abas[1].id : g.abas[0].id; });   // 0 = início, 1..N = grupos, N+1 = resumo
+D.grupos.forEach(g => { if (g.abas) aba[g.id] = g.abas[0].id; });   // estilos abrem em "Todos"   // 0 = início, 1..N = grupos, N+1 = resumo
 const $ = s => document.querySelector(s), esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ic = (id, cls = "pi") => D.icones && D.icones[id] ? `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${D.icones[id]}"/></svg>` : "";
 const CHK = '<svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="#04130A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -491,10 +489,10 @@ function render() {
     const g = D.grupos[passo - 1];
     h = `<div class="passo">${T[L].passo(passo, N)}</div><h2><span class="k">${g.letra}</span>${esc(g.nome[L])}</h2>
       <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : (autoPasso[g.id] ? " · <b style='color:var(--amb)'>" + T[L].gab_escolhe + "</b>" : " · <b style='color:var(--mu)'>" + T[L].marque + "</b>")}</p>
-      ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id) && sel[g.id].has(i.id)).length;
+      ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "todos" || (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id)) && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${ic(x.id)}${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
-      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id])) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
-      <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${i.som ? `<span class="play" data-play="${i.som}" title="${T[L].ouvir}">▶</span>` : ""}${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
+      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
+      <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div><div class="pager" id="pager"></div>`;
   } else {
     const man = D.grupos.filter(g => sel[g.id].size).length, tot = D.grupos.length, pct = auto ? 0 : man / tot;
@@ -528,14 +526,14 @@ function render() {
   scrollTo(0, 0);
 }
 function pula(p) { const g = D.grupos[p - 1]; return g && g.id === "estilo" && sel.motions && sel.motions.has("sem"); }
-// cabe tudo na tela, sem letra miúda: cartão entre 180 e 300 px; mede quantas colunas e linhas cabem e,
+// cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; mede quantas colunas e linhas cabem e,
 // se não couber tudo, divide em páginas (‹ 1/2 ›) em vez de rolar ou encolher.
 function ajustar() {
   const g = $(".grid"), pager = $("#pager"); if (!g) return;
   const cards = [...g.children]; cards.forEach(c => c.style.display = "");
   const n = cards.length, gap = 12, W = g.clientWidth;
   const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 58;
-  const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (180 + gap)));
+  const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (160 + gap)));
   let esc_ = null;
   for (let c = ini; c <= fim; c++) {
     g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
@@ -548,31 +546,6 @@ function ajustar() {
   if (paginas > 1) cards.forEach((c, k) => { if (k < pag[gid] * esc_.cap || k >= (pag[gid] + 1) * esc_.cap) c.style.display = "none"; });
   pager.innerHTML = paginas > 1 ? `<button data-pg="-1" ${pag[gid] ? "" : "disabled"}>‹</button><span>${pag[gid] + 1} / ${paginas}</span><button data-pg="1" ${pag[gid] < paginas - 1 ? "" : "disabled"}>›</button>` : "";
 }
-// amostra do clima da música, sintetizada no navegador (não é a música do vídeo)
-let AC = null, tocando = null;
-const CLIMAS = {
-  emotiva: {bpm: 76, onda: "triangle", corte: 1800, acordes: [[60,64,67,72],[55,59,62,67],[57,60,64,69],[53,57,60,65]]},
-  epica: {bpm: 62, onda: "sawtooth", corte: 900, acordes: [[50,57,62,65],[46,53,58,62],[53,57,60,65],[48,55,60,64]]},
-  tensa: {bpm: 54, onda: "sine", corte: 700, acordes: [[45,52,57,60],[45,52,56,59],[44,51,56,59],[45,52,57,60]]},
-  alegre: {bpm: 120, onda: "square", corte: 2600, acordes: [[60,64,67],[65,69,72],[67,71,74],[60,64,67]]},
-  energia: {bpm: 128, onda: "sawtooth", corte: 2200, acordes: [[52,59,64,67],[48,55,60,64],[55,62,67,71],[50,57,62,66]]},
-  corporativa: {bpm: 100, onda: "triangle", corte: 2000, acordes: [[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,65]]},
-  calma: {bpm: 66, onda: "sine", corte: 1200, acordes: [[57,60,64,67],[53,57,60,64],[48,52,55,59],[55,59,62,66]]},
-  delicada: {bpm: 72, onda: "triangle", corte: 1500, acordes: [[64,67,71,76],[60,64,67,72],[62,65,69,74],[59,62,67,71]]}};
-function tocar(id, el) {
-  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
-  if (tocando) { tocando.forEach(o => { try { o.stop(); } catch (e) {} }); tocando = null; document.querySelectorAll(".play.on").forEach(x => x.classList.remove("on")); }
-  const c = CLIMAS[id]; if (!c) return; el.classList.add("on");
-  const dur = 60 / c.bpm * 2, t0 = AC.currentTime + .05, mestre = AC.createGain(), filtro = AC.createBiquadFilter(); tocando = [];
-  filtro.type = "lowpass"; filtro.frequency.value = c.corte; mestre.gain.value = .14; filtro.connect(mestre); mestre.connect(AC.destination);
-  c.acordes.forEach((ac, k) => ac.forEach(nota => {
-    const o = AC.createOscillator(), v = AC.createGain(), ini = t0 + k * dur;
-    o.type = c.onda; o.frequency.value = 440 * Math.pow(2, (nota - 69) / 12);
-    v.gain.setValueAtTime(0, ini); v.gain.linearRampToValueAtTime(.25, ini + Math.min(.08, dur / 4)); v.gain.exponentialRampToValueAtTime(.001, ini + dur * .98);
-    o.connect(v); v.connect(filtro); o.start(ini); o.stop(ini + dur); tocando.push(o);
-  }));
-  setTimeout(() => el.classList.remove("on"), dur * c.acordes.length * 1000);
-}
 addEventListener("resize", ajustar);
 function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }
 document.addEventListener("click", e => {
@@ -580,7 +553,6 @@ document.addEventListener("click", e => {
   const r = e.target.closest("[data-ir]"); if (r) return ir(+r.dataset.ir);
   const ab = e.target.closest("[data-aba]"); if (ab) { const gid = D.grupos[passo - 1].id; aba[gid] = ab.dataset.aba; pag[gid] = 0; return render(); }
   const pg = e.target.closest("[data-pg]"); if (pg) { const gid = D.grupos[passo - 1].id; pag[gid] = (pag[gid] || 0) + (+pg.dataset.pg); return ajustar(); }
-  const pl = e.target.closest("[data-play]"); if (pl) { e.stopPropagation(); return tocar(pl.dataset.play, pl); }
   const b = e.target.closest(".card"); if (b) {
     const g = D.grupos.find(x => x.id === b.dataset.g), s = sel[g.id], id = b.dataset.i;
     if (s.has(id)) s.delete(id);

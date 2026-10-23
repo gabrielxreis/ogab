@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-10 (23/10/2026)
+- **Menu:** os estilos dos motions abrem na aba "Todos"; a música ficou só com o sentimento e os exemplos de uso (sem o botão de amostra), e os cartões cabem melhor numa página só.
 ## 2026.10.23-9 (23/10/2026)
 - **Ícones das plataformas no menu:** as abas e os cartões do passo de formato mostram o ícone do Instagram, TikTok, YouTube, Facebook, LinkedIn e Anúncios.
 ## 2026.10.23-8 (23/10/2026)
