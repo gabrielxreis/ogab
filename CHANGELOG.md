@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-12 (23/10/2026)
+- **Estilos novos (base):** nasceu a família de estilos curtos para o vídeo da pessoa (gancho, legenda, layout, prova, batidas, b-roll animado, efeitos, ritmo e cor), cada um com prévia em loop. Os primeiros: título atrás da cabeça, notificação do celular e notas na parede. Os próximos chegam nos próximos updates e aparecem sozinhos no menu.
 ## 2026.10.23-13 (23/10/2026)
 - **Link para abrir o menu:** quando o Gab abre o `/ogab menu`, ele mostra na conversa um link "Abrir o menu do vídeo" e explica o que fazer, para o caso de o navegador não abrir sozinho.
 ## 2026.10.23-12 (23/10/2026)

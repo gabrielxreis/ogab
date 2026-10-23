@@ -1,0 +1,9 @@
+{
+ "id": "titulo-atras", "grupo": "gancho", "camada": "atras", "precisa": ["recorte", "rosto"],
+ "nome": {"pt": "Título atrás da cabeça", "en": "Title behind the head"},
+ "desc": {"pt": "Linha pequena + palavra gigante na cor da marca, passando atrás de você nos primeiros segundos.",
+          "en": "Small line + a giant word in the brand colour, passing behind you in the first seconds."},
+ "quando": "gancho com uma palavra forte (nome, número, promessa); primeiros 1 a 3 s",
+ "campos": {"linha": {"tipo": "texto", "exemplo": "o segredo do"}, "titulo": {"tipo": "texto", "exemplo": "GANCHO"}},
+ "exemplo": {"de": 0.3, "ate": 3.4}
+}

@@ -22,11 +22,12 @@ plano.json:
   "orbita":  [{"tipo": "checklist", "de": 15, "ate": 19.8, "titulo": "O QUE MUDOU", "itens": [["Aprendi na prática", 15.6]]},
                {"tipo": "progresso", "de": 5, "ate": 8, "titulo": "Seu reel está pronto", "itens": ["Cortes", "Legenda"]},
                {"tipo": "cta", "de": 27.2, "ate": 30, "texto": "MISSÃO", "rotulo": "comenta", "y": 1460}],
-  "lente":    {"zoom": [{"de": 11.0, "ate": 13.4, "escala": 1.25}]} }
+  "lente":    {"zoom": [{"de": 11.0, "ate": 13.4, "escala": 1.25}]},
+  "estilos":  [{"id": "titulo-atras", "de": 0.2, "ate": 3.0, "titulo": "GAB"}] }   # presets/estilos/LEIA.md
 palavras.json: [{"w": "Olá", "ini": 0.0, "fim": 0.3}, ...] (transcrição com tempo por palavra).
 Ênfase "marca": o grupo inteiro vira PÍLULA branca e a palavra ganha marca-texto.
 """
-import json, os, re, shutil, subprocess, sys, unicodedata
+import glob, json, os, re, shutil, subprocess, sys, unicodedata
 
 AQUI = os.path.dirname(os.path.abspath(__file__)); PRESETS = os.path.dirname(AQUI); RAIZ = os.path.dirname(PRESETS)
 FONTES = [("Poppins", f) for f in ("Poppins-Bold.ttf", "Poppins-ExtraBold.ttf", "Poppins-Black.ttf")] + \
@@ -108,7 +109,7 @@ def destaque(palavras, cfg, dur):
 
 
 # ------------------------------------------------------------ camadas HyperFrames
-def camada(nome, modulos, plano_js, pasta, w, h, fps, dur):
+def camada(nome, modulos, plano_js, pasta, w, h, fps, dur, extras=()):
     proj = os.path.join(pasta, f"proj_{nome}"); os.makedirs(os.path.join(proj, "fonts"), exist_ok=True)
     for fam, f in FONTES:
         shutil.copy(os.path.join(RAIZ, "assets", "fontes", fam, f), os.path.join(proj, "fonts"))
@@ -116,6 +117,8 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur):
         shutil.copy(os.path.join(AQUI, "kit", f), proj)
     for m in modulos:
         shutil.copy(os.path.join(PRESETS, m, f"{m}.js"), proj)
+    for x in extras:   # módulos dos ESTILOS (presets/estilos/<grupo>/<id>/<id>.js), carregados antes do despachante
+        shutil.copy(x, proj)
     for c in plano_js.get("orbita") or []:
         for k in c.get("cartoes", []):
             if k.get("_orig"):
@@ -124,10 +127,31 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur):
     open(os.path.join(proj, "plano.js"), "w").write("window.PLANO = " + json.dumps(plano_js, ensure_ascii=False) + ";\n")
     html = open(os.path.join(AQUI, "kit", "index.html")).read()
     for a, b in (("%W%", w), ("%H%", h), ("%FPS%", fps_txt(fps)), ("%DUR%", round(dur, 3)), ("%CAMADA%", nome),
-                 ("%MODULOS%", "\n".join(f'<script src="{m}.js"></script>' for m in modulos))):
+                 ("%MODULOS%", "\n".join([f'<script src="{m}.js"></script>' for m in modulos]   # despachante dos estilos antes
+                                       + [f'<script src="{os.path.basename(x)}"></script>' for x in extras]))):
         html = html.replace(a, str(b))
     open(os.path.join(proj, "index.html"), "w").write(html)
     return proj
+
+
+def estilos_do_plano(itens):
+    """Separa os ESTILOS do plano por camada lendo presets/estilos/<grupo>/<id>/estilo.json.
+    Devolve (frente, atras, arquivos_js, precisa_rosto)."""
+    idx = {}
+    for j in glob.glob(os.path.join(PRESETS, "estilos", "*", "*", "estilo.json")):
+        m = json.load(open(j, encoding="utf-8")); m["_js"] = os.path.join(os.path.dirname(j), m["id"] + ".js"); idx[m["id"]] = m
+    frente, atras, js, rosto = [], [], [], False
+    for it in itens or []:
+        m = idx.get(it["id"])
+        if not m:
+            raise SystemExit(f"estilo desconhecido: {it['id']} (ver presets/estilos/LEIA.md)")
+        it = dict({k: v["exemplo"] for k, v in (m.get("campos") or {}).items() if isinstance(v, dict) and "exemplo" in v}, **it)
+        it["_precisa"] = m.get("precisa") or []
+        (atras if it.get("camada", m.get("camada", "frente")) == "atras" else frente).append(it)
+        if m["_js"] not in js:
+            js.append(m["_js"])
+        rosto = rosto or "rosto" in (m.get("precisa") or [])
+    return frente, atras, js, rosto
 
 
 def fps_txt(fps):
@@ -267,15 +291,23 @@ def gerar(plano, pasta, fazer_render=True):
         for g in frente.get("destaque") or []:
             if g["ini"] < c["ate"] and g["fim"] > c["de"] and g["y"] < c["_base"] + 30:
                 g["y"] = int(min(c["_base"] + 30, h * .9 - g["alto"]))
+    est_frente, est_atras, est_js, est_rosto = estilos_do_plano(plano.get("estilos"))
+    if any("palavras" in (x.get("_precisa") or []) for x in est_frente + est_atras) and plano.get("palavras"):
+        comum["palavras"] = frente["palavras"] = json.load(open(absp(plano["palavras"]), encoding="utf-8"))   # legenda e batidas na fala
+    if est_rosto or est_atras:   # estilos que fogem do rosto recebem a caixa dele a cada 0,5 s
+        comum["rostos"] = [[t_, *map(int, b)] for t_, b in sorted(rosto_cx().items()) if b]
+        frente["rostos"] = comum["rostos"]
+    if est_frente:
+        frente["estilos"] = est_frente; mods.append("estilos")
     atras_cart = []
-    if plano.get("proteger_rosto", True) and mods:
+    if plano.get("proteger_rosto", True) and (frente.get("destaque") or frente.get("orbita")):   # estilos fogem do rosto sozinhos
         atras_cart, _ = proteger_rosto(rosto_cx(), w, h, plano.get("lente"), frente.get("destaque"), frente.get("orbita"))
     projs = {}
     atras_cart = atras_cart + giros
     frente.setdefault("orbita", []).extend(giros)
     if giros and "orbita" not in mods:
         mods.append("orbita")
-    if plano.get("palco") or atras_cart:
+    if plano.get("palco") or atras_cart or est_atras:
         itens = [dict({"y": int(h * .17), "tam": 0, "estilo": "sans"}, **a) for a in plano.get("palco", [])]
         for a in itens:   # palavra gigante que cabe em ~92% da largura
             if not a["tam"]:
@@ -284,9 +316,11 @@ def gerar(plano, pasta, fazer_render=True):
                 luz = luz_fundo(video, (a["de"] + a["ate"]) / 2, a["y"], min(h, a["y"] + a["tam"]), w, h)
                 a["cor"] = "#141414" if luz > 150 else "#ffffff"
                 print(f"  palco '{a['texto']}': fundo {luz:.0f}/255 -> {a['cor']}")
-        projs["palco"] = camada("palco", ["palco"] + (["orbita"] if atras_cart else []), dict(comum, palco=itens, orbita=atras_cart), pasta, w, h, fps, dur)
+        projs["palco"] = camada("palco", ["palco"] + (["orbita"] if atras_cart else []) + (["estilos"] if est_atras else []),
+                                dict(comum, palco=itens, orbita=atras_cart, estilos=est_atras), pasta, w, h, fps, dur,
+                                extras=est_js if est_atras else ())
     if mods:
-        projs["frente"] = camada("frente", mods, frente, pasta, w, h, fps, dur)
+        projs["frente"] = camada("frente", mods, frente, pasta, w, h, fps, dur, extras=est_js if est_frente else ())
     print("camadas:", ", ".join(projs) or "nenhuma")
     if not fazer_render:
         return pasta

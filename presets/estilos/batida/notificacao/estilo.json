@@ -1,0 +1,10 @@
+{
+ "id": "notificacao", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Notificação do celular", "en": "Phone notification"},
+ "desc": {"pt": "Um aviso de celular desce do topo com a frase que você acabou de dizer.",
+          "en": "A phone notification slides down from the top with the line you just said."},
+ "quando": "fala que vira aviso: venda feita, mensagem recebida, lembrete, resultado chegando",
+ "campos": {"app": {"tipo": "texto", "exemplo": "Gab"}, "titulo": {"tipo": "texto", "exemplo": "Vídeo pronto"},
+            "texto": {"tipo": "texto", "exemplo": "Seu reel foi editado e já pode ser postado."}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

@@ -1,0 +1,40 @@
+{
+ "id": "notas-parede",
+ "grupo": "efeito",
+ "camada": "frente",
+ "precisa": [
+  "rosto"
+ ],
+ "nome": {
+  "pt": "Notas na parede",
+  "en": "Notes on the wall"
+ },
+ "desc": {
+  "pt": "Bilhetes de papel colam na parede em volta da sua cabeça, um a cada fala, sem cobrir o rosto.",
+  "en": "Paper notes stick to the wall around your head, one per line, never over the face."
+ },
+ "quando": "lista falada, várias ideias rápidas, 'o que eu ouvi', manchetes ou opiniões",
+ "campos": {
+  "itens": {
+   "tipo": "lista",
+   "exemplo": [
+    {
+     "texto": "Corta o silêncio",
+     "em": 0.6
+    },
+    {
+     "texto": "Legenda que acompanha",
+     "em": 1.4
+    },
+    {
+     "texto": "Música na emoção",
+     "em": 2.2
+    }
+   ]
+  }
+ },
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.8
+ }
+}
