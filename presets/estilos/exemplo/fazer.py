@@ -1,9 +1,9 @@
 """Prévia (exemplo.mp4) de cada ESTILO sobre um TAKE REAL de pessoa (vídeo de banco com licença livre; nunca apresentador
 ilustrado, regra do usuário 23/10/2026). O take fica só no cache; no repositório vai só o GIF pequeno.
 
-  python3 presets/estilos/exemplo/fazer.py <id> [<id> ...] [--trab <pasta>] [--todos] [--faltando]
+  python3 presets/estilos/exemplo/fazer.py <id> [<id> ...] [--trab <pasta>] [--todos] [--faltando] [--paralelo N]
 
-Monta uma vez a "gravação" e o "recorte" do take real (cache em --trab, padrão ~/.cache/ogab_estilos_real),
+Monta uma vez a "gravação" e o "recorte" do take real (cache em --trab, padrão ~/.cache/ogab_estilos_claro),
 aplica o estilo com os campos de exemplo do estilo.json (tempos em "exemplo": {"de", "ate"}) pelo motor CENA
 (presets/cena/gerar.py) e grava presets/estilos/<grupo>/<id>/exemplo.mp4 (360 px, sem som; o menu toca em loop).
 --todos refaz todos; --faltando só os que ainda não têm exemplo.mp4.
@@ -15,8 +15,8 @@ CENA = os.path.join(PRESETS, "cena")
 FALA = ["Olha", "esse", "estilo", "aqui", "no", "seu", "vídeo,", "funciona", "em", "qualquer", "assunto."]
 
 
-TAKE = {"url": "https://www.pexels.com/download/video/7261920/", "de": 8.0,   # take real, licença livre do Pexels
-        "fonte": "Pexels 7261920 (licença Pexels: uso livre, com modificação)"}
+TAKE = {"url": "https://www.pexels.com/download/video/6962123/", "de": 4.0, "descer": 330,   # claro e nítido (o 7261920 era
+        "fonte": "Pexels 6962123 (licença Pexels: uso livre, com modificação)"}                 # escuro e desfocado)
 DUR = 5.0
 
 
@@ -32,7 +32,7 @@ def gravacao(trab):
     if not os.path.exists(bruto):
         subprocess.run(["curl", "-sL", "-A", "Mozilla/5.0", "-o", bruto, TAKE["url"]], check=True)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(TAKE["de"]), "-t", str(DUR), "-i", bruto, "-vf",
-                    "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=24", "-an",
+                    f"scale=1080:-2,split[a][b];[a]crop=1080:2:0:0,scale=1080:{TAKE['descer']}[t];[t][b]vstack,crop=1080:1920:0:0,fps=24", "-an",
                     "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", g], check=True)
     subprocess.run([sys.executable, os.path.join(CENA, "recorte.py"), g, r, "--w", "1080"], check=True)
     t, pal = .3, []
@@ -69,9 +69,9 @@ def fazer(eid, pasta_estilo, trab):
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    trab = os.path.expanduser(a[a.index("--trab") + 1]) if "--trab" in a else os.path.expanduser("~/.cache/ogab_estilos_real")
+    trab = os.path.expanduser(a[a.index("--trab") + 1]) if "--trab" in a else os.path.expanduser("~/.cache/ogab_estilos_claro")
     todos = estilos()
-    ids = [x for x in a if not x.startswith("--") and x != trab]
+    ids = [x for k, x in enumerate(a) if not x.startswith("--") and x != trab and not (k and a[k - 1] == "--paralelo")]
     if "--todos" in a:
         ids = list(todos)
     if "--faltando" in a:
@@ -82,4 +82,19 @@ if __name__ == "__main__":
     for i in ids:
         if i not in todos:
             raise SystemExit(f"estilo desconhecido: {i}")
-        fazer(i, todos[i], trab)
+    def motor(i):
+        return json.load(open(os.path.join(todos[i], "estilo.json"), encoding="utf-8")).get("motor", "cena")
+    fora = [i for i in ids if motor(i) != "cena"]   # ritmo (davinci/lente) e cor (lut) têm prévia própria
+    if fora:
+        print("pulando (motor próprio, prévia pelo script do grupo):", " ".join(fora), flush=True)
+    ids = [i for i in ids if i not in fora]
+    n = int(a[a.index("--paralelo") + 1]) if "--paralelo" in a else 1
+    from concurrent.futures import ThreadPoolExecutor
+    def um(i):
+        try:
+            fazer(i, todos[i], trab); return i, None
+        except Exception as e:
+            return i, str(e)[-200:]
+    with ThreadPoolExecutor(n) as ex:
+        for i, erro in ex.map(um, ids):
+            print(("FALHOU " + i + ": " + erro) if erro else ("pronto " + i), flush=True)

@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-23 (23/10/2026)
+- **Estilo dos motions em pé:** nesse passo do menu as prévias agora são verticais (9:16), do jeito que o vídeo fica; os outros passos continuam como antes.
+- **Prévia mais bonita:** o vídeo de exemplo dos estilos trocou por um take claro e nítido (o anterior era escuro e desfocado).
 ## 2026.10.23-22 (23/10/2026)
 - **16 estilos novos de gancho e legenda:** adesivos empilhados, caixa de 3 segundos, pergunta com logos, rótulo à mão, riscado vs novo, dois pesos, creme contornado e serifa arredondada (ganchos); frase com palavra-chave brilhando, uma palavra por vez, pequena e grande, pílula na palavra-chave, linha e soco, espaçada com serifa, legenda sob o queixo e escada (legendas). Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-22 (23/10/2026)

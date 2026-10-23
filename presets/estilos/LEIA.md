@@ -71,7 +71,7 @@ ESTILO["meu-estilo"] = (it, C) => {          // it = item do plano (de, ate + ca
 6. Visual: limpo, sem clichês de `docs/etapas/motion_proibidos.md`.
 
 ## Testar
-1. `python3 presets/estilos/exemplo/fazer.py <id>` (render sobre o take real, cache em ~/.cache/ogab_estilos_real).
+1. `python3 presets/estilos/exemplo/fazer.py <id>` (render sobre o take real, cache em ~/.cache/ogab_estilos_claro).
 2. Olhar 2 a 3 quadros da prévia (`ffmpeg -i exemplo.mp4 -vf "select=eq(n\,30)" -frames:v 1 q.png`): rosto livre, nada
    cortado, texto legível, cor da marca.
 3. Plano real: `"estilos": [{"id": "...", "de": 1.0, "ate": 3.5, ...campos}]` no plano do `presets/cena/gerar.py`.

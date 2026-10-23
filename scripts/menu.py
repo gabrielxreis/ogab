@@ -577,7 +577,7 @@ function render() {
       <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : (autoPasso[g.id] ? " · <b style='color:var(--amb)'>" + T[L].gab_escolhe + "</b>" : " · <b style='color:var(--mu)'>" + T[L].marque + "</b>")}</p>
       ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "todos" || (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id)) && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${ic(x.id)}${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
-      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
+      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : g.id === "estilo" ? "--ar:9/16" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
       <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}${i.seu ? `<span class="tag">${T[L].seu}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div><div class="pager" id="pager"></div>`;
   } else {
@@ -619,7 +619,9 @@ function ajustar() {
   const cards = [...g.children]; cards.forEach(c => c.style.display = "");
   const n = cards.length, gap = 12, W = g.clientWidth;
   const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 16;
-  const ini = Math.max(2, Math.ceil((W + gap) / (260 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (160 + gap)));
+  const alto = getComputedStyle(g).getPropertyValue("--ar").trim() === "9/16";   // estilo dos motions: cartões em pé, mais colunas
+  const cmax = alto ? 210 : 260, cmin = alto ? 136 : 160, cmed = alto ? 168 : 200;
+  const ini = Math.max(2, Math.ceil((W + gap) / (cmax + gap))), fim = Math.max(ini, Math.floor((W + gap) / (cmin + gap)));
   let col = null;
   g.style.maxHeight = "none"; g.style.overflowY = "visible";
   for (let c = ini; c <= fim; c++) {
@@ -628,7 +630,7 @@ function ajustar() {
     if (linhas * alt + (linhas - 1) * gap <= H) { col = c; break; }
   }
   if (!col) {   // não cabe: rola
-    col = Math.min(fim, Math.max(ini, Math.floor((W + gap) / (200 + gap))));
+    col = Math.min(fim, Math.max(ini, Math.floor((W + gap) / (cmed + gap))));
     g.style.maxHeight = Math.max(240, H) + "px"; g.style.overflowY = "auto";
   }
   g.style.gridTemplateColumns = `repeat(${col}, 1fr)`;
