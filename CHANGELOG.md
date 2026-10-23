@@ -1,5 +1,7 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.23-22 (23/10/2026)
+- **16 estilos novos de gancho e legenda:** adesivos empilhados, caixa de 3 segundos, pergunta com logos, rótulo à mão, riscado vs novo, dois pesos, creme contornado e serifa arredondada (ganchos); frase com palavra-chave brilhando, uma palavra por vez, pequena e grande, pílula na palavra-chave, linha e soco, espaçada com serifa, legenda sob o queixo e escada (legendas). Aparecem no menu assim que ganharem a prévia com vídeo real.
+## 2026.10.23-22 (23/10/2026)
 - **11 estilos novos de ritmo e cor:** punch no início da frase, zoom com desfoque e luz quente, dois enquadramentos num take só, zoom no rosto, círculo da marca para trocar de parte, e os acabamentos quente de cinema, claro e limpo, pastel azulado, sépia quente, editorial frio (LUTs próprias para o DaVinci) e amarelo chapado. Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-18 (23/10/2026)
 - **Prévias em vídeo:** no menu, a prévia de cada estilo agora é um vídeo curto em loop com pessoa real (mais nítido e bem mais leve que GIF). Estilos com prévia de apresentador desenhado saíram do menu e voltam conforme ganham a prévia com take real.
