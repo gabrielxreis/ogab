@@ -1,0 +1,17 @@
+{
+ "id": "cursor-numero", "grupo": "prova", "camada": "frente", "precisa": ["rosto", "imagem"],
+ "nome": {"pt": "Cursor no número", "en": "Cursor on the number"},
+ "desc": {"pt": "O print de uma ferramenta ou tabela aparece, o cursor desliza até o número, clica e ele fica marcado, com a fonte num rótulo pequeno.",
+          "en": "A screenshot of a tool or table shows up, the cursor glides to the number, clicks and it gets marked, with the source in a small label."},
+ "quando": "fala que mostra um resultado num painel, planilha ou relatório ('olha aqui o número', 'deu tanto no mês'); print real vem do cliente",
+ "campos": {
+  "imagem": {"tipo": "imagem", "exemplo": "", "nota": "print real (do cliente); vazio = tabela ilustrada fictícia com as linhas abaixo"},
+  "alvo": {"tipo": "numeros", "exemplo": [0.8, 0.7], "nota": "onde está o número no print (fração x, y)"},
+  "titulo": {"tipo": "texto", "exemplo": "Pedidos por mês"},
+  "colunas": {"tipo": "lista", "exemplo": ["Mês", "Pedidos", "Receita"]},
+  "linhas": {"tipo": "lista", "exemplo": [["Julho", "312", "R$ 21.400"], ["Agosto", "455", "R$ 30.050"], ["Setembro", "690", "R$ 48.900"]]},
+  "destaque": {"tipo": "numero", "exemplo": 2, "nota": "linha da tabela ilustrada que recebe o clique (0 = primeira)"},
+  "fonte": {"tipo": "texto", "exemplo": "Fonte: painel da loja"}
+ },
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}

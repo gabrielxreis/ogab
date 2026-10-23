@@ -1,0 +1,13 @@
+{
+ "id": "post-social", "grupo": "prova", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Post de rede social", "en": "Social post card"},
+ "desc": {"pt": "Um cartão de post genérico flutua na tela com nome, texto e curtidas; o coração enche na cor da marca.",
+          "en": "A generic post card floats on screen with name, text and likes; the heart fills in the brand colour."},
+ "quando": "fala que cita o que alguém postou ou comentou ('um seguidor escreveu', 'olha o que disseram'); é ilustração: print real vem do cliente",
+ "campos": {"nome": {"tipo": "texto", "exemplo": "Marina Exemplo"}, "usuario": {"tipo": "texto", "exemplo": "@marina.exemplo"},
+            "tempo": {"tipo": "texto", "exemplo": "2 h"},
+            "texto": {"tipo": "texto", "exemplo": "Comecei a legendar os meus vídeos e as visualizações dobraram na mesma semana."},
+            "curtidas": {"tipo": "texto", "exemplo": "12,4 mil"}, "comentarios": {"tipo": "texto", "exemplo": "318"},
+            "avatar": {"tipo": "imagem", "exemplo": "", "nota": "foto de perfil (opcional); vazio = inicial do nome"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

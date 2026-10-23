@@ -1,0 +1,17 @@
+{
+ "id": "materia-marcatexto", "grupo": "prova", "camada": "frente", "precisa": ["rosto", "imagem"],
+ "nome": {"pt": "Matéria com marca-texto", "en": "Article with highlighter"},
+ "desc": {"pt": "O print da matéria entra, a câmera chega no trecho e um marca-texto passa na frase, com a fonte e a data embaixo.",
+          "en": "The article screenshot comes in, the view moves to the passage and a highlighter sweeps the sentence, with source and date below."},
+ "quando": "fala que cita notícia, estudo ou reportagem ('saiu no jornal', 'uma pesquisa mostrou'); a prova é o print real do cliente",
+ "campos": {
+  "imagem": {"tipo": "imagem", "exemplo": "", "nota": "print real da matéria (do cliente); vazio = página ilustrada fictícia"},
+  "foco": {"tipo": "numeros", "exemplo": [0.5, 0.45], "nota": "ponto do trecho no print (fração x, y) para o zoom"},
+  "marca": {"tipo": "numeros", "exemplo": [0.08, 0.40, 0.92, 0.52], "nota": "retângulo da frase no print (frações x0, y0, x1, y1)"},
+  "titulo": {"tipo": "texto", "exemplo": "Vídeo curto vira a principal porta de entrada das marcas"},
+  "trecho": {"tipo": "texto", "exemplo": "quem assiste até o fim lembra da mensagem três vezes mais"},
+  "fonte": {"tipo": "texto", "exemplo": "Jornal Exemplo"},
+  "data": {"tipo": "texto", "exemplo": "12 out 2026"}
+ },
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}

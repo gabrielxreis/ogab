@@ -1,0 +1,14 @@
+{
+ "id": "chat-robos", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Robôs conversando", "en": "Bots chatting"},
+ "desc": {"pt": "Um grupo de chat onde robôs com nome e avatar conversam entre si e se chamam por @menções.",
+          "en": "A group chat where named bots with avatars talk to each other and call each other with @mentions."},
+ "quando": "fala sobre agentes de IA trabalhando juntos, automações que se passam tarefas, equipe de assistentes; tela ilustrada",
+ "campos": {"sala": {"tipo": "texto", "exemplo": "equipe-de-conteudo"},
+            "robos": {"tipo": "lista", "exemplo": [{"nome": "Roteirista"}, {"nome": "Editor"}, {"nome": "Revisor"}]},
+            "mensagens": {"tipo": "lista", "nota": "{de: índice do robô, texto, em: segundo do vídeo (opcional)}; @nome vira menção",
+                          "exemplo": [{"de": 0, "texto": "Roteiro pronto. @Editor pode cortar?"},
+                                      {"de": 1, "texto": "Cortado em 42 s. @Revisor confere a legenda?"},
+                                      {"de": 2, "texto": "Legenda ok. Pode publicar."}]}},
+ "exemplo": {"de": 0.4, "ate": 4.0}
+}

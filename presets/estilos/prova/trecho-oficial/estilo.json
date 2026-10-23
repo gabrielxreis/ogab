@@ -1,0 +1,10 @@
+{
+ "id": "trecho-oficial", "grupo": "prova", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Selo de trecho oficial", "en": "Official clip label"},
+ "desc": {"pt": "Um selo discreto no canto diz de onde vem o trecho de vídeo que está passando (canal, evento, data).",
+          "en": "A discreet corner label says where the video clip on screen comes from (channel, event, date)."},
+ "quando": "quando o editor coloca um trecho de vídeo oficial (entrevista, palestra, jogo, anúncio) como prova do que a pessoa disse; o vídeo é do editor, o estilo só faz o selo",
+ "campos": {"rotulo": {"tipo": "texto", "exemplo": "Trecho oficial"}, "origem": {"tipo": "texto", "exemplo": "Canal Exemplo"},
+            "data": {"tipo": "texto", "exemplo": "mar 2024"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

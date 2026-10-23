@@ -1,0 +1,12 @@
+{
+ "id": "chat-agenda", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Link vira evento na agenda", "en": "Link becomes a calendar event"},
+ "desc": {"pt": "Num chat, o cursor clica num link e a tela vira uma agenda da semana onde o evento cai no horário certo.",
+          "en": "In a chat, the cursor clicks a link and the screen turns into a week calendar where the event drops into its slot."},
+ "quando": "fala de marcar reunião, call, gravação, consulta ou aula ('é só clicar e já entra na agenda'); tela ilustrada",
+ "campos": {"mensagem": {"tipo": "texto", "exemplo": "Fechado! Te mandei o convite da gravação."},
+            "link": {"tipo": "texto", "exemplo": "Convite: Gravação do episódio"},
+            "evento": {"tipo": "texto", "exemplo": "Gravação"}, "hora": {"tipo": "texto", "exemplo": "14:00"},
+            "dia": {"tipo": "numero", "exemplo": 3, "nota": "0 = segunda ... 4 = sexta"}},
+ "exemplo": {"de": 0.4, "ate": 4.0}
+}

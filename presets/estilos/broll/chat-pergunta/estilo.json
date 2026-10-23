@@ -1,0 +1,11 @@
+{
+ "id": "chat-pergunta", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Pergunta no chat", "en": "Chat question"},
+ "desc": {"pt": "Uma janela de chat genérica: a sua pergunta é digitada e enviada, e a resposta chega por partes.",
+          "en": "A generic chat window: your question is typed and sent, and the answer arrives in parts."},
+ "quando": "fala sobre perguntar algo a uma IA ou a um assistente ('eu perguntei', 'pede assim'); tela ilustrada, não é print",
+ "campos": {"nome": {"tipo": "texto", "exemplo": "Assistente"},
+            "pergunta": {"tipo": "texto", "exemplo": "Como deixo meu vídeo mais curto sem perder a ideia?"},
+            "resposta": {"tipo": "lista", "exemplo": ["Corte as pausas e as repetições.", "Comece pela frase mais forte.", "Feche com um convite claro."]}},
+ "exemplo": {"de": 0.4, "ate": 4.2}
+}

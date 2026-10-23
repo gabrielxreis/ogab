@@ -1,0 +1,10 @@
+{
+ "id": "numero-atras", "grupo": "prova", "camada": "atras", "precisa": ["recorte", "rosto"],
+ "nome": {"pt": "Número atrás da cabeça", "en": "Number behind the head"},
+ "desc": {"pt": "O número que você fala aparece enorme atrás de você, girando os dígitos até parar no valor certo.",
+          "en": "The number you say shows up huge behind you, rolling its digits until it lands on the right value."},
+ "quando": "dado falado com número forte (faturamento, alunos, visualizações, porcentagem, anos); no segundo em que o número é dito",
+ "campos": {"numero": {"tipo": "texto", "exemplo": "1.250.000", "nota": "como deve aparecer (pontos, %, R$, + entram fixos; só os dígitos giram)"},
+            "legenda": {"tipo": "texto", "exemplo": "visualizações em 30 dias"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

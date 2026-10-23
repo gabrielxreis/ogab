@@ -1,0 +1,12 @@
+{
+ "id": "conversa-celular", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Conversa no celular", "en": "Phone conversation"},
+ "desc": {"pt": "Um celular sobe de baixo da tela e a conversa vai acontecendo nele, balão por balão.",
+          "en": "A phone rises from the bottom of the screen and the conversation plays on it, bubble by bubble."},
+ "quando": "fala que conta uma troca de mensagens ('ela me mandou', 'o cliente respondeu', 'aí eu falei'); tela ilustrada, não é print",
+ "campos": {"contato": {"tipo": "texto", "exemplo": "Cliente Exemplo"},
+            "mensagens": {"tipo": "lista", "nota": "{texto, eu: true quando é a pessoa do vídeo, em: segundo do vídeo (opcional)}",
+                          "exemplo": [{"texto": "Vi seu vídeo e quero um igual!", "eu": false}, {"texto": "Bora! Te mando a proposta hoje.", "eu": true},
+                                      {"texto": "Fechado. Pode começar segunda?", "eu": false}]}},
+ "exemplo": {"de": 0.4, "ate": 4.0}
+}

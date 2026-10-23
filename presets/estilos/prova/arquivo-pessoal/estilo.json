@@ -1,0 +1,10 @@
+{
+ "id": "arquivo-pessoal", "grupo": "prova", "camada": "frente", "precisa": ["rosto", "imagem"],
+ "nome": {"pt": "Arquivo pessoal", "en": "Personal archive"},
+ "desc": {"pt": "Fotos antigas da própria pessoa entram uma a uma em molduras de papel, cada uma com a data escrita embaixo.",
+          "en": "The person's own old photos come in one by one in paper frames, each with the date written below."},
+ "quando": "fala de história pessoal ('quando eu comecei', 'há dez anos', 'minha primeira loja'); fotos reais vêm do cliente (quadro tirado de vídeo antigo também serve)",
+ "campos": {"imagens": {"tipo": "imagens", "nota": "lista de {img, data, em}; img vazio = foto ilustrada fictícia; em = segundo do vídeo (opcional)",
+                        "exemplo": [{"img": "", "data": "jul 2009"}, {"img": "", "data": "dez 2014"}, {"img": "", "data": "mar 2019"}]}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}

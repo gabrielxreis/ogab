@@ -1,0 +1,14 @@
+{
+ "id": "chat-planilha", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Link abre a planilha", "en": "Link opens the spreadsheet"},
+ "desc": {"pt": "Num chat, o cursor clica num link, uma pasta abre e as linhas de uma planilha vão aparecendo uma a uma.",
+          "en": "In a chat, the cursor clicks a link, a folder opens and the rows of a spreadsheet appear one by one."},
+ "quando": "fala de material entregue, lista, controle ou organização ('mandei a planilha', 'tá tudo numa pasta'); tela ilustrada",
+ "campos": {"mensagem": {"tipo": "texto", "exemplo": "Separei as ideias da semana aqui:"},
+            "link": {"tipo": "texto", "exemplo": "Pasta: Conteúdo de outubro"},
+            "pasta": {"tipo": "texto", "exemplo": "Conteúdo de outubro"},
+            "colunas": {"tipo": "lista", "exemplo": ["Dia", "Ideia", "Status"]},
+            "linhas": {"tipo": "lista", "exemplo": [["Seg", "Bastidores da gravação", "Pronto"], ["Qua", "3 erros de iniciante", "Editando"],
+                                                    ["Sex", "Antes e depois", "Roteiro"], ["Dom", "Pergunta dos seguidores", "Ideia"]]}},
+ "exemplo": {"de": 0.4, "ate": 4.2}
+}

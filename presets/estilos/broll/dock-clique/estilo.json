@@ -1,0 +1,12 @@
+{
+ "id": "dock-clique", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Clique na barra de apps", "en": "Dock click"},
+ "desc": {"pt": "A câmera chega perto de uma barra de apps, o cursor clica num ícone, ele pula e a janela do app abre.",
+          "en": "The view moves close to an app bar, the cursor clicks an icon, it hops and the app window opens."},
+ "quando": "fala de abrir uma ferramenta ou programa ('eu abro o editor', 'entra no app'); ícones genéricos com a inicial, sem logo de terceiros",
+ "campos": {"apps": {"tipo": "lista", "exemplo": ["Arquivos", "Fotos", "Notas", "Editor", "Agenda", "Música"]},
+            "alvo": {"tipo": "numero", "exemplo": 3, "nota": "índice do app clicado (0 = primeiro)"},
+            "janela": {"tipo": "texto", "exemplo": "Editor · projeto novo"},
+            "logo": {"tipo": "logo", "exemplo": "", "nota": "ícone oficial do app clicado (opcional, arquivo do vídeo); vazio = inicial"}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}

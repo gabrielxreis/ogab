@@ -1,0 +1,10 @@
+{
+ "id": "aviso-avatar", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Aviso do personagem", "en": "Character callout"},
+ "desc": {"pt": "Um avatar de personagem aparece no canto, dá um toque e um balão de fala sai dele por cima do vídeo.",
+          "en": "A character avatar pops into the corner, gives a nudge and a speech bubble comes out of it over the video."},
+ "quando": "comentário de um mascote, assistente ou 'voz da consciência' sobre o que a pessoa falou; dica rápida ou aviso",
+ "campos": {"nome": {"tipo": "texto", "exemplo": "Gab"}, "texto": {"tipo": "texto", "exemplo": "Dica: corta essa pausa que o vídeo ganha 2 segundos."},
+            "avatar": {"tipo": "imagem", "exemplo": "", "nota": "imagem do personagem (opcional); vazio = personagem ilustrado"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

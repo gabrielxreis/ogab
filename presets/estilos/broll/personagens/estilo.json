@@ -1,0 +1,10 @@
+{
+ "id": "personagens", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Fila de personagens", "en": "Character lineup"},
+ "desc": {"pt": "Rostos ou avatares entram um a um, em fila, cada um com uma etiqueta de nome e papel embaixo.",
+          "en": "Faces or avatars come in one by one, in a row, each with a name and role tag below."},
+ "quando": "fala que apresenta pessoas: equipe, convidados, clientes, 'os três tipos de aluno'; fotos reais vêm do cliente",
+ "campos": {"pessoas": {"tipo": "imagens", "nota": "lista de {nome, papel, img, em}; img vazio = avatar ilustrado",
+                        "exemplo": [{"nome": "Ana", "papel": "Roteiro"}, {"nome": "Caio", "papel": "Câmera"}, {"nome": "Bia", "papel": "Edição"}]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

@@ -1,0 +1,12 @@
+{
+ "id": "pilula-logo", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Pílula de produto", "en": "Product pill"},
+ "desc": {"pt": "Uma pílula de vidro escuro com ícone, nome do produto, 'por' e a marca, com um brilho passando por cima.",
+          "en": "A dark glass pill with icon, product name, 'by' and the brand, with a sheen sweeping across."},
+ "quando": "quando cita uma ferramenta, curso, produto ou parceiro pelo nome ('eu uso o tal', 'feito com'); logo real só pelo campo logo",
+ "campos": {"nome": {"tipo": "texto", "exemplo": "Corte Rápido"}, "por": {"tipo": "texto", "exemplo": "por"},
+            "marca": {"tipo": "texto", "exemplo": "Estúdio Exemplo"},
+            "icone": {"tipo": "logo", "exemplo": "", "nota": "ícone do produto (opcional, arquivo oficial); vazio = inicial na cor da marca"},
+            "logo": {"tipo": "logo", "exemplo": "", "nota": "logo da marca (opcional); vazio = só o nome escrito"}},
+ "exemplo": {"de": 0.4, "ate": 3.2}
+}

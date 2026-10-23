@@ -1,0 +1,10 @@
+{
+ "id": "diagrama-conceito", "grupo": "broll", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Diagrama do conceito", "en": "Concept diagram"},
+ "desc": {"pt": "Uma explicação desenhada na hora: a nuvem no meio, as contas em volta se ligando a ela com setas e pontos correndo.",
+          "en": "An explanation drawn on the spot: the cloud in the middle, the accounts around it linking to it with arrows and moving dots."},
+ "quando": "fala que explica como algo se conecta (sincronizar, integrar, centralizar, 'tudo cai num lugar só'); troque os nomes pelos do vídeo",
+ "campos": {"centro": {"tipo": "texto", "exemplo": "Nuvem"},
+            "nos": {"tipo": "lista", "exemplo": ["Celular", "Notebook", "Câmera", "Equipe"], "nota": "até 4 itens em volta do centro"}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}
