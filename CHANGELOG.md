@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-39 (23/10/2026)
+- **README atualizado:** novidades do menu, da nova ordem da edição com validação por quadros, das prévias com pessoas reais e dos presets Letreiro, Órbita e Lente; print do menu e fluxo novo.
 ## 2026.10.23-38 (23/10/2026)
 - **README novo no topo:** a claquete 3D saiu e entrou o vídeo de apresentação da /ogab (o mesmo publicado no LinkedIn).
 ## 2026.10.23-37 (23/10/2026)

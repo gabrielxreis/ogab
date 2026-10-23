@@ -27,25 +27,25 @@
   <rect x="750" y="36" width="14" height="14" rx="3" class="card"/><text x="772" y="48" font-size="12" fill="#c9d1d9">o Gab faz</text>
 
   <rect x="40" y="100" width="148" height="100" rx="14" class="dec"/>
-  <text x="56" y="126" class="n">01</text><text x="56" y="150" class="t">Roteiro</text><text x="56" y="170" class="s">gancho em 3 s,</text><text x="56" y="185" class="s">fonte com data</text>
+  <text x="56" y="126" class="n">01</text><text x="56" y="150" class="t">Menu do vídeo</text><text x="56" y="170" class="s">formato e estilos,</text><text x="56" y="185" class="s">ou Automático</text>
   <rect x="208" y="100" width="148" height="100" rx="14" class="dec"/>
-  <text x="224" y="126" class="n">02</text><text x="224" y="150" class="t">Voz</text><text x="224" y="170" class="s">3-5 vozes com prévia,</text><text x="224" y="185" class="s">pronúncia certa</text>
-  <rect x="376" y="100" width="148" height="100" rx="14" class="card"/>
-  <text x="392" y="126" class="n">03</text><text x="392" y="150" class="t">Projeto</text><text x="392" y="170" class="s">DaVinci ou Premiere,</text><text x="392" y="185" class="s">cortes e transcrição</text>
-  <rect x="544" y="100" width="148" height="100" rx="14" class="dec"/>
-  <text x="560" y="126" class="n">04</text><text x="560" y="150" class="t">Legenda</text><text x="560" y="170" class="s">uma linha, métrica,</text><text x="560" y="185" class="s">você valida antes</text>
-  <rect x="712" y="100" width="148" height="100" rx="14" class="dec"/>
-  <text x="728" y="126" class="n">05</text><text x="728" y="150" class="t">Música</text><text x="728" y="170" class="s">3-4 opções, termina</text><text x="728" y="185" class="s">junto com o vídeo</text>
+  <text x="224" y="126" class="n">02</text><text x="224" y="150" class="t">Roteiro</text><text x="224" y="170" class="s">gancho em 3 s,</text><text x="224" y="185" class="s">fonte com data</text>
+  <rect x="376" y="100" width="148" height="100" rx="14" class="dec"/>
+  <text x="392" y="126" class="n">03</text><text x="392" y="150" class="t">Voz</text><text x="392" y="170" class="s">3-5 vozes com prévia,</text><text x="392" y="185" class="s">pronúncia certa</text>
+  <rect x="544" y="100" width="148" height="100" rx="14" class="card"/>
+  <text x="560" y="126" class="n">04</text><text x="560" y="150" class="t">Projeto e cortes</text><text x="560" y="170" class="s">DaVinci, Premiere,</text><text x="560" y="185" class="s">CapCut ou Final Cut</text>
+  <rect x="712" y="100" width="148" height="100" rx="14" class="card"/>
+  <text x="728" y="126" class="n">05</text><text x="728" y="150" class="t">Motions</text><text x="728" y="170" class="s">lettering, presets,</text><text x="728" y="185" class="s">3D e tracking</text>
   <rect x="40" y="260" width="148" height="100" rx="14" class="card"/>
-  <text x="56" y="286" class="n">06</text><text x="56" y="310" class="t">SFX</text><text x="56" y="330" class="s">foley do que a cena</text><text x="56" y="345" class="s">mostra, em camadas</text>
+  <text x="56" y="286" class="n">06</text><text x="56" y="310" class="t">Música e SFX</text><text x="56" y="330" class="s">trilha no clima,</text><text x="56" y="345" class="s">foley da cena</text>
   <rect x="208" y="260" width="148" height="100" rx="14" class="card"/>
-  <text x="224" y="286" class="n">07</text><text x="224" y="310" class="t">Takes e b-roll</text><text x="224" y="330" class="s">banco, IA ou material</text><text x="224" y="345" class="s">real no trecho certo</text>
+  <text x="224" y="286" class="n">07</text><text x="224" y="310" class="t">Takes e cor</text><text x="224" y="330" class="s">banco, IA ou real,</text><text x="224" y="345" class="s">LUT da marca</text>
   <rect x="376" y="260" width="148" height="100" rx="14" class="card"/>
-  <text x="392" y="286" class="n">08</text><text x="392" y="310" class="t">Motions</text><text x="392" y="330" class="s">lettering, motions,</text><text x="392" y="345" class="s">3D e tracking</text>
-  <rect x="544" y="260" width="148" height="100" rx="14" class="card"/>
-  <text x="560" y="286" class="n">09</text><text x="560" y="310" class="t">QC e master</text><text x="560" y="330" class="s">-14 LUFS, conferência</text><text x="560" y="345" class="s">e capa do vídeo</text>
+  <text x="392" y="286" class="n">08</text><text x="392" y="310" class="t">Legenda</text><text x="392" y="330" class="s">uma linha, métrica,</text><text x="392" y="345" class="s">abaixo dos motions</text>
+  <rect x="544" y="260" width="148" height="100" rx="14" class="dec"/>
+  <text x="560" y="286" class="n">09</text><text x="560" y="310" class="t">Validação</text><text x="560" y="330" class="s">folha de quadros,</text><text x="560" y="345" class="s">você valida no editor</text>
   <rect x="712" y="260" width="148" height="100" rx="14" class="dec"/>
-  <text x="728" y="286" class="n">10</text><text x="728" y="310" class="t">Post</text><text x="728" y="330" class="s">legenda e hashtags,</text><text x="728" y="345" class="s">agenda com seu ok</text>
+  <text x="728" y="286" class="n">10</text><text x="728" y="310" class="t">Render e post</text><text x="728" y="330" class="s">-14 LUFS, capa,</text><text x="728" y="345" class="s">legenda e hashtags</text>
   <path d="M188 150 H204" class="lig"/>
   <path d="M356 150 H372" class="lig"/>
   <path d="M524 150 H540" class="lig"/>

@@ -74,6 +74,12 @@
 
 O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo no começo da conversa. Histórico completo em [`CHANGELOG.md`](CHANGELOG.md). Últimas:
 
+- **Menu do vídeo (`/ogab menu`):** em todo pedido de vídeo o Gab abre um painel com a identidade da /ogab, em português e inglês, um passo por tela: formato por plataforma (Instagram, TikTok, YouTube, Facebook, LinkedIn e Anúncios), quantidade de motion, estilo dos motions com prévias em loop (9:16), gancho, layout, prova, legenda do seu editor ou animada, lettering do seu editor, takes, música, SFX, ritmo, cor e extras. Marque o que quer ou aperte **Automático**; no fim, Confirmar e o Gab recebe na hora. O endereço é sempre o mesmo e a aba aberta se atualiza sozinha.
+- **Nova ordem da edição e conferência por quadros:** depois dos cortes vêm lettering e motions, depois música, SFX, takes e cor, e a legenda por último (já desviando dos motions). Antes de renderizar, o Gab mostra uma **folha com os quadros-chave em PNG** exportados direto do DaVinci para você validar; se você apontar um problema, ele confere só aquele trecho (`conferir.py`), sem renderizar o vídeo inteiro de novo.
+- **Prévias com gente de verdade:** os presets e estilos do menu mostram cada efeito sobre um vídeo real (banco gratuito, uma pessoa diferente por estilo), nada de personagem desenhado. Dezenas de estilos novos (gancho, legenda animada, layout, prova, batidas, b-roll animado) entram no menu conforme as prévias são aprovadas.
+- **Presets da pessoa recortada mais fortes:** **Letreiro** (antigo Palco: palavra gigante atrás da cabeça), **Órbita** (cartões de tamanhos diferentes girando a volta inteira em volta da pessoa, por trás da cabeça e pela frente), **Lente** (zoom que vai certo no rosto) e **Título atrás da cabeça** (a cabeça cobre só a base das letras).
+- **Motion atrás da pessoa no próprio DaVinci:** o Gab monta a máscara com o **Magic Mask** no Fusion (seleciona a pessoa com cabelo e o que ela segura, faz o tracking) e deixa a comp na timeline para você ajustar.
+- **Presets da comunidade:** o preset que você cria vai inteiro (com tudo que ele precisa para funcionar) para o banco da comunidade e aparece no menu de todo mundo com a prévia.
 - **CapCut e Final Cut Pro (Mac, beta):** além do DaVinci e do Premiere, o Gab monta o vídeo no **CapCut** (escreve o rascunho direto, com filtros, adesivos, animações e modelos de texto da loja, e recria no CapCut uma timeline do DaVinci) e no **Final Cut Pro** (gera o projeto FCPXML inteiro: takes, camadas, música, SFX, títulos e legenda no estilo do cliente).
 - **Memória da marca:** antes de editar, o Gab cria a pasta e um `<Marca>.md` com o que você pediu de diferente, o que funcionou e o que fazer da próxima vez. Lê tudo antes do próximo vídeo da marca.
 - **Silêncios pela transcrição do DaVinci:** corta as pausas entre as palavras que o próprio DaVinci reconheceu (não depende do volume nem do barulho de fundo) e guarda a timeline original como backup.
@@ -234,6 +240,7 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 |---|---|
 | `/ogab faz um vídeo para a <empresa> sobre <tema>` | Fluxo completo, do roteiro ao export |
 | `/ogab <edição no DaVinci>` | Edita a timeline aberta (cortes, legenda, música, motions, b-roll...) |
+| `/ogab menu` | Abre o menu do vídeo para escolher formato, estilos, legenda, música e o resto passo a passo, ou deixar no Automático (abre sozinho em todo pedido de vídeo) |
 | `/ogab cliente <nome>` | Cria ou atualiza o perfil do cliente (site, logo, pronúncias, estilo) |
 | `/ogab pauta <cliente>` | Busca notícias recentes dos temas do cliente e sugere roteiros |
 | `/ogab instagram <pedido>` | Legenda, carrossel, hashtags, semana de posts, perfil (também funciona só pedindo, sem a palavra) |
@@ -248,22 +255,25 @@ No Claude Code, chame com `/ogab` seguido do pedido, ou só peça em linguagem n
 
 ## O fluxo
 
-<p align="center"><img src=".github/fluxo.svg" alt="Fluxo do /ogab: roteiro, voz, projeto, legenda, música, SFX, takes, motions, QC e post" width="900"></p>
+<p align="center"><img src=".github/fluxo.svg" alt="Fluxo do /ogab: menu, roteiro, voz, projeto e cortes, motions, música e SFX, takes e cor, legenda, validação visual, render e post" width="900"></p>
 
 | # | Etapa | Você decide? | Ferramenta |
 |---|---|---|---|
 | 0 | Pasta do vídeo + **memória da marca** (`<Marca>.md`), lida antes de tudo | - | `projeto.py memoria` |
 | 1 | Perfil do cliente + logos e identidade visual baixadas do site | Só na 1ª vez | `competitor-profiling`, `marca.py` |
-| 2 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa com fonte e data |
-| 3 | **Voz** (narração por IA) | **Escolhe** | ElevenLabs, Artlist ou a sua voz clonada no Mac (`voz_local/`) |
-| 4 | Projeto no DaVinci (`Assunto - Empresa`), Media Pool organizado, Stacked Timelines | - | Scripting API |
-| 5 | Música bruta na timeline, -10 dB, fade no clipe; BPM e tom medidos | Escolhe entre 3-4 | Artlist ou Envato, `musica.py` |
-| 6 | Efeitos sonoros (whoosh, pop, impacto) | Liga/desliga | Artlist ou Envato |
-| 7 | Takes: IA, banco, material real ou misto; geração só no modo ilimitado | Origem | Envato, Artlist, Pexels / Magnific / YouTube, NASA, Commons (`baixar_video.py`) |
-| 8 | Lettering animado nas palavras-chave, FadeOut de 31 quadros no bloco | Vê a lista; **escolhe** padrão ou OGraf | @gabrielxreis_ Text Presets (`.drfx`) ou `ograf/` |
-| 9 | **Motions** centralizados e medidos, com as cores da marca, CTA animado | Vê a tabela | HyperFrames + `guias.py` |
-| 10 | **Legenda** de uma linha, métrica obrigatória, do início ao fim | - | `legendas.py`, `legenda_ui.py` |
-| 11 | Timeline pronta, **conferência**, **master** e export (se pedir), capa e texto do post | - | `resolve_lib.py`, `qc.py` |
+| 2 | **Menu do vídeo**: formato, estilo dos motions, legenda, lettering, música... ou Automático | **Escolhe** | `menu.py` |
+| 3 | **Roteiro** no formato da plataforma (Instagram, YouTube, Meta Ads) | **Aprova** | Pesquisa com fonte e data |
+| 4 | **Voz** (narração por IA) | **Escolhe** | ElevenLabs, Artlist ou a sua voz clonada no Mac (`voz_local/`) |
+| 5 | Projeto no editor (`Assunto - Empresa`), Media Pool organizado, transcrição e cortes | - | Scripting API, `cortes.py`, `silencios.py` |
+| 6 | **Lettering** do pacote do seu editor e **motions** centralizados, medidos na fala, nas cores da marca | Vê a lista | Pacote de títulos, HyperFrames, presets |
+| 7 | Música bruta na timeline, -10 dB, fade no clipe; BPM e tom medidos | Escolhe entre 3-4 | Artlist ou Envato, `musica.py` |
+| 8 | Efeitos sonoros (foley do que a cena mostra) | Liga/desliga | Biblioteca local, Artlist, Envato, Pixabay |
+| 9 | Takes e cor: IA, banco, material real ou misto; LUT da marca | Origem | Envato, Artlist, Pexels / Magnific / YouTube, NASA, Commons (`baixar_video.py`) |
+| 10 | **Legenda** de uma linha, métrica obrigatória, já abaixo dos motions | - | `legendas.py`, `legenda_ui.py`, `legenda_baixa.py` |
+| 11 | **Validação visual**: folha com os quadros-chave em PNG direto do editor | **Valida** | `conferir.py chave` |
+| 12 | Render, **conferência**, **master** e export, capa e texto do post; problema apontado = só aquele trecho | - | `conferir.py trecho`, `qc.py`, `resolve_lib.py` |
+
+<p align="center"><img src=".github/menu.jpg" width="900" alt="Menu do vídeo da /ogab no passo Estilo dos motions, com prévias verticais em loop"><br><sub><b>/ogab menu:</b> um passo por tela, prévias em loop, Automático em cada passo.</sub></p>
 
 ## Editar um vídeo que já está no DaVinci
 
@@ -387,7 +397,7 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 <img src="presets/cartoes/exemplo.gif" width="150" alt="Cartões">&nbsp;
 <img src="presets/podcast/exemplo.gif" width="150" alt="Podcast">
 
-<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch · família CENA (destaque, palco, órbita, lente, bancada) · launch · gráfico · marco · logo reveal · gravura · ranking · respostas · comentário · cartões · podcast</sub>
+<sub>point cloud · vector motion (destaque, bolhas, grade, objetos) · vitrine · sketch · pessoa recortada (destaque, letreiro, órbita, lente, bancada) · launch · gráfico · marco · logo reveal · gravura · ranking · respostas · comentário · cartões · podcast</sub>
 
 <img src="presets/lottie/exemplo.gif" width="480" alt="Lottie para site e app">
 
@@ -412,9 +422,9 @@ Estilos completos que você escolhe pelo nome: ritmo, transições, visual, som 
 | **PODCAST** ([guia](presets/podcast/PRESET.md)) | Duas pessoas em tela dividida, legenda karaokê na cor de quem fala, abaixo do queixo e acompanhando a cabeça; quem está calado escurece. Só para podcast e entrevista com duas pessoas | <img src="presets/podcast/exemplo.gif" width="160" alt="Exemplo do preset Podcast"> |
 | **LUME** ([guia](presets/lume/PRESET.md)) | Estilo "antes e depois" de editor de short-form: legenda em duas camadas (linha pequena fina + palavra-chave grande que brilha em amarelo, letra a letra, num leve ângulo 3D e passando atrás da sua mão), cenas de mesa vista de cima com objetos que nascem desfocados (cérebro, lâmpada, post-it, papéis, tablet), seta tracejada e anotação à mão que se desenham, mergulho de foco e luz vazada quente que esconde o corte para o close. Para bastidor, processo e números de produção | <img src="presets/lume/exemplo.gif" width="160" alt="Exemplo do preset Lume"> |
 | **DESTAQUE** ([guia](presets/destaque/PRESET.md)) | Legenda palavra por palavra branca e pequena, com a palavra-chave entrando grande em amarelo ou em serifa itálica com brilhinhos girando; às vezes numa pílula branca com marca-texto, ou numa frase empilhada em tamanhos diferentes ("estar / UM PASSO / à frente"). Família CENA | <img src="presets/destaque/exemplo.gif" width="160" alt="Exemplo do preset Destaque"> |
-| **LETREIRO** ([guia](presets/palco/PRESET.md)) | Palavra gigante ATRÁS da sua cabeça e das mãos: o Gab recorta você do fundo com a segmentação de pessoas da Apple (grátis, no próprio Mac, sem chave de IA) e põe o texto entre o fundo e você. Mede o fundo e usa texto escuro em parede clara. Família CENA. Em todos: nada na frente do rosto (o Gab detecta o rosto, desce a legenda e manda a animação para trás de você) | <img src="presets/palco/exemplo.gif" width="160" alt="Exemplo do preset Palco"> |
-| **ÓRBITA** ([guia](presets/orbita/PRESET.md)) | Cartões de vidro em volta de você: cartões girando ao seu redor (passam atrás da cabeça e na frente abaixo do queixo, com texto ou print de reel), checklist que recebe o check na hora em que você fala cada item, barra "seu reel está pronto 100%" com pílulas, caixa de comentário digitando a palavra do CTA. Família CENA | <img src="presets/orbita/exemplo.gif" width="160" alt="Exemplo do preset Órbita"> |
-| **LENTE** ([guia](presets/lente/PRESET.md)) | Efeitos de câmera no próprio vídeo: zoom rápido no rosto na palavra forte (o recorte acompanha, então o PALCO continua atrás). Em seguida: foco de luz, congelar com etiqueta, antes e depois, transição com desfoque e encolher para dentro de uma janela. Família CENA | <img src="presets/lente/exemplo.gif" width="160" alt="Exemplo do preset Lente"> |
+| **LETREIRO** ([guia](presets/palco/PRESET.md)) | Palavra gigante ATRÁS da sua cabeça e das mãos: o Gab recorta você do fundo com a segmentação de pessoas da Apple (grátis, no próprio Mac, sem chave de IA) e põe o texto entre o fundo e você. Mede o fundo e usa texto escuro em parede clara. Família CENA. Em todos: nada na frente do rosto (o Gab detecta o rosto, desce a legenda e manda a animação para trás de você) | <img src="presets/palco/exemplo.gif" width="160" alt="Exemplo do preset Letreiro"> |
+| **ÓRBITA** ([guia](presets/orbita/PRESET.md)) | Cartões de vidro em volta de você: cartões de tamanhos diferentes girando a volta inteira ao seu redor (por cima e por trás da cabeça, pela frente abaixo do queixo, sem sumir; com texto ou print de reel), checklist que recebe o check na hora em que você fala cada item, barra "seu reel está pronto 100%" com pílulas, caixa de comentário digitando a palavra do CTA. Família CENA | <img src="presets/orbita/exemplo.gif" width="160" alt="Exemplo do preset Órbita"> |
+| **LENTE** ([guia](presets/lente/PRESET.md)) | Efeitos de câmera no próprio vídeo: zoom rápido no rosto na palavra forte (o recorte acompanha, então o LETREIRO continua atrás). Em seguida: foco de luz, congelar com etiqueta, antes e depois, transição com desfoque e encolher para dentro de uma janela. Família CENA | <img src="presets/lente/exemplo.gif" width="160" alt="Exemplo do preset Lente"> |
 | **BANCADA** ([guia](presets/bancada/PRESET.md)) | Em construção: tela verde para comentário, você recortado embaixo, o assunto atrás, gancho fixo no topo e o número circulado à mão. Família CENA | |
 | **LAUNCH** ([guia](presets/launch/PRESET.md)) | Filme de lançamento de produto com acabamento premium, na linguagem dos filmes de produto da Apple: fundo preto, uma ideia por cena, frases entrando por máscara com curvas longas que freiam no fim, logo nascendo com contraluz e brilho, o seu site ou app de verdade num painel de vidro flutuando em 3D com reflexo e luz passando, recursos um por vez e fecho limpo. O Gab captura o site sozinho (página inteira, cor da marca). Três letras: **apple**, **editorial** e **cinema**. Para lançar curso, app, SaaS ou site | <img src="presets/launch/exemplo.gif" width="160" alt="Exemplo do preset Launch"> |
 | **PAINEL** ([guia](presets/painel/PRESET.md)) | Apresentação de app e fintech: fundo navy contínuo com uma cor de destaque, linha de gráfico que se desenha com a ponta acesa, frase empilhada, cartões de interface em 3D com números rolando e câmera que mergulha, disco da cor cobrindo a tela, palavra que nasce do chão e vira gráfico, caos virando grade e fecho com a marca. Para lançamento de app, banco digital, investimento, painel/SaaS | <img src="presets/painel/exemplo.gif" width="160" alt="Exemplo do preset Painel"> |
@@ -663,6 +673,19 @@ Efeitos sonoros pelos tempos da timeline (whoosh na entrada dos motions e do b-r
 ### tresd/tresd.py
     logo  plano.json saida.mov   Logo ou texto extrudado em metal, MOV ProRes 4444 com alfa (Blender sem janela)
     cena  cena.py saida.mov      Objeto 3D montado por script; o .blend fica ao lado, editável
+
+### conferir.py
+Conferência visual da timeline por quadros em PNG exportados direto do DaVinci (meia resolução), numa folha com o tempo de cada quadro:
+```
+python3 scripts/conferir.py chave  [--timeline "<nome>"] [--pasta <saída>] [--max 24]   # cortes, entrada/meio/saída de lettering, motion e b-roll, marcadores
+python3 scripts/conferir.py trecho --em 12.5 [--raio 2] [--passo 0.25]                 # só o trecho onde você viu o problema
+```
+
+### menu.py
+Menu do vídeo (`/ogab menu`): servidor local em `127.0.0.1:47321`, grava `<pasta>/menu_escolha.json` ao confirmar e traz o Claude para a frente com a mensagem pronta para colar.
+```
+python3 scripts/menu.py --pasta <pasta do vídeo> --cliente <empresa> [--pedido "<pedido>"] [--formato horizontal]
+```
 
 ### qc.py
     <pasta_do_video> [--cliente pasta] [--plataforma instagram|meta_ads|youtube_shorts]
