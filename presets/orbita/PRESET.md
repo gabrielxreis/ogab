@@ -8,7 +8,7 @@ Tipos prontos:
 |---|---|
 | `checklist` | título espaçado + itens que recebem check amarelo um a um, no tempo em que são ditos |
 | `progresso` | "Seu reel está pronto" com % contando até 100, barra enchendo e pílulas com check |
-| `giro` | cartões girando em volta dele (texto ou print de reel `"img"`): atrás passam na altura da cabeça e somem atrás dela (recorte por cima), na frente passam abaixo do queixo; a legenda desce para baixo deles durante o giro |
+| `giro` | cartões girando em volta dele (texto ou print de reel `"img"`): atrás passam por cima e por trás da cabeça (nunca somem: a ponta entra atrás do cabelo), na frente passam abaixo do queixo; raio e tamanho saem da largura da cabeça; cartões com tamanhos diferentes (automático, ou `"tam": 1.2` em cada cartão; `"tamanhos": false` deixa todos iguais); a legenda desce para baixo deles durante o giro |
 | `cta` | caixa de comentário com contorno amarelo digitando a palavra ("MISSÃO"), botão enviar pulsando |
 
 Próximos (estudo em `cena/REFERENCIA.md`): prova social (prints de reels inclinados), parede de manchetes, janela do app com passo a passo, recibo de papel

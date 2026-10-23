@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-29 (23/10/2026)
+- **Lente com pessoa real:** a prévia da Lente mostra só o zoom no rosto, sem legenda.
+- **Órbita com cartões de tamanhos diferentes:** os cartões variam de tamanho sozinhos (ou use "tam" em cada cartão).
 ## 2026.10.23-28 (23/10/2026)
 - **Órbita girando de verdade:** os cartões agora dão a volta inteira em volta da pessoa (por cima e por trás da cabeça, pela frente abaixo do queixo) sem sumir; o tamanho da volta se ajusta à cabeça e avisa se o take for fechado demais.
 - **Correção:** a camada de trás da pessoa estava desenhando a parte da frente (a metade de trás da Órbita e dos estilos de duas camadas não aparecia).

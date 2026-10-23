@@ -114,6 +114,7 @@ def main(trab, quais):
         elif preset == "lente":
             de, ate = q("zoom")["ini"], q("certa")["fim"] + .5
             plano["lente"] = {"zoom": [{"de": de, "ate": ate, "escala": 1.3}]}   # o gerar centra o zoom no rosto
+            plano.pop("destaque")   # Lente é só o zoom no rosto, sem legenda (pedido do usuário 23/10/2026)
         json.dump(plano, open(os.path.join(pasta, "plano.json"), "w"), ensure_ascii=False, indent=1)
         subprocess.run([sys.executable, os.path.join(CENA, "gerar.py"), os.path.join(pasta, "plano.json"),
                         os.path.join(pasta, "saida")], check=True)

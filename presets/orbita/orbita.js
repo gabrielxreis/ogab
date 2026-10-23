@@ -58,7 +58,11 @@ CENA.mod.orbita = function (cartoes, C) {
     const atras = C.P.camada === "palco", n = c.cartoes.length, els = [];
     c.cartoes.forEach((k, i) => {
       const e = el("div", "giro", null, k.img ? `<img src="${k.img}">` : `<b>${esc(k.texto || "")}</b>${k.sub ? `<span>${esc(k.sub)}</span>` : ""}`);
-      e.style.width = c.cw + "px"; e.style.height = c.ch + "px"; e.style.left = (-c.cw / 2) + "px"; e.style.top = (-c.ch / 2) + "px";
+      // tamanhos diferentes (pedido do usuário 23/10/2026): "tam" no cartão (1 = padrão) ou variação automática
+      const f = k.tam || (c.tamanhos === false ? 1 : [1, .78, 1.18, .88, 1.08, .82][i % 6]);
+      const cw = Math.round(c.cw * f), ch = Math.round(c.ch * f);
+      e.style.width = cw + "px"; e.style.height = ch + "px"; e.style.left = (-cw / 2) + "px"; e.style.top = (-ch / 2) + "px";
+      e.style.fontSize = Math.round(100 * f) + "%";
       if (k.img) e.classList.add("img");
       els.push(e);
     });
