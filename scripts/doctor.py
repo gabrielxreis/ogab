@@ -258,6 +258,34 @@ def extras():
         item("!", "extras", f"{len(faltam)} fonte(s) faltando: rode o instalador de novo")
 
 
+def hook_imagem():
+    """Hook do Read que reduz imagem grande antes do Claude olhar (scripts/olhar.py; economia de tokens, 22/10/2026)."""
+    arq = os.path.join(HOME, ".claude", "settings.json")
+    olhar = os.path.join(RAIZ, "scripts", "olhar.py")
+    # Mac: python3 do PATH (o caminho do Homebrew muda a cada versão); Windows: o Python que roda o doctor
+    cmd = 'python3 "$HOME/.claude/skills/ogab/scripts/olhar.py" hook' if not WIN and RAIZ == os.path.join(HOME, ".claude", "skills", "ogab") \
+        else f'"{sys.executable}" "{olhar}" hook'
+    try:
+        conf = json.load(open(arq, encoding="utf-8")) if os.path.exists(arq) else {}
+    except Exception:
+        item("!", "extras", f"economia de tokens: {arq} não é um JSON válido; corrija o arquivo e rode o doctor de novo")
+        return
+    pre = conf.setdefault("hooks", {}).setdefault("PreToolUse", [])
+    if any("olhar.py" in h.get("command", "") for e in pre for h in e.get("hooks", [])):
+        item("✓", "extras", "economia de tokens: imagens reduzidas antes do Claude ver (hook olhar.py)")
+    elif not MAC and not WIN:
+        item("·", "extras", "economia de tokens: hook olhar.py só no Mac e no Windows")
+    elif CORRIGIR:
+        pre.append({"matcher": "Read", "hooks": [{"type": "command", "command": cmd, "timeout": 20}]})
+        os.makedirs(os.path.dirname(arq), exist_ok=True)
+        tmp = arq + ".tmp"
+        json.dump(conf, open(tmp, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+        os.replace(tmp, arq)
+        item("⟳", "extras", "economia de tokens: hook olhar.py registrado (vale ao abrir o Claude Code de novo)")
+    else:
+        item("!", "extras", "economia de tokens: hook olhar.py não registrado: rode o doctor com --corrigir")
+
+
 # ---------------------------------------------------------------- apps
 
 def _rel(app_escolhido):
@@ -483,7 +511,7 @@ def windows():
 
 
 def main():
-    skill(); python(); ferramentas(); ffmpeg_detalhes(); extras(); blender(); windows()
+    skill(); python(); ferramentas(); ffmpeg_detalhes(); extras(); hook_imagem(); blender(); windows()
     c = cfg()
     davinci(c.get("editor", "davinci") == "davinci")
     premiere(c.get("editor") == "premiere")

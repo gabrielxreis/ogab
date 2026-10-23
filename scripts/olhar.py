@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Imagem leve para o Claude olhar (economia de tokens).
 
+Mac: sips (nativo). Windows/Linux: Pillow. Sem nenhum dos dois, o Read segue normal.
 Uma imagem de 1920x1080 custa ~1.800 tokens; com 1024 px no lado maior, ~700.
 Para conferir rosto, enquadramento, legenda e cor, 1024 px basta.
 
@@ -20,6 +21,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -29,12 +31,29 @@ EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".tif", ".tiff", ".bmp"}
 NAO_REDUZ = re.compile(r"folha|sheet|grade|grid|tile|contato|mapa|_full", re.I)
 
 
+def _pillow():
+    try:
+        from PIL import Image
+        return Image
+    except ImportError:
+        return None
+
+
+SIPS = sys.platform == "darwin" and shutil.which("sips")
+
+
 def dims(p):
-    o = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", p],
-                       capture_output=True, text=True).stdout
-    w = re.search(r"pixelWidth: (\d+)", o)
-    h = re.search(r"pixelHeight: (\d+)", o)
-    return (int(w.group(1)), int(h.group(1))) if w and h else (0, 0)
+    if SIPS:
+        o = subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", p],
+                           capture_output=True, text=True).stdout
+        w = re.search(r"pixelWidth: (\d+)", o)
+        h = re.search(r"pixelHeight: (\d+)", o)
+        return (int(w.group(1)), int(h.group(1))) if w and h else (0, 0)
+    Image = _pillow()
+    if not Image:
+        return (0, 0)          # sem sips nem Pillow: não reduz (o Read segue normal)
+    with Image.open(p) as im:
+        return im.size
 
 
 def reduzir(p, limite=LIMITE):
@@ -44,8 +63,15 @@ def reduzir(p, limite=LIMITE):
     nome = re.sub(r"[^\w.-]", "_", os.path.splitext(os.path.basename(p))[0])[:40]
     saida = os.path.join(CACHE, f"{nome}_{chave}.jpg")
     if not os.path.exists(saida):
-        subprocess.run(["sips", "-Z", str(limite), "-s", "format", "jpeg", "-s", "formatOptions", "82",
-                        p, "--out", saida], capture_output=True, check=True)
+        if SIPS:
+            subprocess.run(["sips", "-Z", str(limite), "-s", "format", "jpeg", "-s", "formatOptions", "82",
+                            p, "--out", saida], capture_output=True, check=True)
+        else:                  # Windows/Linux: Pillow (o windows\install.ps1 já instala)
+            Image = _pillow()
+            with Image.open(p) as im:
+                im = im.convert("RGB")
+                im.thumbnail((limite, limite), Image.LANCZOS)
+                im.save(saida, "JPEG", quality=82)
     return saida
 
 
@@ -62,10 +88,10 @@ def hook():
         return
     if not os.path.isfile(p):
         return
-    w, h = dims(p)
-    if max(w, h) <= LIMITE:
-        return
     try:
+        w, h = dims(p)
+        if max(w, h) <= LIMITE:
+            return
         novo = reduzir(p)
     except Exception:
         return

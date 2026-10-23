@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.22-7 (22/10/2026)
+- **Menos tokens com imagens:** o Gab passa a olhar quadros, prints e fotos numa cópia de até 1024 px (o arquivo original não muda), o que gasta cerca de 60% menos por imagem. O `doctor` liga isso sozinho no Mac e no Windows; abra o Claude Code de novo depois de atualizar. Para ver um detalhe em tamanho cheio: `scripts/olhar.py recorte`.
 ## 2026.10.22-5 (22/10/2026)
 - **CapCut pela linha de comando:** `capcut/capcut.py` faz no CapCut o que o Gab já fazia no DaVinci, sem clicar: monta ou edita um rascunho a partir de um plano, lista e confere rascunhos (mídia offline, efeito sem arquivo, buraco na V1) e abre o projeto em 1o na tela inicial.
 - **Prévia do CapCut sem o CapCut:** `capcut.py previa` renderiza o rascunho em MP4 direto (vídeo, fundo desfocado, textos, áudio), com o tamanho do texto medido no motor do CapCut. Exportar pelo próprio CapCut continua sendo um clique seu (o diálogo de exportação só aceita comando com o app na frente).
