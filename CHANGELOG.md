@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-18 (23/10/2026)
+- **11 batidas visuais novas (estilos):** logos com o papel de cada um, logos ligados por setas, palavra única na virada, roleta de logos, pilha de comparação de produtos, palavra clímax atrás da pessoa, frase cinética em tela cheia com ícones, citação no topo, rótulo de montagem, interface plana de patrocínio e cabeçalho de progresso da lista. Aparecem no menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-17 (23/10/2026)
 - **8 efeitos novos (estilos):** checklist ao lado da cabeça, celular com passo a passo, gráfico neon atrás, você dentro do app, parede de miniaturas, telas em órbita (passam atrás e na frente), sair da tela do celular e corte pelo escuro. Aparecem no passo Efeitos do menu assim que ganharem a prévia com vídeo real.
 ## 2026.10.23-16 (23/10/2026)

@@ -1,0 +1,12 @@
+{
+ "id": "pilha-comparacao", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "logo"],
+ "nome": {"pt": "Pilha de comparação", "en": "Comparison stack"},
+ "desc": {"pt": "Fichas de produto caem uma sobre a outra, cada uma com nome, preço e para quem serve.",
+          "en": "Product cards land one on top of another, each with name, price and who it is for."},
+ "quando": "comparação de opções, planos ou produtos ('o barato é para quem começa, o caro para quem já vende'), review, qual escolher",
+ "campos": {"itens": {"tipo": "lista", "exemplo": [
+   {"nome": "Lumo Básico", "preco": "R$ 29", "para": "quem está começando", "em": 0.5, "logo": ""},
+   {"nome": "Fiapo Pro", "preco": "R$ 79", "para": "quem posta todo dia", "em": 1.3, "logo": ""},
+   {"nome": "Norte Max", "preco": "R$ 199", "para": "agência com equipe", "em": 2.1, "logo": ""}]}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}

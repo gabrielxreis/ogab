@@ -1,0 +1,10 @@
+{
+ "id": "citacao-topo", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Citação no topo", "en": "Quote on top"},
+ "desc": {"pt": "Quando você cita alguém, a frase dele aparece palavra por palavra entre aspas na faixa de cima, com o nome do autor.",
+          "en": "When you quote someone, their line appears word by word between quote marks at the top, with the author's name."},
+ "quando": "fala que cita alguém ('como dizia...', 'meu pai falava', 'o fulano escreveu'), frase famosa, depoimento lido",
+ "campos": {"texto": {"tipo": "texto", "exemplo": "Feito é melhor que perfeito."},
+            "autor": {"tipo": "texto", "exemplo": "um velho editor"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

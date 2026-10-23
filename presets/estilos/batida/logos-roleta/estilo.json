@@ -1,0 +1,10 @@
+{
+ "id": "logos-roleta", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "logo"],
+ "nome": {"pt": "Roleta de logos", "en": "Logo roulette"},
+ "desc": {"pt": "Várias marcas trocam rápido no mesmo lugar, vão freando, e a frase assenta ao lado da última.",
+          "en": "Several brands flip fast in one spot, slow down, and the line settles next to the last one."},
+ "quando": "fala do tipo 'não importa qual: A, B, C, todos...', 'qualquer app', 'testei todos', lista longa de marcas parecidas",
+ "campos": {"logos": {"tipo": "lista", "exemplo": [{"nome": "Lumo"}, {"nome": "Fiapo"}, {"nome": "Norte"}, {"nome": "Brisa"}, {"nome": "Ocre"}, {"nome": "Vela"}]},
+            "frase": {"tipo": "texto", "exemplo": "todos fazem igual"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

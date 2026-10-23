@@ -1,0 +1,12 @@
+{
+ "id": "interface-plana", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Interface plana", "en": "Flat interface"},
+ "desc": {"pt": "Cartões planos de comentário, mensagem e e-mail passam um a um mostrando o caminho do patrocinador, sem brilho nem 3D.",
+          "en": "Flat comment, message and email cards slide by one at a time showing the sponsor's path, no glow, no 3D."},
+ "quando": "publi ou patrocínio explicando o passo a passo ('você comenta, recebe a mensagem, chega o e-mail com o cupom'), funil, atendimento",
+ "campos": {"passos": {"tipo": "lista", "exemplo": [
+   {"tipo": "comentario", "quem": "@voce", "texto": "QUERO", "em": 0.5},
+   {"tipo": "mensagem", "quem": "Lumo", "texto": "Oi! Seu link chegou.", "em": 1.4},
+   {"tipo": "email", "quem": "Lumo", "texto": "Seu cupom de 20% está aqui", "em": 2.3}]}},
+ "exemplo": {"de": 0.4, "ate": 3.8}
+}

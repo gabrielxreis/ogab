@@ -1,0 +1,10 @@
+{
+ "id": "palavra-unica", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Palavra única", "en": "Single word"},
+ "desc": {"pt": "Uma palavra grande, sozinha, acima da cabeça, marcando a virada ou a pergunta da fala.",
+          "en": "One big word on its own above the head, marking the turn or the question in the line."},
+ "quando": "ponto de virada curto ('mas', 'só que', 'por quê?', 'errado', 'simples'), pergunta retórica, a palavra que resume a frase",
+ "campos": {"palavra": {"tipo": "texto", "exemplo": "Por quê"},
+            "pergunta": {"tipo": "sim/não", "exemplo": true}},
+ "exemplo": {"de": 0.4, "ate": 2.8}
+}

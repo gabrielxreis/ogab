@@ -1,0 +1,10 @@
+{
+ "id": "rotulo-montagem", "grupo": "batida", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Rótulo de montagem", "en": "Montage label"},
+ "desc": {"pt": "Um selo no canto de cima identifica a montagem de vida real em tela cheia (lugar, data ou 'na prática'); as imagens são do editor.",
+          "en": "A stamp in the top corner labels the full-screen real-life montage (place, date or 'in practice'); the footage comes from the editor."},
+ "quando": "trecho em que entram imagens reais em tela cheia (bastidor, cliente usando, viagem, antes e depois); o vídeo da montagem é do usuário",
+ "campos": {"rotulo": {"tipo": "texto", "exemplo": "Na prática"},
+            "sub": {"tipo": "texto", "exemplo": "gravação de ontem"}},
+ "exemplo": {"de": 0.4, "ate": 3.2}
+}

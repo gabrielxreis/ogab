@@ -1,0 +1,12 @@
+{
+ "id": "logos-setas", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "logo"],
+ "nome": {"pt": "Logos e setas", "en": "Logos and arrows"},
+ "desc": {"pt": "Duas marcas lado a lado e setas se desenham entre elas mostrando o que vai e o que volta.",
+          "en": "Two brands side by side while arrows draw between them, showing what goes and what comes back."},
+ "quando": "fala de relação, troca ou parceria entre dois lados: quem paga quem, dados por dinheiro, cliente e empresa, de onde vem e para onde vai",
+ "campos": {"a": {"tipo": "logo", "exemplo": {"nome": "Lumo", "logo": ""}},
+            "b": {"tipo": "logo", "exemplo": {"nome": "Brisa", "logo": ""}},
+            "ida": {"tipo": "texto", "exemplo": "atenção"},
+            "volta": {"tipo": "texto", "exemplo": "dinheiro"}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

@@ -1,0 +1,57 @@
+{
+ "id": "frase-cinetica",
+ "grupo": "batida",
+ "camada": "frente",
+ "precisa": [],
+ "nome": {
+  "pt": "Frase cinética",
+  "en": "Kinetic sentence"
+ },
+ "desc": {
+  "pt": "Corte para tela cheia: num fundo liso, a frase se monta palavra por palavra, com ícones desenhados no meio.",
+  "en": "Cut to full screen: on a plain backdrop the sentence builds word by word, with drawn icons mixed in."
+ },
+ "quando": "frase-tese do vídeo, promessa, resumo em uma linha (2 a 4 s, é um corte: a pessoa sai da tela); palavras-chave com ícone (dinheiro, tempo, video, coracao, raio, olho, check, seta)",
+ "campos": {
+  "palavras": {
+   "tipo": "lista",
+   "exemplo": [
+    {
+     "w": "Menos",
+     "em": 0.5
+    },
+    {
+     "w": "tempo",
+     "icone": "tempo",
+     "em": 0.8
+    },
+    {
+     "w": "editando,",
+     "em": 1.1
+    },
+    {
+     "w": "mais",
+     "em": 1.6
+    },
+    {
+     "w": "vídeo",
+     "icone": "video",
+     "em": 1.9
+    },
+    {
+     "w": "no ar",
+     "destaque": true,
+     "em": 2.3
+    }
+   ]
+  },
+  "fundo": {
+   "tipo": "cor",
+   "exemplo": "#111317"
+  }
+ },
+ "exemplo": {
+  "de": 0.4,
+  "ate": 3.6
+ }
+}

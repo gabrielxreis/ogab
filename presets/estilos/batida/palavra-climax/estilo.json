@@ -1,0 +1,9 @@
+{
+ "id": "palavra-climax", "grupo": "batida", "camada": "atras", "precisa": ["rosto", "recorte"],
+ "nome": {"pt": "Palavra clímax", "en": "Climax word"},
+ "desc": {"pt": "Uma palavra enorme atravessa o quadro por trás da pessoa no momento de virada.",
+          "en": "One huge word sweeps across the frame behind the person at the turning point."},
+ "quando": "auge da fala, revelação, a palavra que vira o vídeo ('NUNCA', 'TUDO', 'GRÁTIS', 'AGORA'); no máximo uma vez por vídeo",
+ "campos": {"palavra": {"tipo": "texto", "exemplo": "Agora"}},
+ "exemplo": {"de": 0.4, "ate": 2.6}
+}

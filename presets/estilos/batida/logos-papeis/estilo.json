@@ -1,0 +1,12 @@
+{
+ "id": "logos-papeis", "grupo": "batida", "camada": "frente", "precisa": ["rosto", "logo"],
+ "nome": {"pt": "Logos com papel", "en": "Logos with roles"},
+ "desc": {"pt": "Cada marca entra na hora em que é dita, com uma etiqueta de uma palavra dizendo o papel dela.",
+          "en": "Each brand pops in as it is named, with a one-word tag saying its role."},
+ "quando": "fala que cita 2 a 4 empresas, ferramentas ou parceiros e o que cada um faz (quem paga, quem entrega, quem vende)",
+ "campos": {"itens": {"tipo": "lista", "exemplo": [
+   {"nome": "Lumo", "papel": "grava", "em": 0.5, "logo": ""},
+   {"nome": "Fiapo", "papel": "edita", "em": 1.2, "logo": ""},
+   {"nome": "Norte", "papel": "posta", "em": 1.9, "logo": ""}]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}
