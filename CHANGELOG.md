@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-32 (23/10/2026)
+- **Estilo novo, Salta do celular (motion):** um celular entra em 3D e um cartão com o número ou a frase salta para fora da tela; motion puro, com fundo próprio, para usar como inserto.
 ## 2026.10.23-31 (23/10/2026)
 - **Corte pelo escuro removido:** o estilo saiu do menu e da skill (não vai ser usado).
 ## 2026.10.23-30 (23/10/2026)
