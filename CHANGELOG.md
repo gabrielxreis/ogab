@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-8 (23/10/2026)
+- **Menu mais fácil:** a legenda nativa agora se chama "Padrão do DaVinci" (ou do seu editor); a música é escolhida pelo sentimento, com exemplos de uso e um botão ▶ para ouvir uma amostra do clima; os estilos dos motions vêm em abas por tipo de conteúdo, com uma aba "Sugeridos"; cartões maiores, e quando não cabe tudo o passo vira páginas (‹ 1/2 ›) em vez de letra miúda.
+- **Nada passa em branco:** o "Avançar" só libera depois de marcar uma opção ou apertar "Automático neste passo".
+- **Mensagem do Confirmar:** sai por extenso, uma linha por passo, sem caminho de pasta (funciona em qualquer computador).
 ## 2026.10.23-7 (23/10/2026)
 - **Menu sem rolagem:** os cartões se ajustam ao tamanho da tela e cada passo mostra todas as opções de uma vez, inclusive em telas grandes; quando não cabe, a descrição curta vira dica ao passar o mouse.
 ## 2026.10.23-6 (23/10/2026)

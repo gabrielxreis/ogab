@@ -89,7 +89,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
     C = catalogo()
     presets = [p for p in C["presets"] if p["id"] not in FORA_DO_MENU]
     est = [it(p["id"], p["nome"], p["nome"].replace(" (CENA)", " (SCENE)"), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
-              gif=p.get("gif") or None, extra={"cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
+              gif=p.get("gif") or None, extra={"aba": p["categoria"], "cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
               "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or []}) for p in presets]
     def anim_let(n):
         n = n.lower()
@@ -141,6 +141,8 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("muitos", "Muitos", "Lots", "Uma ideia, uma imagem: quase o vídeo todo.", "One idea, one image: almost the whole video.", "dens d3"),
             it("sem", "Sem motion", "No motion", "Só a pessoa, legenda e lettering.", "Just the person, captions and lettering.", "none")]},
         {"id": "estilo", "letra": "E", "unico": False, "max": 3, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
+         "abas": [{"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [{"id": c, "nome": {"pt": C["categorias"][c], "en": CAT_EN.get(c, c)}}
+                  for c in ("apresentador", "ideia", "lista", "dados", "produto", "social", "marca") if c in C["categorias"]],
          "sub": {"pt": "Como os motions vão parecer. Até 3; eles se misturam trecho a trecho.", "en": "How the motion graphics will look. Up to 3; they mix section by section."},
          "itens": est},
         {"id": "legenda", "letra": "L", "unico": True, "nome": {"pt": "Legenda", "en": "Captions"},
@@ -148,10 +150,10 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
          "abas": [{"id": "editor", "nome": {"pt": f"No editor ({editor_nome})", "en": f"In the editor ({editor_nome})"}},
                   {"id": "animada", "nome": {"pt": "Animada (motion)", "en": "Animated (motion)"}}],
          "itens": [
-            it("gab_usa", "GAB USA (padrão)", "GAB USA (default)", f"Legenda nativa do {editor_nome} com o seu preset: editável na trilha de legenda, uma linha, do primeiro ao último segundo.",
-               f"Native {editor_nome} subtitles with your preset: editable on the subtitle track, one line, first to last second.", "cap-gab", extra={"aba": "editor"}),
-            it("editor_padrao", f"Legenda padrão do {editor_nome}", f"Default {editor_nome} subtitles", "Create Subtitles from Audio sem estilo extra, para você ajustar no editor.",
-               "Create Subtitles from Audio with no extra style, for you to tweak in the editor.", "cap-plain", extra={"aba": "editor"}),
+            it("gab_usa", f"Padrão do {editor_nome}", f"{editor_nome} default", f"Legenda do próprio {editor_nome} no estilo do Gab: uma linha, do começo ao fim, editável na trilha de legenda.",
+               f"{editor_nome}'s own subtitles in Gab's style: one line, start to end, editable on the subtitle track.", "cap-gab", extra={"aba": "editor"}),
+            it("editor_padrao", f"Simples do {editor_nome}", f"Plain {editor_nome}", f"Legenda do {editor_nome} sem estilo, para você ajustar do seu jeito.",
+               f"{editor_nome} subtitles with no style, for you to tweak your way.", "cap-plain", extra={"aba": "editor"}),
             it("sem", "Sem legenda", "No captions", "Quadro limpo, só títulos e gráficos.", "Clean frame, only titles and graphics.", "none", extra={"aba": "editor"}),
             it("destaque", "Destaque palavra por palavra", "Word-by-word highlight", "Palavra-chave grande amarela ou em serifa (render em motion).", "Big yellow or serif keyword (rendered as motion).", "cap-hl", extra={"aba": "animada"}),
             it("serif_azul", "Serif azul", "Blue serif", "Sans com a palavra-chave em serifada itálica azul.", "Sans with the keyword in blue serif italic.", "cap-serif", extra={"aba": "animada"}),
@@ -168,14 +170,17 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("real", "Material real", "Real footage", "Vídeo público e acervo (fatos, pessoas, lugares reais).", "Public video and archives (real facts, people, places).", "takes t4"),
             it("sem", "Sem b-roll", "No b-roll", "Só a gravação.", "Only the recording.", "none")]},
         {"id": "musica", "letra": "A", "unico": True, "nome": {"pt": "Música", "en": "Music"},
-         "sub": {"pt": "O clima da trilha (instrumental, entra bruta na timeline).", "en": "The mood of the track (instrumental, placed raw on the timeline)."}, "itens": [
-            it("emotiva", "Emotiva (padrão)", "Emotional (default)", "Faz sonhar, sobe no CTA.", "Dreamy, lifts at the CTA.", "bars m1"),
-            it("epica", "Épica", "Epic", "Grande, cinematográfica.", "Big, cinematic.", "bars m2"),
-            it("tensa", "Tensa / suspense", "Tense / suspense", "Para história e revelação.", "For story and reveals.", "bars m3"),
-            it("alegre", "Alegre", "Upbeat", "Leve e animada.", "Light and lively.", "bars m4"),
-            it("corporativa", "Corporativa", "Corporate", "Limpa, para marca e serviço.", "Clean, for brand and service.", "bars m5"),
-            it("calma", "Calma / lo-fi", "Calm / lo-fi", "Baixinha, para conteúdo explicativo.", "Low, for explainer content.", "bars m6"),
-            it("sem", "Sem música", "No music", "Só voz e efeitos.", "Voice and effects only.", "none")]},
+         "sub": {"pt": "Escolha pelo sentimento. Toque ▶ para ouvir uma amostra do clima (a música de verdade vem do seu Artlist ou Envato). Na dúvida, deixe no automático: o Gab escolhe pelo assunto.",
+                 "en": "Pick by feeling. Tap ▶ to hear a sketch of the mood (the real track comes from your Artlist or Envato). Not sure? Leave it on automatic: Gab picks by topic."}, "itens": [
+            it("emotiva", "Emocionante", "Moving", "Boa para: história de vida, depoimento, conquista.", "Good for: life story, testimonial, achievement.", "bars m1", extra={"som": "emotiva"}),
+            it("epica", "Épica, de cinema", "Epic, cinematic", "Boa para: grande revelação, trailer, momento histórico.", "Good for: big reveal, trailer, historic moment.", "bars m2", extra={"som": "epica"}),
+            it("tensa", "Suspense, mistério", "Suspense, mystery", "Boa para: curiosidade, 'você sabia', caso misterioso.", "Good for: curiosity, 'did you know', mystery story.", "bars m3", extra={"som": "tensa"}),
+            it("alegre", "Alegre, pra cima", "Happy, upbeat", "Boa para: dica rápida, novidade, bastidor leve.", "Good for: quick tip, news, light behind the scenes.", "bars m4", extra={"som": "alegre"}),
+            it("energia", "Energia, motivação", "Energy, motivation", "Boa para: desafio, treino, chamada forte.", "Good for: challenge, workout, strong call to action.", "bars m7", extra={"som": "energia"}),
+            it("corporativa", "Confiança, empresa", "Trust, corporate", "Boa para: serviço, institucional, apresentação da marca.", "Good for: services, corporate, brand intro.", "bars m5", extra={"som": "corporativa"}),
+            it("calma", "Calma, reflexão", "Calm, reflective", "Boa para: explicação, tutorial, fé e reflexão.", "Good for: explainer, tutorial, faith and reflection.", "bars m6", extra={"som": "calma"}),
+            it("delicada", "Delicada, afetiva", "Gentle, heartfelt", "Boa para: família, casamento, homenagem.", "Good for: family, wedding, tribute.", "bars m8", extra={"som": "delicada"}),
+            it("sem", "Sem música", "No music", "Só a voz e os efeitos.", "Voice and effects only.", "none")]},
         {"id": "sfx", "letra": "S", "unico": True, "nome": {"pt": "Efeitos sonoros", "en": "Sound effects"},
          "sub": {"pt": "Som do que aparece na tela (gaveta, papel, avião), nunca mais alto que a voz.", "en": "The sound of what's on screen (drawer, paper, plane), never louder than the voice."}, "itens": [
             it("completo", "Desenho de som completo", "Full sound design", "Foley do que o motion mostra + ambiente.", "Foley for what the motion shows + ambience.", "sfx s1"),
@@ -294,7 +299,10 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 .card[aria-pressed=true]{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.35)}
 .vis{aspect-ratio:var(--ar,4/5);background:#050806;position:relative;overflow:hidden;display:grid;place-items:center}
 .card{display:flex;flex-direction:column}.card .tx{flex:1}
-.compacto .tx span{display:none}.compacto .tx{padding:8px 10px 10px}.compacto .tx b{font-size:13.5px}
+.play{position:absolute;bottom:10px;right:10px;width:38px;height:38px;border-radius:50%;background:var(--grad);color:var(--ink);display:grid;place-items:center;font-size:14px;z-index:3;box-shadow:0 0 14px rgba(43,255,136,.5);cursor:pointer}
+.play.on{animation:breathe .6s infinite}
+.pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:10px;font:800 13px "Inter Tight";color:var(--mu)}
+.pager button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--tx);font:800 18px "Inter Tight";cursor:pointer}.pager button:disabled{opacity:.3;cursor:default}
 .vis img{width:100%;height:100%;object-fit:cover;display:block}
 .chk{position:absolute;top:9px;right:9px;width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(0,0,0,.35);display:grid;place-items:center;z-index:2}
 .card[aria-pressed=true] .chk{background:var(--g);border-color:var(--g)}
@@ -333,6 +341,8 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 @keyframes respira{from{box-shadow:0 0 6px rgba(43,255,136,.25);transform:scale(1)}to{box-shadow:0 0 16px rgba(43,255,136,.7);transform:scale(1.015)}}
 .bk{background:rgba(255,255,255,.08);color:var(--tx);border:1px solid var(--line)!important}.pl{background:rgba(245,181,68,.12);color:var(--amb);border:1px solid rgba(245,181,68,.3)!important;border-radius:999px!important}
 .barra button[hidden]{display:none}
+.go:disabled{animation:none;opacity:.35;cursor:not-allowed;filter:grayscale(.6)}
+.pl.ativo{background:var(--amb)!important;color:var(--ink)!important}
 .fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim div{max-width:460px;padding:24px}.fim b{font-size:26px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px}
 @media (max-width:640px){.inicio{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.resumo b{min-width:110px}.barra .codes{display:none}}
 /* ---------- prévias em loop (opções sem GIF) ---------- */
@@ -410,19 +420,20 @@ const T = {
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
-  max:n=>`até ${n}`,fim_t:"Pronto!",fim_p:"O Gab já recebeu as suas escolhas e o Claude está voltando para a frente. Se não voltar, cole no Claude (Cmd+V / Ctrl+V): a mensagem já está copiada.",msg:(c,a)=>`/ogab menu confirmado: ${c || "automático nos passos sem escolha"}. Escolhas em ${a}`,msg_auto:a=>`/ogab menu confirmado: automático (o Gab escolhe tudo). Escolhas em ${a}`,erro:"Não consegui salvar. O Gab ainda está aberto?"},
+  ouvir:"Ouvir o clima",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto!",fim_p:"O Gab já recebeu as suas escolhas e o Claude está voltando para a frente. Se não voltar, cole no Claude (Cmd+V / Ctrl+V): a mensagem já está copiada.",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
   resumo_t:"Here is your video",resumo_p:"Click a card to go back and change it.",resumo_rot:"Review",suas:"yours",escolhas_suas:"your picks",no_auto:"on automatic",passos_auto:"steps on automatic",editar:"Click to change",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
-  max:n=>`up to ${n}`,fim_t:"Done!",fim_p:"Gab already has your choices and Claude is coming back to the front. If it doesn\'t, paste into Claude (Cmd+V / Ctrl+V): the message is already copied.",msg:(c,a)=>`/ogab menu confirmed: ${c || "automatic on the steps left blank"}. Choices in ${a}`,msg_auto:a=>`/ogab menu confirmed: automatic (Gab picks everything). Choices in ${a}`,erro:"Couldn't save. Is Gab still open?"}};
+  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done!",fim_p:"Gab already has your choices and Claude is coming back to the front. If it doesn\'t, paste into Claude (Cmd+V / Ctrl+V): the message is already copied.",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
 const N = D.grupos.length; let passo = 0, auto = false; const aba = {};
-D.grupos.forEach(g => { if (g.abas) aba[g.id] = g.abas[0].id; });   // 0 = início, 1..N = grupos, N+1 = resumo
+const pag = {}, autoPasso = {};   // autoPasso[g] = a pessoa apertou 'Automático neste passo'
+D.grupos.forEach(g => { if (g.abas) aba[g.id] = (g.abas[0].id === "sugeridos" && !D.sugeridos.length) ? g.abas[1].id : g.abas[0].id; });   // 0 = início, 1..N = grupos, N+1 = resumo
 const $ = s => document.querySelector(s), esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const CHK = '<svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="#04130A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function prev(i) {
@@ -443,7 +454,7 @@ function prev(i) {
     return `<div class="an fmt"><div class="frame" style="width:${wd}%;aspect-ratio:${w}/${h}"><span class="pr">${pr}</span></div></div>`; }
   if (a.startsWith("fmt")) return `<div class="an ${a}"><div class="frame"></div></div>`;
   if (a.startsWith("dens")) { const n = {d1:2,d2:5,d3:9}[a.split(" ")[1]]; return `<div class="an"><div class="dots">${Array.from({length:9},(_,k)=>`<span style="--i:${k};${k<n?"":"visibility:hidden"}"></span>`).join("")}</div></div>`; }
-  if (a.startsWith("bars")) { const d = {m1:"1.3s",m2:".9s",m3:"1.8s",m4:".5s",m5:"1s",m6:"2.2s"}[a.split(" ")[1]]; return `<div class="an"><div class="bars" style="--d:${d}">${"<span></span>".repeat(9)}</div></div>`; }
+  if (a.startsWith("bars")) { const d = {m1:"1.3s",m2:".9s",m3:"1.8s",m4:".5s",m5:"1s",m6:"2.2s",m7:".4s",m8:"1.6s"}[a.split(" ")[1]]; return `<div class="an"><div class="bars" style="--d:${d}">${"<span></span>".repeat(9)}</div></div>`; }
   if (a.startsWith("sfx")) return `<div class="an"><div class="rings" style="${a.endsWith("s2")?"width:18%":""}"></div></div>`;
   if (a.startsWith("pace")) { const d = {p1:"9s",p2:"5s",p3:"2.5s"}[a.split(" ")[1]], ws = {p1:[90,110,100],p2:[60,40,70],p3:[30,22,26]}[a.split(" ")[1]];
     return `<div class="an"><div class="strip" style="--d:${d}">${Array.from({length:16},(_,k)=>`<span style="width:${ws[k%3]}px"></span>`).join("")}</div></div>`; }
@@ -458,6 +469,7 @@ function prev(i) {
   if (a === "cta") return `<div class="an cta"><span class="btn">${L==="pt"?"seusite.com":"yoursite.com"}</span></div>`;
   return `<div class="an none"></div>`;
 }
+function pronto(p) { const g = D.grupos[p - 1]; return !g || sel[g.id].size > 0 || autoPasso[g.id] || pula(p); }
 function codigos() { const out = []; D.grupos.forEach(g => g.itens.forEach((i, n) => { if (sel[g.id].has(i.id)) out.push(g.letra + (n + 1)); })); return out; }
 function render() {
   document.documentElement.lang = L === "pt" ? "pt-BR" : "en";
@@ -473,12 +485,12 @@ function render() {
   } else if (passo <= N) {
     const g = D.grupos[passo - 1];
     h = `<div class="passo">${T[L].passo(passo, N)}</div><h2><span class="k">${g.letra}</span>${esc(g.nome[L])}</h2>
-      <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : " · <b style='color:var(--g)'>" + T[L].gab_escolhe + "</b>"}</p>
-      ${g.abas ? `<div class="abas">${g.abas.map(x => { const c = g.itens.filter(i => i.aba === x.id && sel[g.id].has(i.id)).length;
+      <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : (autoPasso[g.id] ? " · <b style='color:var(--amb)'>" + T[L].gab_escolhe + "</b>" : " · <b style='color:var(--mu)'>" + T[L].marque + "</b>")}</p>
+      ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id) && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
-      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && i.aba !== aba[g.id]) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
-      <div class="vis">${prev(i)}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
-      <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div>`;
+      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id])) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
+      <div class="vis">${prev(i)}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${i.som ? `<span class="play" data-play="${i.som}" title="${T[L].ouvir}">▶</span>` : ""}${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
+      <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div><div class="pager" id="pager"></div>`;
   } else {
     const man = D.grupos.filter(g => sel[g.id].size).length, tot = D.grupos.length, pct = auto ? 0 : man / tot;
     const C = 2 * Math.PI * 46, anel = `<div class="anel"><svg viewBox="0 0 104 104"><circle cx="52" cy="52" r="46" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="9"/>
@@ -505,43 +517,78 @@ function render() {
   $("#bk").hidden = passo === 0; $("#pl").hidden = !(passo >= 1 && passo <= N); $("#go").hidden = passo === 0;
   $("#go").textContent = passo > N ? (auto ? T[L].conf_auto : T[L].confirmar) : (passo === N ? T[L].revisar : T[L].avancar);
   $("#codes").textContent = auto ? T[L].auto_t : codigos().join("  ");
+  const trava = passo >= 1 && passo <= N && !pronto(passo);
+  $("#go").disabled = trava; $("#go").title = trava ? T[L].trava : "";
+  $("#pl").classList.toggle("ativo", passo >= 1 && passo <= N && !!autoPasso[D.grupos[passo - 1].id]);
   scrollTo(0, 0);
 }
 function pula(p) { const g = D.grupos[p - 1]; return g && g.id === "estilo" && sel.motions && sel.motions.has("sem"); }
-// cabe tudo na tela: mede de verdade, aumentando as colunas até todas as opções do passo caberem sem rolar;
-// se não couber, esconde a descrição (fica no title, aparece ao passar o mouse) e tenta de novo; passo enorme rola.
+// cabe tudo na tela, sem letra miúda: cartão entre 180 e 300 px; mede quantas colunas e linhas cabem e,
+// se não couber tudo, divide em páginas (‹ 1/2 ›) em vez de rolar ou encolher.
 function ajustar() {
-  const g = $(".grid"); if (!g) return;
-  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 14, W = g.clientWidth, gap = 12;
-  g.style.maxHeight = H + "px";
-  for (const compacto of [false, true]) {
-    g.classList.toggle("compacto", compacto);
-    const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap)));   // cartão de no máximo ~300 px
-    for (let c = ini; c <= Math.max(g.children.length, ini) + 1; c++) {
-      if ((W - gap * (c - 1)) / c < 104) break;
-      g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
-      if (g.scrollHeight <= g.clientHeight + 1) return;
-    }
+  const g = $(".grid"), pager = $("#pager"); if (!g) return;
+  const cards = [...g.children]; cards.forEach(c => c.style.display = "");
+  const n = cards.length, gap = 12, W = g.clientWidth;
+  const H = innerHeight - g.getBoundingClientRect().top - $(".barra").offsetHeight - 58;
+  const ini = Math.max(2, Math.ceil((W + gap) / (300 + gap))), fim = Math.max(ini, Math.floor((W + gap) / (180 + gap)));
+  let esc_ = null;
+  for (let c = ini; c <= fim; c++) {
+    g.style.gridTemplateColumns = `repeat(${c}, 1fr)`;
+    const alt = Math.max(...cards.slice(0, c).map(x => x.offsetHeight)) || 300, linhas = Math.max(1, Math.floor((H + gap) / (alt + gap)));
+    esc_ = {c, cap: c * linhas}; if (c * linhas >= n) break;
   }
-  g.style.gridTemplateColumns = "repeat(auto-fill,minmax(130px,1fr))";
+  g.style.gridTemplateColumns = `repeat(${esc_.c}, 1fr)`; g.style.maxHeight = "none"; g.style.overflow = "visible";
+  const gid = D.grupos[passo - 1].id, paginas = Math.ceil(n / esc_.cap);
+  pag[gid] = Math.max(0, Math.min(paginas - 1, pag[gid] || 0));
+  if (paginas > 1) cards.forEach((c, k) => { if (k < pag[gid] * esc_.cap || k >= (pag[gid] + 1) * esc_.cap) c.style.display = "none"; });
+  pager.innerHTML = paginas > 1 ? `<button data-pg="-1" ${pag[gid] ? "" : "disabled"}>‹</button><span>${pag[gid] + 1} / ${paginas}</span><button data-pg="1" ${pag[gid] < paginas - 1 ? "" : "disabled"}>›</button>` : "";
+}
+// amostra do clima da música, sintetizada no navegador (não é a música do vídeo)
+let AC = null, tocando = null;
+const CLIMAS = {
+  emotiva: {bpm: 76, onda: "triangle", corte: 1800, acordes: [[60,64,67,72],[55,59,62,67],[57,60,64,69],[53,57,60,65]]},
+  epica: {bpm: 62, onda: "sawtooth", corte: 900, acordes: [[50,57,62,65],[46,53,58,62],[53,57,60,65],[48,55,60,64]]},
+  tensa: {bpm: 54, onda: "sine", corte: 700, acordes: [[45,52,57,60],[45,52,56,59],[44,51,56,59],[45,52,57,60]]},
+  alegre: {bpm: 120, onda: "square", corte: 2600, acordes: [[60,64,67],[65,69,72],[67,71,74],[60,64,67]]},
+  energia: {bpm: 128, onda: "sawtooth", corte: 2200, acordes: [[52,59,64,67],[48,55,60,64],[55,62,67,71],[50,57,62,66]]},
+  corporativa: {bpm: 100, onda: "triangle", corte: 2000, acordes: [[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,65]]},
+  calma: {bpm: 66, onda: "sine", corte: 1200, acordes: [[57,60,64,67],[53,57,60,64],[48,52,55,59],[55,59,62,66]]},
+  delicada: {bpm: 72, onda: "triangle", corte: 1500, acordes: [[64,67,71,76],[60,64,67,72],[62,65,69,74],[59,62,67,71]]}};
+function tocar(id, el) {
+  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  if (tocando) { tocando.forEach(o => { try { o.stop(); } catch (e) {} }); tocando = null; document.querySelectorAll(".play.on").forEach(x => x.classList.remove("on")); }
+  const c = CLIMAS[id]; if (!c) return; el.classList.add("on");
+  const dur = 60 / c.bpm * 2, t0 = AC.currentTime + .05, mestre = AC.createGain(), filtro = AC.createBiquadFilter(); tocando = [];
+  filtro.type = "lowpass"; filtro.frequency.value = c.corte; mestre.gain.value = .14; filtro.connect(mestre); mestre.connect(AC.destination);
+  c.acordes.forEach((ac, k) => ac.forEach(nota => {
+    const o = AC.createOscillator(), v = AC.createGain(), ini = t0 + k * dur;
+    o.type = c.onda; o.frequency.value = 440 * Math.pow(2, (nota - 69) / 12);
+    v.gain.setValueAtTime(0, ini); v.gain.linearRampToValueAtTime(.25, ini + Math.min(.08, dur / 4)); v.gain.exponentialRampToValueAtTime(.001, ini + dur * .98);
+    o.connect(v); v.connect(filtro); o.start(ini); o.stop(ini + dur); tocando.push(o);
+  }));
+  setTimeout(() => el.classList.remove("on"), dur * c.acordes.length * 1000);
 }
 addEventListener("resize", ajustar);
 function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }
 document.addEventListener("click", e => {
   const op = e.target.closest(".op"); if (op) { auto = op.dataset.op === "auto"; return ir(auto ? N + 1 : 1); }
   const r = e.target.closest("[data-ir]"); if (r) return ir(+r.dataset.ir);
-  const ab = e.target.closest("[data-aba]"); if (ab) { aba[D.grupos[passo - 1].id] = ab.dataset.aba; return render(); }
+  const ab = e.target.closest("[data-aba]"); if (ab) { const gid = D.grupos[passo - 1].id; aba[gid] = ab.dataset.aba; pag[gid] = 0; return render(); }
+  const pg = e.target.closest("[data-pg]"); if (pg) { const gid = D.grupos[passo - 1].id; pag[gid] = (pag[gid] || 0) + (+pg.dataset.pg); return ajustar(); }
+  const pl = e.target.closest("[data-play]"); if (pl) { e.stopPropagation(); return tocar(pl.dataset.play, pl); }
   const b = e.target.closest(".card"); if (b) {
     const g = D.grupos.find(x => x.id === b.dataset.g), s = sel[g.id], id = b.dataset.i;
     if (s.has(id)) s.delete(id);
     else { if (g.unico || id === "sem") s.clear(); else s.delete("sem"); if (g.max && s.size >= g.max) return; s.add(id); }
+    autoPasso[g.id] = false;
     const gr = $(".grid"), y = gr ? gr.scrollTop : 0; render(); if ($(".grid")) $(".grid").scrollTop = y; return;
   }
   const l = e.target.closest(".lang button"); if (l) { L = l.dataset.l; try { localStorage.setItem("ogab_menu_lang", L) } catch(e) {} render(); }
 });
 $("#bk").onclick = () => ir(auto ? 0 : passo - 1);
-$("#pl").onclick = () => { sel[D.grupos[passo - 1].id].clear(); ir(passo + 1); };
+$("#pl").onclick = () => { const gid = D.grupos[passo - 1].id; sel[gid].clear(); autoPasso[gid] = true; ir(passo + 1); };
 $("#go").onclick = async () => {
+  if (passo >= 1 && passo <= N && !pronto(passo)) return;
   if (passo <= N) return ir(passo + 1);
   const esc_ = {}, deixou = []; D.grupos.forEach(g => { if (sel[g.id].size) esc_[g.id] = [...sel[g.id]]; else deixou.push(g.id); });
   const lt = D.grupos.find(g => g.id === "lettering"); if (esc_.lettering) esc_.lettering_templates = esc_.lettering.map(id => (lt.itens.find(x => x.id === id) || {}).template).filter(Boolean);
@@ -549,12 +596,14 @@ $("#go").onclick = async () => {
   try {
     const r = await fetch("/escolha", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corpo)}); if (!r.ok) throw 0;
     const arq = (await r.json()).arquivo;
-    const msg = auto ? T[L].msg_auto(arq) : T[L].msg(corpo.codigos.join(" "), arq);
+    const msg = auto ? T[L].cab_auto : [T[L].cab + ":"].concat(D.grupos.map(g => {
+      const its = g.itens.filter(i => sel[g.id].has(i.id)).map(i => (g.id === "formato" ? (g.abas.find(x => x.id === i.aba) || {nome: {}}).nome[L] + " " : "") + i.nome[L] + (i.proporcao ? ` (${i.proporcao})` : ""));
+      return `- ${g.nome[L]}: ${its.length ? its.join(", ") : T[L].auto_l}`; })).join("\n");
     try { await navigator.clipboard.writeText(msg); } catch (e) {}
     $("#fim").style.display = "grid";
   } catch (e) { alert(T[L].erro); }
 };
-document.addEventListener("keydown", e => { if (e.key === "ArrowRight" && passo > 0 && passo <= N) ir(passo + 1); if (e.key === "ArrowLeft" && passo > 0) ir(auto ? 0 : passo - 1); });
+document.addEventListener("keydown", e => { if (e.key === "ArrowRight" && passo > 0 && passo <= N && pronto(passo)) ir(passo + 1); if (e.key === "ArrowLeft" && passo > 0) ir(auto ? 0 : passo - 1); });
 render();
 </script></body></html>"""
 
