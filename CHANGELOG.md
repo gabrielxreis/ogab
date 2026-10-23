@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-35 (23/10/2026)
+- **Extras sem repetição:** saíram "Motion atrás da pessoa" e "Gancho com lettering" dos Extras (já existem nos passos de estilo e gancho).
 ## 2026.10.23-34 (23/10/2026)
 - **Menu mais curto:** o passo "Efeitos" saiu do menu, junto com o preset Salta do celular.
 ## 2026.10.23-33 (23/10/2026)

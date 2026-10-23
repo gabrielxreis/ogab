@@ -262,8 +262,6 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("pb", "Preto e branco", "Black and white", "Neutro, com contraste.", "Neutral, with contrast.", "col c3")] + EST.get("cor", [])},
         {"id": "extras", "letra": "X", "unico": False, "nome": {"pt": "Extras", "en": "Extras"},
          "sub": {"pt": "Marque o que quer a mais.", "en": "Tick what you want on top."}, "itens": [
-            it("atras_pessoa", "Motion atrás da pessoa", "Motion behind the person", "Magic Mask no Fusion: texto e objetos passam atrás de você.", "Magic Mask in Fusion: text and objects go behind you.", "behind"),
-            it("gancho_lettering", "Gancho com lettering", "Hook with lettering", "Título forte nos 3 primeiros segundos.", "A strong title in the first 3 seconds.", "let-cine"),
             it("variacoes_gancho", "Variações de gancho", "Hook variations", "3 a 5 ganchos para testar no anúncio.", "3 to 5 hooks to test in the ad.", "hooks"),
             it("capa", "Capa + legenda do post", "Cover + post caption", "Capa PNG e texto do post prontos.", "PNG cover and post text ready.", "cover"),
             it("logo_abertura", "Logo na abertura", "Logo opener", "Abertura de marca de 5-8 s.", "5-8 s brand opener.", "logo"),
