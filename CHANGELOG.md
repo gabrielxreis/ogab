@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-36 (23/10/2026)
+- **Órbita:** o texto de cada cartão agora acompanha o tamanho dele (não estoura mais a borda em take fechado); prévia refeita com o cartão "Letreiro".
+- **Prévias mais robustas:** se o cache de vídeos for apagado (limpeza de disco), os takes escolhidos são baixados de novo sozinhos.
 ## 2026.10.23-35 (23/10/2026)
 - **Extras sem repetição:** saíram "Motion atrás da pessoa" e "Gancho com lettering" dos Extras (já existem nos passos de estilo e gancho).
 ## 2026.10.23-34 (23/10/2026)

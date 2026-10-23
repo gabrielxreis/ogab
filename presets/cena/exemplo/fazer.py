@@ -66,7 +66,7 @@ def gravacao(take, orig, dest, dur):
                                     "stream=width,height", "-of", "csv=p=0", orig], capture_output=True, text=True,
                                    check=True).stdout.strip().split(",")[:2])
     if w / h > 9 / 16:
-        corte = f"crop=ih*9/16:ih:(iw-ih*9/16)/2:0"
+        corte = "crop=ih*9/16:ih:(iw-ih*9/16)/2:0"
     else:
         corte = f"crop=iw:iw*16/9:0:(ih-iw*16/9)*{take.get('y', .5)}"
     ajuste = max(-.12, min(.12, (LUMA_ALVO - luma(orig, take["de"] + 1)) / 255))
@@ -95,6 +95,8 @@ def main(trab, quais):
                if p["ini"] >= t0 - 1e-6 and p["fim"] <= t1 + 1e-6]
         json.dump(pal, open(os.path.join(pasta, "palavras.json"), "w"), ensure_ascii=False)
         take = TAKES[preset]
+        if take.get("banco"):   # banco de takes (presets/estilos/exemplo/takes.py); cache apagado: baixa de novo
+            sys.path.insert(0, os.path.join(PRESETS, "estilos", "exemplo")); from takes import garantir; garantir(take["banco"])
         orig = (os.path.expanduser(f"~/.cache/ogab_takes/ok/{take['banco']}/gravacao.mp4") if take.get("banco")
                 else baixar(take["url"], os.path.join(trab, f"take_{preset}.mp4")))
         gravacao(take, orig, os.path.join(pasta, "gravacao.mp4"), dur)

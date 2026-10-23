@@ -62,7 +62,12 @@ CENA.mod.orbita = function (cartoes, C) {
       const f = k.tam || (c.tamanhos === false ? 1 : [1, .78, 1.18, .88, 1.08, .82][i % 6]);
       const cw = Math.round(c.cw * f), ch = Math.round(c.ch * f);
       e.style.width = cw + "px"; e.style.height = ch + "px"; e.style.left = (-cw / 2) + "px"; e.style.top = (-ch / 2) + "px";
-      e.style.fontSize = Math.round(100 * f) + "%";
+      if (!k.img) {   // a letra acompanha o cartão: texto nunca estoura a borda (cartão pequeno em take fechado)
+        const tx = String(k.texto || ""), fs = Math.min(46 * f, cw * .84 / Math.max(4, tx.length) / .7);
+        const b = e.querySelector("b"), s = e.querySelector("span");
+        if (b) b.style.fontSize = Math.round(fs) + "px";
+        if (s) s.style.fontSize = Math.round(Math.max(12, fs * .48)) + "px";
+      }
       if (k.img) e.classList.add("img");
       els.push(e);
     });

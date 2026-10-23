@@ -42,8 +42,9 @@ def takes_por_estilo(ids):
         i = json.load(open(os.path.join(BANCO, "ok", p, "info.json")))
         return i["luma"] <= 150 and i["luma_rosto"] <= 160
     ok = [p for p in aprovados() if bom(p)]; mapa = json.load(open(MAPA)) if os.path.exists(MAPA) else {}
-    mapa = {e: p for e, p in mapa.items() if p in ok}
-    livres = [p for p in ok if p not in set(mapa.values())]; random.Random(7).shuffle(livres)
+    # escolha já feita vale mesmo se o cache sumiu (o take é baixado de novo); só sorteia para estilo sem take
+    livres_ok = set(ok)
+    livres = [p for p in livres_ok if p not in set(mapa.values())]; livres.sort(); random.Random(7).shuffle(livres)
     for e in sorted(ids):
         if e not in mapa:
             if not livres:
@@ -99,6 +100,10 @@ if __name__ == "__main__":
         print("pulando (motor próprio, prévia pelo script do grupo):", " ".join(fora), flush=True)
     ids = [i for i in ids if i not in fora]
     trabs = {i: trab for i in ids} if "--trab" in a else takes_por_estilo(ids)
+    if "--trab" not in a:   # cache apagado: baixa de novo os takes escolhidos (takes.json guarda o número do Pexels)
+        from takes import garantir
+        for d in set(trabs.values()):
+            garantir(os.path.basename(d))
     for d in set(trabs.values()):
         gravacao(d)
     n = int(a[a.index("--paralelo") + 1]) if "--paralelo" in a else 1

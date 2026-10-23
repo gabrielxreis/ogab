@@ -38,7 +38,6 @@ def rostos_vision(png):
 
 
 def nitidez(cinza):
-    import numpy as np
     a = cinza.astype("float32")
     lap = -4 * a[1:-1, 1:-1] + a[:-2, 1:-1] + a[2:, 1:-1] + a[1:-1, :-2] + a[1:-1, 2:]
     return float(lap.var())
@@ -121,6 +120,25 @@ def preparar(arq):
     info["fonte"] = f"Pexels {pid} (licença Pexels: uso livre, com modificação)"
     json.dump(info, open(os.path.join(pasta, "info.json"), "w"))
     return pid, True, f"luma rosto {info['luma_rosto']}, nitidez {info['nitidez']}"
+
+
+def garantir(pid):
+    """Caminho da gravacao.mp4 do take; se o cache sumiu (limpeza de disco), baixa do Pexels e prepara de novo."""
+    g = os.path.join(BANCO, "ok", str(pid), "gravacao.mp4")
+    if os.path.exists(g):
+        return g
+    brutos = os.path.join(BANCO, "brutos"); os.makedirs(brutos, exist_ok=True)
+    arq = os.path.join(brutos, f"{pid}.mp4")
+    try:
+        subprocess.run(["curl", "-sL", "-A", "Mozilla/5.0", "--max-time", "300", "-o", arq,
+                        f"https://www.pexels.com/download/video/{pid}/"], check=True)
+        _, ok, msg = preparar(arq)
+    finally:
+        if os.path.exists(arq):
+            os.remove(arq)
+    if not ok:
+        raise SystemExit(f"take {pid} não passou no filtro ao baixar de novo: {msg}")
+    return g
 
 
 def aprovados():
