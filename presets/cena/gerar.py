@@ -117,6 +117,9 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur, extras=()):
         shutil.copy(os.path.join(AQUI, "kit", f), proj)
     for m in modulos:
         shutil.copy(os.path.join(PRESETS, m, f"{m}.js"), proj)
+    for c in plano_js.get("estilos") or []:   # imagens/logos dos campos dos estilos
+        for orig, nome in c.get("_copiar", []):
+            os.makedirs(os.path.join(proj, "img"), exist_ok=True); shutil.copy(orig, os.path.join(proj, "img", nome))
     for x in extras:   # módulos dos ESTILOS (presets/estilos/<grupo>/<id>/<id>.js), carregados antes do despachante
         shutil.copy(x, proj)
     for c in plano_js.get("orbita") or []:
@@ -134,7 +137,7 @@ def camada(nome, modulos, plano_js, pasta, w, h, fps, dur, extras=()):
     return proj
 
 
-def estilos_do_plano(itens):
+def estilos_do_plano(itens, absp=lambda p: p):
     """Separa os ESTILOS do plano por camada lendo presets/estilos/<grupo>/<id>/estilo.json.
     Devolve (frente, atras, arquivos_js, precisa_rosto)."""
     idx = {}
@@ -147,6 +150,15 @@ def estilos_do_plano(itens):
             raise SystemExit(f"estilo desconhecido: {it['id']} (ver presets/estilos/LEIA.md)")
         it = dict({k: v["exemplo"] for k, v in (m.get("campos") or {}).items() if isinstance(v, dict) and "exemplo" in v}, **it)
         it["_precisa"] = m.get("precisa") or []
+        for k, c in (m.get("campos") or {}).items():   # imagens/logos do estilo vão para img/ do projeto
+            if not isinstance(c, dict) or c.get("tipo") not in ("imagem", "imagens", "logo") or not it.get(k):
+                continue
+            def traz(v):
+                if not isinstance(v, str) or re.match(r"^(https?:|data:|img/)", v) or not os.path.exists(absp(v)):
+                    return v
+                nome = re.sub(r"[^A-Za-z0-9._-]", "_", os.path.basename(v))
+                it.setdefault("_copiar", []).append((absp(v), nome)); return "img/" + nome
+            it[k] = [traz(v) for v in it[k]] if isinstance(it[k], list) else traz(it[k])
         (atras if it.get("camada", m.get("camada", "frente")) == "atras" else frente).append(it)
         if m["_js"] not in js:
             js.append(m["_js"])
@@ -291,7 +303,7 @@ def gerar(plano, pasta, fazer_render=True):
         for g in frente.get("destaque") or []:
             if g["ini"] < c["ate"] and g["fim"] > c["de"] and g["y"] < c["_base"] + 30:
                 g["y"] = int(min(c["_base"] + 30, h * .9 - g["alto"]))
-    est_frente, est_atras, est_js, est_rosto = estilos_do_plano(plano.get("estilos"))
+    est_frente, est_atras, est_js, est_rosto = estilos_do_plano(plano.get("estilos"), absp)
     if any("palavras" in (x.get("_precisa") or []) for x in est_frente + est_atras) and plano.get("palavras"):
         comum["palavras"] = frente["palavras"] = json.load(open(absp(plano["palavras"]), encoding="utf-8"))   # legenda e batidas na fala
     if est_rosto or est_atras:   # estilos que fogem do rosto recebem a caixa dele a cada 0,5 s
