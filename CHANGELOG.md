@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.23-5 (23/10/2026)
+- **Revisão do menu redesenhada:** anel com quantas escolhas são suas e quantas ficaram no automático, e um cartão por passo com a prévia em loop do que você marcou (clique para mudar).
+- **Confirmar volta para o Claude:** ao confirmar, o Gab recebe as escolhas na hora, o Claude vem para a frente e a mensagem já fica copiada; se precisar, é só colar (Cmd+V) no Claude.
 ## 2026.10.23-4 (23/10/2026)
 - **Menu mais organizado:** o formato agora é escolhido por plataforma (Instagram, TikTok, YouTube, Facebook, LinkedIn e Anúncios), com proporção e resolução de cada um; dá para marcar vários. A legenda tem a opção nativa do seu editor (como o preset GAB USA do DaVinci) separada das animadas. O lettering mostra os títulos do editor que você usa (DaVinci, Premiere, CapCut ou Final Cut). O passo de estilo virou "estilo dos motions" e some se você marcar "sem motion". O botão de cada passo agora se chama "Automático neste passo".
 ## 2026.10.23-3 (23/10/2026)

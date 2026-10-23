@@ -2,7 +2,7 @@
 """/ogab menu: painel local (PT/EN) para a pessoa escolher o que vai no vídeo antes de criar, ou deixar no automático.
 
   python3 menu.py [--pasta <pasta do vídeo>] [--cliente <empresa>] [--pedido "texto"] [--roteiro roteiro.txt]
-                  [--formato vertical|horizontal] [--editor davinci|premiere|capcut|finalcut|nenhum] [--lingua pt|en] [--porta 0] [--sem-abrir] [--timeout 1800]
+                  [--formato vertical|horizontal] [--editor davinci|premiere|capcut|finalcut|nenhum] [--lingua pt|en] [--porta 0] [--sem-abrir] [--sem-voltar] [--timeout 1800]
 
 - Cada opção tem um check: marcou, entra no vídeo. Grupo sem nada marcado = o Gab escolhe aquele grupo.
 - "Automático": o Gab escolhe TUDO pelo que já sabe da pessoa e da marca (estilo.md do cliente, memória da marca,
@@ -304,6 +304,24 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:12px;width:40px;heig
 .op{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card);backdrop-filter:blur(14px);cursor:pointer;color:inherit;font:inherit;text-align:left;transition:.15s}
 .op:hover{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.3);transform:translateY(-2px)}.op b{display:block;font-weight:800;font-size:22px;letter-spacing:-.025em;margin:12px 0 6px}.op p{color:var(--mu);font-size:14px}
 .op .ic{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.rev{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin:8px 0 18px;padding:18px 22px;border-radius:16px;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line)}
+.anel{width:104px;height:104px;position:relative}.anel svg{width:100%;height:100%;transform:rotate(-90deg)}.anel .n{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font:800 26px "Inter Tight";letter-spacing:-.03em;line-height:1}.anel .n small{display:block;font:500 11px "Inter Tight";color:var(--mu);letter-spacing:0;margin-top:2px}
+.rev h2{margin:0}.rev .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill{display:inline-flex;align-items:center;gap:7px;font:800 12px "Inter Tight";padding:6px 12px;border-radius:999px;border:1px solid}
+.pill.g{color:var(--g);background:rgba(43,255,136,.12);border-color:rgba(43,255,136,.3)}.pill.a{color:var(--amb);background:rgba(245,181,68,.12);border-color:rgba(245,181,68,.3)}
+.pill i{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor;animation:breathe 1.6s infinite}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;max-height:calc(100vh - 360px);overflow:auto;padding:2px}
+.rc{display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:center;padding:10px;border-radius:16px;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);cursor:pointer;transition:.15s;text-align:left;color:inherit;font:inherit}
+.rc:hover{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.25);transform:translateY(-2px)}
+.rc .mini{width:86px;aspect-ratio:4/5;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#050806;display:grid;place-items:center}.rc .mini img{width:100%;height:100%;object-fit:cover}
+.rc .mini.auto{background:radial-gradient(circle at 50% 40%,rgba(245,181,68,.22),transparent 70%),#0B110D}.rc .mini.auto span{font:800 13px "Inter Tight";letter-spacing:.12em;color:var(--amb)}
+.rc .rot{font:800 10.5px "Inter Tight";letter-spacing:.12em;text-transform:uppercase;color:var(--mu);display:flex;align-items:center;gap:6px}.rc .rot b{color:var(--ink);background:var(--grad);border-radius:6px;padding:0 6px;letter-spacing:0}
+.rc .esc{font-weight:800;font-size:15px;letter-spacing:-.015em;margin-top:4px;line-height:1.25}.rc .mais{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.rc .mais span{font:800 11px "Inter Tight";color:var(--g1);background:rgba(43,255,136,.1);border:1px solid rgba(43,255,136,.25);padding:2px 8px;border-radius:999px}
+.rc .ed{font:500 12px "Inter Tight";color:var(--mu);margin-top:6px}
+.autobox{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;padding:24px;border-radius:16px;background:var(--card);backdrop-filter:blur(14px);border:1px solid rgba(43,255,136,.4);box-shadow:0 0 30px rgba(43,255,136,.15);margin-top:8px}
+.autobox .lg svg{width:120px;height:120px;border-radius:30px;box-shadow:0 0 34px rgba(43,255,136,.5);animation:breathe 2.4s ease-in-out infinite}
+.autobox b{display:block;font-weight:800;font-size:24px;letter-spacing:-.03em;margin-bottom:6px}.autobox p{color:var(--mu)}
+@media (max-width:640px){.rev,.autobox{grid-template-columns:1fr}}
 .resumo{display:grid;gap:8px;margin-top:10px;max-height:calc(100vh - 330px);overflow:auto}.resumo div{display:flex;gap:12px;padding:12px 16px;border-radius:12px;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line)}
 .resumo b{min-width:200px;font:800 10.5px "Inter Tight";letter-spacing:.12em;text-transform:uppercase;color:var(--mu);padding-top:3px}.resumo span{color:var(--mu)}.resumo .ok{color:var(--tx)}
 .barra{position:fixed;left:0;right:0;bottom:0;background:rgba(5,8,6,.8);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:9}
@@ -389,15 +407,15 @@ const T = {
   eu_t:"Eu escolho",eu_p:"Passo a passo: formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras.",
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
-  resumo_t:"Confere antes de mandar",resumo_p:"Clique num item para voltar e mudar.",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
-  max:n=>`até ${n}`,fim_t:"Pronto!",fim_p:"Pode voltar para o Claude: o Gab já recebeu as suas escolhas.",erro:"Não consegui salvar. O Gab ainda está aberto?"},
+  resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
+  max:n=>`até ${n}`,fim_t:"Pronto!",fim_p:"O Gab já recebeu as suas escolhas e o Claude está voltando para a frente. Se não voltar, cole no Claude (Cmd+V / Ctrl+V): a mensagem já está copiada.",msg:(c,a)=>`/ogab menu confirmado: ${c || "automático nos passos sem escolha"}. Escolhas em ${a}`,msg_auto:a=>`/ogab menu confirmado: automático (o Gab escolhe tudo). Escolhas em ${a}`,erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
-  resumo_t:"Check before sending",resumo_p:"Click an item to go back and change it.",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
-  max:n=>`up to ${n}`,fim_t:"Done!",fim_p:"Go back to Claude: Gab already has your choices.",erro:"Couldn't save. Is Gab still open?"}};
+  resumo_t:"Here is your video",resumo_p:"Click a card to go back and change it.",resumo_rot:"Review",suas:"yours",escolhas_suas:"your picks",no_auto:"on automatic",passos_auto:"steps on automatic",editar:"Click to change",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
+  max:n=>`up to ${n}`,fim_t:"Done!",fim_p:"Gab already has your choices and Claude is coming back to the front. If it doesn\'t, paste into Claude (Cmd+V / Ctrl+V): the message is already copied.",msg:(c,a)=>`/ogab menu confirmed: ${c || "automatic on the steps left blank"}. Choices in ${a}`,msg_auto:a=>`/ogab menu confirmed: automatic (Gab picks everything). Choices in ${a}`,erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
@@ -460,9 +478,25 @@ function render() {
       <div class="vis">${prev(i)}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div>`;
   } else {
-    h = `<h2>${T[L].resumo_t}</h2>` + (auto ? `<p class="sub">${T[L].auto_resumo}</p>${sabe}` :
-      `<p class="sub">${T[L].resumo_p}</p><div class="resumo">${D.grupos.map((g, k) => `<div data-ir="${k + 1}" style="cursor:pointer"><b>${g.letra} · ${esc(g.nome[L])}</b>
-      <span class="${sel[g.id].size ? "ok" : ""}">${sel[g.id].size ? g.itens.filter(i => sel[g.id].has(i.id)).map(i => esc(i.nome[L])).join(", ") : T[L].gab_escolhe}</span></div>`).join("")}</div>`);
+    const man = D.grupos.filter(g => sel[g.id].size).length, tot = D.grupos.length, pct = auto ? 0 : man / tot;
+    const C = 2 * Math.PI * 46, anel = `<div class="anel"><svg viewBox="0 0 104 104"><circle cx="52" cy="52" r="46" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="9"/>
+      <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ga)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" style="filter:drop-shadow(0 0 6px rgba(43,255,136,.6));transition:stroke-dashoffset .8s"/>
+      <defs><linearGradient id="ga"><stop offset="0" stop-color="#9CFFC9"/><stop offset="1" stop-color="#14E070"/></linearGradient></defs></svg>
+      <div class="n"><div>${auto ? "auto" : man + "/" + tot}<small>${T[L].suas}</small></div></div></div>`;
+    if (auto) {
+      h = `<div class="passo">${T[L].resumo_rot}</div><h2>${T[L].resumo_t}</h2><div class="autobox"><div class="lg">${document.querySelector(".logo svg").outerHTML}</div>
+        <div><b>${T[L].auto_t}</b><p>${T[L].auto_resumo}</p><div class="rev" style="margin:12px 0 0;padding:0;border:0;background:none;display:block">
+        <div class="pills"><span class="pill g"><i></i>${tot} ${T[L].passos_auto}</span></div></div></div></div>${sabe}`;
+    } else {
+      h = `<div class="passo">${T[L].resumo_rot}</div><div class="rev">${anel}<div><h2>${T[L].resumo_t}</h2><p class="sub" style="margin:4px 0 0">${T[L].resumo_p}</p>
+        <div class="pills"><span class="pill g"><i></i>${man} ${T[L].escolhas_suas}</span><span class="pill a"><i></i>${tot - man} ${T[L].no_auto}</span></div></div></div>
+        <div class="rgrid">${D.grupos.map((g, k) => { const its = g.itens.filter(i => sel[g.id].has(i.id));
+          const mini = its.length ? `<div class="mini">${prev(its[0])}</div>` : `<div class="mini auto"><span>AUTO</span></div>`;
+          return `<button class="rc" data-ir="${k + 1}">${mini}<div><div class="rot"><b>${g.letra}</b>${esc(g.nome[L])}</div>
+            <div class="esc">${its.length ? esc(its[0].nome[L]) : `<span style="color:var(--amb)">${T[L].gab_escolhe}</span>`}</div>
+            ${its.length > 1 ? `<div class="mais">${its.slice(1, 4).map(i => `<span>${esc(i.nome[L])}</span>`).join("")}${its.length > 4 ? `<span>+${its.length - 4}</span>` : ""}</div>` : ""}
+            <div class="ed">${T[L].editar}</div></div></button>`; }).join("")}</div>`;
+    }
   }
   $("#tela").innerHTML = h;
   $("#bk").hidden = passo === 0; $("#pl").hidden = !(passo >= 1 && passo <= N); $("#go").hidden = passo === 0;
@@ -491,8 +525,13 @@ $("#go").onclick = async () => {
   const esc_ = {}, deixou = []; D.grupos.forEach(g => { if (sel[g.id].size) esc_[g.id] = [...sel[g.id]]; else deixou.push(g.id); });
   const lt = D.grupos.find(g => g.id === "lettering"); if (esc_.lettering) esc_.lettering_templates = esc_.lettering.map(id => (lt.itens.find(x => x.id === id) || {}).template).filter(Boolean);
   const corpo = {modo: auto ? "auto" : "manual", lingua: L, escolhas: auto ? {} : esc_, gab_escolhe: auto ? D.grupos.map(g => g.id) : deixou, codigos: auto ? [] : codigos()};
-  try { const r = await fetch("/escolha", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corpo)}); if (!r.ok) throw 0; $("#fim").style.display = "grid"; }
-  catch (e) { alert(T[L].erro); }
+  try {
+    const r = await fetch("/escolha", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corpo)}); if (!r.ok) throw 0;
+    const arq = (await r.json()).arquivo;
+    const msg = auto ? T[L].msg_auto(arq) : T[L].msg(corpo.codigos.join(" "), arq);
+    try { await navigator.clipboard.writeText(msg); } catch (e) {}
+    $("#fim").style.display = "grid";
+  } catch (e) { alert(T[L].erro); }
 };
 document.addEventListener("keydown", e => { if (e.key === "ArrowRight" && passo > 0 && passo <= N) ir(passo + 1); if (e.key === "ArrowLeft" && passo > 0) ir(auto ? 0 : passo - 1); });
 render();
@@ -558,7 +597,16 @@ def main(a):
             d["salvo_em"] = time.strftime("%Y-%m-%d %H:%M"); d["cliente"] = cliente
             os.makedirs(os.path.dirname(saida), exist_ok=True)
             json.dump(d, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-            self._envia(200, b"ok", "text/plain"); pronto.set()
+            self._envia(200, json.dumps({"arquivo": saida}).encode(), "application/json"); pronto.set()
+            if "--sem-voltar" not in a:   # traz o Claude para a frente (o Gab já é avisado porque o menu roda em segundo plano)
+                try:
+                    if sys.platform == "darwin":
+                        subprocess.Popen(["open", "-a", "Claude"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    elif os.name == "nt":
+                        subprocess.Popen(["powershell", "-NoProfile", "-Command",
+                                          "(New-Object -ComObject WScript.Shell).AppActivate('Claude')"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                except Exception:
+                    pass
 
     porta = porta_livre(int(arg("--porta", 0)))
     srv = ThreadingHTTPServer(("127.0.0.1", porta), H)
