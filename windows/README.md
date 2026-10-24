@@ -40,6 +40,8 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
 
 ## CapCut no Windows (beta)
 
+**Tudo pelos arquivos, nunca pela tela:** no Windows o Claude não tem computer-use, então o Gab nunca tenta abrir o CapCut para ver ou clicar. Lê e edita o rascunho com `capcut.py` (retrato, ids, conferir, previa, faz, presets). Tela só em último caso, e aí quem clica é o usuário.
+
 `"editor": "capcut"` funciona no Windows (escolha 3 no instalador ou `/ogab config editor capcut`). O Gab escreve o rascunho em `%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft\<nome>\draft_content.json` com o CapCut fechado (ou na tela inicial), igual ao Mac. Diferença no fluxo: abrir o projeto é um clique na 1a miniatura da tela inicial e no Windows quem clica é o usuário (`capcut.py abrir "<rascunho>"` e pedir o clique). Detalhes e armadilhas: `capcut/README.md`, seção Windows.
 
 ## Requisitos

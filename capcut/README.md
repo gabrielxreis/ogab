@@ -1,5 +1,7 @@
 # Gab (/ogab) no CapCut (Mac e Windows)
 
+> **CapCut é SEMPRE pelos arquivos, nunca pela tela (regra do usuário 24/10/2026, vale no Mac e no Windows):** ler, editar, salvar, conferir e guardar presets só pelo `capcut/capcut.py` / `capcut_lib` (rascunho JSON, pasta `Presets`, `presets salvar|aplicar|backup`). Não abrir o CapCut, não tirar screenshot, não usar computer-use para "ver como está": o `retrato`, o `ids`, o `conferir` e a `previa` respondem isso. Tela só em ÚLTIMO caso, depois de tentar pelo arquivo e dizer ao usuário o que falhou e por quê (ex.: abrir o projeto = clique na miniatura; exportar pelo app). No Windows não existe computer-use: o clique é pedido ao usuário.
+
 Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando o usuário pedir CapCut (ou `"editor": "capcut"` no config), usar `capcut/capcut_lib.py` onde o `SKILL.md` manda usar `resolve_lib.py`.
 
 > **22/10/2026:** linha de comando (`capcut.py`), prévia renderizada sem o app e fábrica de cortes; rascunho gravado pela lib aberto e regravado pelo CapCut 9.4 (versão 181 -> 185) sem perder nada.
@@ -125,6 +127,18 @@ Chroma key, fontes da loja no `texto()` (os ids já estão em `loja.json`) e con
 | `catalogo.json` | 936 transições, animações, efeitos e máscaras com os ids internos do CapCut |
 | `molde.json` | estruturas reais de segmento/material extraídas do CapCut 9.4 (sem caminhos pessoais) |
 | `esqueleto/` | pasta de rascunho vazio do 9.4 (ids trocados a cada `novo()`) |
+
+## Presets do usuário (24/10/2026, tudo por arquivo)
+
+| Comando | O que faz |
+|---|---|
+| `capcut.py presets` | lista os presets do Gab (`~/.claude/ogab_capcut/presets`, fora do git) e as predefinições do próprio CapCut (`User Data/Presets`: Adjust, Combination...) |
+| `capcut.py presets salvar <nome> "<rascunho>" @t0:2 [--posicao]` | guarda o visual do segmento. Texto: material inteiro menos o que depende do texto (fonte, cor, contorno, fundo, sombra, alinhamento) + 1o estilo + animações. Vídeo/imagem: filtro, efeitos, animação, máscara, fundo (`canvases`). `--posicao` leva escala/posição/rotação. Velocidade e áudio ficam de fora |
+| `capcut.py presets aplicar <nome> "<rascunho\|CORTE*>" @t0:*` | aplica: texto, mídia e tempo do destino ficam; o visual troca (refs do mesmo tipo são substituídas). Mesmo que `faz ... aplicar_preset @alvo <nome>` |
+| `capcut.py presets ver/apagar <nome>` | conteúdo / apaga |
+| `capcut.py presets backup [zip]` / `restaurar <zip> [--substituir]` | cópia das predefinições do CapCut + presets do Gab; restaurar com o CapCut FECHADO (ele regrava as predefinições ao sair) |
+
+O usuário fez o estilo no app e quer guardar: ele fecha o projeto, o Gab acha o segmento com `ids` e roda `presets salvar` (nada de tela). Testado no Mac 24/10/2026 (título com cor, contorno, fundo e animação Blur salvo e aplicado em outro texto). O formato das predefinições NATIVAS do CapCut (Combination/Adjust) ainda não foi lido com um preset real: por isso o Gab guarda as dele em JSON próprio e só faz cópia de segurança das nativas.
 
 ## Windows (24/10/2026, beta)
 

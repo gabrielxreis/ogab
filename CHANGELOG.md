@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.24-3 (24/10/2026)
+- **Presets no CapCut:** fez um estilo de texto ou de clipe que gostou? Peça "salva esse estilo" e o Gab guarda o visual (fonte, cor, contorno, fundo, sombra, animação, filtro, efeitos) para aplicar em qualquer vídeo depois. Também faz cópia de segurança das suas predefinições do CapCut.
+- **CapCut sem mexer na sua tela:** no Mac e no Windows o Gab faz tudo pelos arquivos do projeto; só pede para você clicar quando não tem outro jeito (abrir o projeto, exportar pelo app).
 ## 2026.10.24-2 (24/10/2026)
 - **CapCut no Windows (beta):** quem usa Windows agora pode escolher o CapCut como editor (opção 3 no instalador ou `/ogab config editor capcut`). O Gab monta o vídeo direto no rascunho do CapCut, como já fazia no Mac: cortes, legenda, música, textos, filtros e animações da loja, e a prévia em MP4 sem abrir o app. Para abrir o projeto, é só clicar na primeira miniatura da tela inicial do CapCut.
 ## 2026.10.24-1 (24/10/2026)

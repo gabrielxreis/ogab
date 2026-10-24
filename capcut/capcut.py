@@ -29,6 +29,10 @@ Comandos rápidos (uma ação = um comando, em 1 ou vários rascunhos):
         grupos: legenda, texto_entrada, texto_saida, texto_loop, modelos_texto, modelos_legenda, filtros,
                 adesivos, efeitos_loja, video_entrada, video_saida
     python3 capcut.py loja [grupo] [busca] [--tipo in]          filtros, adesivos, modelos de texto, vozes, fontes
+    python3 capcut.py presets [listar]                          presets do usuário (Gab) + predefinições do CapCut
+    python3 capcut.py presets salvar <nome> "<rascunho>" @t0:2 [--posicao]   guarda o visual do segmento
+    python3 capcut.py presets aplicar <nome> "<rascunho|CORTE*>" @t0:*       aplica (texto/mídia/tempo ficam)
+    python3 capcut.py presets backup [arquivo.zip] | restaurar <zip> [--substituir]   cópia de tudo
 
 Plano JSON (cada op é um método do Rascunho da capcut_lib; "id" guarda o segmento para usar depois como "$id"):
     {"nome": "Reels 01", "w": 1080, "h": 1920, "fps": 30, "substituir": true,
@@ -718,6 +722,41 @@ def validar_ler():
 
 
 # ---------------------------------------------------------------- CLI
+# ---------------------------------------------------------------- presets (por arquivo, sem abrir o CapCut)
+def presets_cmd(a, op):
+    sub = a[0] if a else "listar"
+    if sub == "listar":
+        ps = C.presets()
+        print(f"Presets do Gab ({C.PRESETS_GAB}): {len(ps)}")
+        for n, t, o, c in ps:
+            print(f"  {n:30} {t:6} de '{o}' ({c})")
+        nat = C.presets_capcut()
+        print(f"Predefinições do CapCut ({C.PRESETS_CAPCUT}):" + ("" if nat else " nenhuma"))
+        for pasta, arqs in nat.items():
+            print(f"  {pasta}: {len(arqs)} arquivo(s)")
+    elif sub == "salvar":   # presets salvar <nome> "<rascunho>" @seletor [--posicao]
+        nome, rasc, sel = a[1], a[2], a[3]
+        d = C.abrir(rasc)
+        alvo = alvos(d, sel if sel.startswith("@") else "@" + sel)
+        if len(alvo) != 1:
+            raise SystemExit(f"o seletor precisa achar 1 segmento (achou {len(alvo)}). capcut.py ids \"{rasc}\"")
+        print("salvo:", d.guardar_preset(alvo[0], nome, posicao="--posicao" in a))
+    elif sub == "aplicar":  # presets aplicar <nome> "<rascunho|CORTE*>" @seletor
+        faz(a[2], ["aplicar_preset", a[3], a[1]], projeto_fechado="--projeto-fechado" in a)
+    elif sub == "ver":
+        print(json.dumps(C.carregar_preset(a[1]), ensure_ascii=False, indent=1)[:4000])
+    elif sub == "apagar":
+        os.remove(C._arq_preset(a[1])); print("apagado:", a[1])
+    elif sub == "backup":
+        f, n = C.backup_presets(a[1] if len(a) > 1 else None)
+        print(f"{n} arquivo(s) em {f}")
+    elif sub == "restaurar":
+        print(C.restaurar_presets(a[1], substituir="--substituir" in a), "arquivo(s) restaurado(s)")
+    else:
+        raise SystemExit("presets listar | salvar <nome> <rascunho> @sel [--posicao] | aplicar <nome> <rascunho> @sel | "
+                         "ver <nome> | apagar <nome> | backup [zip] | restaurar <zip> [--substituir]")
+
+
 def main(a):
     op = lambda k, d=None: a[a.index(k) + 1] if k in a else d
     if not a or a[0] in ("-h", "--help", "ajuda"):
@@ -786,6 +825,8 @@ def main(a):
                           int(op("--inicio", 0)))
     elif cmd == "fechar":
         print("fechado" if C.fechar_capcut() else "não fechou (diálogo aberto no CapCut?)")
+    elif cmd == "presets":
+        presets_cmd(a[1:], op)
     else:
         raise SystemExit(__doc__)
 

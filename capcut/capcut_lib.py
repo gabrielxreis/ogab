@@ -314,6 +314,96 @@ def novo(nome, w=1080, h=1920, fps=30, substituir=False):
     return d
 
 
+# ---------- presets (tudo por arquivo, sem abrir o CapCut) ----------
+# Presets do usuário guardados pelo Gab: visual de um segmento (texto: fonte, cor, contorno, fundo, sombra, animações;
+# vídeo: filtro, efeitos, animação, máscara, fundo) num JSON fora do git, para reaplicar em qualquer rascunho.
+PRESETS_GAB = os.path.expanduser("~/.claude/ogab_capcut/presets")
+# Predefinições do próprio CapCut (Ajustes > Salvar predefinição etc.): User Data/Presets (Adjust, Combination...).
+PRESETS_CAPCUT = os.path.join(os.path.dirname(CACHE_CAPCUT), "Presets")
+# materiais de apoio que são do clipe (velocidade, áudio), não do visual: não entram no preset
+_APOIO_FORA = {"speeds", "placeholder_infos", "sound_channel_mappings", "vocal_separations", "loudnesses",
+               "audio_fades", "beats"}
+# campos do material de texto que dependem do texto em si: ficam os do destino
+_TEXTO_DO_DESTINO = {"id", "name", "content", "words", "current_words", "recognize_text", "recognize_task_id",
+                     "text_to_audio_ids", "original_size", "text_size", "group_id"}
+
+
+def _arq_preset(nome):
+    return os.path.join(PRESETS_GAB, re.sub(r'[\\/:*?"<>|]', "_", nome) + ".json")
+
+
+def presets():
+    """Presets do usuário guardados pelo Gab: [(nome, tipo, origem, criado)]."""
+    out = []
+    if os.path.isdir(PRESETS_GAB):
+        for f in sorted(os.listdir(PRESETS_GAB)):
+            if f.endswith(".json"):
+                p = json.load(open(os.path.join(PRESETS_GAB, f), encoding="utf-8"))
+                out.append((p["nome"], p["tipo"], p.get("origem", ""), p.get("criado", "")))
+    return out
+
+
+def carregar_preset(nome):
+    f = _arq_preset(nome)
+    if not os.path.isfile(f):
+        perto = difflib.get_close_matches(nome, [p[0] for p in presets()], 5, 0.4)
+        raise FileNotFoundError(f"preset '{nome}' não existe. Parecidos: {perto}. Lista: presets()")
+    return json.load(open(f, encoding="utf-8"))
+
+
+def presets_capcut():
+    """Inventário das predefinições do próprio CapCut (só leitura): {subpasta: [arquivos]}."""
+    out = {}
+    if os.path.isdir(PRESETS_CAPCUT):
+        for base, _, arqs in os.walk(PRESETS_CAPCUT):
+            if arqs:
+                out[os.path.relpath(base, PRESETS_CAPCUT)] = sorted(arqs)
+    return out
+
+
+def backup_presets(destino=None):
+    """Copia as predefinições do CapCut + os presets do Gab num .zip (o CapCut pode estar aberto: só lê)."""
+    import zipfile
+    destino = destino or os.path.expanduser(f"~/.claude/ogab_capcut/backup_presets_{time.strftime('%Y%m%d-%H%M%S')}.zip")
+    os.makedirs(os.path.dirname(os.path.abspath(destino)), exist_ok=True)
+    n = 0
+    with zipfile.ZipFile(destino, "w", zipfile.ZIP_DEFLATED) as z:
+        for raiz, prefixo in ((PRESETS_CAPCUT, "capcut"), (PRESETS_GAB, "gab")):
+            if not os.path.isdir(raiz):
+                continue
+            for base, _, arqs in os.walk(raiz):
+                for a in arqs:
+                    f = os.path.join(base, a)
+                    z.write(f, os.path.join(prefixo, os.path.relpath(f, raiz)).replace("\\", "/"))
+                    n += 1
+    return destino, n
+
+
+def restaurar_presets(zip_arq, substituir=False):
+    """Devolve um backup_presets(): CapCut FECHADO (ele regrava as predefinições ao sair).
+    Sem substituir, arquivo que já existe fica como está."""
+    import zipfile
+    if capcut_aberto():
+        raise RuntimeError("Feche o CapCut antes (C.fechar_capcut()): aberto, ele regrava as predefinições ao sair")
+    feitos = 0
+    with zipfile.ZipFile(zip_arq) as z:
+        for i in z.infolist():
+            if i.is_dir():
+                continue
+            prefixo, _, resto = i.filename.partition("/")
+            raiz = {"capcut": PRESETS_CAPCUT, "gab": PRESETS_GAB}.get(prefixo)
+            if not raiz or ".." in resto.split("/"):
+                continue
+            alvo = os.path.join(raiz, *resto.split("/"))
+            if os.path.exists(alvo) and not substituir:
+                continue
+            os.makedirs(os.path.dirname(alvo), exist_ok=True)
+            with z.open(i) as de, open(alvo, "wb") as para:
+                shutil.copyfileobj(de, para)
+            feitos += 1
+    return feitos
+
+
 def abrir(nome):
     return Rascunho(nome)
 
@@ -736,6 +826,62 @@ class Rascunho:
         m["content"] = json.dumps(c, ensure_ascii=False)
         m["is_rich_text"] = len(c["styles"]) > 1
         return sid
+
+    def _lista_de(self, mid):
+        for k, lista in self.j["materials"].items():
+            if isinstance(lista, list) and any(isinstance(m, dict) and m.get("id") == mid for m in lista):
+                return k
+        return None
+
+    def guardar_preset(self, sid, nome, posicao=False):
+        """Salva o visual deste segmento como preset do usuário (arquivo, sem abrir o CapCut). posicao=True leva junto
+        escala/posição/rotação. Reaplicar: aplicar_preset(@alvo, nome)."""
+        t, s = self.segmento(sid)
+        m = self._mat(s["material_id"]) or {}
+        extras = []
+        for r in s.get("extra_material_refs", []):
+            k = self._lista_de(r)
+            if k and k not in _APOIO_FORA:
+                extras.append({"lista": k, "mat": copy.deepcopy(self._mat(r))})
+        p = {"nome": nome, "tipo": t["type"], "origem": self.nome, "criado": time.strftime("%Y-%m-%d %H:%M"),
+             "plataforma": "windows" if WIN else "mac", "extras": extras}
+        if t["type"] == "text":
+            mm = {k: copy.deepcopy(v) for k, v in m.items() if k not in _TEXTO_DO_DESTINO}
+            estilos = json.loads(m.get("content") or "{}").get("styles") or []
+            p["texto"] = {"material": mm, "estilo": estilos[0] if estilos else None}
+        if posicao:
+            p["segmento"] = {k: copy.deepcopy(s[k]) for k in ("clip", "uniform_scale") if k in s}
+        os.makedirs(PRESETS_GAB, exist_ok=True)
+        f = _arq_preset(nome)
+        json.dump(p, open(f, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        return f
+
+    def aplicar_preset(self, sid, nome):
+        """Aplica um preset do usuário (guardar_preset) neste segmento: mantém o texto/mídia e o tempo, troca o visual."""
+        p = carregar_preset(nome)
+        t, s = self.segmento(sid)
+        if p["tipo"] != t["type"]:
+            raise ValueError(f"preset '{nome}' é de {p['tipo']}, o segmento é {t['type']}")
+        if p["tipo"] == "text" and p.get("texto"):
+            m = self._mat(s["material_id"])
+            texto = json.loads(m.get("content") or "{}").get("text", "")
+            for k in [k for k in m if k not in _TEXTO_DO_DESTINO]:
+                del m[k]
+            m.update(copy.deepcopy(p["texto"]["material"]))
+            estilo = copy.deepcopy(p["texto"]["estilo"]) if p["texto"].get("estilo") else None
+            if estilo:
+                estilo["range"] = [0, len(texto)]
+                m["content"] = json.dumps({"styles": [estilo], "text": texto}, ensure_ascii=False)
+        listas = {e["lista"] for e in p["extras"]}
+        s["extra_material_refs"] = [r for r in s.get("extra_material_refs", []) if self._lista_de(r) not in listas]
+        for e in p["extras"]:
+            novo = copy.deepcopy(e["mat"])
+            novo["id"] = _id()
+            self.j["materials"].setdefault(e["lista"], []).append(novo)
+            s["extra_material_refs"].append(novo["id"])
+        if p.get("segmento"):
+            s.update(copy.deepcopy(p["segmento"]))
+        return s["id"]
 
     def trocar_texto(self, sid, texto):
         """Troca o texto mantendo estilo, posição e tempo."""
