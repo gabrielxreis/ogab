@@ -463,10 +463,26 @@ def aftereffects(usa):
 
 
 def capcut(usa):
-    """CapCut (Mac, beta): sem API; o Gab escreve o rascunho JSON (capcut/README.md)."""
+    """CapCut (Mac e Windows, beta): sem API; o Gab escreve o rascunho JSON (capcut/README.md)."""
+    if WIN:
+        sys.path.insert(0, os.path.join(RAIZ, "capcut"))
+        try:
+            import capcut_lib as C
+        except Exception as e:
+            item(_rel(usa), "CapCut", f"capcut_lib não carregou: {e}")
+            return
+        if not C.capcut_exe():
+            item(_rel(usa), "CapCut", "CapCut não instalado (capcut.com, versão para Windows)")
+            return
+        if not os.path.isdir(C.RAIZ_CAPCUT):
+            item(_rel(usa), "CapCut", "CapCut instalado, mas a pasta de rascunhos não existe: abra o CapCut uma vez e entre na "
+                 "sua conta. Se mudou o local do rascunho nos Ajustes, grave GAB_CAPCUT_RAIZ com a pasta nova")
+            return
+        item("✓", "CapCut", "CapCut e pasta de rascunhos" + ("" if usa else " (não é o editor escolhido)"))
+        return
     if not MAC:
         if usa:
-            item("!", "CapCut", "o Gab no CapCut é só no Mac: /ogab config editor davinci|premiere")
+            item("!", "CapCut", "o Gab no CapCut é só no Mac e no Windows: /ogab config editor davinci|premiere")
         return
     if not os.path.isdir("/Applications/CapCut.app"):
         item(_rel(usa), "CapCut", "CapCut não instalado (capcut.com ou App Store)")

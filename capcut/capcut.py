@@ -1,4 +1,4 @@
-"""Gab no CapCut pela linha de comando (Mac). Mesmo papel do resolve_lib no DaVinci: tudo por comando, sem clicar.
+"""Gab no CapCut pela linha de comando (Mac e Windows). Mesmo papel do resolve_lib no DaVinci: tudo por comando, sem clicar.
 
     python3 capcut.py rascunhos
     python3 capcut.py retrato "<rascunho>" [--json saida.json]
@@ -50,7 +50,7 @@ sys.path.insert(0, AQUI)
 import capcut_lib as C
 
 US = 1_000_000
-FONTE_PADRAO = os.path.expanduser("~/Library/Fonts/Montserrat-SemiBold.ttf")
+FONTE_PADRAO = C.fonte("Montserrat-SemiBold.ttf")
 # Medido no CapCut 9.4 (22/10/2026, Anton e Montserrat): a ALTURA DE LINHA da fonte (hhea ascent - descent) é
 # tamanho x 6,35 px num quadro de 1080 de largura; o corpo da letra (em) sai dessa altura dividida pela métrica.
 LINHA_POR_TAMANHO = 6.35
@@ -182,7 +182,7 @@ def cortes(cortes_json, video, transcricao, prefixo="CORTE", correcoes=None, cre
     cor = json.load(open(correcoes)) if correcoes else {}
     ws = _palavras(transcricao)
     secoes = _secoes(secoes) if secoes else {}
-    fonte_titulo = fonte_titulo or os.path.expanduser("~/Library/Fonts/Anton-Regular.ttf")
+    fonte_titulo = fonte_titulo or C.fonte("Anton-Regular.ttf")
     fonte_legenda = fonte_legenda or FONTE_PADRAO
     for c in lista:   # mesma ordem do fabrica_cortes.py conferir (média das notas, estável) = cortes/NN.json
         n = c.get("notas") or {}
@@ -229,7 +229,7 @@ def conferir(nome):
         for m in d.j["materials"].get(lista, []):
             if m.get("path") and not os.path.exists(m["path"]):
                 probs.append(f"mídia offline: {m['path']}")
-            elif m.get("path") and not m["path"].startswith(os.path.expanduser("~/Movies/")):
+            elif not C.WIN and m.get("path") and not m["path"].startswith(os.path.expanduser("~/Movies/")):
                 probs.append(f"fora de ~/Movies (CapCut não lê sem pedir): {m['path']}")
     for grupo in ("effects", "video_effects", "transitions", "material_animations", "stickers", "filters"):
         for m in d.j["materials"].get(grupo, []) or []:
@@ -261,7 +261,7 @@ def levar(padrao, substituir=False):
     if not os.path.isdir(C.RAIZ_CAPCUT):
         raise SystemExit("CapCut não encontrado: instale (grátis, capcut.com), abra uma vez e rode de novo")
     origem = C.RAIZ_SEM_EDITOR
-    nomes = [n for n in sorted(os.listdir(origem)) if os.path.isfile(os.path.join(origem, n, "draft_info.json"))
+    nomes = [n for n in sorted(os.listdir(origem)) if any(os.path.isfile(os.path.join(origem, n, a)) for a in C.NOMES_RASCUNHO)
              and fnmatch.fnmatchcase(n, padrao)] if os.path.isdir(origem) else []
     if not nomes:
         raise SystemExit(f"nenhum rascunho '{padrao}' em {origem}")
@@ -280,10 +280,16 @@ def levar(padrao, substituir=False):
                     t = open(f, encoding="utf-8").read()
                 except (UnicodeDecodeError, OSError):
                     continue
-                t2 = t.replace(json.dumps(de)[1:-1], json.dumps(para)[1:-1]).replace(de, para)
-                t2 = t2.replace(json.dumps(origem)[1:-1], json.dumps(C.RAIZ_CAPCUT)[1:-1]).replace(origem, C.RAIZ_CAPCUT)
+                t2 = t
+                for a, b in ((de, para), (origem, C.RAIZ_CAPCUT), (C._p(de), C._p(para)), (C._p(origem), C._p(C.RAIZ_CAPCUT))):
+                    t2 = t2.replace(json.dumps(a)[1:-1], json.dumps(b)[1:-1]).replace(a, b)
                 if t2 != t:
                     open(f, "w", encoding="utf-8").write(t2)
+        if C.WIN and os.path.isfile(os.path.join(para, "draft_info.json")) and not os.path.isfile(os.path.join(para, C.ARQ)):
+            for base, _, arqs in os.walk(para):   # rascunho do esqueleto Mac: o CapCut do Windows lê draft_content.json
+                for a in arqs:
+                    if a.startswith("draft_info.json"):
+                        os.replace(os.path.join(base, a), os.path.join(base, a.replace("draft_info.json", C.ARQ)))
         d = C.abrir(n)
         d._registrar(int(time.time() * C.US))
         print(f"  no CapCut: {n}")
@@ -297,7 +303,7 @@ def abrir_no_app(nome):
     if C.capcut_aberto():
         print("CapCut já aberto: se este projeto não estiver aberto nele, ok; senão feche antes de editar por comando")
     d._registrar(int(__import__("time").time() * US))
-    subprocess.run(["open", "-a", "CapCut"])
+    C.abrir_capcut()
     print(f"'{nome}' é a 1a miniatura em Projetos. Clique nela para abrir.")
 
 

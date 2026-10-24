@@ -1,8 +1,9 @@
-"""Gab no CapCut (Mac): edita o rascunho do CapCut direto no JSON.
+"""Gab no CapCut (Mac e Windows): edita o rascunho do CapCut direto no JSON.
 
 O CapCut não tem API de script nem porta local (engenharia reversa de 14/10/2026,
 CapCut 9.4.0, rascunho new_version 181). O que ele tem é o rascunho em JSON puro:
-  ~/Movies/CapCut/User Data/Projects/com.lveditor.draft/<nome>/draft_info.json
+  ~/Movies/CapCut/User Data/Projects/com.lveditor.draft/<nome>/draft_info.json          (Mac)
+  %LOCALAPPDATA%\\CapCut\\User Data\\Projects\\com.lveditor.draft\\<nome>\\draft_content.json  (Windows)
 Esta lib lê e escreve esse arquivo. Regra de ouro: o CapCut precisa estar FECHADO
 (ou fora do projeto) na hora de salvar, senão ele sobrescreve na próxima gravação.
 
@@ -18,10 +19,49 @@ de BAIXO, igual à convenção da /ogab no DaVinci: legenda Y 724).
 """
 import copy, difflib, hashlib, json, math, os, re, shutil, subprocess, time, uuid
 
-RAIZ_CAPCUT = os.path.expanduser("~/Movies/CapCut/User Data/Projects/com.lveditor.draft")
-# modo sem editor (config.json "editor": "nenhum"): os rascunhos ficam numa pasta do Gab e a entrega é a prévia
-# renderizada (capcut.py previa). Quem instalar o CapCut depois leva o rascunho com `capcut.py levar`.
-RAIZ_SEM_EDITOR = os.path.expanduser("~/Movies/Gab Sem Editor/Rascunhos")
+WIN = os.name == "nt"
+
+
+def _p(c):
+    """Caminho como o CapCut grava no JSON: no Windows com "/" (C:/Users/...)."""
+    return c.replace("\\", "/") if WIN and isinstance(c, str) else c
+
+
+# Windows: o CapCut fica em %LOCALAPPDATA%\CapCut, o rascunho se chama draft_content.json (no Mac, draft_info.json)
+# e não há sandbox (a mídia fica onde está). A pasta de rascunhos pode ter sido trocada nos Ajustes do CapCut
+# (Configurações > Local do rascunho): GAB_CAPCUT_RAIZ aponta para ela.
+if WIN:
+    _LOCAL = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~/AppData/Local")
+    RAIZ_CAPCUT = _p(os.environ.get("GAB_CAPCUT_RAIZ") or os.path.join(_LOCAL, "CapCut", "User Data", "Projects", "com.lveditor.draft"))
+    CACHE_CAPCUT = os.path.join(_LOCAL, "CapCut", "User Data", "Cache")
+    RAIZ_SEM_EDITOR = _p(os.path.expanduser("~/Videos/Gab Sem Editor/Rascunhos"))
+else:
+    RAIZ_CAPCUT = os.environ.get("GAB_CAPCUT_RAIZ") or os.path.expanduser("~/Movies/CapCut/User Data/Projects/com.lveditor.draft")
+    CACHE_CAPCUT = os.path.expanduser("~/Movies/CapCut/User Data/Cache")
+    # modo sem editor (config.json "editor": "nenhum"): os rascunhos ficam numa pasta do Gab e a entrega é a prévia
+    # renderizada (capcut.py previa). Quem instalar o CapCut depois leva o rascunho com `capcut.py levar`.
+    RAIZ_SEM_EDITOR = os.path.expanduser("~/Movies/Gab Sem Editor/Rascunhos")
+ARQ = "draft_content.json" if WIN else "draft_info.json"
+NOMES_RASCUNHO = ("draft_info.json", "draft_content.json")
+
+
+def arq_rascunho(pasta):
+    """Arquivo principal do rascunho: o que existir (rascunho do Mac aberto no Windows e vice-versa), senão o do sistema."""
+    for n in (ARQ,) + tuple(x for x in NOMES_RASCUNHO if x != ARQ):
+        if os.path.isfile(os.path.join(pasta, n)):
+            return os.path.join(pasta, n)
+    return os.path.join(pasta, ARQ)
+
+
+def fonte(arquivo):
+    """Acha uma fonte pelo nome do arquivo (ex.: "Anton-Regular.ttf") nas pastas do Mac e do Windows."""
+    pastas = [os.path.expanduser("~/Library/Fonts"), "/Library/Fonts"]
+    if WIN:
+        pastas = [os.path.join(_LOCAL, "Microsoft", "Windows", "Fonts"), os.path.join(os.environ.get("WINDIR", "C:/Windows"), "Fonts")] + pastas
+    for d in pastas:
+        if os.path.isfile(os.path.join(d, arquivo)):
+            return os.path.join(d, arquivo)
+    return os.path.join(pastas[0], arquivo)
 
 
 def _raiz():
@@ -35,7 +75,7 @@ def _raiz():
 
 
 RAIZ = _raiz()
-MIDIA = os.path.expanduser("~/Movies/Gab CapCut")   # o CapCut é sandboxed: só lê ~/Movies sem pedir
+MIDIA = os.path.expanduser("~/Movies/Gab CapCut")   # Mac: o CapCut é sandboxed, só lê ~/Movies sem pedir
 AQUI = os.path.dirname(os.path.abspath(__file__))
 MOLDE = json.load(open(os.path.join(AQUI, "molde.json")))
 # transições, animações, efeitos e máscaras do CapCut internacional (ids do VectCutAPI, Apache 2.0).
@@ -56,7 +96,7 @@ CAT_ANIM = {"entrada": "in", "in": "in", "saída": "out", "out": "out", "loop": 
 def atualizar_loja():
     """Relê o cache do CapCut e regrava loja.json (abrir um painel no CapCut põe os itens dele no cache)."""
     import glob, sqlite3
-    base = os.path.join(os.path.dirname(RAIZ), "..", "Cache", "ressdk_db")
+    base = os.path.join(CACHE_CAPCUT, "ressdk_db")
     loja = {g: {} for g in set(TIPOS_LOJA.values())}
     for db in glob.glob(os.path.join(base, "*", "rp.db")):
         con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
@@ -169,14 +209,20 @@ def capcut_aberto():
     if RAIZ != RAIZ_CAPCUT:   # sem editor: o CapCut nem lê esta pasta
         return False
     try:
+        if WIN:
+            r = subprocess.run(["tasklist", "/FI", "IMAGENAME eq CapCut.exe", "/NH"], capture_output=True, text=True)
+            return "capcut.exe" in r.stdout.lower()
         return subprocess.run(["pgrep", "-x", "CapCut"], capture_output=True).returncode == 0
-    except FileNotFoundError:   # Windows
+    except FileNotFoundError:
         return False
 
 
 def fechar_capcut(espera=20):
     """Fecha o CapCut (ele salva o que estiver aberto). Necessário antes de salvar()."""
-    subprocess.run(["osascript", "-e", 'tell application "CapCut" to quit'], capture_output=True)
+    if WIN:   # sem /F: o Windows pede para fechar (WM_CLOSE) e o CapCut salva antes
+        subprocess.run(["taskkill", "/IM", "CapCut.exe"], capture_output=True)
+    else:
+        subprocess.run(["osascript", "-e", 'tell application "CapCut" to quit'], capture_output=True)
     for _ in range(espera * 2):
         if not capcut_aberto():
             return True
@@ -186,8 +232,27 @@ def fechar_capcut(espera=20):
 
 def abrir_capcut():
     """Abre o CapCut na tela inicial. Abrir o projeto é 1 clique na miniatura
-    (não há deep link para rascunho; com o computer-use o Gab clica sozinho)."""
-    subprocess.run(["open", "-a", "CapCut"])
+    (não há deep link para rascunho; no Mac o Gab clica sozinho com o computer-use, no Windows o usuário clica)."""
+    if not WIN:
+        subprocess.run(["open", "-a", "CapCut"])
+        return
+    exe = capcut_exe()
+    if not exe:
+        raise FileNotFoundError("CapCut.exe não encontrado: instale (grátis, capcut.com) e abra uma vez")
+    os.startfile(exe)
+
+
+def capcut_exe():
+    """Windows: caminho do CapCut.exe (instalador do site em %LOCALAPPDATA%; Microsoft Store/Program Files)."""
+    if not WIN:
+        return None
+    import glob
+    for c in [os.path.join(_LOCAL, "CapCut", "Apps", "CapCut.exe"),
+              *sorted(glob.glob(os.path.join(_LOCAL, "CapCut", "Apps", "*", "CapCut.exe")), reverse=True),
+              os.path.join(os.environ.get("ProgramFiles", "C:/Program Files"), "CapCut", "CapCut.exe")]:
+        if os.path.isfile(c):
+            return c
+    return None
 
 
 def rascunhos():
@@ -196,7 +261,7 @@ def rascunhos():
     if not os.path.isdir(RAIZ):
         return out
     for n in sorted(os.listdir(RAIZ)):
-        f = os.path.join(RAIZ, n, "draft_info.json")
+        f = arq_rascunho(os.path.join(RAIZ, n))
         if os.path.isfile(f):
             d = json.load(open(f))
             out.append((n, d.get("duration", 0) / US, time.strftime("%d/%m %H:%M", time.localtime(os.path.getmtime(f)))))
@@ -211,6 +276,11 @@ def novo(nome, w=1080, h=1920, fps=30, substituir=False):
             raise FileExistsError(f"Já existe o rascunho '{nome}'. Use abrir('{nome}') ou substituir=True")
         shutil.rmtree(pasta)
     shutil.copytree(os.path.join(AQUI, "esqueleto"), pasta)
+    if WIN:   # o esqueleto veio do Mac (draft_info.json); o CapCut do Windows lê draft_content.json
+        for base, _, arqs in os.walk(pasta):
+            for a in arqs:
+                if a.startswith("draft_info.json"):
+                    os.replace(os.path.join(base, a), os.path.join(base, a.replace("draft_info.json", ARQ)))
     # ids do esqueleto trocados por novos em todos os arquivos
     velho_tl = json.load(open(os.path.join(pasta, "Timelines", "project.json")))
     trocas = {velho_tl["main_timeline_id"]: _id(), velho_tl["id"]: _id(),
@@ -230,11 +300,15 @@ def novo(nome, w=1080, h=1920, fps=30, substituir=False):
             open(f, "w", encoding="utf-8").write(t)
     d = Rascunho(nome)
     d.j.update(fps=float(fps), duration=0, tracks=[])
+    if WIN:
+        for k in ("platform", "last_modified_platform"):
+            if isinstance(d.j.get(k), dict):
+                d.j[k].update(os="windows", os_version="10.0", mac_address="")
     # ímã da trilha principal desligado: senão o CapCut gruda os clipes da V1 ao abrir e some com os buracos
     d.j["config"]["maintrack_adsorb"] = False
     d.j["canvas_config"].update(width=w, height=h, ratio="original")
     m = d.meta
-    m.update(draft_name=nome, draft_fold_path=pasta, draft_root_path=RAIZ, draft_cover="",
+    m.update(draft_name=nome, draft_fold_path=_p(pasta), draft_root_path=_p(RAIZ), draft_cover="",
              tm_draft_create=agora, tm_draft_modified=agora, draft_materials=[{"type": t, "value": []} for t in (0, 1, 2, 3, 6, 7, 8)])
     d.salvar(forcar=True)
     return d
@@ -247,10 +321,14 @@ def abrir(nome):
 class Rascunho:
     def __init__(self, nome):
         self.nome = nome
-        self.pasta = os.path.join(RAIZ, nome)
+        self.pasta = _p(os.path.join(RAIZ, nome))
         if not os.path.isdir(self.pasta):
             raise FileNotFoundError(f"Rascunho '{nome}' não existe. rascunhos() lista os que existem")
-        bruto = open(os.path.join(self.pasta, "draft_info.json"), "rb").read()
+        self.arq = os.path.basename(arq_rascunho(self.pasta))
+        bruto = open(os.path.join(self.pasta, self.arq), "rb").read()
+        if not bruto.lstrip(b"\xef\xbb\xbf \t\r\n").startswith(b"{"):
+            raise RuntimeError(f"'{nome}': {self.arq} não é JSON puro (rascunho criptografado). Acontece no Jianying "
+                               "chinês; no CapCut internacional, atualizar o CapCut ou usar o modo sem editor")
         self._digital = hashlib.sha256(bruto).hexdigest()   # se mudar até o salvar(), alguém mexeu no CapCut
         self.j = json.loads(bruto)
         self.meta = json.load(open(os.path.join(self.pasta, "draft_meta_info.json")))
@@ -353,10 +431,13 @@ class Rascunho:
 
     # ---------- mídia ----------
     def _trazer(self, arq):
-        """Garante que o arquivo está em ~/Movies (sandbox do CapCut). Fora disso, copia (hardlink se der)."""
+        """Mac: garante que o arquivo está em ~/Movies (sandbox do CapCut); fora disso, copia (hardlink se der).
+        Windows: sem sandbox, usa o arquivo onde está."""
         arq = os.path.abspath(os.path.expanduser(arq))
         if not os.path.isfile(arq):
             raise FileNotFoundError(arq)
+        if WIN:
+            return _p(arq)
         if arq.startswith(os.path.expanduser("~/Movies/")):
             return arq
         destino_dir = os.path.join(MIDIA, self.nome)
@@ -456,7 +537,7 @@ class Rascunho:
               negrito=False, fonte=None, x=None, y=None, escala=1.0, alinhamento=1, largura_max=0.82,
               destaques=None, **visual):
         """Texto simples. tamanho na escala do CapCut (legenda ~8-10, título ~15-20).
-        contorno='#000000' liga a borda. fonte=caminho de .ttf/.otf (cópia vai para ~/Movies)."""
+        contorno='#000000' liga a borda. fonte=caminho de .ttf/.otf (no Mac a cópia vai para ~/Movies)."""
         estilo = {"fill": {"alpha": 1.0, "content": {"render_type": "solid", "solid": {"alpha": 1.0, "color": _hex(cor)}}},
                   "range": [0, len(texto)], "size": tamanho, "bold": negrito, "italic": False, "underline": False}
         mat = copy.deepcopy(MOLDE["texto"])
@@ -1106,7 +1187,7 @@ class Rascunho:
         if capcut_aberto() and not (projeto_fechado or forcar):
             raise RuntimeError("O CapCut está aberto. Se este projeto NÃO estiver aberto nele (tela inicial ou outro "
                                "projeto), salve com projeto_fechado=True. Senão, feche o projeto ou C.fechar_capcut()")
-        info = os.path.join(self.pasta, "draft_info.json")
+        info = os.path.join(self.pasta, self.arq)
         if not forcar and os.path.exists(info) and hashlib.sha256(open(info, "rb").read()).hexdigest() != self._digital:
             raise RuntimeError("O rascunho mudou no disco desde que foi aberto (edição no CapCut?). "
                                "Abra de novo com C.abrir() e refaça, para não apagar a edição manual")
@@ -1119,15 +1200,16 @@ class Rascunho:
             open(tmp, "w", encoding="utf-8").write(texto)
             os.replace(tmp, f)
         if not self._backup_feito:
-            orig = os.path.join(self.pasta, "draft_info.json")
+            orig = os.path.join(self.pasta, self.arq)
             if os.path.exists(orig):
-                shutil.copy2(orig, os.path.join(self.pasta, f"draft_info.gab_{time.strftime('%Y%m%d-%H%M%S')}.json"))
+                shutil.copy2(orig, os.path.join(self.pasta, f"{self.arq[:-5]}.gab_{time.strftime('%Y%m%d-%H%M%S')}.json"))
             self._backup_feito = True
         tdir = os.path.join(self.pasta, "Timelines", tl)
-        for f in (os.path.join(self.pasta, n) for n in ("draft_info.json", "draft_info.json.bak", "template-2.tmp")):
+        copias = (self.arq, self.arq + ".bak", "template-2.tmp")
+        for f in (os.path.join(self.pasta, n) for n in copias):
             gravar(f, dados)
         if os.path.isdir(tdir):
-            for n in ("draft_info.json", "draft_info.json.bak", "template-2.tmp"):
+            for n in copias:
                 gravar(os.path.join(tdir, n), dados)
             patch = os.path.join(tdir, "attachment", "patch")
             if os.path.isdir(patch):
@@ -1145,14 +1227,14 @@ class Rascunho:
     def _registrar(self, agora):
         """Entrada na tela inicial do CapCut (root_meta_info.json)."""
         f = os.path.join(RAIZ, "root_meta_info.json")
-        r = json.load(open(f)) if os.path.exists(f) else {"all_draft_store": [], "draft_ids": 0, "root_path": RAIZ}
+        r = json.load(open(f, encoding="utf-8")) if os.path.exists(f) else {"all_draft_store": [], "draft_ids": 0, "root_path": _p(RAIZ)}
         lista = r.setdefault("all_draft_store", [])
         e = next((x for x in lista if x.get("draft_fold_path") == self.pasta), None)
         if e is None:
             e = copy.deepcopy(lista[0]) if lista else {}
             lista.insert(0, e)
             e.update(draft_cover="", tm_draft_create=agora, draft_id=self.meta.get("draft_id", _id()))
-        e.update(draft_fold_path=self.pasta, draft_json_file=os.path.join(self.pasta, "draft_info.json"),
-                 draft_name=self.nome, draft_root_path=RAIZ, tm_draft_modified=agora, tm_duration=self.j["duration"],
+        e.update(draft_fold_path=self.pasta, draft_json_file=_p(os.path.join(self.pasta, self.arq)),
+                 draft_name=self.nome, draft_root_path=_p(RAIZ), tm_draft_modified=agora, tm_duration=self.j["duration"],
                  draft_timeline_materials_size=0, tm_draft_removed=0, draft_is_invisible=False)
-        json.dump(r, open(f, "w"), ensure_ascii=False)
+        json.dump(r, open(f, "w", encoding="utf-8"), ensure_ascii=False)

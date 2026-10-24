@@ -7,7 +7,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude_Code-skill-D97757.svg?style=for-the-badge&logo=anthropic&logoColor=white)](https://claude.com/claude-code "Claude Code")
 [![DaVinci Resolve Studio](https://img.shields.io/badge/DaVinci_Resolve-Studio_21.1+-233A51.svg?style=for-the-badge&logo=davinciresolve&logoColor=white)](#requisitos "Requisitos")
 [![Premiere Pro](https://img.shields.io/badge/Premiere_Pro-2026+-9999FF.svg?style=for-the-badge&logo=adobepremierepro&logoColor=white)](premiere/README.md "Premiere")
-[![CapCut](https://img.shields.io/badge/CapCut-Mac_beta-000000.svg?style=for-the-badge)](capcut/README.md "CapCut")
+[![CapCut](https://img.shields.io/badge/CapCut-Mac_e_Windows_beta-000000.svg?style=for-the-badge)](capcut/README.md "CapCut")
 [![Final Cut Pro](https://img.shields.io/badge/Final_Cut_Pro-Mac_beta-6E44FF.svg?style=for-the-badge&logo=apple&logoColor=white)](finalcut/README.md "Final Cut Pro")
 [![After Effects](https://img.shields.io/badge/After_Effects-motions-9999FF.svg?style=for-the-badge&logo=adobeaftereffects&logoColor=white)](aftereffects/README.md "After Effects")
 [![macOS](https://img.shields.io/badge/-macOS-lightblue.svg?style=for-the-badge&logo=apple&logoColor=black)](#instalacao "Instalação")
@@ -17,7 +17,7 @@
 
 </div>
 
-**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve, no Adobe Premiere Pro** (Mac e Windows), **no CapCut e no Final Cut Pro** (Mac, beta), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci (cortes, silêncios, multicâmera de podcast, reenquadramento para vertical) e cuida do **Instagram**: legenda do post, carrossel, hashtags, semana de conteúdo e perfil. A cada marca ele guarda uma **memória** com o que você pediu de diferente, para acertar de primeira no próximo vídeo.
+**/ogab** (o Gab) é uma skill do Claude Code que edita vídeo para redes sociais **no DaVinci Resolve, no Adobe Premiere Pro** (Mac e Windows), **no CapCut** (Mac e Windows, beta) **e no Final Cut Pro** (Mac, beta), com motions automáticos ou montados **no After Effects** em camadas editáveis: do roteiro aprovado até a timeline pronta e o MP4 masterizado, com narração por IA, música, efeitos sonoros, takes de banco ou gerados, lettering animado, motions (HyperFrames), legenda com métrica e conferência automática. Também edita gravações de apresentador (talking head) já abertas no DaVinci (cortes, silêncios, multicâmera de podcast, reenquadramento para vertical) e cuida do **Instagram**: legenda do post, carrossel, hashtags, semana de conteúdo e perfil. A cada marca ele guarda uma **memória** com o que você pediu de diferente, para acertar de primeira no próximo vídeo.
 
 <div align="center">
 
@@ -80,7 +80,7 @@ O Gab se atualiza sozinho toda vez que você usa e **mostra o que mudou** logo n
 - **Presets da pessoa recortada mais fortes:** **Letreiro** (antigo Palco: palavra gigante atrás da cabeça), **Órbita** (cartões de tamanhos diferentes girando a volta inteira em volta da pessoa, por trás da cabeça e pela frente), **Lente** (zoom que vai certo no rosto) e **Título atrás da cabeça** (a cabeça cobre só a base das letras).
 - **Motion atrás da pessoa no próprio DaVinci:** o Gab monta a máscara com o **Magic Mask** no Fusion (seleciona a pessoa com cabelo e o que ela segura, faz o tracking) e deixa a comp na timeline para você ajustar.
 - **Presets da comunidade:** o preset que você cria vai inteiro (com tudo que ele precisa para funcionar) para o banco da comunidade e aparece no menu de todo mundo com a prévia.
-- **CapCut e Final Cut Pro (Mac, beta):** além do DaVinci e do Premiere, o Gab monta o vídeo no **CapCut** (escreve o rascunho direto, com filtros, adesivos, animações e modelos de texto da loja, e recria no CapCut uma timeline do DaVinci) e no **Final Cut Pro** (gera o projeto FCPXML inteiro: takes, camadas, música, SFX, títulos e legenda no estilo do cliente).
+- **CapCut (Mac e Windows, beta) e Final Cut Pro (Mac, beta):** além do DaVinci e do Premiere, o Gab monta o vídeo no **CapCut** (escreve o rascunho direto, com filtros, adesivos, animações e modelos de texto da loja, e recria no CapCut uma timeline do DaVinci) e no **Final Cut Pro** (gera o projeto FCPXML inteiro: takes, camadas, música, SFX, títulos e legenda no estilo do cliente).
 - **Memória da marca:** antes de editar, o Gab cria a pasta e um `<Marca>.md` com o que você pediu de diferente, o que funcionou e o que fazer da próxima vez. Lê tudo antes do próximo vídeo da marca.
 - **Silêncios pela transcrição do DaVinci:** corta as pausas entre as palavras que o próprio DaVinci reconheceu (não depende do volume nem do barulho de fundo) e guarda a timeline original como backup.
 - **Podcast com 2 câmeras:** multicâmera sincronizado pelo áudio e troca de câmera automática por quem fala. **"Arruma esses aqui":** selecione os clipes no DaVinci e o Gab mexe só neles. **Smart Reframe** para vídeo horizontal em vertical e **estabilização** de take tremido.
@@ -148,7 +148,7 @@ Se baixou o arquivo `install.ps1` em vez de usar o comando acima, rode com `powe
 
 **Instalando pelo Claude Code (ou outro terminal sem teclado):** as 3 perguntas do instalador não aparecem; responda antes por variável e acompanhe o log ao vivo em outra aba:
 ```powershell
-$env:OGAB_EDITOR = 'davinci'      # ou premiere (CapCut e Final Cut só no Mac)
+$env:OGAB_EDITOR = 'davinci'      # ou premiere, capcut ou nenhum (Final Cut só no Mac)
 $env:OGAB_MOTION = 'hyperframes'  # ou aftereffects
 $env:OGAB_ACEITO = 'sim'          # só depois que a pessoa digitou ACEITO nos termos
 irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
@@ -158,7 +158,7 @@ Get-Content $env:TEMP\ogab-install.log -Wait
 ```
 
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
-1. **Editor:** DaVinci Resolve, Adobe Premiere Pro, CapCut (Mac, beta) ou Final Cut Pro (Mac, beta). No Windows: DaVinci ou Premiere.
+1. **Editor:** DaVinci Resolve, Adobe Premiere Pro, CapCut (Mac e Windows, beta) ou Final Cut Pro (Mac, beta). No Windows: DaVinci, Premiere ou CapCut.
 2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).
 
 Trocar depois, sem reinstalar: `/ogab config editor davinci|premiere|capcut|finalcut|nenhum` e `/ogab config motion hyperframes|aftereffects`.
@@ -219,7 +219,7 @@ A skill faz `git pull` sozinha toda vez que é usada (sem tocar no seu `config.j
 | | Mínimo | Observação |
 |---|---|---|
 | Sistema | macOS ou Windows 10/11 | Testado em Apple Silicon; diferenças do Windows em [`windows/README.md`](windows/README.md) |
-| Editor | **DaVinci Resolve Studio 21.1+**, **Adobe Premiere Pro 2026+**, **CapCut 9.4+** (Mac) ou **Final Cut Pro 12.2+** (Mac) | DaVinci: a versão grátis não tem scripting externo. Premiere: ver [`premiere/README.md`](premiere/README.md). CapCut: grátis serve; efeito "(pro)" só exporta no Pro ([`capcut/README.md`](capcut/README.md)). Final Cut: ver [`finalcut/README.md`](finalcut/README.md) |
+| Editor | **DaVinci Resolve Studio 21.1+**, **Adobe Premiere Pro 2026+**, **CapCut 9.4+** (Mac e Windows) ou **Final Cut Pro 12.2+** (Mac) | DaVinci: a versão grátis não tem scripting externo. Premiere: ver [`premiere/README.md`](premiere/README.md). CapCut: grátis serve; efeito "(pro)" só exporta no Pro ([`capcut/README.md`](capcut/README.md)). Final Cut: ver [`finalcut/README.md`](finalcut/README.md) |
 | After Effects | 2024+ (só se escolher motions no AE) | Ver [`aftereffects/README.md`](aftereffects/README.md) |
 | Python | 3.10+ | Pillow; `pyobjc-framework-Vision` para o `legenda_ui.py` |
 | ffmpeg | qualquer recente | Conversão, loudness, master, conferência |
@@ -564,7 +564,7 @@ No DaVinci o Media Pool fica em `Timelines / Footages / BRoll / SFX / Musicas / 
 
 # EDITORES E MOTIONS
 
-| | DaVinci Resolve | Adobe Premiere Pro | CapCut (Mac, beta) | Final Cut Pro (Mac, beta) |
+| | DaVinci Resolve | Adobe Premiere Pro | CapCut (Mac e Windows, beta) | Final Cut Pro (Mac, beta) |
 |---|---|---|---|---|
 | Como o Gab controla | API de scripting do Resolve | plugin **Gab Ponte** (painel UXP, uma vez: Window > UXP Plugins > Gab Ponte) | escreve o rascunho JSON direto (o CapCut não tem API); você abre o projeto no app | gera o projeto **FCPXML** e o Final Cut importa; ajustes no projeto que já existe, sem recriar |
 | Como escolher | `config editor davinci` (padrão) | `config editor premiere` | `config editor capcut` | `config editor finalcut` |
@@ -751,7 +751,7 @@ scripts/                 resolve_lib, legendas, legenda_ui, legenda_auto, legend
 tresd/                   3D no Blender: logo/texto extrudado e objetos (cenas/)
 voz_local/               clonador de voz local opcional (motor do VoiceStudio, sem o app): voz.py, voicestudio.sh
 ograf/                   títulos OGraf (HTML editável no DaVinci): GabLettering + README de como criar
-capcut/                  CapCut (Mac, beta): escreve o rascunho do projeto e recria timeline do DaVinci
+capcut/                  CapCut (Mac e Windows, beta): escreve o rascunho do projeto e recria timeline do DaVinci
 finalcut/                Final Cut Pro (Mac, beta): gerador FCPXML, acessibilidade e engenharia reversa
 navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões

@@ -38,6 +38,10 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
 9. **Transcrição:** igual (DaVinci 21.1+ pela API). Abaixo disso o Whisper local é o `faster-whisper` (CPU; com placa NVIDIA dá para trocar para CUDA).
 10. **Downloads pelo navegador:** iguais (Claude in Chrome); os arquivos caem em `%USERPROFILE%\Downloads`.
 
+## CapCut no Windows (beta)
+
+`"editor": "capcut"` funciona no Windows (escolha 3 no instalador ou `/ogab config editor capcut`). O Gab escreve o rascunho em `%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft\<nome>\draft_content.json` com o CapCut fechado (ou na tela inicial), igual ao Mac. Diferença no fluxo: abrir o projeto é um clique na 1a miniatura da tela inicial e no Windows quem clica é o usuário (`capcut.py abrir "<rascunho>"` e pedir o clique). Detalhes e armadilhas: `capcut/README.md`, seção Windows.
+
 ## Requisitos
 
 | Item | Versão |

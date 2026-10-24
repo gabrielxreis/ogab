@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.24-2 (24/10/2026)
+- **CapCut no Windows (beta):** quem usa Windows agora pode escolher o CapCut como editor (opção 3 no instalador ou `/ogab config editor capcut`). O Gab monta o vídeo direto no rascunho do CapCut, como já fazia no Mac: cortes, legenda, música, textos, filtros e animações da loja, e a prévia em MP4 sem abrir o app. Para abrir o projeto, é só clicar na primeira miniatura da tela inicial do CapCut.
 ## 2026.10.24-1 (24/10/2026)
 - **Óculos Even Realities G2 (`/ogab eveng2`):** o roteiro aprovado vai para o teleprompter da lente (você rola no anel R1 ou deixa rolar sozinho), a lista de planos vira checklist que você marca no anel durante a gravação, e o Gab pode avisar na lente quando um render termina. Funciona por Bluetooth direto do Mac: desligue o Bluetooth do iPhone antes. Primeira vez: `/ogab eveng2` instala e procura o óculos. O teleprompter ainda é experimental.
 ## 2026.10.23-44 (23/10/2026)

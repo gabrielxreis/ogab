@@ -119,21 +119,24 @@ if (Test-Path $cfg) {
 if (-not (Test-Path $cfg)) { Copy-Item (Join-Path $DEST "config.example.json") $cfg; Ok "config.json criado (fica so na sua maquina)" }
 else { Ok "config.json mantido" }
 
-# Editor: cada usuario escolhe UM (DaVinci, Premiere ou nenhum; CapCut e Final Cut so no Mac) e o Gab trabalha so nele (config.json "editor").
+# Editor: cada usuario escolhe UM (DaVinci, Premiere, CapCut ou nenhum; Final Cut so no Mac) e o Gab trabalha so nele (config.json "editor").
 $cfgJ = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
 $editor = if ($env:OGAB_EDITOR) { $env:OGAB_EDITOR } elseif ($cfgJ.editor) { $cfgJ.editor } else { "" }
 if (-not $editor) {
-  Write-Host "`n  Em qual editor o Gab vai montar seus videos?`n    1) DaVinci Resolve Studio`n    2) Adobe Premiere Pro`n    3) Nenhum: o Claude faz tudo e entrega o MP4 pronto (beta)"
+  Write-Host "`n  Em qual editor o Gab vai montar seus videos?`n    1) DaVinci Resolve Studio`n    2) Adobe Premiere Pro`n    3) CapCut (beta, gratis)`n    4) Nenhum: o Claude faz tudo e entrega o MP4 pronto (beta)"
   $esc = Read-Host "  Escolha [1-3]"
-  $editor = if ($esc -eq "2") { "premiere" } elseif ($esc -eq "3") { "nenhum" } else { "davinci" }
+  $editor = if ($esc -eq "2") { "premiere" } elseif ($esc -eq "3") { "capcut" } elseif ($esc -eq "4") { "nenhum" } else { "davinci" }
   if ($editor -eq "nenhum") { Write-Host "  Dica: o CapCut e gratis (capcut.com); com ele voce abre o video e muda o que quiser." }
 }
-if ($editor -notin @("davinci", "premiere", "nenhum")) {
-  Warn "CapCut e Final Cut sao so no Mac (beta); no Windows o Gab usa DaVinci, Premiere ou nenhum. Usando davinci."
+if ($editor -eq "capcut" -and -not ((Test-Path "$env:LOCALAPPDATA\CapCut\Apps\CapCut.exe") -or (Get-ChildItem "$env:LOCALAPPDATA\CapCut\Apps" -Recurse -Filter CapCut.exe -ErrorAction SilentlyContinue))) {
+  Warn "CapCut nao encontrado: instale (gratis, capcut.com), abra uma vez e entre na sua conta. O Gab ja fica configurado para ele."
+}
+if ($editor -notin @("davinci", "premiere", "capcut", "nenhum")) {
+  Warn "Final Cut e so no Mac (beta); no Windows o Gab usa DaVinci, Premiere, CapCut ou nenhum. Usando davinci."
   $editor = "davinci"
 }
 Py -c "import json,sys;p=sys.argv[1];c=json.load(open(p,encoding='utf-8'));c['editor']=sys.argv[2];json.dump(c,open(p,'w',encoding='utf-8'),ensure_ascii=False,indent=2)" $cfg $editor
-Ok "editor: $editor (para trocar: /ogab config editor davinci|premiere|nenhum)"
+Ok "editor: $editor (para trocar: /ogab config editor davinci|premiere|capcut|nenhum)"
 
 # Motions: automatico (HyperFrames) ou no After Effects (camadas editaveis). Tudo e instalado; a escolha so diz qual o Gab usa.
 $motion = if ($env:OGAB_MOTION) { $env:OGAB_MOTION } elseif ($cfgJ.motion) { $cfgJ.motion } else { "" }
@@ -334,7 +337,7 @@ Py (Join-Path $DEST "scripts\doctor.py") --corrigir
 Write-Host @"
 
 Pronto. Seu Gab vai editar no: $editor   |   motions: $motion
-(trocar a qualquer hora: /ogab config editor davinci|premiere  e  /ogab config motion hyperframes|aftereffects)
+(trocar a qualquer hora: /ogab config editor davinci|premiere|capcut  e  /ogab config motion hyperframes|aftereffects)
 
 Falta so o que precisa de voce (uma vez), no app que voce usa:
   DaVinci:        Preferences > System > General > External scripting using: Local (e reinicie o Resolve).

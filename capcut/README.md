@@ -1,4 +1,4 @@
-# Gab (/ogab) no CapCut (Mac)
+# Gab (/ogab) no CapCut (Mac e Windows)
 
 Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando o usuário pedir CapCut (ou `"editor": "capcut"` no config), usar `capcut/capcut_lib.py` onde o `SKILL.md` manda usar `resolve_lib.py`.
 
@@ -10,7 +10,7 @@ Camada à parte, igual a `premiere/`: o método do `SKILL.md` não muda. Quando 
 
 ## Sem editor (`"editor": "nenhum"`, 23/10/2026)
 
-Para quem não tem nenhum editor: o mesmo motor, sem o app. Com `"editor": "nenhum"` no config, a `capcut_lib` grava os rascunhos em `~/Movies/Gab Sem Editor/Rascunhos` (a variável `GAB_RASCUNHOS` força outra pasta) e não confere se o CapCut está aberto. Monta com `capcut.py plano`, entrega com `capcut.py previa "<rascunho>" saida.mp4` (escala 1 = final). Testado 23/10/2026: vídeo com fundo desfocado + MOV com alfa (motion) + texto saiu certo. Fora do render: transição, filtro, efeito, adesivo e animação da loja (usar corte seco, keyframe e motion do HyperFrames). Funciona sem o CapCut instalado; no Windows não testado (sem `pgrep`, tratado).
+Para quem não tem nenhum editor: o mesmo motor, sem o app. Com `"editor": "nenhum"` no config, a `capcut_lib` grava os rascunhos em `~/Movies/Gab Sem Editor/Rascunhos` (a variável `GAB_RASCUNHOS` força outra pasta) e não confere se o CapCut está aberto. Monta com `capcut.py plano`, entrega com `capcut.py previa "<rascunho>" saida.mp4` (escala 1 = final). Testado 23/10/2026: vídeo com fundo desfocado + MOV com alfa (motion) + texto saiu certo. Fora do render: transição, filtro, efeito, adesivo e animação da loja (usar corte seco, keyframe e motion do HyperFrames). Funciona sem o CapCut instalado (no Windows a pasta é `~/Videos/Gab Sem Editor/Rascunhos`).
 Instalou o CapCut depois: `capcut.py levar "<rascunho|*>"` copia para a pasta do CapCut, troca os caminhos e registra na tela inicial; depois `/ogab config editor capcut`. Com a tela inicial do CapCut vazia (nenhum projeto), a entrada é mínima: conferir que aparece.
 
 ## Linha de comando (`capcut.py`, 22/10/2026): o jeito padrão de mexer no CapCut
@@ -125,3 +125,22 @@ Chroma key, fontes da loja no `texto()` (os ids já estão em `loja.json`) e con
 | `catalogo.json` | 936 transições, animações, efeitos e máscaras com os ids internos do CapCut |
 | `molde.json` | estruturas reais de segmento/material extraídas do CapCut 9.4 (sem caminhos pessoais) |
 | `esqueleto/` | pasta de rascunho vazio do 9.4 (ids trocados a cada `novo()`) |
+
+## Windows (24/10/2026, beta)
+
+Mesma lib e mesma linha de comando; a `capcut_lib` detecta o Windows (`C.WIN`) e troca sozinha:
+
+| | Mac | Windows |
+|---|---|---|
+| Pasta dos rascunhos | `~/Movies/CapCut/User Data/Projects/com.lveditor.draft` | `%LOCALAPPDATA%\CapCut\User Data\Projects\com.lveditor.draft` |
+| Arquivo do rascunho | `draft_info.json` | `draft_content.json` (`C.arq_rascunho()` aceita os dois: rascunho do Mac abre no Windows e vice-versa) |
+| Mídia | copiada para `~/Movies/Gab CapCut` (sandbox) | fica onde está (sem sandbox); caminhos gravados com `/` como o CapCut do Windows grava |
+| Aberto? / fechar | `pgrep` / AppleScript | `tasklist` / `taskkill` sem `/F` (o CapCut recebe o pedido de fechar e salva) |
+| Abrir | `open -a CapCut` | `CapCut.exe` em `%LOCALAPPDATA%\CapCut\Apps` |
+| Fontes | `~/Library/Fonts` | `%LOCALAPPDATA%\Microsoft\Windows\Fonts` e `C:\Windows\Fonts` (`C.fonte("Anton-Regular.ttf")`) |
+| Clicar na miniatura para abrir | o Gab (computer-use) | o usuário (computer-use do Claude é só no Mac): `capcut.py abrir "<rascunho>"` e pedir o clique na 1a miniatura |
+
+- **Local do rascunho trocado nos Ajustes do CapCut:** gravar a variável de usuário `GAB_CAPCUT_RAIZ` com a pasta nova (`setx GAB_CAPCUT_RAIZ "D:/CapCut/Projects/com.lveditor.draft"`) e reabrir o Claude Code. Vale no Mac também.
+- **Rascunho criptografado:** a lib recusa com aviso claro se o arquivo não for JSON puro (o Jianying chinês criptografa desde a 6.0; o CapCut internacional não, até onde se sabe em 10/2026). Nesse caso: modo `nenhum` + `previa`.
+- **Testado:** simulação no Mac (criar, salvar, reabrir, registrar na tela inicial, `previa`). **Ainda não aberto num CapCut de Windows de verdade:** no primeiro uso, conferir que o rascunho aparece na tela inicial e abre; se não abrir, olhar se o CapCut gravou algum arquivo novo na pasta do projeto e registrar em docs/PROCESSO.md.
+- `previa`, `conferir`, `plano`, `cortes`, `faz`, `levar` e `davinci_para_capcut.py` rodam iguais (com `PYTHONUTF8=1`, que o `install.ps1` grava).
