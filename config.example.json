@@ -195,5 +195,9 @@
   "motor": "omnivoice",
   "passos": 32,
   "_leia": "Clonador de voz local opcional (voz_local/README.md). ativo=true: o Gab oferece as vozes clonadas no Mac junto com o ElevenLabs. Motor padrão OmniVoice tem licença NÃO comercial."
- }
+ },
+  "eveng2": {
+    "_leia": "Óculos Even Realities G2 (eveng2/README.md). avisos=true: o Gab manda aviso na lente quando render/etapa termina.",
+    "avisos": false
+  }
 }

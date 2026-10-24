@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.24-1 (24/10/2026)
+- **Óculos Even Realities G2 (`/ogab eveng2`):** o roteiro aprovado vai para o teleprompter da lente (você rola no anel R1 ou deixa rolar sozinho), a lista de planos vira checklist que você marca no anel durante a gravação, e o Gab pode avisar na lente quando um render termina. Funciona por Bluetooth direto do Mac: desligue o Bluetooth do iPhone antes. Primeira vez: `/ogab eveng2` instala e procura o óculos. O teleprompter ainda é experimental.
 ## 2026.10.23-44 (23/10/2026)
 - **Nada renderizado para a timeline sem você pedir:** fotos entram como arquivo original (duração e zoom ajustados no DaVinci) e a legenda não vira mais vídeo. O Gab só renderiza o motion e o export final.
 ## 2026.10.23-43 (23/10/2026)
