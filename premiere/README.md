@@ -1,26 +1,38 @@
 # Gab (/ogab) no Adobe Premiere Pro
 
-O mesmo método do `SKILL.md` (roteiro, voz, legenda, música, SFX, takes, cor, lettering, motions, QC), com o **Premiere Pro 2026+** no lugar do DaVinci. Nada do fluxo do DaVinci muda: esta pasta é uma camada à parte e funciona no Mac e no Windows.
+O mesmo método do `SKILL.md` (roteiro, voz, legenda, música, SFX, takes, cor, lettering, motions, QC), com o **Premiere Pro** no lugar do DaVinci. Nada do fluxo do DaVinci muda: esta pasta é uma camada à parte e funciona no Mac e no Windows.
 
-Quando vale: `config.json` com `"editor": "premiere"` (`/ogab config editor premiere`) ou o usuário pedindo Premiere. Nesse caso, em toda etapa que o `SKILL.md` manda usar `resolve_lib.py`, usar `premiere/premiere_lib.py`.
+**Duas pontes, uma interface.** O Premiere 26+ usa UXP; o Premiere 2018 a 25.x usa CEP + ExtendScript. O Gab não precisa saber a versão: usa `premiere/ponte.py`, que escolhe sozinho a ponte que estiver no ar (CEP na porta 8767 se o Premiere antigo estiver aberto; senão UXP na 8765). `P.qual()` diz qual pegou. Detalhes da ponte antiga e o que ela NÃO faz: seção "Premiere antigo (CEP)" mais abaixo e `cep/ENGENHARIA_REVERSA_PREMIERE_2019.md`.
+
+Quando vale: `config.json` com `"editor": "premiere"` (`/ogab config editor premiere`) ou o usuário pedindo Premiere. Nesse caso, em toda etapa que o `SKILL.md` manda usar `resolve_lib.py`, usar **`premiere/ponte.py`** (que delega para `premiere_lib.py` no 26+ ou `cep/premiere2019_lib.py` no 2018–25).
 
 ## Instalar (uma vez por máquina)
 
+**Premiere 26+ (UXP):**
 - Mac: `bash ~/.claude/skills/ogab/premiere/instalar.sh`
 - Windows (depois do `windows\install.ps1`): `powershell -ExecutionPolicy Bypass -File "$HOME\.claude\skills\ogab\premiere\instalar.ps1"`
 
 Instala o plugin **Gab Ponte**, o LUT (`assets/lut/*.cube` nas pastas de LUT do Premiere) e os letterings (`assets/mogrt/*.mogrt` em Motion Graphics Templates). No Premiere, uma vez: **Window > UXP Plugins > Gab Ponte**, e deixar o painel encaixado. Ele mostra "conectado" enquanto o Gab trabalha.
 
+**Premiere 2018 a 25.x (CEP):**
+- Windows: `powershell -ExecutionPolicy Bypass -File "$HOME\.claude\skills\ogab\premiere\cep\instalar.ps1"`
+- Mac: `bash ~/.claude/skills/ogab/premiere/cep/instalar.sh`
+
+Instala a extensão **Gab Ponte PPro** (CEP) e liga o `PlayerDebugMode` (extensão sem assinatura). Esse passo escreve no registro do Windows e é do USUÁRIO: o Gab não faz isso sozinho. Depois é só reabrir o Premiere, a ponte inicia invisível. Se não iniciar, abrir **Window > Extensions > Gab Ponte**.
+
 ## Como o Gab fala com o Premiere
 
-O Premiere não aceita script de fora como o DaVinci. Por isso o plugin Gab Ponte fica dentro dele e se conecta ao Python da skill (WebSocket local `127.0.0.1:8765`, sem internet). O plugin não tem lógica de edição: cada função do `premiere_lib.py` manda o seu trecho de JavaScript da API UXP. Para melhorar o Gab basta um `git pull`, sem reinstalar o plugin.
+O Premiere não aceita script de fora como o DaVinci. Por isso o plugin Gab Ponte fica dentro dele e se conecta ao Python da skill, sem internet. No 26+ é UXP por WebSocket `127.0.0.1:8765`; no 2018–25 é CEP por HTTP `127.0.0.1:8767`. O plugin não tem lógica de edição: cada função manda o seu trecho de código (JS da API UXP no 26, ExtendScript no antigo). Para melhorar o Gab basta um `git pull`, sem reinstalar o plugin.
+
+Sempre importe pela **ponte** (ela escolhe a versão certa):
 
 ```python
-import sys, os; sys.path.insert(0, os.path.expanduser("~/.claude/skills/ogab/premiere")); import premiere_lib as P
-P.js("return (await proj()).name")   # qualquer coisa da API: https://developer.adobe.com/premiere-pro/uxp/
+import sys, os; sys.path.insert(0, os.path.expanduser("~/.claude/skills/ogab/premiere")); import ponte as P
+P.qual()                 # "uxp (Premiere 26.x)" ou "cep (Premiere 13.1.5)"
+P.colocar(seq, arquivo, tempo, video=1)   # mesma interface nas duas pontes
 ```
 
-Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Ponte não foi aberto. Pedir ao usuário para abrir e tentar de novo.
+Se der `O Premiere não conectou` / não responder na porta: o Premiere está fechado ou o painel Gab Ponte não foi aberto. Pedir ao usuário para abrir e tentar de novo.
 
 ## Etapa por etapa (o que muda em relação ao DaVinci)
 
@@ -56,11 +68,28 @@ Se der `O Premiere não conectou`: o Premiere está fechado ou o painel Gab Pont
 - **Premiere 26.0 (17/10/2026):** não tem `createSubClipAction`, então `colocar(..., audio=None)` e `montar_takes` param com erro claro. Motion MOV (sem áudio) entra com `createOverwriteItemAction(item, t, trilha, -1)` direto (conferir antes com ffprobe que o MOV não tem áudio). Desde 19/10/2026 o `colocar`/`montar_takes` já faz isso sozinho (`_tem_audio` pelo ffprobe): no 26.5 o subclipe de arquivo sem áudio dá "startTime must be less than endTime". Overwrite numa V acima da última CRIA a trilha nesse caso. Recolocar um motion mais longo que o vão cobre o começo do seguinte: recolocar os seguintes em ordem.
 - O painel Gab Ponte carrega mesmo na tela inicial do Premiere; plugin atualizado só carrega depois de reiniciar o Premiere.
 
+## Premiere antigo (2018 a 25.x): ponte CEP
+
+Quando `P.qual()` começa com **`cep`**, a ponte ativa é a do Premiere antigo (`cep/premiere2019_lib.py`, ExtendScript). A interface é a mesma para o que importa (`colocar`, `volume`, `colocar_musica`, `montar_takes`, `legenda`, `marcador`, `cortar`, `efeito`, `transicao`, `velocidade`, `aplicar_lut`, `quadro`, `exportar`, `retrato`, `salvar`), com estas diferenças (testadas no 13.1.5; detalhes e armadilhas em `cep/ENGENHARIA_REVERSA_PREMIERE_2019.md`):
+
+- **Transcrição e Enhance Speech NÃO existem na API** do Premiere antigo. Transcrever com o whisper do `transcrever.py` e tratar o áudio (isolar voz) com ffmpeg/serviço **antes** de importar. Chamar `P.transcrever`/`P.isolar_voz` pela ponte CEP dá erro claro.
+- **Sequência:** `P.criar_sequencia(nome, w, h, fps)` cria pela QE (sem diálogo). Ela ainda **não herda a mídia base** como no 26; o portão do menu (`portao_menu`) continua valendo no fluxo da skill, não na lib.
+- **Legenda:** `P.legenda(seq, srt)` põe o SRT numa trilha de vídeo, no início da 1ª fala. A API antiga não cria trilha de legenda nem aplica o estilo pela API (posição/fonte do GAB USA ⏳): se precisar do estilo, pedir ao usuário.
+- **Lettering do Gab (MOGRT) não entra no 2019** (trava o import). Usar título nativo; não oferecer os MOGRTs da biblioteca quando a ponte for CEP.
+- **LUT:** `P.aplicar_lut` funciona (Lumetri + índice do "Input LUT"); a calibração por quadro exportado é a mesma do 26 (⏳ revalidar o índice no antigo).
+- **envelope_volume** não foi portado: usar `P.volume` com mais pontos, ou deixar para o 26.
+- **Timeline inteira num comando:** para Reels, montar o "plano" e mandar de uma vez é ~2x mais rápido que função por função (o ExtendScript reimporta/salva a cada chamada). Ver `cep/teste/t10_lote.py`.
+- **Conferir sem tela:** `P.quadro(seq, t, png)` e o render do `P.exportar` vão direto para o `qc.py`, sem screenshot.
+- **Instalação/registro:** a extensão CEP precisa do `PlayerDebugMode` ligado (`cep/instalar.ps1`), que é passo do USUÁRIO no Windows. O Gab nunca escreve no registro.
+- **CEP está sendo aposentado pela Adobe:** confirmar no calendário dela até qual versão a ponte abre antes de prometer "qualquer Premiere".
+
 ## Arquivos
 
 | Arquivo | O que é |
 |---|---|
-| `premiere_lib.py` | as funções acima (ponte WebSocket + JS da API UXP) |
+| `ponte.py` | **o que o Gab importa**: escolhe a ponte (UXP 26+ ou CEP 2018–25) e expõe a interface comum |
+| `premiere_lib.py` | ponte UXP (WebSocket 8765 + JS da API UXP), Premiere 26+ |
+| `cep/` | ponte CEP (HTTP 8767 + ExtendScript), Premiere 2018–25: `premiere2019_lib.py`, `jsx/gab_ppro.jsx`, `plugin/` (extensão), `instalar.ps1/.sh`, `teste/`, `ENGENHARIA_REVERSA_PREMIERE_2019.md` |
 | `plugin/` | o painel Gab Ponte (manifesto UXP v5, Premiere 25.6+) |
 | `assets/lut/` | LUT do Gab (`LUT DO GAB.cube`) |
 | `assets/mogrt/` | letterings animados exportados do Premiere |
