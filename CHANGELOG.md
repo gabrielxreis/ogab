@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.25-1 (25/10/2026)
+- **Pronto para o FFmpeg 9:** a prévia do CapCut/sem editor e a sonorização usavam uma opção que saiu do FFmpeg 9 e iam parar de funcionar quando ele atualizasse. Já está corrigido e continua funcionando no FFmpeg 7 e 8.
+- **Componentes sempre atualizados:** uma vez por semana o Gab confere se o ffmpeg, o yt-dlp e o node estão na última versão e avisa; o `/ogab doctor` atualiza tudo sozinho. O yt-dlp velho é o que mais faz download do Instagram e do YouTube falhar.
 ## 2026.10.24-3 (24/10/2026)
 - **Presets no CapCut:** fez um estilo de texto ou de clipe que gostou? Peça "salva esse estilo" e o Gab guarda o visual (fonte, cor, contorno, fundo, sombra, animação, filtro, efeitos) para aplicar em qualquer vídeo depois. Também faz cópia de segurança das suas predefinições do CapCut.
 - **CapCut sem mexer na sua tela:** no Mac e no Windows o Gab faz tudo pelos arquivos do projeto; só pede para você clicar quando não tem outro jeito (abrir o projeto, exportar pelo app).

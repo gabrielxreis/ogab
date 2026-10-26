@@ -256,7 +256,7 @@ def _render(entradas, cadeias, rotulos, saida, dur):
     for e in entradas:
         args += e
     fcf = saida + ".filtro.txt"; open(fcf, "w").write(fc)
-    subprocess.run(args + ["-filter_complex_script", fcf, "-map", "[o]", "-ar", str(SR), "-c:a", "pcm_s24le", saida], check=True)
+    subprocess.run(args + ["-/filter_complex", fcf, "-map", "[o]", "-ar", str(SR), "-c:a", "pcm_s24le", saida], check=True)
     os.remove(fcf)
 
 

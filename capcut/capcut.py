@@ -500,7 +500,7 @@ def previa(nome, saida, ate=None, escala=1.0, lufs=-14.0):
         mapa += ["-map", "[aout]"]
     script = os.path.join(tmp, "filtros.txt")
     open(script, "w").write(";\n".join(filtros))
-    cmd = ["ffmpeg", "-y", "-v", "error", *entradas, "-filter_complex_script", script, *mapa, "-t", f"{dur:.3f}",
+    cmd = ["ffmpeg", "-y", "-v", "error", *entradas, "-/filter_complex", script, *mapa, "-t", f"{dur:.3f}",
            "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
            "-movflags", "+faststart", saida]
     r = subprocess.run(cmd, capture_output=True, text=True)

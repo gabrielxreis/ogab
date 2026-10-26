@@ -526,8 +526,19 @@ def windows():
          f"faltam variáveis {', '.join(faltam)}: rode windows\\install.ps1 e abra o Claude Code de novo")
 
 
+def componentes_em_dia():
+    """ffmpeg/yt-dlp/node na última versão e código sem opção que o ffmpeg tirou (scripts/componentes.py)."""
+    sys.path.insert(0, os.path.join(RAIZ, "scripts"))
+    import componentes as comp
+    if CORRIGIR and (WIN or comp.velhos()):
+        item("⟳" if comp.atualizar() else "!", "ferramentas", "ffmpeg/yt-dlp/node atualizados")
+    p = comp.problemas()
+    item("✓" if not p else "!", "ferramentas", "componentes em dia (ffmpeg, yt-dlp, node)" if not p
+         else "; ".join(p) + ": rode /ogab doctor para atualizar")
+
+
 def main():
-    skill(); python(); ferramentas(); ffmpeg_detalhes(); extras(); hook_imagem(); blender(); windows()
+    skill(); python(); ferramentas(); ffmpeg_detalhes(); componentes_em_dia(); extras(); hook_imagem(); blender(); windows()
     c = cfg()
     davinci(c.get("editor", "davinci") == "davinci")
     premiere(c.get("editor") == "premiere")
