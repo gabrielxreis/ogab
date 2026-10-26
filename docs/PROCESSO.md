@@ -233,6 +233,7 @@ Ver "Regras fixas" no topo: `~/Desktop/<Assunto> - <Empresa>/` com `roteiro.txt`
 
 | Data | Bug | Causa | Correção |
 |---|---|---|---|
+| 25/10/2026 | Aula cortada com frases picotadas que não se conectavam e boas-vindas duas vezes no começo | cortes planejados pela transcrição do Whisper (apaga repetições e falsos começos) e trechos tirados no meio da frase sem ler as emendas | regra 1f1 (corte só em fronteira de frase, retake inteiro, transcrição do DaVinci) e `scripts/emendas.py` obrigatório (marca FRASE CORTADA, REPETE, DUPLICADO) |
 | 17/10/2026 | O instalador do Premiere dizia "Premiere Pro não encontrado" e não instalava o plugin Gab Ponte (Baldi 08, Windows) | `instalar.ps1` só procurava em `C:\Program Files\Adobe`, e o Premiere estava em `D:\Adobe\Adobe Premiere Pro 2026` | acha o Premiere também pelo processo aberto; com o app aberto, instala o plugin pelo UPIA |
 | 17/10/2026 | `P.colocar(..., audio=None)` quebrou com `createSubClipAction is not a function` | essa função da API não existe no Premiere 26.0 (a skill foi testada no 26.5); ela cria o subclipe só de vídeo | conferir com ffprobe se o MOV tem áudio e encaixar com `createOverwriteItemAction(item, t, trilha, -1)`; erro claro no `premiere_lib.py` e receita no `premiere/README.md` |
 | 17/10/2026 | Ao recolocar um motion, ele cobriu o começo do seguinte, em cascata | o overwrite do Premiere recorta o clipe seguinte | recolocar em ordem todas as cenas seguintes. O overwrite num índice de trilha que ainda não existe (V5) cria a trilha sozinho no 26.0 |

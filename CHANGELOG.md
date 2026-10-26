@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.25-3 (25/10/2026)
+- **Cortes de fala sem frase picotada:** o Gab só corta em fronteira de frase, tira o retake inteiro (nada de boas-vindas duas vezes) e confere cada emenda com o novo `emendas.py` antes de montar. A transcrição para cortar passa a ser sempre a do DaVinci (o Whisper escondia as repetições).
 ## 2026.10.25-2 (25/10/2026)
 - **Tudo se atualiza sozinho:** uma vez por semana, sem você esperar, o Gab atualiza em segundo plano o ffmpeg, o yt-dlp, o node, o git, os pacotes de Python e as skills que ele usa (HyperFrames e as outras), e conta na conversa seguinte o que mudou. Se algo falhar, `/ogab doctor` resolve.
 - **HyperFrames novo (0.8.200), pronto para o FFmpeg 9:** todos os motions usam a mesma versão, testada antes de chegar para você.
