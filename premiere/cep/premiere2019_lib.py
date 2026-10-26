@@ -493,6 +493,92 @@ def aplicar_lut(seq, trilha_video, tempos, lut="LUT DO GAB"):
     """, "LUT", seq=seq, v=trilha_video, tempos=[float(t) for t in tempos], i=i, look=_LOOK, lut=lut)
 
 
+# ---------------------------------------------------------------- timeline inteira por XML (xmeml, Final Cut 7)
+
+def _midia_info(arq):
+    import subprocess
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration:stream=codec_type,width,height,channels",
+                        "-of", "json", arq], capture_output=True, text=True)
+    d = json.loads(r.stdout or "{}")
+    v = next((s for s in d.get("streams", []) if s.get("codec_type") == "video"), None)
+    a = next((s for s in d.get("streams", []) if s.get("codec_type") == "audio"), None)
+    return float(d.get("format", {}).get("duration", 0)), v, a
+
+
+def xmeml(plano, saida):
+    """Gera um XML do Final Cut 7 (xmeml v4) com a timeline inteira, para importar de uma vez (importar_xml).
+    plano = {"nome", "w", "h", "fps",
+             "video": [[{"arquivo", "inicio", "de"?, "ate"?, "escala"?}, ...], ...],   # uma lista por trilha (V1, V2...)
+             "audio": [[{"arquivo", "inicio", "de"?, "ate"?, "db"?}, ...], ...]}     # uma lista por trilha (A1, A2...)
+    Tempos em segundos. Clipe de vídeo sem par de áudio = só vídeo (não leva o áudio do take)."""
+    from urllib.parse import quote
+    from xml.sax.saxutils import escape
+    fps = int(plano.get("fps", 30)); q = lambda s: int(round(float(s) * fps))
+    rate = f"<rate><timebase>{fps}</timebase><ntsc>FALSE</ntsc></rate>"
+    arquivos, n = {}, [0]
+
+    def arq_xml(caminho):
+        caminho = os.path.abspath(caminho)
+        if caminho in arquivos:
+            return f'<file id="{arquivos[caminho]}"/>'
+        fid = f"arq-{len(arquivos) + 1}"; arquivos[caminho] = fid
+        dur, v, a = _midia_info(caminho)
+        url = "file://localhost/" + quote(caminho.replace("\\", "/"), safe="/")
+        m = ""
+        if v: m += f"<video><samplecharacteristics>{rate}<width>{v['width']}</width><height>{v['height']}</height></samplecharacteristics></video>"
+        if a: m += f"<audio><samplecharacteristics><depth>16</depth><samplerate>48000</samplerate></samplecharacteristics><channelcount>{a.get('channels', 2)}</channelcount></audio>"
+        return (f'<file id="{fid}"><name>{escape(os.path.basename(caminho))}</name><pathurl>{url}</pathurl>{rate}'
+                f"<duration>{q(dur)}</duration><media>{m}</media></file>")
+
+    def item(c, tipo, trilha):
+        n[0] += 1
+        dur, _, _ = _midia_info(os.path.abspath(c["arquivo"]))
+        de = c.get("de") or 0.0; ate = c.get("ate") if c.get("ate") is not None else dur
+        ini = q(c["inicio"]); fim = ini + q(ate) - q(de)
+        filtro = ""
+        if tipo == "video" and c.get("escala"):
+            filtro = ("<filter><effect><name>Basic Motion</name><effectid>basic</effectid><effectcategory>motion</effectcategory>"
+                      "<effecttype>motion</effecttype><mediatype>video</mediatype><parameter><parameterid>scale</parameterid>"
+                      f"<name>Scale</name><valuemin>0</valuemin><valuemax>1000</valuemax><value>{c['escala']}</value></parameter></effect></filter>")
+        if tipo == "audio" and c.get("db") is not None:
+            filtro = ("<filter><effect><name>Audio Levels</name><effectid>audiolevels</effectid><effectcategory>audiolevels</effectcategory>"
+                      "<effecttype>audiolevels</effecttype><mediatype>audio</mediatype><parameter><parameterid>level</parameterid>"
+                      f"<name>Level</name><valuemin>0</valuemin><valuemax>3.98109</valuemax><value>{10 ** (c['db'] / 20):.6f}</value></parameter></effect></filter>")
+        fonte = f"<sourcetrack><mediatype>{tipo}</mediatype><trackindex>1</trackindex></sourcetrack>" if tipo == "audio" else ""
+        return (f'<clipitem id="item-{n[0]}"><name>{escape(os.path.basename(c["arquivo"]))}</name><enabled>TRUE</enabled>'
+                f"<duration>{q(dur)}</duration>{rate}<start>{ini}</start><end>{fim}</end><in>{q(de)}</in><out>{q(ate)}</out>"
+                f"{arq_xml(c['arquivo'])}{fonte}{filtro}</clipitem>")
+
+    fim_seq = 0
+    for lado in ("video", "audio"):
+        for tr in plano.get(lado, []):
+            for c in tr:
+                d = (c.get("ate") if c.get("ate") is not None else _midia_info(os.path.abspath(c["arquivo"]))[0]) - (c.get("de") or 0)
+                fim_seq = max(fim_seq, q(c["inicio"]) + q(d))
+    v = "".join(f"<track>{''.join(item(c, 'video', i) for c in tr)}</track>" for i, tr in enumerate(plano.get("video", [])))
+    a = "".join(f"<track>{''.join(item(c, 'audio', i) for c in tr)}</track>" for i, tr in enumerate(plano.get("audio", [])))
+    xml = ('<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE xmeml>\n<xmeml version="4">'
+           f'<sequence id="seq-1"><name>{escape(plano["nome"])}</name><duration>{fim_seq}</duration>{rate}'
+           f"<media><video><format><samplecharacteristics>{rate}<width>{plano.get('w', 1080)}</width><height>{plano.get('h', 1920)}</height>"
+           f"<pixelaspectratio>square</pixelaspectratio></samplecharacteristics></format>{v}</video>"
+           f"<audio>{a}</audio></media></sequence></xmeml>\n")
+    os.makedirs(os.path.dirname(os.path.abspath(saida)), exist_ok=True)
+    open(saida, "w", encoding="utf-8").write(xml)
+    return os.path.abspath(saida)
+
+
+def importar_xml(xml, bin_nome="Timelines"):
+    """Importa o xmeml (importFiles) e devolve as sequências novas."""
+    return jsx("""
+      var p = GAB.proj(), antes = {};
+      for (var i = 0; i < p.sequences.numSequences; i++) antes[p.sequences[i].sequenceID] = 1;
+      p.importFiles([args.xml], true, GAB.bin(args.bin), false);
+      var novas = [];
+      for (var j = 0; j < p.sequences.numSequences; j++) if (!antes[p.sequences[j].sequenceID]) novas.push(p.sequences[j].name);
+      return novas;
+    """, "importar XML", xml=_abs(xml), bin=bin_nome)
+
+
 # ---------------------------------------------------------------- conferir e exportar (sem olhar a tela)
 
 def quadro(seq, tempo, png):

@@ -77,7 +77,10 @@ Python (premiere2019_lib.py)   --POST /jsx-->  extensão CEP invisível (Node, 1
     `Level = 0,5 × 10^(dB/20)`. 0,5 = 0 dB (padrão do clipe), 1,0 = +6 dB (teto; 2,0 vira 1,0), 0,1778 = -9 dB.
     O `premiere_lib.py` do 26 usa 0,1778 = 0 dB e teto +15 dB. **A mesma fórmula no 2019 deixa todo ganho 9 dB baixo.**
     Clipe mono numa sequência estéreo cai -3 dB (lei de pan). Keyframes de fade vão em **tempo da fonte**
-    (`inPoint + t`). ✅ (só testei WAV mono; ⏳ conferir o padrão num clipe estéreo)
+    (`inPoint + t`). ✅ Clipe **estéreo** (`teste/t15_volume_estereo.py`): padrão também 0,5 = 0 dB, sem a perda de
+    pan (saída = fonte); -10 dB pedido saiu -10,005 dB no render. **Fades conferidos no WAV renderizado**: sobe do
+    silêncio a -10 dB em 0,5 s e desce ao silêncio no fim, também com ponto de entrada (de=2 s). A rampa é linear na
+    amplitude (no meio do fade: -6 dB abaixo do alvo). ✅
 12. **A QE conta os vãos como itens da trilha** (`type "Empty"`): `getItemAt(0)` pegou o vão antes do take, e o
     `addVideoEffect` "não existia". Filtrar `type === "Clip"`. ✅
 13. **Objeto da QE fica inválido depois de qualquer edição** ("Object is invalid"): buscar de novo a cada operação
@@ -126,7 +129,7 @@ Python (premiere2019_lib.py)   --POST /jsx-->  extensão CEP invisível (Node, 1
 | `abrir_projeto` | `qe.newProject` + `app.openDocument`, bins da regra 1b | ✅ |
 | `criar_sequencia` | `qe.project.newSequence` + `setSettings` (w, h, fps exatos), vai para o bin Timelines | ✅ (a sequência ainda não herda a mídia base como no 26) |
 | `colocar` (V/A, de/ate, só vídeo, só áudio) | `Sequence.overwriteClip` / `Track.overwriteClip` + subclipe só vídeo + `preencher` | ✅ |
-| `volume` / fades | `GAB.nivel` + escala 0,5 = 0 dB + keyframes `addKey/setValueAtKey` | ✅ (valor), ⏳ ouvir os fades no render |
+| `volume` / fades | `GAB.nivel` + escala 0,5 = 0 dB + keyframes `addKey/setValueAtKey` | ✅ medido no render (mono e estéreo, com e sem ponto de entrada) |
 | `envelope_volume` | igual ao volume, mais pontos | ⏳ (não portei) |
 | `colocar_musica` | `colocar` com de/ate na A2 | ✅ |
 | `montar_takes` | `colocar` só vídeo na V2 com `preencher=True` | ✅ |
@@ -153,9 +156,17 @@ salvar (~1 s), overwrite (20 a 150 ms). Duas regras:
 2. **Conferir sem tela**: `P.quadro(seq, t, png)` (QE `exportFramePNG`) e o render do `exportar` vão direto para o
    `qc.py`. Não precisa de screenshot em nenhum passo.
 
-⏳ Caminho alternativo para timelines enormes: gerar XML do Final Cut 7 (`xmeml`) e importar (`importFiles` com .xml
-ou `app.openFCPXML`, que existe no 13.1.5). É o formato de troca que o Premiere importa há muitas versões e põe
-centenas de clipes de uma vez. Não testei aqui.
+**Timeline inteira por XML do Final Cut 7** (`P.xmeml(plano, saida)` + `P.importar_xml(xml)`, `teste/t16_xmeml.py`):
+o Gab descreve a timeline num dicionário (trilhas de vídeo e de áudio, cada clipe com arquivo, início, de/ate, escala,
+dB), o Python gera o xmeml v4 e o Premiere importa com `importFiles`. Conferido no 13.1.5: sequência 1080×1920 a
+30 fps exatos, 3 trilhas de vídeo e 2 de áudio nos tempos certos, take **só vídeo** (clipe de vídeo sem par de áudio
+no XML não leva o áudio do take, sem precisar de subclipe), ponto de entrada da música, escala (Basic Motion > scale)
+e volume (Audio Levels > level, **ganho linear: 1 = 0 dB**, que o Premiere converte para a escala dele: 0,316 virou
+Level 0,158 = -10 dB). Gerar 1,2 s (quase tudo é o ffprobe de cada arquivo) e importar 1,3 s. ✅
+
+Quando usar: montagem inicial grande (muitos clipes) num passo só, e que tende a funcionar igual em outras versões
+do Premiere, porque o xmeml é formato de troca antigo e estável. Depois, os ajustes finos (LUT, legenda GAB USA,
+títulos, fades) vão pela ponte. ⏳ Fades por keyframe dentro do XML e transições no XML não testei.
 
 ## Integração sugerida no /ogab
 
@@ -174,12 +185,11 @@ centenas de clipes de uma vez. Não testei aqui.
   `instalar.ps1` daqui tenta e avisa).
 - `lettering_ae` com um After Effects instalado de verdade.
 - Legenda GAB USA: a sombra foi ligada (27%, deslocamento 2) mas não comparei com o render do DaVinci.
-- Fades do volume ouvidos no render; padrão do `Level` em clipe estéreo.
 - Undo: cada chamada do ExtendScript vira um passo de Undo sem nome. A QE tem `undo()`/`undoStackIndex()`, mas não
   testei agrupar.
 - Versões 2018, 2020 a 25.x (o manifesto aceita; a API muda). Rodar `P.descrever(...)` em cada uma e comparar com
   `teste/reflexao_13.1.5.json`.
-- Importar `xmeml`.
+- xmeml com keyframes (fades) e transições dentro do XML.
 
 ## Arquivos deste pacote
 
@@ -193,6 +203,7 @@ centenas de clipes de uma vez. Não testei aqui.
 | `teste/gerar_midia.py` | gera as mídias de teste com ffmpeg em `teste/midia` (não vão no zip: ~100 MB) | ✅ |
 | `teste/t1_ponte.py` ... `teste/t11_ponta_a_ponta.py` | os experimentos, na ordem em que deram as armadilhas | ✅ |
 | `teste/t12_texto.py`, `teste/t13_legenda.py`, `teste/t14_legenda_gab.py` | texto do título nativo, Open Captions + calibração do tamanho GAB USA, legenda GAB USA com medida do centro | ✅ |
+| `teste/t15_volume_estereo.py`, `teste/t16_xmeml.py` | volume e fades de clipe estéreo medidos no render; timeline inteira por xmeml | ✅ |
 | `teste/reflexao_13.1.5.json` | reflexão do DOM e da QE do 13.1.5 | ✅ |
 | `teste/dll_metodos_*.txt` | nomes de métodos tirados das DLLs | ✅ |
 

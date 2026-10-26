@@ -79,6 +79,8 @@ Quando `P.qual()` começa com **`cep`**, a ponte ativa é a do Premiere antigo (
 - **LUT:** `P.aplicar_lut` funciona (Lumetri; "Look" é o parâmetro 30 e "Input LUT" o 6, índices calibrados e guardados em `lut_indice.json`). O `cep/instalar.ps1` **copia o `LUT DO GAB.cube` para a pasta Lumetri do Premiere** (Program Files, por isso roda como administrador); o Lumetri do 13.x só lê LUT de lá, não do `%APPDATA%`.
 - **envelope_volume** não foi portado: usar `P.volume` com mais pontos, ou deixar para o 26.
 - **Timeline inteira num comando:** para Reels, montar o "plano" e mandar de uma vez é ~2x mais rápido que função por função (o ExtendScript reimporta/salva a cada chamada). Ver `cep/teste/t10_lote.py`.
+- **Timeline enorme (centenas de clipes) por XML:** `P.xmeml(plano, saida)` gera um XML do Final Cut 7 (xmeml v4) com a timeline inteira (vídeo e áudio por trilha, cortes, escala, volume) e `P.importar_xml(xml)` importa tudo de uma vez. É o formato de troca estável que o Premiere antigo aceita. Depois, os ajustes finos (LUT, `legenda_gab`, `titulo`, fades) vão pela ponte. ⏳ fades/transições DENTRO do XML ainda não.
+- **Volume/fades conferidos em estéreo:** a escala 0,5 = 0 dB vale também em clipe estéreo (sem perda de pan), fades medidos no render.
 - **Conferir sem tela:** `P.quadro(seq, t, png)` e o render do `P.exportar` vão direto para o `qc.py`, sem screenshot.
 - **Instalação/registro:** a extensão CEP precisa do `PlayerDebugMode` ligado (`cep/instalar.ps1`), que é passo do USUÁRIO no Windows. O Gab nunca escreve no registro.
 - **CEP está sendo aposentado pela Adobe:** confirmar no calendário dela até qual versão a ponte abre antes de prometer "qualquer Premiere".
