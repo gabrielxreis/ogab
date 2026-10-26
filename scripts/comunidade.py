@@ -78,7 +78,7 @@ def apresentar(nome=None, nao=False):
     os.makedirs(relatar.PEND, exist_ok=True)
     json.dump(rel, open(os.path.join(relatar.PEND, f"{time.strftime('%Y%m%d-%H%M%S')}-usuario.json"), "w",
                         encoding="utf-8"), ensure_ascii=False, indent=1)
-    com["apresentacao"] = "sim"; _salvar(c)
+    com["apresentacao"] = "sim"; com["nome"] = nome.strip()[:120]; _salvar(c)
     n = relatar.enviar()
     return f"apresentação {'enviada' if n else 'guardada (sai na próxima abertura com internet)'}: {nome}"
 

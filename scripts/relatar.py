@@ -791,36 +791,71 @@ def _log(msg):
 
 
 def enviar():
-    cfg = _config(); dest = _destino()
-    if cfg.get("dono_biblioteca") or not dest.get("action"):
+    """Envia os pendentes para a VPS do autor (/v1/preset): presets (tipo=preset, partes juntas) e relatos de erro
+    (tipo=relato, como txt). Precisa de chave de licenca; na maquina do dono nao envia."""
+    cfg = _config()
+    if cfg.get("dono_biblioteca"):
         return 0
-    so_apresentacao = cfg.get("relatos") is not True   # sem consentimento de relatos: só a apresentação que a pessoa pediu
+    try:
+        import licenca
+    except Exception as e:
+        _log(f"sem licenca.py: {e}"); return 0
+    d = licenca._ler()
+    if not d.get("key"):
+        return 0   # ainda sem chave: nada a enviar
+    key, maq = d["key"], licenca.maquina()
+    usuario = str((cfg.get("comunidade") or {}).get("nome") or "anon")[:60]
+    so_apresentacao = cfg.get("relatos") is not True
     try:
         for chave, res in ([] if so_apresentacao else varrer()):
             _log(f"varredura {chave}: {res}")
     except Exception as e:
         _log(f"varredura falhou: {e}")
-    import urllib.parse
-    os.makedirs(ENV, exist_ok=True); n = 0
-    for arq in sorted(glob.glob(os.path.join(PEND, "*.json")))[:20]:
+    os.makedirs(ENV, exist_ok=True)
+    presets, soltos = {}, []
+    for arq in sorted(glob.glob(os.path.join(PEND, "*.json")))[:40]:
         try:
             rel = json.load(open(arq, encoding="utf-8"))
-            if so_apresentacao and rel.get("tipo") != "usuario":
-                continue   # erros e motions só com "relatos": true
-            if rel.get("tipo") == "preset" and int(cfg.get("relatos_v", 1)) < CONSENTIMENTO_V:
-                continue   # motion só com o consentimento novo
-            dados = urllib.parse.urlencode({f"entry.{eid}": str(rel.get(nome, ""))
-                                            for nome, eid in dest["campos"].items()}).encode()
-            req = urllib.request.Request(dest["action"], data=dados, method="POST",
-                                         headers={"Content-Type": "application/x-www-form-urlencoded"})
-            if urllib.request.urlopen(req, timeout=20).status == 200:   # Formulário Google: 200 = resposta gravada
-                os.replace(arq, os.path.join(ENV, os.path.basename(arq))); n += 1
-        except Exception as e:
-            _log(f"falhou {os.path.basename(arq)}: {e}"); break   # sem internet: tenta de novo na próxima abertura
-    if n:
-        _log(f"{n} relato(s) enviado(s)")
-    return n
+        except Exception:
+            continue
+        if so_apresentacao and rel.get("tipo") != "usuario":
+            continue
+        if rel.get("tipo") == "preset":
+            if int(cfg.get("relatos_v", 1)) < CONSENTIMENTO_V:
+                continue
+            g = presets.setdefault(rel.get("assinatura", os.path.basename(arq)), {"rel": rel, "arqs": [], "diffs": []})
+            g["arqs"].append(arq); g["diffs"].append(rel.get("diff", ""))
+        else:
+            soltos.append((arq, rel))
 
+    def _mandar(nome, pacote, tipo):
+        return licenca._post("/v1/preset", {"key": key, "maquina": maq, "usuario": usuario,
+                                            "preset": str(nome)[:80], "pacote": pacote, "tipo": tipo})
+
+    def _mover(arqs):
+        for arq in arqs:
+            os.replace(arq, os.path.join(ENV, os.path.basename(arq)))
+
+    n = 0
+    for sig, g in presets.items():
+        nome = re.sub(r"\s*\(parte \d+/\d+\)", "", g["rel"].get("titulo", "motion"))
+        r = _mandar(nome, "\n".join(g["diffs"]), "preset")
+        if r is None:
+            break   # sem internet: tenta na proxima abertura
+        if r.get("status") == "ok":
+            _mover(g["arqs"]); n += 1
+    rot = [("titulo", "titulo"), ("erro", "erro"), ("causa", "causa"), ("correcao", "correcao"),
+           ("versao", "versao"), ("sistema", "sistema"), ("editor", "editor"), ("diff", "diff")]
+    for arq, rel in soltos:
+        txt = "\n".join(f"[{r}] {rel.get(k, '')}" for k, r in rot if rel.get(k))
+        res = _mandar(rel.get("titulo") or "relato", txt, "relato")
+        if res is None:
+            break
+        if res.get("status") == "ok":
+            _mover([arq]); n += 1
+    if n:
+        _log(f"{n} item(ns) enviado(s) para a VPS")
+    return n
 
 def status():
     cfg = _config(); url = _destino().get("action", "")
