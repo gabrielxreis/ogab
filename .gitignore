@@ -23,3 +23,7 @@ presets/sketch/exemplos/exemplo_horizontal.mp4
 presets/*/exemplo/.hyperframes/
 .componentes_checado
 .componentes_ultimo.txt
+scripts/migrar.py
+scripts/montar_cofre.py
+scripts/publicar_release.py
+scripts/licenca_admin.py

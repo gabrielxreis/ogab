@@ -1,9 +1,73 @@
-MIT License
+Licença de Uso do Gab (/ogab) — Proprietária
+Copyright (c) 2026 Gabriel Reis. Todos os direitos reservados.
 
-Copyright (c) 2026 Gabriel Reis
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Este software — a skill /ogab e tudo que a acompanha: scripts, textos, etapas, regras, receitas, presets, modelos,
+instaladores e o conteúdo criptografado ("cofre") — é propriedade de Gabriel Reis ("Autor"). O software é
+LICENCIADO, não vendido.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Esta licença passa a reger as versões distribuídas a partir da data de sua publicação e substitui, para essas
+versões, a licença MIT anterior. As cópias que já foram obtidas sob a licença MIT permanecem, quanto àquelas
+cópias, sob os termos da MIT; esta licença não retroage sobre elas.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+1. CONCESSÃO
+   Mediante uma licença de uso (chave/"key") válida e ativa, o Autor concede a você um direito pessoal,
+   intransferível, não exclusivo e revogável de usar o Gab em 1 (um) computador por chave, para produzir vídeos
+   seus e de seus clientes, inclusive com fins comerciais. Os vídeos que você produz com o Gab são seus.
+
+2. RESTRIÇÕES
+   Você NÃO pode, no todo ou em parte: (a) copiar, redistribuir, revender, sublicenciar, publicar, alugar,
+   emprestar ou disponibilizar o Gab a terceiros; (b) remover, contornar, desativar, burlar ou interferir na
+   verificação de licença, na criptografia do conteúdo ou em qualquer medida técnica de proteção; (c) descompilar
+   ou fazer engenharia reversa do conteúdo protegido, salvo na estrita medida em que a lei expressamente permitir e
+   não puder ser afastada por contrato; (d) usar o Gab após o término ou a revogação desta licença.
+
+3. PROTEÇÃO TÉCNICA E REVOGAÇÃO
+   A inteligência do Gab é fornecida de forma criptografada e só é aberta, em cada uso, mediante uma licença válida
+   verificada junto ao servidor do Autor. Se a licença estiver ausente, inválida, suspensa ou revogada, ou se forem
+   constatadas violações a esta licença, o Gab deixa de funcionar e remove do computador APENAS os arquivos de
+   propriedade do Autor (a skill protegida: o conteúdo criptografado e eventuais cópias temporárias
+   descriptografadas). O que é SEU nunca é apagado nem acessado: os vídeos e projetos que você criou com o Gab, suas
+   configurações, seus presets e os dados dos seus clientes permanecem intactos. Ao usar o Gab você reconhece e
+   autoriza esse funcionamento.
+
+4. CONTRIBUIÇÕES (viram da comunidade, de forma anônima)
+   Se você (ou o assistente de IA agindo no seu computador) criar motions, presets, scripts ou melhorias nos
+   arquivos da própria skill e você aceitar enviá-los, esse material passa a integrar a biblioteca da COMUNIDADE do
+   /ogab de forma ANÔNIMA: sem o seu nome, sem autoria pessoal e sem qualquer dado que identifique você ou seus
+   clientes. Ao aceitar, você concede ao Autor uma licença mundial, perpétua, irrevogável, gratuita e com direito de
+   sublicenciar para usar, adaptar, incorporar e distribuir esse material no Gab e em produtos derivados, como
+   recurso da comunidade. Você declara ter os direitos necessários para isso. Isso NÃO transfere a propriedade dos
+   seus vídeos nem dos seus projetos, que continuam seus.
+
+5. TELEMETRIA
+   O Gab envia ao Autor, de forma anônima, erros corrigidos e a estrutura de contribuições, conforme os Termos de
+   Uso (docs/TERMOS.md). Nunca são enviados vídeos, áudios, roteiros, arquivos de clientes, senhas ou dados pessoais.
+
+6. COMPONENTES DE TERCEIROS
+   O Gab inclui componentes de terceiros sob licenças próprias (por exemplo, trechos sob licença MIT e fontes sob a
+   SIL Open Font License), mantidas junto aos respectivos arquivos. Esta licença não altera os direitos e deveres
+   relativos a esses componentes. Programas e serviços externos (DaVinci Resolve, Premiere, ElevenLabs, bancos de
+   mídia etc.) têm licenças próprias, de sua responsabilidade.
+
+7. DADOS PESSOAIS (LGPD)
+   O cadastro da licença usa seu e-mail para identificar e gerenciar a chave. Apresentar-se com o nome é opcional e
+   não é condição para usar o Gab. O tratamento de dados segue a Lei nº 13.709/2018 (LGPD).
+
+8. SEM GARANTIA
+   O Gab é fornecido "COMO ESTÁ", sem garantias de qualquer tipo, expressas ou implícitas, inclusive de adequação a
+   uma finalidade específica. Confira sempre o resultado antes de entregar a um cliente.
+
+9. LIMITAÇÃO DE RESPONSABILIDADE
+   Na máxima extensão permitida em lei, o Autor não responde por danos indiretos, lucros cessantes, perda de dados,
+   de prazo ou de arquivos decorrentes do uso ou da impossibilidade de uso do Gab.
+
+10. RESCISÃO
+    Esta licença termina automaticamente se você descumprir qualquer de seus termos. Com o término, cessa o direito
+    de uso e o Gab para de funcionar conforme a cláusula 3. O Autor pode revogar uma chave em caso de violação.
+
+11. LEI APLICÁVEL E FORO
+    Esta licença é regida pelas leis da República Federativa do Brasil. Fica eleito o foro da comarca do domicílio
+    do Autor para dirimir controvérsias, salvo direito do consumidor que determine foro diverso.
+
+Contato: instagram.com/gabrielxreis_ — gabrielxreis.com

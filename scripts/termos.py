@@ -18,17 +18,18 @@ SKILL = os.path.dirname(AQUI)
 CONFIG = os.path.join(SKILL, "config.json")
 TEXTO = os.path.join(SKILL, "docs", "TERMOS.md")
 URL = "https://github.com/gabrielxreis/ogab/blob/main/docs/TERMOS.md"
-VERSAO = 2
+VERSAO = 3
 RESUMO = f"""TERMOS DE USO DO GAB (/ogab), versão {VERSAO}
-- Licença pessoal de uso do Gab nos seus vídeos e nos dos seus clientes (os vídeos são seus).
-  Revender ou distribuir a skill depende de autorização do autor (Gabriel Reis).
-- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, os erros da skill que ele corrigir, a
-  estrutura dos motions novos que você criar e as invenções (scripts novos e melhorias) feitas nos arquivos
-  da própria skill. Nunca sai vídeo, roteiro, cliente, senha, chave ou dado pessoal.
-- Se apresentar com o nome é opcional e perguntado à parte.
-- Programas de terceiros (DaVinci, Premiere, ElevenLabs...) têm licenças próprias. Sem garantia: confira antes de entregar.
+- O Gab é LICENCIADO, não vendido. Com uma chave (key) válida você usa em 1 computador, nos seus vídeos e nos
+  dos seus clientes (os vídeos são seus). Não pode copiar, revender nem burlar a chave/criptografia.
+- A inteligência do Gab é criptografada e só abre com chave válida. Sem chave válida o Gab para e REMOVE da
+  máquina só os arquivos dele (o que é seu: vídeos, projetos, config e clientes, nunca é apagado nem acessado).
+- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, erros corrigidos e a estrutura das suas
+  criações; ao aceitar, essas criações viram da COMUNIDADE do /ogab, sem nome nem autoria. Nunca sai vídeo,
+  roteiro, cliente, senha, chave ou dado pessoal.
+- Se apresentar com o nome é opcional. Programas de terceiros têm licenças próprias. Sem garantia.
 Texto completo: {URL}
-Sem o aceite, nada é instalado e o Gab não roda. Para aceitar, digite ACEITO."""
+Sem o aceite e sem uma chave válida, nada é instalado e o Gab não roda. Para aceitar, digite ACEITO."""
 
 
 def _cfg():

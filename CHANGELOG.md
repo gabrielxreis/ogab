@@ -1,5 +1,9 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.26-1 (26/10/2026)
+- **O Gab agora precisa de uma chave (grátis).** Na primeira vez, ele pede seu email e cria a chave na hora (1 chave por computador). É o que deixa o autor cuidar da comunidade e das atualizações.
+- **Termos novos (v3):** a skill passa a ser licenciada e a inteligência do Gab fica protegida. Nada do que é seu (vídeos, projetos, config, clientes) é tocado. Ao abrir, o Gab pede o ACEITO de novo.
+- **Atualização pelo autor:** o Gab passa a se atualizar pelo servidor do autor, baixando só o que muda.
+## 2026.10.26-1 (26/10/2026)
 - **Efeitos extras no `/ogab menu`:** física, IA pensando (orbe), ASCII, lupa e rabisco ganharam uma aba própria no passo de estilo dos motions, com prévia em loop. As animações Lottie para site e app agora aparecem em Extras.
 ## 2026.10.25-4 (25/10/2026)
 - **6 estilos novos de efeito** (capa de revista, contorno rabiscado, fichas com objeto, palavra de vidro, recorte de papel, vertigem); o celular que saltava saiu. Eles aparecem no `/ogab menu` quando a prévia com take real ficar pronta.
