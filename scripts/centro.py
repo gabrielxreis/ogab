@@ -23,7 +23,9 @@ ALVO = (540, 960)
 TOL = 6
 ALTURA_MAX = 1200   # 4:5 do feed (1350) menos margem: y de 360 a 1560
 LARGURA_MAX = 900   # 90 px de margem em cada lado
-HF = ["npx", "--yes", "hyperframes@0.8.145"]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from componentes import hf  # noqa: E402
+HF = ["npx", "--yes", hf()]  # versão fixada em versoes.json
 
 
 def _snap(pasta, tempos):

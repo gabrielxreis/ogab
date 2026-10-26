@@ -21,6 +21,7 @@ import glob, hashlib, json, os, re, shutil, subprocess, sys, tempfile
 AQUI = os.path.dirname(os.path.abspath(__file__)); SKILL = os.path.dirname(AQUI)
 sys.path.insert(0, AQUI)
 import relatar  # noqa: E402
+from componentes import hf  # noqa: E402
 
 ESTADO = os.path.join(relatar.PASTA, "presets_enviados.json")
 CATEGORIAS = ("apresentador", "ideia", "lista", "dados", "produto", "social", "marca")
@@ -253,7 +254,7 @@ def gerar_gif(pasta, render=True):
     if render and os.path.exists(os.path.join(pasta, "index.html")):
         tmp = os.path.join(tempfile.mkdtemp(prefix="gab_previa_"), "previa.mp4")
         try:
-            subprocess.run(["npx", "--yes", "hyperframes@0.8.151", "render", pasta, "--format", "mp4", "-q", "draft",
+            subprocess.run(["npx", "--yes", hf(), "render", pasta, "--format", "mp4", "-q", "draft",
                             "-w", "2", "-o", tmp], check=True, capture_output=True, timeout=900)
             _mp4_para_gif(tmp, destino)
             return "exemplo.gif", "GIF renderizado do index.html (HyperFrames)"

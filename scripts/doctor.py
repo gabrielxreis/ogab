@@ -530,10 +530,11 @@ def componentes_em_dia():
     """ffmpeg/yt-dlp/node na última versão e código sem opção que o ffmpeg tirou (scripts/componentes.py)."""
     sys.path.insert(0, os.path.join(RAIZ, "scripts"))
     import componentes as comp
-    if CORRIGIR and (WIN or comp.velhos()):
-        item("⟳" if comp.atualizar() else "!", "ferramentas", "ffmpeg/yt-dlp/node atualizados")
+    if CORRIGIR:
+        for linha in comp.atualizar():
+            item("!" if linha.startswith(("FALHOU", "ATENÇÃO")) else "⟳", "ferramentas", linha)
     p = comp.problemas()
-    item("✓" if not p else "!", "ferramentas", "componentes em dia (ffmpeg, yt-dlp, node)" if not p
+    item("✓" if not p else "!", "ferramentas", "componentes em dia (programas, pacotes Python, " + comp.hf() + ")" if not p
          else "; ".join(p) + ": rode /ogab doctor para atualizar")
 
 

@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.25-2 (25/10/2026)
+- **Tudo se atualiza sozinho:** uma vez por semana, sem você esperar, o Gab atualiza em segundo plano o ffmpeg, o yt-dlp, o node, o git, os pacotes de Python e as skills que ele usa (HyperFrames e as outras), e conta na conversa seguinte o que mudou. Se algo falhar, `/ogab doctor` resolve.
+- **HyperFrames novo (0.8.200), pronto para o FFmpeg 9:** todos os motions usam a mesma versão, testada antes de chegar para você.
 ## 2026.10.25-1 (25/10/2026)
 - **Pronto para o FFmpeg 9:** a prévia do CapCut/sem editor e a sonorização usavam uma opção que saiu do FFmpeg 9 e iam parar de funcionar quando ele atualizasse. Já está corrigido e continua funcionando no FFmpeg 7 e 8.
 - **Componentes sempre atualizados:** uma vez por semana o Gab confere se o ffmpeg, o yt-dlp e o node estão na última versão e avisa; o `/ogab doctor` atualiza tudo sozinho. O yt-dlp velho é o que mais faz download do Instagram e do YouTube falhar.

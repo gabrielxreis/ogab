@@ -20,6 +20,8 @@ Tipos:
   cta       texto, url, botao (texto; opcional), comLogo (false = sem logo), aviso (linha pequena, ex.: risco), tam
 """
 import json, os, re, shutil, struct, subprocess, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+from componentes import hf  # versão do HyperFrames fixada em versoes.json  # noqa: E402
 AQUI = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -86,7 +88,7 @@ if __name__ == "__main__":
     pasta = gerar(json.load(open(arq)), os.path.abspath(a[1]), os.path.dirname(arq))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", "hyperframes@0.8.151", "render", pasta, "--format", "mp4", "-q", "high", "-w", "2", "-o", saida], check=True); print("render", saida)
+        subprocess.run(["npx", "--yes", hf(), "render", pasta, "--format", "mp4", "-q", "high", "-w", "2", "-o", saida], check=True); print("render", saida)
         if "--gif" in a:   # prévia leve (README, mandar no chat): 15 fps, paleta própria
             gif = os.path.splitext(saida)[0] + ".gif"
             subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", saida, "-vf",

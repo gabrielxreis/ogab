@@ -39,6 +39,8 @@ import json, os, subprocess, sys
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(AQUI, "kit"))
 import base, cenas  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+from componentes import hf  # versão do HyperFrames fixada em versoes.json  # noqa: E402
 
 BG = ("numero", "frase", "lista", "passos", "versus")
 CENAS = ("print_destaque", "dois_problemas", "montagem", "chip", "blocos", "foto_lado", "funil", "paginas", "estrutura")
@@ -62,7 +64,7 @@ def main(a):
         print(f'{m["id"]:<22} {m["tipo"]:<15} {m["ini"]:8.2f}s  {pasta}')
         if "--render" in a:
             out = os.path.join(saida, f'{m["id"]}.{ext}')
-            cmd = f'npx --yes hyperframes@0.8.151 render --fps {fps} --format {ext} -o "{out}"' + (" -q delivery" if ext == "mp4" else "")
+            cmd = f'npx --yes {hf()} render --fps {fps} --format {ext} -o "{out}"' + (" -q delivery" if ext == "mp4" else "")
             r = subprocess.run(cmd, shell=True, cwd=pasta, capture_output=True, text=True, encoding="utf-8", errors="replace")
             print("   render:", "OK" if r.returncode == 0 and os.path.exists(out) else "ERRO\n" + r.stdout[-600:] + r.stderr[-600:])
 

@@ -4,9 +4,12 @@
   pasta = montar(kit, plano, pasta, dur, base)                 # copia o kit, grava plano.js, preenche index.html
   renderizar(pasta, "saida.mp4", gif=True)                     # MP4 (HyperFrames) + prévia GIF opcional
 """
-import json, os, re, shutil, subprocess
+import json, os, re, shutil, subprocess, sys
 
-HYPERFRAMES = "hyperframes@0.8.151"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from componentes import hf  # noqa: E402
+
+HYPERFRAMES = hf()  # versão fixada em versoes.json
 
 
 def traz(caminho, base, pasta):

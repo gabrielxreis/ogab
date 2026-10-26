@@ -326,7 +326,10 @@ def _pixels_photoshop(arq, blocos, caixa):
 # ---------------------------------------------------------------- PDF (Canva, Illustrator, InDesign)
 
 def _render_sem(doc_bytes, pagina, zoom, tirar_texto, tirar_imagens, tirar_formas):
-    import fitz
+    try:
+        import pymupdf as fitz  # PyMuPDF 2.0 tirou o nome fitz
+    except ImportError:
+        import fitz
     d = fitz.open("pdf", doc_bytes)
     p = d[pagina]
     p.add_redact_annot(p.rect)
@@ -360,7 +363,10 @@ def _componentes(img, dil, min_area):
 
 def _desenhar(paths, rect, zoom):
     """Redesenha só estes vetores numa página vazia e devolve a imagem com transparência."""
-    import fitz
+    try:
+        import pymupdf as fitz  # PyMuPDF 2.0 tirou o nome fitz
+    except ImportError:
+        import fitz
     d = fitz.open()
     pg = d.new_page(width=rect.width, height=rect.height)
     for pa in paths:
@@ -418,7 +424,10 @@ def _agrupar_vetores(paths, folga):
 
 
 def ler_pdf(arq, pasta, pagina=0, largura=1080):
-    import fitz
+    try:
+        import pymupdf as fitz  # PyMuPDF 2.0 tirou o nome fitz
+    except ImportError:
+        import fitz
     dados = Path(arq).read_bytes()
     d = fitz.open("pdf", dados)
     pg = d[pagina]

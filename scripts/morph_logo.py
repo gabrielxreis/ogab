@@ -15,6 +15,7 @@ import json, os, subprocess, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from svg_texto import caminho, letras
+from componentes import hf  # noqa: E402
 
 FORMAS = {"losango": "M540,780 L690,930 L540,1080 L390,930 Z",
           "circulo": "M540,780 C622.8,780 690,847.2 690,930 C690,1012.8 622.8,1080 540,1080 C457.2,1080 390,1012.8 390,930 C390,847.2 457.2,780 540,780 Z"}
@@ -93,6 +94,6 @@ if __name__ == "__main__":
     plano = json.load(open(a[0])); arq = gerar(plano, a[1]); print(arq)
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1]); fmt = "mov" if saida.endswith(".mov") else "mp4"
-        subprocess.run(["npx", "--yes", "hyperframes@0.8.145", "render", os.path.join("motions", plano.get("id", "morph-logo")),
+        subprocess.run(["npx", "--yes", hf(), "render", os.path.join("motions", plano.get("id", "morph-logo")),
                         "--format", fmt, "-o", saida], cwd=a[1], check=True)
         print(saida)
