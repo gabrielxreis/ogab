@@ -15,6 +15,7 @@ Guardado em ~/.claude/ogab_licenca.json (fora da pasta da skill, sobrevive a upd
 import hashlib, json, os, platform, subprocess, sys, time, urllib.error, urllib.request
 
 URL = os.environ.get("OGAB_LICENCA_URL", "https://licencas.gabrielxreis.com").rstrip("/")
+SITE = os.environ.get("OGAB_SITE", "https://www.agrandemissao.com.br/ogab")   # cadastro da key (grátis)
 ARQ = os.path.join(os.path.expanduser("~"), ".claude", "ogab_licenca.json")
 OFFLINE_DIAS = 3
 TIMEOUT = 6
@@ -85,9 +86,9 @@ def _sistema():
     return f"{platform.system()} {platform.release()} {platform.machine()}"
 
 
-PENDENTE = ("LICENCA_PENDENTE: o Gab precisa de uma key (grátis). Perguntar o email da pessoa e rodar "
-            "`licenca.py registrar --email <email>`; se ela já tem key: `licenca.py ativar --key <key>`. "
-            "Não fazer nada do pedido antes disso.")
+PENDENTE = ("LICENCA_PENDENTE: o Gab só roda com uma key (grátis). MOSTRAR à pessoa o site e PARAR: "
+            f"cadastre-se em {SITE}, pegue sua key (GAB-...) e cole aqui; então "
+            "`licenca.py ativar --key <key>`. Enquanto não houver key válida, NÃO fazer nada do pedido.")
 
 
 def checar():
@@ -116,8 +117,8 @@ def checar():
         print("LICENCA_BLOQUEADA: esta instalação foi desativada pelo autor. Falar com @gabrielxreis_ no "
               "Instagram. O Gab não roda.")
     elif st == "outra_maquina":
-        print("LICENCA_OUTRA_MAQUINA: esta key está ativa em outro computador (1 por key). No computador antigo: "
-              "`licenca.py liberar`; ou cadastrar outro email aqui com `licenca.py registrar --email <email>`.")
+        print("LICENCA_OUTRA_MAQUINA: esta key está ativa em outro computador (1 por key). No computador antigo rode "
+              f"`licenca.py liberar`; ou cadastre outra key (grátis) em {SITE} e ative com `licenca.py ativar --key <key>`.")
     elif st == "invalida":
         print("LICENCA_INVALIDA: a key salva não existe mais. " + PENDENTE.split(": ", 1)[1])
     else:
