@@ -58,6 +58,7 @@ PRESET_EN = {
     "cartoes": "Proof cards (numbers, testimonials, screenshots) stacking in depth and fanning out.",
     "podcast": "Two people in split screen, karaoke captions in the speaker's colour, below the chin.",
     "logo-reveal": "5-8 s brand opener: the logo born from the dark in light, lines or dots.",
+    "whiteboard": "An illustration draws itself on a whiteboard: a real hand traces the lines, colours the characters, then the background.",
 }
 CAT_EN = {"dados": "Numbers, charts and milestones", "produto": "Product, app and launch", "apresentador": "Person talking to camera",
           "ideia": "Punchline, idea and story", "lista": "List, ranking and step by step", "social": "Comment, social proof and interview",

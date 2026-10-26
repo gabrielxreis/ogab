@@ -138,6 +138,8 @@ def etapas_mac(cfg):
           Etapa(G, "HyperFrames: navegador de render", "npx --yes hyperframes doctor", sempre=True, mb=5, opcional=True),
           Etapa(G, "carrossel do Instagram (PNG/PDF)", f'{PY} "{DEST}/instagram/carrossel/carrossel.py" instalar',
                 lambda: (DEST / "instagram/carrossel/template/node_modules").exists(), mb=60),
+          Etapa(G, "whiteboard (lousa com a mão desenhando)", f'{PY} "{DEST}/presets/whiteboard/whiteboard.py" instalar',
+                lambda: sh_ok(f'{PY} "{DEST}/presets/whiteboard/whiteboard.py" checar'), mb=1100, opcional=True),
           Etapa(G, "taste-skill (design)", f"{npx} leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y", sempre=True, mb=2),
           Etapa(G, "web-design-guidelines", f"{npx} vercel-labs/agent-skills -g -a claude-code -s web-design-guidelines -y", sempre=True, mb=2),
           Etapa(G, "playwright-cli (navegador)", 'command -v playwright-cli >/dev/null || npm install -g @playwright/cli@latest; cd ~ && playwright-cli install --skills',

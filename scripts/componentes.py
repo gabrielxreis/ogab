@@ -207,6 +207,12 @@ def main():
                 print("COMPONENTES: " + "; ".join(linhas))
         for p in problemas(rede=False):  # o que não se resolve sozinho (ffmpeg velho demais, código com opção removida)
             print("COMPONENTES: " + p)
+        try:  # preset whiteboard: quem recebeu no update instala o motor sozinho, em segundo plano
+            sys.path.insert(0, os.path.join(SKILL, "presets", "whiteboard"))
+            import whiteboard
+            whiteboard.garantir()
+        except Exception:
+            pass
         try:
             if time.time() - os.path.getmtime(MARCA) < SEMANA:
                 return

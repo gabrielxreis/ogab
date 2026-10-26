@@ -211,6 +211,14 @@ Npx "skills do HyperFrames instaladas" "npx --yes skills add heygen-com/hyperfra
 Npx "hyperframes doctor ok" "npx --yes hyperframes doctor"
 Py (Join-Path $DEST "instagram\carrossel\carrossel.py") instalar *> $null
 if ($LASTEXITCODE -eq 0) { Ok "carrossel do Instagram pronto (slides PNG/PDF)" } else { Warn "rode depois: py -3 $DEST\instagram\carrossel\carrossel.py instalar" }
+$wb = Join-Path $DEST "presets\whiteboard\whiteboard.py"
+Py $wb checar 2>$null
+if ($LASTEXITCODE -eq 0) { Ok "preset whiteboard ja instalado" }
+else {
+  Write-Host "  instalando o preset whiteboard (PyTorch + modelo, ~1 GB; com NVIDIA usa a placa)..."
+  Py $wb instalar *> $null
+  if ($LASTEXITCODE -eq 0) { Ok "preset whiteboard pronto (lousa com a mao desenhando)" } else { Warn "rode depois: py -3 $wb instalar (log em ~\.claude\ogab_ferramentas\whiteboard)" }
+}
 Npx "taste-skill (design-taste-frontend, image-to-code) instaladas" "npx --yes skills add leonxlnx/taste-skill -g -a claude-code -s design-taste-frontend -s image-to-code -y"
 Npx "web-design-guidelines instalada" "npx --yes skills add vercel-labs/agent-skills -g -a claude-code -s web-design-guidelines -y"
 $temPw = Tem playwright-cli

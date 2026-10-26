@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.26-2 (26/10/2026)
+- **Preset novo: Whiteboard.** Uma ilustração se desenha na lousa com uma mão de verdade: primeiro as linhas, depois os personagens pintados cor por cor e por último o fundo. Ótimo para explicação, aula, mapa e infográfico. Peça "no preset whiteboard" ou marque **Whiteboard** no passo de estilo do `/ogab menu`. O motor (~1 GB) se instala sozinho em segundo plano na primeira vez que você abrir o Gab depois desta atualização; o Gab avisa quando ficar pronto. Funciona no Mac e no Windows, sem precisar de placa de vídeo (com NVIDIA fica mais rápido).
+- **CapCut no Windows:** a checagem de "CapCut aberto" não quebra mais em Windows com nome de processo acentuado.
 ## 2026.10.26-1 (26/10/2026)
 - **O Gab agora precisa de uma chave (grátis).** Na primeira vez, ele pede seu email e cria a chave na hora (1 chave por computador). É o que deixa o autor cuidar da comunidade e das atualizações.
 - **Termos novos (v3):** a skill passa a ser licenciada e a inteligência do Gab fica protegida. Nada do que é seu (vídeos, projetos, config, clientes) é tocado. Ao abrir, o Gab pede o ACEITO de novo.

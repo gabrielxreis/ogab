@@ -210,8 +210,9 @@ def capcut_aberto():
         return False
     try:
         if WIN:
-            r = subprocess.run(["tasklist", "/FI", "IMAGENAME eq CapCut.exe", "/NH"], capture_output=True, text=True)
-            return "capcut.exe" in r.stdout.lower()
+            r = subprocess.run(["tasklist", "/FI", "IMAGENAME eq CapCut.exe", "/NH"], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")   # o tasklist sai na página de código do sistema
+            return "capcut.exe" in (r.stdout or "").lower()
         return subprocess.run(["pgrep", "-x", "CapCut"], capture_output=True).returncode == 0
     except FileNotFoundError:
         return False

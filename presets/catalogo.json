@@ -1168,6 +1168,43 @@
    ],
    "padroes": {},
    "cenas": {}
+  },
+  {
+   "id": "whiteboard",
+   "nome": "Whiteboard",
+   "categoria": "ideia",
+   "papel": "trecho",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Uma ilustração se desenha na lousa: a mão traça as linhas, pinta os personagens e depois o fundo.",
+   "quando": "explicação, aula, mapa, infográfico, personagem ilustrado, 'como funciona', história contada em desenho",
+   "nichos": [
+    "educa",
+    "aula",
+    "curso",
+    "escola",
+    "professor",
+    "explic",
+    "infantil"
+   ],
+   "sinais": [
+    "whiteboard",
+    "lousa",
+    "quadro branco",
+    "desenho",
+    "desenhad",
+    "ilustra",
+    "mapa",
+    "explica",
+    "como funciona",
+    "infografico",
+    "rabisc"
+   ],
+   "padroes": {},
+   "cenas": {}
   }
  ],
  "pedidos": [
