@@ -1,0 +1,12 @@
+{
+ "id": "fichas-objeto", "grupo": "efeito", "camada": "frente", "precisa": ["rosto"],
+ "nome": {"pt": "Fichas com objeto", "en": "Object cards"},
+ "desc": {"pt": "Fichas creme viram acima da sua cabeça, cada uma com um objeto brilhante desenhado e um rótulo em serifa.",
+          "en": "Cream cards flip in above your head, each with a shiny drawn object and a serif label."},
+ "quando": "lista curta de 2 a 3 coisas concretas (ferramentas, passos, ingredientes, pilares); cada ficha entra na fala do item",
+ "campos": {"itens": {"tipo": "lista", "objetos": ["esfera", "cubo", "estrela", "raio", "coracao", "moeda", "chave", "lampada"],
+                      "exemplo": [{"rotulo": "ideia", "objeto": "lampada", "em": 0.5},
+                                  {"rotulo": "ritmo", "objeto": "raio", "em": 1.2},
+                                  {"rotulo": "valor", "objeto": "moeda", "em": 1.9}]}},
+ "exemplo": {"de": 0.4, "ate": 3.6}
+}

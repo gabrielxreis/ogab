@@ -6,17 +6,21 @@ uma ideia por cena, revelações longas que freiam no fim, produto flutuando em 
 plano.json: { "w": 1080, "h": 1920, "fps": 60, "cor": "#C4A34F" (destaque), "cor2": "#F2E2B3" (luz do destaque),
   "letra": "apple" (padrão: Inter Tight pesada, branca, centralizada) | "editorial" (à esquerda, destaque em serifa itálica)
            | "cinema" (tudo em serifa grande, destaque em itálico),
-  "fonte": "Inter Tight" (padrão; troque só se a marca exigir), "marca": { "nome", "dominio", "logo" (png/svg) }, "cenas": [ ... ] }
-Campos comuns da cena: tipo, dur (s), luz (true = faixa de luz atravessa na saída da cena).
+  "fonte": "Inter Tight" (padrão; troque só se a marca exigir), "batida": {bpm, inicio, cada, forca} (pulso das cenas a cada compasso), "marca": { "nome", "dominio", "logo" (png/svg) }, "cenas": [ ... ] }
+Campos comuns da cena: tipo, dur (s), luz (true = faixa de luz atravessa na saída da cena),
+  flutuantes [imagens] (cartões nas bordas, atrás do texto, com paralaxe: cena de texto mais viva).
 Texto: "*palavra*" = degradê metálico na cor da marca; "|" = quebra de linha. Frases curtas (2-4 palavras por linha).
 Tipos:
   gancho    texto ("||" = próxima batida: a frase sai e a seguinte entra, uma ideia por vez), olho, sub, tam
-  logo      nome, frase, logo (padrão: o da marca; sem logo vira monograma), tamLogo
-  tela      imagem (print: desktop.png/celular.png do capturar.py), moldura navegador|celular, titulo, sub, url,
+  logo      nome, frase, logo (padrão: o da marca; sem logo vira monograma), tamLogo, tamFrase
+  tela      imagem (print: desktop.png/celular.png do capturar.py; com quadros, é o reflexo), quadros [jpgs em sequência que
+            tocam dentro do painel] + fpsQuadros (12) + inicioQuadros (s), moldura navegador|celular, titulo, sub, url,
             proporcao (altura/largura do print; o gerar.py mede sozinho), foco [{y 0-1 do rolar, zoom}]
-  lista     olho, itens ["Método.", {t, d}] (um de cada vez, grande; 3 é o ideal), tam
+  lista     olho, itens ["Método.", {t, d}] (um de cada vez, grande; 3 é o ideal), tam, cada e inicio (s; itens na batida)
   recursos  = lista (compatível com planos antigos)
   numero    de, ate, prefixo, sufixo, decimais, texto
+  editor    DaVinci simulado: titulo, janela (texto da barra), miniaturas [imagens do media pool], visor [imagens do visor],
+            passos [{at (s na cena), trilha V3|V2|V1|ST|A1|A2|A3, ini, fim (0-1), rotulo, aviso (o que a IA está fazendo), visor (índice)}]
   cta       texto, url, botao (texto; opcional), comLogo (false = sem logo), aviso (linha pequena, ex.: risco), tam
 """
 import json, os, re, shutil, struct, subprocess, sys
@@ -61,6 +65,17 @@ def gerar(plano, pasta, base):
             orig = c["imagem"] if os.path.isabs(c["imagem"]) else os.path.join(base, c["imagem"])
             c.setdefault("proporcao", proporcao_png(orig))
             c["imagem"] = traz(c["imagem"])
+        for k in ("miniaturas", "visor", "quadros", "flutuantes"):   # cena editor; quadros = sequência que toca no painel da tela
+            if c.get(k): c[k] = [traz(x) for x in c[k]]
+    # vídeo dentro do painel da cena tela: o <video> precisa existir no index.html quando a página carrega
+    videos, ini = [], 0.0
+    for i, c in enumerate(plano["cenas"]):
+        if c.get("tipo") == "tela" and c.get("video"):
+            c["videoId"] = f"vid{i}"
+            videos.append(f'<video id="vid{i}" class="clip" src="{traz(c["video"])}" muted playsinline '
+                          f'data-start="{round(ini, 3)}" data-duration="{c["dur"]}" data-track-index="{20 + i}" '
+                          f'style="position:absolute;opacity:0"></video>')
+        ini += c["dur"]
     dur = round(sum(c["dur"] for c in plano["cenas"]), 3)
     open(os.path.join(pasta, "plano.js"), "w").write("window.PLANO = " + json.dumps(plano, ensure_ascii=False) + ";\n")
     shutil.copy(os.path.join(K, "launch.js"), pasta)
@@ -76,6 +91,7 @@ def gerar(plano, pasta, base):
         html = html.replace("<link rel=\"stylesheet\" href=\"launch.css\">",
                             '<link href="https://fonts.googleapis.com/css2?%s&display=block" rel="stylesheet">\n<link rel="stylesheet" href="launch.css">' % fam)
     for a, b2 in (("%W%", plano["w"]), ("%H%", plano["h"]), ("%FPS%", plano["fps"]), ("%DUR%", dur)): html = html.replace(a, str(b2))
+    if videos: html = html.replace('<div id="luz">', "\n".join(videos) + '\n<div id="luz">', 1)
     open(os.path.join(pasta, "index.html"), "w").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}}, open(os.path.join(pasta, "hyperframes.json"), "w"))
     print("ok", pasta, len(plano["cenas"]), "cenas", dur, "s"); return pasta

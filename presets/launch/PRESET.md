@@ -54,6 +54,17 @@ Vídeo curto (12-25 s) que apresenta um produto digital (site, app, SaaS, curso)
    O render sai a 60 fps. O revisor dá nota com olhos novos (ver `docs/etapas/revisor.md`).
 5. **Som:** mixar com ffmpeg como descrito acima, ou levar o MP4 para a timeline do cliente e colocar a música lá.
 
+## Cena editor (DaVinci simulado)
+Para mostrar um produto de edição trabalhando: janela escura com media pool, visor com código de tempo, régua, cursor vermelho e as trilhas V3 Motion, V2 B-roll, V1 Video, ST Captions, A1 Voice, A2 Music e A3 SFX. Cada passo do plano faz um clipe crescer na trilha dele e troca o aviso embaixo ("Placing the music"). Campos no `gerar.py`.
+- Um clipe por batida da música (`at` em múltiplos da batida); clipes da mesma trilha com 0,12 s entre eles, nunca no mesmo instante.
+- Som: um clique de interface por clipe e uma notificação no aviso final.
+- Em 16:9, o celular da cena `tela` já cabe abaixo do título.
+
+## Na batida da música
+- Medir a faixa (`musica.py medir`) e dar a cada cena um número inteiro de batidas; o drop da faixa no momento mais forte (ex.: o logo).
+- `"batida": {"bpm": 120, "inicio": 4.0}` pulsa as cenas a cada compasso; lista com `"cada"` em batidas.
+- Vídeo tocando no painel: `"quadros": [jpgs]` + `"fpsQuadros": 12` na cena `tela` (`ffmpeg -i x.mp4 -vf fps=12,scale=1280:-2 q_%03d.jpg`), com `"imagem"` = um quadro (reflexo). Não usar `<video>`: no painel 3D o render desenha ele deslocado.
+
 ## Cliente com marca
 - `cor` e `cor2` vêm da marca. O padrão é dourado `#C4A34F` / `#F2E2B3`.
 - `marca.logo` entra no logo e no fecho (logo largo é detectado sozinho).

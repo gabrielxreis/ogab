@@ -5,8 +5,8 @@ ESTILO["celular-passos"] = (it, C) => {
   const esq = r[0] - m - S.lado, dir = W - S.lado - (r[2] + m), naDir = dir >= esq;
   let w = Math.min(340, Math.max(esq, dir)), x, y;
   if (w >= 240) { x = naDir ? r[2] + m : r[0] - m - w; y = Math.max(S.topo, r[1] - 30); }
-  else { w = 340; x = naDir ? W - S.lado - w : S.lado; y = r[3] + 40; }   // sem lado livre: abaixo do queixo, encostado na borda
-  const h = Math.min(w * 2.02, H - S.baixo - y + 160), k = w / 340;            // k: escala das letras pelo tamanho do celular
+  else { y = r[3] + 30; w = 340 * Math.min(1, (H - S.baixo + 150 - y) / 560); x = naDir ? W - S.lado - w : S.lado; }   // sem lado livre: abaixo do queixo, na borda
+  const k = w / 340, h = y > r[3] ? Math.max(560 * k, Math.min(w * 2.02, H - S.baixo + 150 - y)) : w * 2.02;   // k: escala das letras
   C.css("celular-passos", `
     .cp{position:absolute;border-radius:${46 * k}px;background:#0d0e11;border:${7 * k}px solid #2a2c31;box-shadow:0 30px 70px rgba(0,0,0,.55),
         inset 0 0 0 2px rgba(255,255,255,.06);overflow:hidden;color:#fff;font-family:"PalcoSans"}

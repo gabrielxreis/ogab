@@ -1,0 +1,9 @@
+{
+ "id": "vertigem", "grupo": "efeito", "camada": "atras", "precisa": ["rosto", "video"],
+ "nome": {"pt": "Vertigem", "en": "Vertigo"},
+ "desc": {"pt": "Efeito dolly zoom: você fica do mesmo tamanho e a sala estica para trás, como no cinema, com um leve escurecer nas bordas.",
+          "en": "Dolly zoom effect: you stay the same size while the room stretches away behind you, cinema style, with a slight edge darkening."},
+ "quando": "revelação, susto, 'e foi aí que eu percebi', virada dramática, frase de impacto; 1 a 2,5 s",
+ "campos": {"forca": {"tipo": "numero", "exemplo": 0.3}},
+ "exemplo": {"de": 0.4, "ate": 3.0}
+}

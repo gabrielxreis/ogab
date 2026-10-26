@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.25-4 (25/10/2026)
+- **6 estilos novos de efeito** (capa de revista, contorno rabiscado, fichas com objeto, palavra de vidro, recorte de papel, vertigem); o celular que saltava saiu. Eles aparecem no `/ogab menu` quando a prévia com take real ficar pronta.
+- **Launch:** cena de editor (DaVinci simulado) e cenas na batida da música; o celular e o gráfico neon respeitam melhor o rosto; a trava de "motion começando do preto" parou de dar falso alarme com texto claro entrando.
 ## 2026.10.25-3 (25/10/2026)
 - **Cortes de fala sem frase picotada:** o Gab só corta em fronteira de frase, tira o retake inteiro (nada de boas-vindas duas vezes) e confere cada emenda com o novo `emendas.py` antes de montar. A transcrição para cortar passa a ser sempre a do DaVinci (o Whisper escondia as repetições).
 ## 2026.10.25-2 (25/10/2026)

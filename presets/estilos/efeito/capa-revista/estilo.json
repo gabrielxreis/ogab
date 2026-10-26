@@ -1,0 +1,13 @@
+{
+ "id": "capa-revista", "grupo": "efeito", "camada": "frente", "precisa": ["rosto", "silhueta"],
+ "nome": {"pt": "Capa de revista", "en": "Magazine cover"},
+ "desc": {"pt": "O quadro vira capa de revista: título fino em serifa enorme atrás da sua cabeça, chamadas nos cantos e uma linha em itálico embaixo.",
+          "en": "The frame turns into a magazine cover: a huge thin serif title behind your head, small cover lines in the corners and an italic line below."},
+ "quando": "apresentação de quem fala, autoridade, 'a história de', virada de capítulo, antes e depois; 1,5 a 3 s",
+ "campos": {"titulo": {"tipo": "texto", "exemplo": "Foco"},
+            "linha": {"tipo": "texto", "exemplo": "o método que ninguém te conta"},
+            "edicao": {"tipo": "texto", "exemplo": "Nº 07 · OUTUBRO"},
+            "chamadas": {"tipo": "lista", "exemplo": ["3 hábitos que mudam tudo", "A rotina de 5 minutos", "Por que você trava"]},
+            "numero": {"tipo": "texto", "exemplo": "97%"}},
+ "exemplo": {"de": 0.4, "ate": 3.5}
+}

@@ -1,0 +1,10 @@
+{
+ "id": "contorno-rabisco", "grupo": "efeito", "camada": "atras", "precisa": ["rosto", "silhueta"],
+ "nome": {"pt": "Contorno rabiscado", "en": "Scribbled outline"},
+ "desc": {"pt": "Um contorno branco desenhado à mão aparece em volta de você, tremendo a cada quadro, com corações e brilhos rabiscados perto da cabeça.",
+          "en": "A hand-drawn white outline appears around you, wobbling every frame, with doodled hearts and sparkles near your head."},
+ "quando": "momento leve, carinho, conquista, 'eu amo isso', reação positiva, apresentação descontraída; 1 a 2,5 s",
+ "campos": {"rabiscos": {"tipo": "lista", "opcoes": ["coracao", "brilho", "estrela", "espiral"],
+                         "exemplo": ["coracao", "brilho", "coracao", "brilho", "espiral"]}},
+ "exemplo": {"de": 0.4, "ate": 3.2}
+}

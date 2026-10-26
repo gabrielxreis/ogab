@@ -1,0 +1,9 @@
+{
+ "id": "palavra-vidro", "grupo": "efeito", "camada": "atras", "precisa": ["rosto", "video"],
+ "nome": {"pt": "Palavra de vidro", "en": "Glass word"},
+ "desc": {"pt": "Uma palavra enorme de vidro fosco surge atrás da sua cabeça, distorcendo a sala por dentro, com um brilho correndo pela borda.",
+          "en": "A huge frosted-glass word rises behind your head, bending the room inside it, with a light sweep along the edge."},
+ "quando": "palavra-chave elegante (tema, valor, nome do método), abertura premium, frase calma; 1,5 a 3 s",
+ "campos": {"palavra": {"tipo": "texto", "exemplo": "CLAREZA"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

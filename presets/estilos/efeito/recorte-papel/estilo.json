@@ -1,0 +1,9 @@
+{
+ "id": "recorte-papel", "grupo": "efeito", "camada": "atras", "precisa": ["rosto", "silhueta"],
+ "nome": {"pt": "Recorte de papel", "en": "Paper cut-out"},
+ "desc": {"pt": "Você vira um recorte de papel com borda branca sobre uma colagem de papel rasgado, letras de bilhete, rabiscos de giz e fita.",
+          "en": "You become a paper cut-out with a white border over a collage of torn paper, ransom-note letters, chalk scribbles and tape."},
+ "quando": "virada criativa, 'faça você mesmo', escola, arte, nostalgia, lista de ideias, chamada de atenção divertida; 1,5 a 3 s",
+ "campos": {"palavra": {"tipo": "texto", "exemplo": "IDEIA!"}},
+ "exemplo": {"de": 0.4, "ate": 3.4}
+}

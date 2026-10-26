@@ -70,7 +70,8 @@ def comeca_do_preto(pasta, comparar=0.6):
     shutil.copytree(pasta, dst, ignore=shutil.ignore_patterns("snapshots"))
     subprocess.run(HF + ["snapshot", str(dst), "--at", f"0,{comparar}"], capture_output=True, text=True, cwd=str(tmp))
     pngs = sorted((dst / "snapshots").glob("*.png"), key=lambda p: float(re.search(r"at-([\d.]+)s", p.name).group(1)))
-    b = [float(np.asarray(Image.open(p).convert("L")).mean()) for p in pngs[:2]]
+    # mediana = o fundo; texto grande e claro entrando (permitido) não puxa a medida (falso alarme no launch verde, 22/10/2026)
+    b = [float(np.median(np.asarray(Image.open(p).convert("L")))) for p in pngs[:2]]
     shutil.rmtree(tmp, ignore_errors=True)
     return len(b) == 2 and b[0] < b[1] * 0.75 - 1, b
 

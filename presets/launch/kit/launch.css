@@ -51,7 +51,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
 .painel.celular { border-radius: 58px; background: #111114; }
 .vidro { position: absolute; overflow: hidden; inset: 0; }
 .painel.celular .vidro { inset: 12px; border-radius: 47px; }
-.vidro img { position: absolute; left: 0; top: 0; width: 100%; transform-origin: 50% 0; will-change: transform; }
+.vidro img, .vidro video { position: absolute; left: 0; top: 0; width: 100%; transform-origin: 50% 0; will-change: transform; }
 .reflexo-vidro { position: absolute; inset: 0; pointer-events: none; z-index: 3;
   background: linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.14) 45%, rgba(255,255,255,0) 60%); background-size: 260% 100%; mix-blend-mode: screen; }
 .barra-nav { position: absolute; left: 0; right: 0; top: 0; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 0 20px;

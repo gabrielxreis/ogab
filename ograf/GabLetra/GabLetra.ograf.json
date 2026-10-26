@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ograf.ebu.io/v1/specification/json-schemas/graphics/schema.json",
+  "id": "gab-letra",
+  "version": "1.0.0",
+  "name": "Gab Letra",
+  "description": "Letra de música para telão (/ogab): cada palavra entra no tempo em que é cantada (campo Tempos, segundos a partir do início do clipe), com desfoque e brilho. Editável no Inspector.",
+  "author": { "name": "Gab (/ogab)" },
+  "main": "GabLetra.js",
+  "supportsRealTime": false,
+  "supportsNonRealTime": true,
+  "stepCount": 1,
+  "actionDurations": [
+    { "type": "playAction", "duration": 600 },
+    { "type": "updateAction", "duration": 0 },
+    { "type": "stopAction", "duration": 500 }
+  ],
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "texto": { "type": "string", "title": "Texto", "default": "LETRA" },
+      "tempos": { "type": "string", "title": "Tempos das palavras (s, separados por vírgula)", "default": "" },
+      "cor": { "title": "Cor do texto", "type": "string", "pattern": "^#[0-9a-f]{6}$", "gddType": "color-rrggbb", "default": "#fff6e6" },
+      "corBrilho": { "title": "Cor do brilho", "type": "string", "pattern": "^#[0-9a-f]{6}$", "gddType": "color-rrggbb", "default": "#ffc46b" },
+      "fonte": { "type": "string", "title": "Fonte", "default": "Playfair Display" },
+      "tamanho": { "type": "number", "title": "Tamanho", "minimum": 0.3, "maximum": 3.0, "default": 1.1 },
+      "posY": { "type": "number", "title": "Posição vertical (0 topo, 1 base)", "minimum": 0.0, "maximum": 1.0, "default": 0.76 },
+      "italico": { "type": "boolean", "title": "Itálico", "default": true },
+      "maiusculas": { "type": "boolean", "title": "Tudo em maiúsculas", "default": false }
+    }
+  },
+  "renderRequirements": [
+    { "resolution": { "width": { "ideal": 1920 }, "height": { "ideal": 1080 } }, "frameRate": { "ideal": 24 } }
+  ],
+  "v_bmd": { "duration": 4 }
+}
