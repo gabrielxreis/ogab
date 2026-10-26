@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.26-1 (26/10/2026)
+- **Efeitos extras no `/ogab menu`:** física, IA pensando (orbe), ASCII, lupa e rabisco ganharam uma aba própria no passo de estilo dos motions, com prévia em loop. As animações Lottie para site e app agora aparecem em Extras.
 ## 2026.10.25-4 (25/10/2026)
 - **6 estilos novos de efeito** (capa de revista, contorno rabiscado, fichas com objeto, palavra de vidro, recorte de papel, vertigem); o celular que saltava saiu. Eles aparecem no `/ogab menu` quando a prévia com take real ficar pronta.
 - **Launch:** cena de editor (DaVinci simulado) e cenas na batida da música; o celular e o gráfico neon respeitam melhor o rosto; a trava de "motion começando do preto" parou de dar falso alarme com texto claro entrando.
