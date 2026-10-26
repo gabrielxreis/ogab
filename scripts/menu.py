@@ -35,6 +35,7 @@ EFEITOS_KIT = [
 
 PRESET_EN = {
     "painel": "Finance/data app: navy, 3D app cards with rolling numbers, a chart drawing itself, camera diving in.",
+    "globo": "Full explainer style: 3D globe spinning to each city with dotted routes, data card (section, tag, counting number, source), bullets, stamp, CTA and karaoke captions.",
     "launch": "Premium Apple-style launch film: black, one idea per scene, real product screens in 3D glass.",
     "vitrine": "Clean luxury interface: every line becomes a piece of UI (converter, profile, card, window, pill).",
     "kinetic": "Aggressive kinetic type: giant words swapping on the beat of the voice, red box, glitch, whip.",
@@ -65,7 +66,7 @@ CAT_EN = {"dados": "Numbers, charts and milestones", "produto": "Product, app an
           "marca": "Opener, brand and web delivery"}
 
 
-NOME_EN = {"Destaque": "Highlight", "Letreiro": "Big word behind", "Órbita": "Orbit", "Lente": "Lens"}   # nome em inglês no menu
+NOME_EN = {"Explicador de notícia": "News explainer", "Destaque": "Highlight", "Letreiro": "Big word behind", "Órbita": "Orbit", "Lente": "Lens"}   # nome em inglês no menu
 
 
 def it(id, pt, en, dpt, den, anim=None, gif=None, extra=None):
@@ -107,8 +108,9 @@ def presets_do_usuario(C):
     except Exception:
         return []
     r = []
+    oficiais = {p["id"] for p in C["presets"]}   # já está no catálogo: aparece uma vez só, como preset oficial
     for p in locais:
-        if not p.get("no_menu"):
+        if not p.get("no_menu") or p["id"] in oficiais:
             continue
         cat = p.get("categoria") or "ideia"
         r.append(it("local:" + p["id"], p["nome"], p["nome"], p.get("resumo") or "", p.get("resumo") or "",

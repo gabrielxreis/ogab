@@ -1,4 +1,7 @@
-"""Quantas pessoas usam o Gab (lado do DONO: /ogab uso). Nada é coletado de quem usa para esta contagem.
+"""Apresentações: a planilha foi desativada em 26/10/2026; os nomes agora chegam como `usuario` na fila da VPS
+(scripts/presets_vps.py listar). O --csv abaixo só lê exportações antigas.
+
+Quantas pessoas usam o Gab (lado do DONO: /ogab uso). Nada é coletado de quem usa para esta contagem.
 
   python3 uso.py              # usuários únicos por dia (média 7 e 14 dias), estrelas e quem se apresentou
   python3 uso.py --csv respostas.csv   # lista de apresentações a partir do CSV da planilha (sem gws)

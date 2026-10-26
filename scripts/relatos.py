@@ -1,24 +1,23 @@
-"""Relatos de erro que chegaram das instalações (lado do DONO: /ogab relatos).
+"""Relatos de erro e motions que chegaram das instalações (lado do DONO: /ogab relatos).
 
-Os relatos caem na planilha de respostas do Formulário Google do dono (relatos/destino.json > planilha_id). Ninguém
-além do dono vê a planilha. O Gab do dono lê pelo Chrome logado (Claude in Chrome), na versão HTML:
+SÓ VPS (regra do usuário, 26/10/2026): relatos e presets da comunidade chegam APENAS pela fila da VPS do autor
+(`/v1/preset`, enviada pelo `relatar.py enviar`). A planilha/Formulário Google e o Drive foram DESATIVADOS: não ler,
+não recriar e não inventar outro destino (planilha, formulário, Drive, gws, webhook, e-mail). O dono lê a fila com a
+key de criador pelo `presets_vps.py` (só no Mac do dono, fora do git):
 
-  python3 relatos.py url [--editar]            # planilha em HTML para ler (ou em edição, para apagar o resolvido)
+  python3 relatos.py fila                      # lista a fila da VPS (relatos/ e presets/ de cada usuário)
+  python3 presets_vps.py puxar                 # baixa e reconstrói tudo em ~/.claude/ogab_presets_vps para tratar
+  python3 presets_vps.py apagar <path>         # tira da VPS o que já foi tratado (ou `limpar` = tudo da fila atual)
   python3 relatos.py resolvidos                # assinaturas já resolvidas (ficam só no Mac do dono)
   python3 relatos.py resolver <assinatura> <commit> ["nota"]   # marcar como resolvido depois do commit+push
-  python3 relatos.py lido                      # marca "planilha lida agora" (libera commits por LEITURA_VALE horas)
+  python3 relatos.py lido                      # marca "fila lida agora" (libera commits por LEITURA_VALE horas)
   python3 relatos.py checar                    # sai com erro se a última leitura é velha (usado pelo hook do git)
   python3 relatos.py hook                      # instala o pre-commit no repo do dono (commit só depois de ler)
 
-Regra do dono (13/10/2026): ANTES de qualquer commit na skill, ler a planilha inteira: erros (tipo bug ou vazio) E
-motions novos (tipo preset). O pre-commit do git trava o commit se a leitura tiver mais de LEITURA_VALE horas.
-Preset bom: renderizar a prévia com as cores de um cliente de exemplo, salvar com `biblioteca_motions.py salvar`
-(no dono publica), "autor": "comunidade"; preset fraco ou repetido: só apagar a linha.
-
-Fluxo: abrir a URL, ler as linhas, IGNORAR as assinaturas já resolvidas, agrupar pela assinatura (vezes e máquinas =
-coluna instalacao), e para cada erro: ler causa, correção e diff, reproduzir, aplicar a correção (ou uma melhor) no
-repo, linha em docs/PROCESSO.md e no CHANGELOG, commit+push, `resolver` e APAGAR da planilha as linhas desse erro
-(`relatos.py url --editar`, clique direito no número da linha > Excluir linha). Os usuários recebem no auto-update.
+Regra do dono (13/10/2026): ANTES de qualquer commit na skill, ler a fila inteira: erros (relatos/) E motions novos
+(presets/). Para cada erro: reproduzir, corrigir no repo, linha em docs/PROCESSO.md e no CHANGELOG, commit+push,
+`resolver` e `presets_vps.py apagar` daquele item. Preset bom: `biblioteca_motions.py salvar` ("autor": "comunidade");
+preset fraco ou repetido: só apagar da fila.
 """
 import json, os, sys, time
 
@@ -32,10 +31,17 @@ python3 "$(git rev-parse --show-toplevel)/scripts/relatos.py" checar || exit 1
 """
 
 
-def url(editar=False):
-    d = json.load(open(os.path.join(SKILL, "relatos", "destino.json"), encoding="utf-8"))
-    base = f"https://docs.google.com/spreadsheets/d/{d['planilha_id']}"
-    return base + ("/edit" if editar else f"/htmlview/sheet?headers=true&gid={d.get('aba_gid', '0')}")   # sem gid não abre
+PLANILHA_DESATIVADA = ("A planilha/Formulário dos relatos foi DESATIVADA em 26/10/2026: tudo chega pela VPS.\n"
+                       "Ler a fila: python3 scripts/relatos.py fila (ou presets_vps.py listar|puxar). Não recriar planilha.")
+
+
+def fila():
+    """Lista a fila da VPS pelo presets_vps.py (ferramenta só do dono, fora do git)."""
+    p = os.path.join(SKILL, "scripts", "presets_vps.py")
+    if not os.path.exists(p):
+        raise SystemExit("presets_vps.py não está nesta máquina: a fila da VPS só é lida no Mac do dono (key de criador).")
+    import subprocess
+    return subprocess.call([sys.executable, p, "listar"])
 
 
 def resolvidos():
@@ -63,7 +69,7 @@ def checar():
         h = None
     if h is None or h > LEITURA_VALE:
         print("COMMIT BLOQUEADO: antes de commitar na skill, ler os relatos (erros e motions novos): /ogab relatos\n"
-              f"  (abrir `python3 scripts/relatos.py url` no Chrome, tratar tudo, depois `python3 scripts/relatos.py lido`)\n"
+              f"  (ler a fila da VPS: `python3 scripts/relatos.py fila` / `presets_vps.py puxar`, tratar tudo, depois `python3 scripts/relatos.py lido`)\n"
               f"  última leitura: {'nunca' if h is None else f'há {h:.1f} h'} (vale {LEITURA_VALE} h)")
         return False
     return True
@@ -77,8 +83,10 @@ def hook():
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    if a[:1] == ["url"]:
-        print(url("--editar" in a))
+    if a[:1] == ["fila"]:
+        sys.exit(fila())
+    elif a[:1] == ["url"]:
+        raise SystemExit(PLANILHA_DESATIVADA)
     elif a[:1] == ["resolvidos"]:
         print(json.dumps(resolvidos(), ensure_ascii=False, indent=1))
     elif a[:1] == ["lido"]:

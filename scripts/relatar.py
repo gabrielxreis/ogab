@@ -18,12 +18,13 @@ nome de cliente sai pela anonimização e as cores nem ficam no modelo (vêm do 
 Preset HyperFrames ("motor": "hyperframes", spec vazio) vai como PACOTE dos arquivos de texto da pasta do modelo
 (PRESET.md, gerar.py, kit/*.css|js, index.html, hyperframes.json), para o dono remontar e renderizar: anonimizados,
 cores viram cinza da mesma luminosidade (sem a cor da marca), textos visíveis viram "Texto", data: URIs e libs
-minificadas saem, binários só aparecem na lista. Até PARTES_MAX relatos de ~LIMITE_PARTE caracteres (célula da planilha).
+minificadas saem, binários só aparecem na lista. Até PARTES_MAX partes de ~LIMITE_PARTE caracteres (juntadas na VPS).
 O relato é ANONIMIZADO antes de ser gravado: caminhos viram ~/..., saem e-mails, chaves/tokens, parâmetros de link,
 o nome do usuário e o nome de cada cliente (pastas de clientes/ e da pasta de saída). Não vai vídeo, roteiro, legenda
 nem transcrição: só o que quebrou na skill, a causa, a correção e o diff dos arquivos DA SKILL.
-Na máquina do dono ("dono_biblioteca": true) não envia (ele corrige direto). Destino: relatos/destino.json
-(Formulário Google do dono: quem envia só responde; não vê, não edita e não apaga nada).
+Na máquina do dono ("dono_biblioteca": true) não envia (ele corrige direto). Destino: SÓ a fila da VPS do autor
+(`/v1/preset`, com a key de licença; regra do usuário 26/10/2026). A planilha/Formulário Google foi desativada: nunca
+recriar nem mandar para outro lugar (planilha, formulário, Drive, gws, webhook, e-mail).
 """
 import glob, hashlib, json, os, platform, re, subprocess, sys, time, urllib.request
 
@@ -61,13 +62,6 @@ def precisa_perguntar():
     if c.get("dono_biblioteca"):
         return False
     return False   # desde 22/10/2026 os relatos vêm do aceite dos termos (termos.py), sem pergunta separada
-
-
-def _destino():
-    try:
-        return json.load(open(os.path.join(SKILL, "relatos", "destino.json"), encoding="utf-8"))
-    except Exception:
-        return {}
 
 
 def _versao():
@@ -858,9 +852,9 @@ def enviar():
     return n
 
 def status():
-    cfg = _config(); url = _destino().get("action", "")
+    cfg = _config()
     cons = "sim" if cfg.get("relatos") is True else "não" if cfg.get("relatos") is False else "ainda não respondeu"
-    return {"consentimento": cons, "maquina_do_dono": bool(cfg.get("dono_biblioteca")), "destino": bool(url),
+    return {"consentimento": cons, "maquina_do_dono": bool(cfg.get("dono_biblioteca")), "destino": "vps",
             "pendentes": len(glob.glob(os.path.join(PEND, "*.json"))), "enviados": len(glob.glob(os.path.join(ENV, "*.json")))}
 
 

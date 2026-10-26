@@ -1205,6 +1205,80 @@
    ],
    "padroes": {},
    "cenas": {}
+  },
+  {
+   "id": "globo",
+   "nome": "Explicador de notícia",
+   "categoria": "dados",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Estilo explicador completo: globo 3D que gira até cada cidade com rotas pontilhadas, cartão de dado (seção, etiqueta, número contando, fonte), tópicos, carimbo, CTA e legenda karaokê.",
+   "quando": "notícia de mercado, economia, dólar, bolsa, geopolítica, eleição, viagem, exportação, logística, 'de onde vem / para onde vai', fatos em várias cidades ou países",
+   "nichos": [
+    "mercado",
+    "bolsa",
+    "dolar",
+    "economi",
+    "geopolit",
+    "eleica",
+    "noticia",
+    "export",
+    "import",
+    "logistic",
+    "viag",
+    "comerci",
+    "internacion",
+    "mundo",
+    "pais",
+    "paises"
+   ],
+   "sinais": [
+    "nova york",
+    "toquio",
+    "china",
+    "estados unidos",
+    "europa",
+    "japao",
+    "londres",
+    "bolsa de",
+    "dolar",
+    "fundo",
+    "acoes",
+    "mercado",
+    "no mundo",
+    "pelo mundo",
+    "exterior",
+    "la fora",
+    "porto",
+    "rota",
+    "viaj"
+   ],
+   "padroes": {
+    "porcentagem": 2,
+    "dinheiro": 1,
+    "fonte": 2,
+    "numero": 1
+   },
+   "cenas": {
+    "cidade": [],
+    "rota": [
+     "saiu",
+     "chegou",
+     "viaj",
+     "export",
+     "import",
+     "atravess",
+     "de navio",
+     "voo",
+     "rota"
+    ],
+    "cta": [
+     "@ultima"
+    ]
+   }
   }
  ],
  "pedidos": [

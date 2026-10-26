@@ -1,0 +1,21 @@
+{ "w": 1080, "h": 1920, "fps": 30, "legenda": true,
+  "serie": "EXEMPLO · O CAMINHO DO CAFÉ",
+  "fontes": "FONTES: DADOS FICTÍCIOS · EXEMPLO DO PRESET", "fontes_em": 0.8,
+  "cenas": [
+    { "de": 0, "ate": 6.4, "secao": "O CAFÉ", "etiqueta": "PORTO DE SANTOS", "foco": "santos", "zoom": 1.12, "inclina": 3,
+      "camera": [ {"em": "72%", "zoom": 0.95, "inclina": -4} ],
+      "numero": {"valor": 72, "sufixo": "%", "em": "72%"}, "rotulo": "DO CAFÉ DA FAZENDA VAI PRA FORA", "sub": "NÚMERO FICTÍCIO, SÓ PARA O EXEMPLO",
+      "rotas": [ {"de": "santos", "para": "hamburgo", "em": "embarca", "arco": 0.2, "dur": 1.2} ],
+      "fala": "Esse café sai do porto de Santos e embarca para a Europa. 72% dele vai pra fora." },
+    { "de": 6.4, "ate": 12.6, "secao": "A EUROPA", "etiqueta": "HAMBURGO · TORRA", "foco": "hamburgo", "zoom": 1.2, "inclina": -6,
+      "numero": {"valor": 18, "sufixo": " DIAS", "em": "18"}, "rotulo": "DE NAVIO ATÉ A EUROPA",
+      "topicos": [ {"texto": "Contêiner refrigerado", "em": "contêiner"}, {"texto": "Seguro da carga", "em": "seguro"} ],
+      "fala": "Depois de 18 dias de navio ele chega em Hamburgo, em contêiner refrigerado e com seguro da carga." },
+    { "de": 12.6, "ate": 19.0, "secao": "NA ÁSIA", "etiqueta": "TÓQUIO · XÍCARA", "foco": "toquio", "zoom": 1.22, "inclina": 4,
+      "rotas": [ {"de": "hamburgo", "para": "toquio", "em": 12.7, "arco": 0.25, "dur": 1.0} ],
+      "numero": {"valor": 12.5, "decimais": 1, "sufixo": "%", "sinal": true, "em": "sobe"}, "rotulo": "PREÇO DEPOIS DA TORRA", "sub": "NÚMERO FICTÍCIO",
+      "carimbo": {"titulo": "VOCÊ PAGA NA XÍCARA", "sub": "CADA ETAPA SOMA NO PREÇO", "em": "paga", "y": 0.47},
+      "fala": "Torrado, ele segue até Tóquio e o preço sobe 12,5%. E quem paga isso é você, na xícara." },
+    { "de": 19.0, "ate": 23.0, "tipo": "cta", "foco": "hamburgo", "inclina": -8, "giro": 30, "pergunta": "Quer ver outra rota?", "botao": "COMENTA CAFÉ",
+      "fala": "Quer ver outra rota? Comenta café." }
+  ] }

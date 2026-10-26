@@ -1,8 +1,12 @@
 # Relatos de erro do Gab
 
 Quem instalou o Gab e respondeu **sim** à pergunta única (no instalador ou na primeira vez que abre) manda, sozinho e
-anônimo, cada erro da skill que o Gab corrigiu na máquina dele. O dono (Gabriel) recebe numa planilha privada, corrige
+anônimo, cada erro da skill que o Gab corrigiu na máquina dele. O dono (Gabriel) recebe na fila privada da VPS dele, corrige
 no repositório e todo mundo recebe no próximo auto-update.
+
+**SÓ VPS (regra do usuário, 26/10/2026):** relatos, presets, invenções e apresentações vão APENAS para a fila da VPS
+do autor (`/v1/preset`, com a key de licença). A planilha/Formulário Google e o Drive foram desativados. Nunca
+recriar planilha ou formulário, nem inventar outro destino (Drive, gws, webhook, e-mail, repositório).
 
 ## O que chega
 
@@ -16,10 +20,10 @@ no repositório e todo mundo recebe no próximo auto-update.
   cor, tempo, posição, uma animação ou o número de linhas não conta como motion novo. A coluna `correcao` traz
   "novidade X% (mais parecido: ...)". Conferir à mão: `relatar.py parecido <pasta do modelo>`.
   **HyperFrames** (`"motor": "hyperframes"`, spec vazio): vai o PACOTE dos arquivos de texto da pasta do modelo
-  (PRESET.md, gerar.py, kit/*.css|js, index.html, hyperframes.json) em até 4 relatos de ~45 mil caracteres (a célula
-  da planilha aguenta 50 mil): cores viram cinza da mesma luminosidade, texto visível vira "Texto", data: URIs e
+  (PRESET.md, gerar.py, kit/*.css|js, index.html, hyperframes.json) em até 4 partes de ~45 mil caracteres (juntadas
+  de novo na VPS): cores viram cinza da mesma luminosidade, texto visível vira "Texto", data: URIs e
   libs minificadas saem, binários só na lista. A semelhança compara o código (tags, props do GSAP, eases, técnicas,
-  CSS) com os presets/ da skill. Remontar: colar as partes num .txt e `relatar.py desempacotar <txt> <pasta>`.
+  CSS) com os presets/ da skill. Remontar: `presets_vps.py puxar` já junta; à mão, `relatar.py desempacotar <txt> <pasta>`.
 
   **Varredura (22/10/2026):** o usuário não precisa lembrar de salvar na biblioteca. Toda vez que o Gab abre,
   `relatar.py enviar` primeiro roda `varrer`: acha as pastas novas em `presets/` (criadas nesta máquina, fora do git)
@@ -28,24 +32,21 @@ no repositório e todo mundo recebe no próximo auto-update.
 
 - **Apresentações** (`tipo` usuario, 22/10/2026): só o nome de quem ACEITOU se apresentar
   (`scripts/comunidade.py`; perguntado uma vez, na 3ª abertura). Sai mesmo sem `"relatos": true`, porque a pessoa
-  mandou na hora, mas só isso: erros e motions continuam dependendo do consentimento. Dono vê com `uso.py`.
+  mandou na hora, mas só isso: erros e motions continuam dependendo do consentimento. Dono vê o nome como `usuario` na fila (`presets_vps.py listar`).
 
 - **Invenções** (`tipo` invencao, 22/10/2026): scripts novos fora do git, `git diff` dos arquivos da skill e o que o
   doctor guardou no stash no update (fora presets, clientes, config e assets). Anonimizado, até 4 partes, sem repetir o
-  mesmo conteúdo. No dono: `banco_presets.py puxar` > `candidatos/<id>/pacote.txt`; incorporar à mão e `recusar`.
+  mesmo conteúdo. No dono: `presets_vps.py puxar` > `~/.claude/ogab_presets_vps/`; incorporar à mão e apagar da fila.
 
-## Banco de presets da comunidade (lado do dono)
+## Fila da VPS (lado do dono)
 
-`scripts/banco_presets.py` (`/ogab presets`) transforma os motions que chegam em presets publicados:
+`scripts/presets_vps.py` (só no Mac do dono, fora do git; usa a key marcada como criador):
 
-1. `puxar`: lê a planilha (gws logado; ou `--csv` baixado no Chrome em `.../export?format=csv&gid=<aba_gid>`),
-   pega só `tipo` preset ainda não resolvido, junta as partes pela assinatura, remonta a pasta em
-   `~/.claude/ogab_relatos/candidatos/<id>/` e recalcula a novidade contra o banco ATUAL.
-2. `listar` / `ver <id>` / `previa <id>`: avaliar (a prévia sai em cinza e com textos genéricos, de propósito).
-3. `aceitar <id> --nome <nome>`: entra em `biblioteca_motions/<nome>/` com "autor": "comunidade", refaz o
-   catálogo `biblioteca_motions/CATALOGO.md`, commit + push, `relatos.py resolver`. Todos recebem no auto-update.
-   `recusar <id> "motivo"`: marca resolvido e apaga o candidato.
-4. Apagar da planilha as linhas que o comando lista.
+1. `listar` (ou `relatos.py fila`): o que chegou, separado em `presets/` e `relatos/` por usuário.
+2. `puxar`: baixa tudo e reconstrói em `~/.claude/ogab_presets_vps/` (partes juntadas).
+3. Tratar: erro = reproduzir, corrigir no repo, PROCESSO/CHANGELOG, commit+push, `relatos.py resolver`; motion bom =
+   `biblioteca_motions.py salvar` com "autor": "comunidade"; fraco ou repetido = só descartar.
+4. `apagar <path>` de cada item tratado (ou `limpar` quando a fila inteira foi tratada).
 
 **Dono: ler tudo antes de qualquer commit na skill** (o pre-commit trava; `relatos.py hook`, `relatos.py lido`).
 
@@ -57,15 +58,7 @@ no repositório e todo mundo recebe no próximo auto-update.
      `~/…/*.ext`, saem e-mails, chaves e tokens, parâmetros de link, o nome do usuário e o nome de cada cliente;
    - ao abrir o Gab, `relatar.py enviar` manda os pendentes em segundo plano, **só se `"relatos": true`** no config.
      Sem resposta ou com "não", nada sai da máquina. Mudar: `/ogab config relatos sim|nao`.
-2. **No meio**: o Formulário Google "Relatos do Gab (/ogab)" do dono (`relatos/destino.json`). Quem envia só RESPONDE
-   o formulário: não vê as respostas, não edita e não apaga nada, e não tem acesso a nenhum arquivo do dono. Sem
-   código, sem chave, sem token. As respostas caem na planilha "Relatos do Gab (respostas)", privada do dono.
-3. **No dono** (`/ogab relatos`, `scripts/relatos.py`): o Gab abre `relatos.py url` no Chrome logado, lê, agrupa pela
+2. **No meio**: a fila da VPS do autor (`/v1/preset`). Quem envia só manda: não lista, não lê e não apaga nada da
+   fila (essas rotas exigem a key de criador).
+3. **No dono** (`/ogab relatos`, `scripts/relatos.py`): o Gab lê a fila (`relatos.py fila`, `presets_vps.py puxar`), agrupa pela
    assinatura, ignora os já resolvidos, corrige no repo, commit+push e `relatos.py resolver <assinatura> <commit>`.
-
-## Se precisar refazer o formulário
-
-10 perguntas do tipo Parágrafo, nenhuma obrigatória, com estes títulos: `titulo`, `erro`, `causa`, `correcao`,
-`diff`, `assinatura`, `versao`, `sistema`, `editor`, `instalacao`. Configurações > Respostas: "Coletar e-mails" =
-Não coletar, "Limitar a 1 resposta" desligado. Publicar ("qualquer pessoa com o link" pode responder) e vincular a uma
-planilha. Os ids `entry.N` saem do `FB_PUBLIC_LOAD_DATA_` da página `/viewform`; gravar em `relatos/destino.json`.

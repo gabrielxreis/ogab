@@ -1,14 +1,14 @@
 {
-  "quando": "2026-10-26 02:03",
+  "quando": "2026-10-26 09:06",
   "arquivos": {
-    "SKILL.md": "601bfe824b141c5aabbbfb343aa8bab3168849d19b1c60e09a918c8affa9d13e",
+    "SKILL.md": "0bb0908c5234772023e43688ec1fb428888563c086a84ca6e7fab8820cbda98a",
     "docs/PROCESSO.md": "31a67caa626f9795e2c1d9ae07faa05bccc51e261840358f81c75fff9bdc408c",
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "0bb56b9549f2fa9b10287eaa74bd9281c7a8d34dc6b48138168f9c6fe1c61f10",
     "docs/etapas/cliente.md": "5aeca50488e50713e495c5cd30ef232a4d4a52d30ce6a896617845f09c597997",
     "docs/etapas/davinci.md": "163f020a8a4c62f4451f65ad73ee590d60d65128b8a2af7124406e2278412ce3",
     "docs/etapas/davinci_api.md": "e89e17796c00a889e51c4debb87a05de9661aa9a88aad352cf91d04e90baffe1",
-    "docs/etapas/dono.md": "3673c84cbfb09c86390784b4280752cbafc5c9e963e5c5090abf3fae95c2343a",
+    "docs/etapas/dono.md": "ffe18317e12cd401c12cbc7a15639becabd7c96d9c09a8c1dfe9330dc0a3ee6f",
     "docs/etapas/extras.md": "d6a6c8bc66ba8479d402238b81423f45c707302e10a8ee93a00f76c582f66817",
     "docs/etapas/fx.md": "f4f2d0a8ca0fb904d38bb7fcdb51d8677abbb79c2daeb38ff852cf780d03f55f",
     "docs/etapas/legenda.md": "b4e4927a2c8fd12b64012af9635fdc22ca418b20e901b1119116a0be4d407991",

@@ -1,4 +1,7 @@
-"""Banco de presets da comunidade (lado do DONO): puxa os motions que os usuários criaram, compara com o banco
+"""LEGADO: a planilha foi desativada em 26/10/2026; presets e relatos chegam SÓ pela VPS (scripts/presets_vps.py).
+Os comandos listar/ver/previa/aceitar/recusar seguem valendo para os candidatos já baixados.
+
+Banco de presets da comunidade (lado do DONO): puxa os motions que os usuários criaram, compara com o banco
 inteiro e publica os bons para todo mundo no próximo update. Assim a biblioteca cresce com quem usa o Gab.
 
   python3 banco_presets.py puxar [--csv respostas.csv]   # lê a planilha, remonta cada motion novo e cada INVENÇÃO
@@ -318,7 +321,10 @@ def main(a):
     if not a:
         raise SystemExit(__doc__)
     cmd = a[0]
-    if cmd == "puxar":
+    if cmd == "puxar":   # a planilha foi desativada em 26/10/2026: a fila agora é a da VPS
+        raise SystemExit("A planilha dos relatos foi DESATIVADA (26/10/2026): presets e relatos chegam SÓ pela VPS.\n"
+                         "Use: python3 scripts/presets_vps.py listar | puxar | apagar <path>. Não recriar planilha.")
+    if cmd == "puxar_planilha_antiga":
         r = puxar(a[a.index("--csv") + 1] if "--csv" in a else None)
         print(f"{len(r)} motion(s) novo(s) da comunidade em {CAND}")
         main(["listar"])

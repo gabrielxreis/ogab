@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.26-3 (26/10/2026)
+- **Estilo novo: Explicador de notícia.** O estilo completo dos vídeos explicadores de mercado e notícia: globo 3D que gira até cada cidade da história, rotas pontilhadas ligando os lugares, cartão de dado no canto (seção, etiqueta, número contando e a fonte), tópicos, carimbo, chamada no fim e legenda karaokê. Bom para dólar, bolsa, economia, eleição, exportação e viagem. Peça "no estilo explicador de notícia" ou marque **Explicador de notícia** no passo de estilo do `/ogab menu`.
+- **Menu:** um preset que já é oficial não aparece mais duas vezes (uma como "seu").
 ## 2026.10.26-2 (26/10/2026)
 - **Preset novo: Whiteboard.** Uma ilustração se desenha na lousa com uma mão de verdade: primeiro as linhas, depois os personagens pintados cor por cor e por último o fundo. Ótimo para explicação, aula, mapa e infográfico. Peça "no preset whiteboard" ou marque **Whiteboard** no passo de estilo do `/ogab menu`. O motor (~1 GB) se instala sozinho em segundo plano na primeira vez que você abrir o Gab depois desta atualização; o Gab avisa quando ficar pronto. Funciona no Mac e no Windows, sem precisar de placa de vídeo (com NVIDIA fica mais rápido).
 - **CapCut no Windows:** a checagem de "CapCut aberto" não quebra mais em Windows com nome de processo acentuado.
