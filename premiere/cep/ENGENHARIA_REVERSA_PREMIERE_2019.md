@@ -55,7 +55,7 @@ Python (premiere2019_lib.py)   --POST /jsx-->  extensão CEP invisível (Node, 1
 1. **Erro de sintaxe trava o Premiere.** Erro de sintaxe no topo de um `evalScript` abre a janela modal
    "Run Script Error: Syntax error" e o motor para até alguém clicar OK (a chamada fica pendurada, e o Node fecha a
    conexão em 2 min). Dentro de `eval()` vira exceção comum. Por isso o envelope põe tudo em `eval()`. ✅
-2. **O ExtendScript não aceita regex com `\u0000` ou ` `** ("Syntax error"). O `GAB.json` escapa por laço. ✅
+2. **O ExtendScript não aceita regex com `\u0000` ou `U+2028`** ("Syntax error"). O `GAB.json` escapa por laço. ✅
 3. **Caractere U+2028/U+2029 dentro de comentário quebra o arquivo**, porque o JS trata como fim de linha. ✅
 4. `$.evalFile` dentro de função deixa o `var GAB` local: usar `$.global.GAB`. ✅
 5. **Sem projeto aberto** (tela Home), ler `app.project.*` gera exceção nativa que **escapa do try/catch** (a resposta
@@ -86,12 +86,34 @@ Python (premiere2019_lib.py)   --POST /jsx-->  extensão CEP invisível (Node, 1
 15. `razor` da QE corta só a trilha pedida (V1 sem cortar A1) e usa timecode `"HH;MM;SS;FF"`. ✅
 16. Legenda: SRT importado vira item que se coloca numa **trilha de vídeo** (o 13.x não cria trilha de legenda pela
     API). **O item começa na primeira fala**: colocado em 0, adianta tudo; colocar no início da 1ª legenda. Acentos ✅.
-    Estilo da legenda (fonte, posição Y 724 do GAB USA) ⏳ não achei pela API.
+    O 13.x trata o SRT como **"Open Captions"**. Pela QE (`qeItem.clip.getCaptioningStreamAt(0).getCaptionAt(i)`) dá
+    para ler e mudar posição X/Y (em pixels; `setPositionY` muda também a âncora), âncora e alinhamento, e o texto
+    (`getParagraphAt(i).text`). As cores são nomes de uma lista fixa ("White (Bright)"); `setTextColor(número)` dá
+    "Bad argument list". **Fonte e tamanho não existem na API.** Por isso o estilo GAB USA vai por títulos (armadilha 20). ✅
 17. **MOGRT do Gab (`premiere/assets/mogrt/*.mogrt`, feitos para o 26) travou o `importMGT` por 82 s** e terminou em
-    exceção nativa. Não oferecer esses MOGRTs no 2019 (⏳ gerar uma versão pelo AE 2019 ou usar título nativo).
-    MOGRT nativo do 2019 (`Essential Graphics\Basic Title.mogrt`) entra (✅), mas `getMGTComponent()` volta null. O
-    texto fica em `components[3]` "Text [AE.ADBE Text]" > "Source Text": um blob binário com JSON (`mTextParam`).
-    Editável em tese, ⏳ não testei escrever.
+    exceção nativa. Não oferecer esses MOGRTs no 2019. MOGRT nativo do 2019 (`Essential Graphics\Basic Title.mogrt`)
+    entra (✅), mas `getMGTComponent()` volta null. O texto fica no componente "Text" (`AE.ADBE Text`) >
+    `properties[0]` "Source Text": **4 caracteres de prefixo (o 1º vale 2 × tamanho do JSON, os outros 3 são \0) + JSON
+    `mTextParam`**. Reescrever esse valor funciona (✅ `P.titulo`): `mStyleSheet.mText` (texto; quebra de linha =
+    `\r`), `mFontName` (nome PostScript, ex. `Poppins-Bold`), `mFontSize`, `mFillColor` (**0xRRGGBB**), sombra
+    (`mShadowVisible/Opacity/Offset/Blur/Angle/Color`), `mAlignment` (2 = centro). `properties[2]` = Position
+    normalizada (0..1), que marca a **linha de base** da 1ª linha. A duração se muda escrevendo `trackItem.end`. ✅
+20. **Legenda GAB USA no 2019 = um título nativo por fala** (`P.legenda_gab`). Calibrado contra a medida do DaVinci
+    (`legenda_baixa.py`: "NÃO FOI O MOVIMENTO" com 414 px no 1080×1920): `mFontSize` **63,53** dá 414 px exatos. Centro
+    do texto em Y 724 contado de baixo: linha de base = `1920 - 724 + 0,26 × tamanho`; com N linhas, sobe
+    `(N-1) × 0,614 × tamanho / 2` (entrelinha medida: 39 px). Medido no quadro exportado: centro em 1196 px (1 linha) e
+    1197,5 px (2 linhas), alvo 1196. 3 falas em 0,78 s (duas chamadas: importa todas, depois escreve todas). ✅
+21. **LUT: o 13.x NÃO lê `%APPDATA%\Adobe\Common\LUTs`** (a pasta que o `premiere/instalar.ps1` usa). A calibração
+    testou todos os índices do Look e nenhum bateu (melhor diferença 12,95). Com os LUTs da própria instalação ela acha
+    na hora: "Kodak 5218 Kodak 2383 (by Adobe)" = índice 11 e "Fuji F125 Kodak 2393 (by Adobe)" = 7, com diferença
+    < 1,5 (~5 s cada). O LUT do Gab precisa ir para `<Premiere>\Lumetri\LUTs\Creative` e o Premiere precisa reabrir.
+    Essa pasta pede administrador: aqui foi copiado com `Start-Process powershell -Verb RunAs` (o usuário aprova no
+    UAC). Depois disso: **LUT DO GAB = índice 13** no 13.1.5 desta máquina, diferença 1,27 (o 2º melhor deu 13,47),
+    em 8 s. `aplicar_lut` pôs o Look nos 2 takes e o quadro exportado mostra o look do Gab. A amostra da calibração tem
+    que **cobrir o quadro inteiro**: com a amostra pequena e preto em volta, um índice errado (5) "ganhou" por pouco. ✅
+22. O After Effects que o `ae_lib` acha (`Adobe After Effects 20*`) pode ser uma pasta que sobrou de desinstalação
+    (aqui: `Adobe After Effects 2023` só com `Support Files`, sem `AfterFX.exe`), e o `conectar()` quebra com
+    FileNotFoundError. Conferir o executável antes. ✅ (achado; `lettering_ae` ⏳ sem AE nesta máquina)
 18. `exportFramePNG` volta antes de gravar o arquivo: esperar o arquivo aparecer (`P.quadro` espera). ✅
 19. Tamanho da fonte não está no TrackItem: vem de `projectItem.getProjectMetadata()`, campo
     `Column.Intrinsic.VideoInfo` ("1920 x 1080 (1,0)"). Escala para cobrir = `max(W/w, H/h) × 100` em Motion > Scale
@@ -110,9 +132,10 @@ Python (premiere2019_lib.py)   --POST /jsx-->  extensão CEP invisível (Node, 1
 | `montar_takes` | `colocar` só vídeo na V2 com `preencher=True` | ✅ |
 | `transcrever` (Speech to Text) | **não existe no 2019** (chegou no 15.x/2021). Usar o motor whisper do `transcrever.py` | ❌ no Premiere |
 | `isolar_voz` (Enhance Speech) | **não existe no 2019**. Tratar o áudio fora (ffmpeg/serviço) antes de importar | ❌ no Premiere |
-| `importar_legenda` | `legenda()`: SRT direto numa trilha de vídeo, no início da 1ª fala | ✅ (estilo ⏳) |
-| `aplicar_lut` | Lumetri ✅. "Look" é o parâmetro 30 e "Input LUT" o 6, ambos índice (como no 26). `aplicar_lut(seq, v, tempos)` + `_indice_lut` portam a calibração do 26 com `exportFramePNG` | ⏳ escrito, não rodou |
-| `lettering` (MOGRT) | `importMGT(caminho, ticks, v, a)` ✅ com MOGRT nativo; MOGRT do Gab trava (armadilha 17) | ❌/⏳ |
+| `importar_legenda` + estilo GAB USA | `legenda_gab(seq, srt, trilha, y=724)`: um título por fala, Poppins Bold, caixa alta, branca, sombra leve, centro em Y 724 (y=390 para a legenda baixa). `legenda()` continua para a Open Caption simples | ✅ |
+| `aplicar_lut` | Lumetri ✅. "Look" = parâmetro 30, "Input LUT" = 6 (índices). `aplicar_lut(seq, v, tempos)` + `_indice_lut` calibram e guardam em `lut_indice.json` por versão | ✅ LUT do Gab = índice 13 aqui, aplicado e conferido (o .cube vai para a pasta da instalação, como admin: armadilha 21) |
+| `lettering` (texto) | `titulo(seq, texto, inicio, dur, trilha, fonte, tamanho, cor, y)`: título nativo com o Source Text reescrito | ✅ |
+| `lettering_ae` (animado) | modelo da biblioteca montado no AE → `ae_lib.renderizar` (MOV com alfa) → `colocar`. Não vira MOGRT: o 13.x não importa MOGRT do AE novo | ⏳ sem AE nesta máquina (armadilha 22). Sem AE, lettering animado = motion HyperFrames em MOV, que já entra ✅ |
 | `animar` (keyframes Motion) | `addKey/setValueAtKey` em `components[1]` (mesmo mecanismo do volume) | ⏳ |
 | `marcador` | `markers.createMarker` | ✅ |
 | `exportar` | `exportAsMediaDirect` síncrono, preset H.264 Match Source - High bitrate | ✅ 15 s para 20 s 1080x1920 |
@@ -147,9 +170,10 @@ centenas de clipes de uma vez. Não testei aqui.
 
 ## O que falta testar
 
-- Calibração do LUT (índice do "Input LUT" do Lumetri no 2019).
-- Escrever o texto de um título nativo (blob `mTextParam`) e gerar MOGRTs do Gab compatíveis com 2019.
-- Estilo e posição da legenda.
+- O instalador do /ogab precisa copiar o LUT para `<Premiere>\Lumetri\LUTs\Creative` no 13.x (como admin; o
+  `instalar.ps1` daqui tenta e avisa).
+- `lettering_ae` com um After Effects instalado de verdade.
+- Legenda GAB USA: a sombra foi ligada (27%, deslocamento 2) mas não comparei com o render do DaVinci.
 - Fades do volume ouvidos no render; padrão do `Level` em clipe estéreo.
 - Undo: cada chamada do ExtendScript vira um passo de Undo sem nome. A QE tem `undo()`/`undoStackIndex()`, mas não
   testei agrupar.
@@ -163,19 +187,15 @@ centenas de clipes de uma vez. Não testei aqui.
 |---|---|---|
 | `plugin/CSXS/manifest.xml`, `plugin/index.html`, `plugin/main.js` | a extensão CEP (servidor 127.0.0.1:8767) | ✅ Windows |
 | `jsx/gab_ppro.jsx` | funções de apoio no ExtendScript (`GAB.*`), carregado e recarregado sozinho | ✅ |
-| `premiere2019_lib.py` | a biblioteca do Gab para o 13.x (mesma interface do `premiere_lib.py`) | ✅, menos `aplicar_lut` |
+| `premiere2019_lib.py` | a biblioteca do Gab para o 13.x (mesma interface do `premiere_lib.py`) | ✅, menos `lettering_ae` (sem AE aqui) |
 | `instalar.ps1` | instalador Windows (copia o plugin, liga PlayerDebugMode) | ✅ a cópia; o registro já estava ligado aqui |
 | `instalar.sh` | instalador Mac | ⏳ **não testado** (feito sem Mac) |
 | `teste/gerar_midia.py` | gera as mídias de teste com ffmpeg em `teste/midia` (não vão no zip: ~100 MB) | ✅ |
 | `teste/t1_ponte.py` ... `teste/t11_ponta_a_ponta.py` | os experimentos, na ordem em que deram as armadilhas | ✅ |
+| `teste/t12_texto.py`, `teste/t13_legenda.py`, `teste/t14_legenda_gab.py` | texto do título nativo, Open Captions + calibração do tamanho GAB USA, legenda GAB USA com medida do centro | ✅ |
 | `teste/reflexao_13.1.5.json` | reflexão do DOM e da QE do 13.1.5 | ✅ |
 | `teste/dll_metodos_*.txt` | nomes de métodos tirados das DLLs | ✅ |
 
-**`aplicar_lut` / `_indice_lut`** (calibração do LUT do Gab no Look do Lumetri, parâmetro 30) foram escritas no fim e
-**não rodaram ainda** (⏳). Já confirmado: o Lumetri do 13.1.5 tem "Look" no parâmetro 30 e "Input LUT" no 6, os dois
-como índice. O `LUT DO GAB.cube` está em `%APPDATA%\Adobe\Common\LUTs\Creative`, mas **não sei se o 13.x lê essa
-pasta de usuário**. A pasta da própria instalação (`<Premiere>\Lumetri\LUTs\Creative`) com certeza é lida, mas pede
-admin. A calibração responde isso: se não achar o índice, o LUT não está no menu.
 
 ## Como reproduzir
 

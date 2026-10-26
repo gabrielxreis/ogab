@@ -68,6 +68,6 @@ def __getattr__(nome):   # PEP 562: ponte.colocar, ponte.volume... caem aqui e v
     onde = "Premiere 2018-25 (ponte CEP)" if _eh_cep(b) else "Premiere 26 (ponte UXP)"
     raise AttributeError(
         f"'{nome}' não existe na {onde}. No Premiere antigo, transcrição (Speech to Text) e Enhance Speech não "
-        f"existem na API: transcreva com o whisper do transcrever.py e trate o áudio com ffmpeg ANTES de importar; "
-        f"lettering do Gab (MOGRT) não entra no 2019 (usar título nativo). Ver "
+        f"existem na API: transcreva com o whisper do transcrever.py e trate o áudio com ffmpeg ANTES de importar. "
+        f"Para legenda no estilo GAB, título e lettering no 2019 há `legenda_gab`, `titulo` e `lettering_ae`. Ver "
         f"premiere/cep/ENGENHARIA_REVERSA_PREMIERE_2019.md.")

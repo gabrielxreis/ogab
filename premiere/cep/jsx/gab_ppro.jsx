@@ -202,6 +202,13 @@ GAB.qeClipe = function (s, v, seg) {
   throw new Error("clipe QE não encontrado em " + seg + " s na V" + (v + 1));
 };
 
+// Componente "Text" (AE.ADBE Text) de um título nativo: properties[0] = Source Text, [2] = Position (0..1).
+GAB.textoDe = function (c) {
+  if (!c) throw new Error("título não encontrado");
+  for (var i = 0; i < c.components.numItems; i++) if (c.components[i].matchName === "AE.ADBE Text") return c.components[i];
+  throw new Error("sem componente de texto em " + c.name);
+};
+
 // Componente Lumetri do clipe; criar=true põe um (pela QE) se não houver.
 GAB.lumetri = function (c, criar) {
   var achar = function (x) { for (var i = 0; i < x.components.numItems; i++) if (x.components[i].matchName === "AE.ADBE Lumetri") return x.components[i]; return null; };

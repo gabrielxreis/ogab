@@ -10,7 +10,7 @@ Como funciona: a extensão invisível "Gab Ponte PPro" (plugin/, instalada por i
     P.retrato()                                 # trilhas e clipes da sequência ativa
 Trilhas: índice 0 = V1/A1. Tempo em segundos.
 """
-import json, os, urllib.request, urllib.error
+import json, os, sys, urllib.request, urllib.error
 
 PORTA = int(os.environ.get("OGAB_PREMIERE_CEP_PORTA", "8767"))
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -263,6 +263,127 @@ def velocidade(seq, trilha_video, tempo, fator):
                "velocidade", seq=seq, v=trilha_video, t=float(tempo), f=float(fator))
 
 
+# ---------------------------------------------------------------- lettering
+
+def titulo(seq, texto, inicio, dur, trilha=3, fonte="Poppins-Bold", tamanho=90, cor=0xFFFFFF, y=None, alinhamento=2):
+    """Texto editável no 13.x: o título nativo (Essential Graphics > Basic Title.mogrt) com o Source Text reescrito.
+    O valor do Source Text é 4 caracteres de prefixo (o 1º = 2 x tamanho do JSON) + JSON `mTextParam`.
+    cor = 0xRRGGBB. y em px da sequência (centro do texto); None = posição do modelo.
+    Os MOGRTs do Gab (feitos no AE novo) travam o importMGT do 13.x: para lettering animado usar lettering_ae."""
+    import glob
+    modelo = (glob.glob(os.path.join(r, "Essential Graphics", "Basic Title.mogrt")) for r in _instalacoes())
+    modelo = next((m[0] for m in modelo if m), None)
+    if not modelo:
+        raise SystemExit("Basic Title.mogrt não encontrado na instalação do Premiere")
+    bruto = jsx("""
+      var s = GAB.seq(args.seq);
+      GAB.garantirTrilhas(s, args.v + 1, 1);
+      var ti = s.importMGT(args.m, GAB.ticks(args.ini), args.v, 0);
+      if (!ti) throw new Error("importMGT não devolveu o clipe");
+      return GAB.textoDe(GAB.clipeEm(s.videoTracks[args.v], args.ini)).properties[0].getValue().substr(4);
+    """, "título", seq=seq, m=modelo.replace("/", "\\"), v=trilha, ini=float(inicio))
+    j = json.loads(bruto)
+    tp = j["mTextParam"]; ss = tp["mStyleSheet"]
+    ss["mText"] = texto
+    ss["mFontName"]["mParamValues"][0][1] = fonte
+    ss["mFontSize"]["mParamValues"][0][1] = tamanho
+    ss["mFillColor"]["mParamValues"][0][1] = int(cor)
+    tp["mAlignment"] = alinhamento
+    return jsx("""
+      var s = GAB.seq(args.seq), c = GAB.clipeEm(s.videoTracks[args.v], args.ini), txt = GAB.textoDe(c);
+      txt.properties[0].setValue(String.fromCharCode(args.json.length * 2) + String.fromCharCode(0, 0, 0) + args.json, true);
+      if (args.y !== null) { var pos = txt.properties[2], p = pos.getValue(); pos.setValue([p[0], args.y / s.frameSizeVertical], true); }
+      var fim = GAB.tempo(args.ini + args.dur); c.end = fim;
+      return { nome: c.name, inicio: c.start.seconds, fim: c.end.seconds, ok: txt.properties[0].getValue().indexOf(args.amostra) >= 0 };
+    """, "título", seq=seq, v=trilha, ini=float(inicio), dur=float(dur), y=y,
+               json=json.dumps(j, ensure_ascii=True, separators=(",", ":")), amostra=texto[:8].encode("ascii", "ignore").decode())
+
+
+def _ler_srt(srt):
+    import re
+    blocos = re.split(r"\r?\n\r?\n", open(srt, encoding="utf-8-sig").read().strip())
+    seg = lambda h, m, s, ms: int(h) * 3600 + int(m) * 60 + int(s) + int(ms) / 1000
+    out = []
+    for b in blocos:
+        m = re.search(r"(\d+):(\d+):(\d+)[,.](\d+)\s*-->\s*(\d+):(\d+):(\d+)[,.](\d+)\s*\r?\n(.*)", b, re.S)
+        if m:
+            out.append((seg(*m.groups()[:4]), seg(*m.groups()[4:8]), m[9].strip()))
+    return out
+
+
+# GAB USA (DaVinci) medido no render: Poppins Bold, caixa alta, branca, sombra leve, "NÃO FOI O MOVIMENTO" com 414 px
+# de largura no 1080x1920, centro do texto em Y 724 contado de baixo. No título nativo do 13.1.5 isso é fontSize 63,53
+# (calibrado em teste/t13_legenda.py); o Position do título é a LINHA DE BASE, por isso a base desce 0,26 x tamanho.
+GAB_USA = dict(fonte="Poppins-Bold", tamanho=63.53, cor=0xFFFFFF, y=724, sombra=27)
+
+
+def legenda_gab(seq, srt, trilha=3, y=None, estilo=None):
+    """Legenda no estilo GAB USA no 13.x: um título nativo por fala do SRT (as Open Captions do 13.x não deixam trocar
+    fonte nem tamanho pela API). y = altura do CENTRO do texto contada de baixo (724 do GAB USA; 390 = legenda baixa).
+    Duas chamadas no total: importa todos os títulos, depois escreve texto/estilo/posição/duração de todos."""
+    e = dict(GAB_USA, **(estilo or {}))
+    if y is not None: e["y"] = y
+    falas = _ler_srt(_abs(srt))
+    if not falas:
+        raise SystemExit("SRT vazio ou ilegível: " + srt)
+    import glob
+    modelo = next((m[0] for m in (glob.glob(os.path.join(r, "Essential Graphics", "Basic Title.mogrt")) for r in _instalacoes()) if m), None)
+    bruto = jsx("""
+      var s = GAB.seq(args.seq);
+      GAB.garantirTrilhas(s, args.v + 1, 1);
+      for (var i = 0; i < args.inicios.length; i++) s.importMGT(args.m, GAB.ticks(args.inicios[i]), args.v, 0);
+      return GAB.textoDe(GAB.clipeEm(s.videoTracks[args.v], args.inicios[0])).properties[0].getValue().substr(4);
+    """, "legenda (importar)", seq=seq, m=modelo.replace("/", "\\"), v=trilha, inicios=[a for a, _, _ in falas])
+    base = json.loads(bruto)
+    blobs = []
+    for _, _, texto in falas:
+        j = json.loads(json.dumps(base)); tp = j["mTextParam"]; ss = tp["mStyleSheet"]
+        ss["mText"] = texto.upper().replace("\r\n", "\r").replace("\n", "\r")
+        ss["mFontName"]["mParamValues"][0][1] = e["fonte"]
+        ss["mFontSize"]["mParamValues"][0][1] = e["tamanho"]
+        ss["mFillColor"]["mParamValues"][0][1] = int(e["cor"])
+        tp["mAlignment"] = 2
+        tp["mShadowVisible"] = bool(e["sombra"]); tp["mShadowOpacity"] = e["sombra"]; tp["mShadowColor"] = 0
+        tp["mShadowOffset"] = 2; tp["mShadowBlur"] = 0; tp["mShadowAngle"] = 135
+        js_ = json.dumps(j, ensure_ascii=True, separators=(",", ":"))
+        blobs.append(chr(len(js_) * 2) + "\x00\x00\x00" + js_)
+    # linha de base da 1ª linha; com N linhas o bloco cresce para baixo (entrelinha medida: 0,614 x tamanho)
+    bases = [(1920 - e["y"]) + 0.26 * e["tamanho"] - t.count("\n") * 0.614 * e["tamanho"] / 2 for _, _, t in falas]
+    return jsx("""
+      var s = GAB.seq(args.seq), n = 0, H = s.frameSizeVertical;
+      for (var i = 0; i < args.falas.length; i++) {
+        var f = args.falas[i], c = GAB.clipeEm(s.videoTracks[args.v], f[0]);
+        if (!c) continue;
+        var txt = GAB.textoDe(c);
+        txt.properties[0].setValue(args.blobs[i], true);
+        var pos = txt.properties[2], p = pos.getValue(); pos.setValue([p[0], args.bases[i] / H], true);
+        c.end = GAB.tempo(f[1]); n++;
+      }
+      return { falas: args.falas.length, colocadas: n };
+    """, "legenda (estilo)", seq=seq, v=trilha, falas=[[a, b] for a, b, _ in falas], blobs=blobs, bases=bases)
+
+
+def lettering_ae(seq, modelo, valores, inicio, trilha=2, pasta=None, cores=None, nome=None):
+    """Lettering ANIMADO da biblioteca do Gab no 13.x: monta o modelo no After Effects (ponte do AE), renderiza em
+    MOV com alfa (ae_lib.renderizar) e coloca como motion. Diferença do 26: não vira MOGRT (o importMGT do 13.x não
+    aceita MOGRT do AE novo), então o texto se muda no .aep e renderiza de novo.
+    valores = campos do modelo (ex.: {"linha1": "SEM ATALHO.", "linha2": "COM PROCESSO."}). pasta = <vídeo>/motions."""
+    raiz = os.path.expanduser(os.path.join("~", ".claude", "skills", "ogab"))
+    sys.path.insert(0, os.path.join(raiz, "scripts")); sys.path.insert(0, os.path.join(raiz, "aftereffects"))
+    import biblioteca_motions as B, ae_lib as AE
+    nome = nome or f"{modelo} {int(inicio * 100):06d}"
+    spec = B.aplicar(modelo, valores, cores, nome_comp=nome)
+    spec["elementos"] = [e for e in spec["elementos"] if e.get("tipo") not in ("fundo", "fundo_rico")]
+    pasta = _abs(pasta or os.path.join(os.path.expanduser("~"), "Desktop", "ogab_letterings"))
+    AE.conectar()
+    AE.abrir_projeto(os.path.join(pasta, "letterings.aep"))
+    AE.motion(spec)
+    mov = AE.renderizar(nome, os.path.join(pasta, "mov", nome + ".mov"))
+    r = colocar(seq, mov, inicio, video=trilha, audio=None)
+    r["mov"] = mov
+    return r
+
+
 # ---------------------------------------------------------------- cor: LUT do Gab no Lumetri
 
 def luts_instalados():
@@ -302,15 +423,19 @@ def _indice_lut(lut):
     import subprocess, time
     from PIL import Image, ImageChops, ImageStat
     d = os.path.join(AQUI, "_calibracao_lut"); os.makedirs(d, exist_ok=True)
-    for f in os.listdir(d): os.remove(os.path.join(d, f))
-    amostra = os.path.join(d, "amostra.mp4")   # barras coloridas + gradiente: cobre o cubo inteiro
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "smptehdbars=s=640x360:d=1:r=30", "-f", "lavfi", "-i",
-                    "gradients=s=640x360:d=1:r=30", "-filter_complex", "[0][1]vstack", "-pix_fmt", "yuv420p", amostra], check=True)
+    for f in os.listdir(d):
+        if f.endswith(".png"): os.remove(os.path.join(d, f))
+    amostra = os.path.join(d, "amostra_1080.mp4")   # barras + gradiente no quadro 1920x1080 INTEIRO (preto em volta dilui a diferença)
+    if not os.path.exists(amostra):   # depois de importada, o Premiere trava o arquivo: reaproveitar
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "smptehdbars=s=1920x540:d=1:r=30", "-f", "lavfi", "-i",
+                    "gradients=s=1920x540:d=1:r=30", "-filter_complex", "[0][1]vstack", "-pix_fmt", "yuv420p", amostra], check=True)
     jsx("""
       var nome = "_Calibracao LUT";
       try { GAB.seq(nome); } catch (e) { app.enableQE(); qe.project.newSequence(nome, GAB.instalacao("Settings/SequencePresets/Digital SLR/1080p/DSLR 1080p30.sqpreset")); }
       var s = GAB.seq(nome);
-      if (!s.videoTracks[0].clips.numItems) s.videoTracks[0].overwriteClip(GAB.importar([args.a], "Footages")[0], GAB.tempo(0));
+      var cs = s.videoTracks[0].clips;
+      if (!cs.numItems || GAB.norm(cs[0].projectItem.getMediaPath()) !== GAB.norm(args.a))
+        s.videoTracks[0].overwriteClip(GAB.importar([args.a], "Footages")[0], GAB.tempo(0));
       var c = s.videoTracks[0].clips[0];
       for (var i = 0; i < c.components.numItems; i++) if (c.components[i].matchName === "AE.ADBE Lumetri") return true;
       GAB.qeClipe(s, 0, 0).addVideoEffect(qe.project.getVideoEffectByName("Lumetri Color"));
@@ -324,9 +449,12 @@ def _indice_lut(lut):
           GAB.lumetri(c).properties[args.look].setValue(args.i, true);
           GAB.qeSeq(s).exportFramePNG("00;00;00;10", args.png); return true;
         """, "LUT", i=i, look=_LOOK, png=png)
-        for _ in range(100):
+        for _ in range(200):
             if os.path.exists(png) and os.path.getsize(png) > 0:
-                time.sleep(0.15); return Image.open(png).convert("RGB").resize((320, 180))
+                try:
+                    return Image.open(png).convert("RGB").resize((320, 180))
+                except (PermissionError, OSError):   # o Premiere ainda está gravando o PNG
+                    pass
             time.sleep(0.05)
         raise RuntimeError("o Premiere não exportou o quadro de calibração")
 
@@ -341,7 +469,7 @@ def _indice_lut(lut):
         dv = round(dif(quadro(i)), 2)
         if dv < melhor[0]: melhor = (dv, i)
         rep = rep + 1 if dv == ant else 0; ant = dv
-        if rep >= 6 or dv < 1.0: break        # passou do fim da lista, ou achou
+        if rep >= 6 or dv < 1.5: break        # passou do fim da lista, ou achou
     if melhor[1] == 0 or melhor[0] > 10:
         raise SystemExit(f"não achei o '{lut}' no menu Look do Lumetri (melhor diferença {melhor[0]} no índice {melhor[1]}).")
     dados.setdefault(v, {})[lut] = melhor[1]
@@ -374,8 +502,12 @@ def quadro(seq, tempo, png):
     jsx("GAB.qeSeq(GAB.seq(args.seq)).exportFramePNG(GAB.tc(GAB.seq(args.seq), args.t), args.png); return true;",
         "quadro", seq=seq, t=float(tempo), png=png)
     import time
-    for _ in range(50):
-        if os.path.exists(png) and os.path.getsize(png) > 0: return png
+    for _ in range(100):
+        if os.path.exists(png) and os.path.getsize(png) > 0:
+            try:
+                with open(png, "rb+"): return png   # o Premiere ainda grava (e às vezes recria) o PNG depois de voltar
+            except OSError:
+                pass
         time.sleep(0.1)
     raise RuntimeError("o Premiere não gravou o quadro " + png)
 

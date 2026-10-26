@@ -14,3 +14,18 @@ foreach ($v in 8..12) {
 if (Test-Path $destino) { Remove-Item -Recurse -Force $destino }
 Copy-Item -Recurse $origem $destino
 Write-Host "Gab Ponte PPro instalada em $destino. Feche e abra o Premiere para ela iniciar."
+
+# LUT do Gab: o Lumetri do 13.x só lista LUTs da pasta da instalação (não lê %APPDATA%\Adobe\Common\LUTs).
+# Essa pasta fica em Program Files: precisa rodar este instalador como administrador.
+$cubo = Join-Path $env:USERPROFILE ".claude\skills\ogab\premiere\assets\lut\LUT DO GAB.cube"
+$pprs = Get-ChildItem (Join-Path $env:ProgramFiles "Adobe") -Directory -Filter "Adobe Premiere Pro*" -ErrorAction SilentlyContinue
+foreach ($p in $pprs) {
+  $dst = Join-Path $p.FullName "Lumetri\LUTs\Creative"
+  if (-not (Test-Path $dst) -or -not (Test-Path $cubo)) { continue }
+  try {
+    Copy-Item $cubo $dst -Force -ErrorAction Stop
+    Write-Host "LUT DO GAB copiado para $dst (reabra o Premiere)."
+  } catch {
+    Write-Host "Sem permissão para $dst. Rode de novo como administrador para o LUT do Gab aparecer no Lumetri." -ForegroundColor Yellow
+  }
+}
