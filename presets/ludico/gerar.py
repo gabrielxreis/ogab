@@ -53,9 +53,21 @@ def aplicar_tema(pasta, tema):
 
 
 def copiar_fotos(plano, base, pasta):
-    """Fotos do "duelo" vão para <pasta>/fotos/ e o plano passa a apontar para elas (o render só enxerga a pasta)."""
+    """Fotos do "duelo" e do "instagram" vão para <pasta>/fotos/ e o plano passa a apontar para elas (o render só enxerga a pasta)."""
     import shutil
+    def leva(rel):   # copia para <pasta>/fotos/ e devolve o caminho que o render enxerga
+        orig = rel if os.path.isabs(rel) else os.path.join(base, rel)
+        if not os.path.exists(orig):
+            raise SystemExit("Foto não encontrada: " + orig)
+        os.makedirs(os.path.join(pasta, "fotos"), exist_ok=True)
+        shutil.copy(orig, os.path.join(pasta, "fotos", os.path.basename(orig)))
+        return "fotos/" + os.path.basename(orig)
     for c in plano.get("cenas", []):
+        pf = c.get("perfil")
+        if pf:   # cenário "instagram": foto de perfil e capas da grade
+            if pf.get("foto"):
+                pf["foto"] = leva(pf["foto"])
+            pf["capas"] = [leva(x) for x in pf.get("capas", [])]
         for l in c.get("lados") or []:
             if l.get("foto"):
                 orig = l["foto"] if os.path.isabs(l["foto"]) else os.path.join(base, l["foto"])

@@ -25,7 +25,7 @@
   // ---------- qual linguagem cada cena usa ----------
   const TIPOS3D = new Set(["palco", "disjuntor", "barras", "blocos", "placas", "duelo", "grafico", "pregao", "elevador", "placar", "calculadora",
     "barco", "skyline", "cesta", "relogios", "gangorra", "semaforo", "balanca", "cambio", "termometro", "carrinho", "luneta",
-    "quique", "bussola", "cofre", "escudo", "bifurcacao", "seguir", "setas", "moeda", "martelo", "ima", "domino", "escada", "leilao", "sismografo", "cartao", "foguete", "chip", "planta", "dado", "urna", "alvo", "balao", "ponte", "pilha", "casa", "carne", "torneira"]);
+    "quique", "bussola", "cofre", "escudo", "bifurcacao", "seguir", "setas", "moeda", "martelo", "ima", "domino", "escada", "leilao", "sismografo", "cartao", "foguete", "chip", "planta", "dado", "urna", "alvo", "balao", "ponte", "pilha", "casa", "carne", "torneira", "instagram"]);
   cenas.forEach(c => { c._3d = TIPOS3D.has(c.tipo) || (c.tipo === "cta" && !!c.cenario && c.cenario !== "globo"); });
   // cena sem globo herda o foco do globo mais perto (a câmera do globo não gira à toa na volta)
   { let ult = null; cenas.forEach(c => { if (!c._3d && c.foco) ult = c.foco; else if (!c.foco) c._foco = ult; });
@@ -1016,6 +1016,78 @@
         item.upd = t => { const lento = t >= tE ? 2.2 : 1; go.forEach(o => { const per = .9 * lento, f = ((t - c.de) / per + o.k / go.length) % 1;
             o.m.visible = t > c.de + o.k * .1; o.m.position.set(0, 2.9 - 1.85 * f * f, -.2 + .1 * f); o.m.rotation.y = t * 3 + o.k; });
           const a = eout(prog(t, tE, .4)); mT.emissiveIntensity = .5 * a; tag.material.opacity = a; tag.scale.setScalar(Math.max(.001, eback(prog(t, tE, .45)))); };
+      } else if (c.tipo === "instagram") {
+        // celular 3D com o perfil do Instagram igual ao app (modo escuro): foto com anel, números, bio, destaques e a grade
+        // com as capas reais; o toque aperta "Seguir" na palavra (em) e vira "Seguindo". Campos em c.perfil (ver PRESET.md).
+        const pf = c.perfil || {}, CW = 720, CH = 1480, SW = 1.75, SH = SW * CH / CW;
+        holofote(grupo, 0, 0, 1.6);
+        const cel = new T.Group(); cel.position.set(0, 2.35, 0); grupo.add(cel);
+        cel.add(caixa(SW + .16, SH + .2, .16, mEsc, 0, 0, 0));
+        const aro = caixa(SW + .2, SH + .24, .1, mCinza, 0, 0, -.04); cel.add(aro);
+        const ilha = caixa(.42, .1, .02, new T.MeshBasicMaterial({ color: "#000" }), 0, SH / 2 - .1, .087); cel.add(ilha);
+        const img = src => { const im = new Image(); im.src = src; return im; };
+        const foto = pf.foto ? img(pf.foto) : null, capas = (pf.capas || []).map(img);
+        const fmt = v => typeof v === "number" ? v.toLocaleString("pt-BR") : (v || "");
+        function tela(seguindo) {
+          const cv = document.createElement("canvas"); cv.width = CW; cv.height = CH; const x = cv.getContext("2d");
+          const F = (p, w = 600) => `${w} ${p}px -apple-system, 'Inter Tight', '${FONTE}', sans-serif`;
+          const desenha = () => {
+            x.fillStyle = "#000"; x.fillRect(0, 0, CW, CH);
+            x.fillStyle = "#F5F5F5"; x.font = F(30, 600); x.textBaseline = "middle"; x.textAlign = "left"; x.fillText("9:41", 40, 34);
+            x.fillRect(CW - 92, 26, 46, 18); x.fillRect(CW - 44, 31, 4, 8);
+            x.font = F(34, 700); x.fillText(pf.user || "perfil", 40, 100);
+            x.font = F(34, 400); x.textAlign = "right"; x.fillText("☰", CW - 40, 100); x.fillText("⊕", CW - 100, 100);
+            // foto com o anel de story
+            const ax = 120, ay = 255, r = 84, gr = x.createLinearGradient(ax - r, ay + r, ax + r, ay - r);
+            gr.addColorStop(0, "#FEDA75"); gr.addColorStop(.35, "#FA7E1E"); gr.addColorStop(.6, "#D62976"); gr.addColorStop(1, "#962FBF");
+            x.fillStyle = gr; x.beginPath(); x.arc(ax, ay, r + 9, 0, Math.PI * 2); x.fill();
+            x.fillStyle = "#000"; x.beginPath(); x.arc(ax, ay, r + 3, 0, Math.PI * 2); x.fill();
+            x.save(); x.beginPath(); x.arc(ax, ay, r - 2, 0, Math.PI * 2); x.clip();
+            if (foto && foto.complete && foto.naturalWidth) x.drawImage(foto, ax - r, ay - r, 2 * r, 2 * r); else { x.fillStyle = "#333"; x.fillRect(ax - r, ay - r, 2 * r, 2 * r); }
+            x.restore();
+            if (pf.nota) { x.font = F(22, 600); const tw = x.measureText(pf.nota).width + 30; x.fillStyle = "#262626"; x.beginPath(); x.roundRect(ax - tw / 2, ay - r - 10, tw, 42, 21); x.fill();
+              x.fillStyle = "#F5F5F5"; x.textAlign = "center"; x.fillText(pf.nota, ax, ay - r + 11); }
+            const segs = seguindo ? (pf.seguidores_depois || pf.seguidores) : pf.seguidores;
+            [[fmt(pf.posts), "posts"], [segs, "seguidores"], [fmt(pf.seguindo), "seguindo"]].forEach(([n, l], k) => { const cx = 330 + k * 140;
+              x.fillStyle = "#F5F5F5"; x.textAlign = "center"; x.font = F(32, 700); x.fillText(n, cx, ay - 14); x.font = F(24, 400); x.fillText(l, cx, ay + 22); });
+            x.textAlign = "left"; let y = 390; x.fillStyle = "#F5F5F5"; x.font = F(27, 700); x.fillText(pf.nome || "", 40, y);
+            x.font = F(26, 400); (pf.bio || []).forEach(l => { y += 36; x.fillText(l, 40, y); });
+            if (pf.link) { y += 36; x.fillStyle = "#E0F1FF"; x.font = F(26, 600); x.fillText("🔗 " + pf.link, 40, y); }
+            y += 62;
+            const bw = (CW - 80 - 16) / 2, rr = (bx, w, cor, txt, corT) => { x.fillStyle = cor; x.beginPath(); x.roundRect(bx, y - 30, w, 60, 14); x.fill();
+              x.fillStyle = corT; x.textAlign = "center"; x.font = F(26, 700); x.fillText(txt, bx + w / 2, y); };
+            rr(40, bw, seguindo ? "#262626" : "#0095F6", seguindo ? "Seguindo ⌄" : "Seguir", "#FFFFFF"); rr(40 + bw + 16, bw, "#262626", "Mensagem", "#F5F5F5");
+            tela.botao = { x: 40 + bw / 2, y };
+            y += 70; (pf.destaques || []).slice(0, 5).forEach((d, k) => { const hx = 80 + k * 130, hy = y + 50;
+              x.strokeStyle = "#3a3a3a"; x.lineWidth = 3; x.beginPath(); x.arc(hx, hy, 46, 0, Math.PI * 2); x.stroke();
+              x.save(); x.beginPath(); x.arc(hx, hy, 40, 0, Math.PI * 2); x.clip(); const im = capas[(k + 2) % Math.max(1, capas.length)];
+              if (im && im.complete && im.naturalWidth) { const s = Math.max(80 / im.naturalWidth, 80 / im.naturalHeight); x.drawImage(im, hx - im.naturalWidth * s / 2, hy - im.naturalHeight * s / 2, im.naturalWidth * s, im.naturalHeight * s); }
+              else { x.fillStyle = "#262626"; x.fillRect(hx - 40, hy - 40, 80, 80); } x.restore();
+              x.fillStyle = "#F5F5F5"; x.font = F(20, 400); x.textAlign = "center"; x.fillText(d, hx, hy + 70); });
+            y += 160; x.strokeStyle = "#262626"; x.lineWidth = 2; x.beginPath(); x.moveTo(0, y); x.lineTo(CW, y); x.stroke();
+            x.fillStyle = "#F5F5F5"; x.fillRect(0, y, CW / 3, 3); x.font = F(30, 400); x.textAlign = "center"; ["▦", "▶", "◫"].forEach((s, k) => { x.fillStyle = k ? "#737373" : "#F5F5F5"; x.fillText(s, CW / 6 + k * CW / 3, y + 40); });
+            y += 76; const cw = (CW - 4) / 3, ch = cw * 4 / 3;
+            capas.slice(0, 9).forEach((im, k) => { const gx = (k % 3) * (cw + 2), gy = y + Math.floor(k / 3) * (ch + 2); if (gy > CH) return;
+              x.save(); x.beginPath(); x.rect(gx, gy, cw, ch); x.clip();
+              if (im.complete && im.naturalWidth) { const s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight); x.drawImage(im, gx + (cw - im.naturalWidth * s) / 2, gy + (ch - im.naturalHeight * s) / 2, im.naturalWidth * s, im.naturalHeight * s); }
+              else { x.fillStyle = "#1c1c1c"; x.fillRect(gx, gy, cw, ch); }
+              if (k < (pf.fixados || 0)) { x.fillStyle = "#FFF"; x.font = F(24, 700); x.textAlign = "right"; x.fillText("📌", gx + cw - 10, gy + 26); }
+              x.restore(); });
+            tx.needsUpdate = true; };
+          const tx = new T.CanvasTexture(cv); tx.colorSpace = T.SRGBColorSpace; tx.anisotropy = 8;
+          desenha(); [foto, ...capas].filter(Boolean).forEach(im => im.addEventListener("load", desenha));
+          const m = new T.Mesh(new T.PlaneGeometry(SW, SH), new T.MeshBasicMaterial({ map: tx, toneMapped: false })); m.position.z = .085; cel.add(m); return m;
+        }
+        const tA = tela(false), bot = tela.botao, tB = tela(true); tB.position.z = .086;
+        const bx = (bot.x / CW - .5) * SW, by = (.5 - bot.y / CH) * SH;
+        const toque = new T.Mesh(new T.CircleGeometry(.16, 32), new T.MeshBasicMaterial({ color: "#FFFFFF", transparent: true, opacity: 0, depthWrite: false, toneMapped: false })); toque.position.set(bx, by, .09); cel.add(toque);
+        const onda = new T.Mesh(new T.RingGeometry(.16, .2, 40), new T.MeshBasicMaterial({ color: "#FFFFFF", transparent: true, opacity: 0, depthWrite: false, toneMapped: false })); onda.position.set(bx, by, .09); cel.add(onda);
+        const tE = em(c.em, 1.2);
+        item.pose = { pos: [0, 2.5, 5.4], alvo: [0, 2.55, 0] };
+        item.upd = t => { const e = eback(prog(t, c.de, .9)); cel.rotation.y = (1 - e) * .7 + .1 * Math.sin(t * .6); cel.rotation.x = -.05; cel.position.y = 2.35 - (1 - e) * .6;
+          const ap = prog(t, tE - .35, .35), so = prog(t, tE, .3); toque.material.opacity = .55 * ap * (1 - so); toque.scale.setScalar(1 - .25 * ap);
+          const o = prog(t, tE, .6); onda.material.opacity = t >= tE ? .7 * (1 - o) : 0; onda.scale.setScalar(1 + 1.8 * o);
+          tB.visible = t >= tE + .05; tA.scale.setScalar(t >= tE - .05 && t < tE + .08 ? .995 : 1); };
       } else if (c.tipo === "cta") {
         holofote(grupo, 0, 0, 1.15); const bo = boneco(); grupo.add(bo);
         item.pose = { pos: [0, 2.2, 7.5], alvo: [0, 1.6, 0] };
@@ -1077,7 +1149,8 @@
   // ---------- cartão (DOM) ----------
   const card = document.getElementById("card");
   Object.assign(card.style, VERT ? { left: px(90), top: (H * .152).toFixed(1) + "px" } : { left: px(80), top: px(80) });
-  if (P.serie) { const k = mk("div", "kicker", card, { fontSize: px(24), marginBottom: px(14) }); k.textContent = P.serie;
+  let kick = null;
+  if (P.serie) { const k = mk("div", "kicker", card, { fontSize: px(24), marginBottom: px(14) }); k.textContent = P.serie; kick = k;
     tl.fromTo(k, { opacity: 0 }, { opacity: 1, duration: .5, ease: "power2.out" }, 0); }
   const pil = mk("div", "pilula", card, { height: px(62), paddingRight: px(26) });
   mk("span", "bola", pil, { width: px(40), height: px(40), margin: `0 ${px(14)} 0 ${px(11)}` });
@@ -1088,6 +1161,12 @@
   const fontesEl = P.fontes ? mk("div", "fontes", card, { fontSize: px(18), marginTop: px(12) }) : null;
   if (fontesEl) { fontesEl.textContent = P.fontes; tl.fromTo(fontesEl, { opacity: 0 }, { opacity: 1, duration: .5, ease: "power2.out" }, P.fontes_em ?? .6); }
   const area = mk("div", "", card, { position: "relative", marginTop: px(14) });
+  // topo limpo (pedido do Gabriel, 27/10/2026): série, pílula e fontes só na abertura; depois somem e o cartão sobe,
+  // ficando só as palavras-chave (etiqueta, número, tópicos). As fontes voltam discretas no CTA. "topo_ate": false desliga.
+  const topoAte = P.topo_ate === false ? null : (P.topo_ate ?? (cenas[1] ? cenas[1].de : null));
+  if (topoAte != null) { const sobe = area.offsetTop;
+    tl.to([kick, pil, fontesEl].filter(Boolean), { opacity: 0, duration: .35, ease: "power2.in" }, topoAte - .25);
+    tl.to(area, { y: -sobe, duration: .5, ease: "power3.inOut" }, topoAte - .2); }
   const sinal = (v, n) => v < 0 ? "−" : (n.sinal && v > 0 ? "+" : "");
   const fmt = (v, n) => (n.prefixo || "") + sinal(v, n) + Math.abs(v).toLocaleString("pt-BR", { minimumFractionDigits: n.decimais || 0, maximumFractionDigits: n.decimais || 0 }) + (n.sufixo || "");
   cenas.forEach((c, i) => {

@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-3 (27/10/2026)
+- **Lúdico: CTA de seguir com o Instagram de verdade.** Quando a fala pede para seguir, entra um celular 3D com o perfil igual ao app (foto, bio, seguidores, seguindo, destaques e as capas dos últimos posts) e um toque em "Seguir". Vídeo sem essa fala ganha a cena no fim.
+- **Lúdico: cartão mais limpo.** Série, seção e fontes aparecem só na abertura; depois fica só o que importa (etiqueta, número, tópicos). As fontes voltam discretas no final.
 ## 2026.10.27-4 (27/10/2026)
 - **Estilo novo: Colagem.** Fotos antigas recortadas à tesoura em meio-tom, coladas em papel kraft ou jornal, etiquetas de papel rasgado e movimento em stop-motion. Ótimo para "você sabia", curiosidade histórica, invenção e personagem. Peça "no estilo colagem" ou marque **Colagem** no passo de estilo do `/ogab menu`.
 - **Estilo novo: Linha.** O vídeo inteiro é uma linha dourada fina e contínua: escreve as palavras em cursiva, desenha formas (casa, árvore, coroa, chave), fecha o monograma da marca e termina num pôster. Para marca premium, luxo, arquitetura e manifesto curto. Peça "no estilo linha" ou marque **Linha** no menu.

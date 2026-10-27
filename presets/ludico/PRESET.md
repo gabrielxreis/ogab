@@ -97,6 +97,7 @@ Todos centrados no x = 0, simétricos, com holofote e anel no chão; campos na d
 | `setas` | duas setas no mesmo dia, uma despenca e outra sobe; `lados: [{rotulo, valor, dir: sobe|desce, em}]` | Brasil despenca, Nasdaq sobe |
 | `moeda` | moeda gigante gira: frente e verso (oportunidade x risco, sobe x cai); `frente`, `verso`, `em` | Brasil despenca / Washington (CTA) |
 | `pilha` | pilha de moedas cresce (construir aos poucos); `rotulo3d`, `em`, `fim_em` | Brasil despenca |
+| `instagram` | **CTA de seguir** ("me segue aqui"): celular 3D com o perfil igual ao app (modo escuro), foto com anel, posts/seguidores/seguindo, nome, bio, link, destaques e a grade com as capas REAIS; o toque aperta "Seguir" e vira "Seguindo". `perfil: {user, nome, posts, seguidores, seguindo, bio: [linhas], link, nota, destaques, fixados, foto, capas: [...]}`, `em` = palavra do "segue". Vídeo sem a fala de seguir: criar a cena no fim com ele | todos os de 27/10 (substituiu o `seguir`) |
 | `martelo` | martelo da decisão bate no bloco; `placa`, `em` | Decisão em Washington |
 | `ima` | ímã puxa as moedas de um lado para o outro (capital que sai/vai); `esq`, `dir`, `em` | Washington / Por que reagiu |
 | `domino` | efeito dominó com rótulo em cada peça; `pecas: [{t, em}]` | Decisão em Washington |
@@ -138,3 +139,6 @@ globo NY > palco > placas > plenário acendendo > CTA no globo. 9 cenas, 88,8 s.
 - **Objeto que bate ou cai** (bola, flecha, peso no telhado, dardo, peça de dominó): o som vai no instante do contato, não na palavra (bola: `cai_em + 0,65`; flecha k: `em + 0,45 + 0,45k`; peso: `peso_em + 0,45`; dardo: `em + 0,5`; dominó: um som por peça em `em + 0,32`).
 - **Arquivo com mais de uma batida** (martelo do juiz): cortar a duração para ficar com uma só.
 - Os tempos de palavra da transcrição do DaVinci batem com o áudio (0,05 a 0,15 s); se o som parecer fora, o erro está no instante escolhido, não na transcrição.
+
+## Cartão: topo limpo (Gabriel, 27/10/2026: "aqui em cima eu acho muito sujo, para um início tudo bem, mas seria legal depois sair")
+A série, a pílula da seção e a linha de fontes aparecem só na primeira cena; depois somem e o cartão sobe, ficando só as palavras-chave (etiqueta, número, tópicos, carimbo). As fontes voltam discretas no CTA. `"topo_ate": <segundo>` muda quando some; `"topo_ate": false` mantém o topo o vídeo todo.
