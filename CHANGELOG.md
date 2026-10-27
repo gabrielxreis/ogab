@@ -1,7 +1,6 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.27-9 (27/10/2026)
 - **Lúdico com luz variada:** o holofote em cone deixou de ser fixo. Cada cena alterna entre neon no chão, contraluz com halo, fachos cruzados, grade luminosa, luz de janela e o cone clássico, para o vídeo não ter a mesma cara do começo ao fim.
-## 2026.10.27-9 (27/10/2026)
 - **Estilo novo: Mimic.** Teatrinho de bonecos de papel: palco com cortina azul e franja dourada, cada frase numa placa de papel que desce pendurada no barbante e balança (a passagem bíblica vem numa plaquinha embaixo), bonecos que sobem do alçapão, apontam, andam e caem, e o cenário pintado que troca descendo como telão. Ótimo para história bíblica, parábola, fábula e lição de moral. Peça "no preset mimic" ou marque **Mimic** no passo de estilo do `/ogab menu`.
 ## 2026.10.27-8 (27/10/2026)
 - **Tela sempre mudando (todo vídeo):** cada ideia da fala ganha um elemento novo na tela, a cada 2,5 a 4 segundos; nenhuma cena fica mais de ~4,5 s (o convite final pode ir a 7 s). No Lúdico, o Gab nem gera o motion se alguma cena passar disso.
