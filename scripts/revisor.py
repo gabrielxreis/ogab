@@ -120,6 +120,8 @@ def lint(pasta):
         (r"text-shadow:[^;]*\b([2-9]\d|1\d\d)px", "brilho (glow) em texto"),
         (r"(#(7c3aed|8b5cf6|a855f7|6d28d9|9333ea)[^;]*#(3b82f6|2563eb|06b6d4|0ea5e9))|purple[^;]*blue", "fundo em degradê roxo e azul"),
         (r"Math\.random\(", "Math.random (o render tem que ser determinístico; usar semente)"),
+        (r"gsap\.utils\.random\(|scrambleText", "gsap.utils.random / ScrambleText (sorteiam sem semente; o render tem que ser determinístico)"),
+        (r"autoSplit\s*:\s*true", "SplitText com autoSplit (refaz a divisão no meio do render e quebra o seek)"),
         (r"ease:\s*[\"'](none|linear)[\"']", "movimento linear (só vale para câmera contínua ou contador; conferir)"),
     ]
     achados = []

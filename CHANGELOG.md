@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-3 (27/10/2026)
+- **Motions mais firmes.** Morph de logo, traço se desenhando, texto entrando letra a letra e 3D no navegador ganharam as armadilhas conhecidas já resolvidas (forma que cruzava no meio do morph, texto que pulava ao dividir, modelo 3D saindo preto ou com cor lavada). O revisor agora também acusa sorteio sem semente escondido. A logo do morph entra sem o quique.
 ## 2026.10.27-2 (27/10/2026)
 - **YouTube: título + capa, capítulos e retenção.** Antes de subir, o Gab escreve 10 títulos, confere cada um junto com o texto da capa (tamanho que aparece no celular e no computador, capa sem repetir o título, palavras vagas) e mostra os melhores para você escolher; escreve a descrição e os capítulos do vídeo longo já no formato que o YouTube aceita. Depois de publicado, mande o CSV de retenção do YouTube Studio (Análises > Engajamento > baixar) e ele diz onde as pessoas saíram, o que estava sendo dito naquele segundo e o que mudar. Peça "/ogab youtube" ou só "título do vídeo", "capítulos", "por que pararam de assistir".
 - **YouTube: concorrência das buscas.** O Gab mostra os 10 primeiros vídeos das buscas que o seu vídeo quer ganhar, com views e as palavras que os vencedores usam, e diz se o seu título traz essas palavras.

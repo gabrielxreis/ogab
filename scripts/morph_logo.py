@@ -73,7 +73,7 @@ const tl = gsap.timeline({{ paused: true }});
 {fundo_js}
 gsap.registerPlugin(MorphSVGPlugin);
 gsap.set("#m", {{ transformOrigin: "50% 50%" }});
-tl.from("#m", {{ scale: 0, rotation: -90, duration: 0.6, ease: "back.out(2)" }}, 0.1);
+tl.from("#m", {{ scale: 0, rotation: -90, duration: 0.7, ease: "power3.out" }}, 0.1);
 tl.to("#m", {{ morphSVG: {{ shape: "#alvoL", type: "rotational" }}, duration: 1.1, ease: "power3.inOut" }}, 0.9);
 tl.to("#m", {{ morphSVG: {{ shape: "#alvoP" }}, duration: 1.0, ease: "power3.inOut" }}, 2.3);
 tl.from(".lt", {{ opacity: 0, x: 40, filter: "blur(6px)", duration: 0.55, stagger: 0.06, ease: "power3.out" }}, 2.75);

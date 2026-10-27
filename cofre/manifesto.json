@@ -1,8 +1,8 @@
 {
-  "quando": "2026-10-27 12:06",
+  "quando": "2026-10-27 12:12",
   "arquivos": {
     "SKILL.md": "c5581d4e48abdc1359e1f13dbdd0ec3a8eb5165d1587439c90fd1dffcdd44356",
-    "docs/PROCESSO.md": "f3a16fe657da2a5b1a6b61854d197ff1c7b9787c1e6fab6593cb0b6b82d0333b",
+    "docs/PROCESSO.md": "b85be6fdd617366ad61c9aa82e4ae28f93a175e6b83b23fc3fbcc168cbae4eb4",
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "0bb56b9549f2fa9b10287eaa74bd9281c7a8d34dc6b48138168f9c6fe1c61f10",
     "docs/etapas/cliente.md": "39951c123444c16d9303497a7c94f012d2420c8023c7bfa0318c6255bfc45975",
@@ -12,9 +12,9 @@
     "docs/etapas/extras.md": "d6a6c8bc66ba8479d402238b81423f45c707302e10a8ee93a00f76c582f66817",
     "docs/etapas/fx.md": "f4f2d0a8ca0fb904d38bb7fcdb51d8677abbb79c2daeb38ff852cf780d03f55f",
     "docs/etapas/legenda.md": "b4e4927a2c8fd12b64012af9635fdc22ca418b20e901b1119116a0be4d407991",
-    "docs/etapas/lettering_motions.md": "88548c03d22abf890d411f8b4fede014b4ff2a174984ca9a78630d6daa85f559",
-    "docs/etapas/motion_avancado.md": "0e58e866dfbe909d140820a3072ecacdf2141774823f722bdfe658e459ea9057",
-    "docs/etapas/motion_proibidos.md": "65f4a7c736261597b8117624288abd7fface891371676757d3f284fef11fec6d",
+    "docs/etapas/lettering_motions.md": "6fb8306d006f21cae972548f70129de5999492fa17cbe283d4a5fabbdc9eb889",
+    "docs/etapas/motion_avancado.md": "ca9de32e7e07211cb940dfb3dee5617b31cd2be91e5cc0ce3a61b8f9f8bba517",
+    "docs/etapas/motion_proibidos.md": "3ca9609f31eaac1d7fa83786ba2a8b3962e98063fdadd8a6d426add5db0ac3a2",
     "docs/etapas/padrao_reels.md": "74923e6ea054d0c7b9ae8e32f483280581960fa1724fbdc3376bef9ae8146d4a",
     "docs/etapas/principios_animacao.md": "94430dc5a7ba6583af50bd5b99bd83048da317b1cb12b18477d713786042a33b",
     "docs/etapas/regras.md": "94842ee70257955425db30d37704577dfa65b8414fbd228c89e40471adb1b374",
