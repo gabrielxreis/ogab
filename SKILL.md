@@ -26,3 +26,13 @@ Logo depois de abrir, mandar na conversa o link da aba para a pessoa tocar e aco
 
 ## Tela sempre mudando (REGRA do usuário, 27/10/2026: retenção, vale para TODO vídeo e todo preset)
 "Ele fala muito e fica no mesmo motion; o ideal é estar sempre com algo diferente na tela." Cada ideia nova da fala = um elemento NOVO na tela (cenário, objeto, número, take), não o mesmo motion parado enquanto a pessoa segue falando. Planejar pela transcrição: uma troca de elemento a cada ~2,5-4 s, nenhum cenário mais de ~4,5 s (o CTA final pode ir a 7 s); frase longa vira 2-3 elementos em sequência. Câmera viva e batidas (Lúdico) ajudam, mas NÃO substituem a troca de elemento. Conferir a tabela de cenas (início, fim, duração, o que entra) antes do render; o `gerar.py` do Lúdico recusa cena longa.
+
+## Prints antes de renderizar (REGRA do usuário, 27/10/2026: "o cenário tá mega preto, personagens bugados, funções bugadas e muito feio; salva isso para nunca mais dar esses furos")
+NENHUM motion é renderizado sem antes: `python3 SKILL_DIR/scripts/prints_cenas.py <pasta da composição> <plano.json>` (1 print por cena no estado final, folha em tamanho de leitura, 360 px por quadro, nunca miniatura; conferência automática de ESCURO, BORDA e VAZIO, sai com 1 se algo disparar). Depois OLHAR a folha cena a cena, com este checklist, e corrigir antes do render:
+1. **Luz:** cenário legível, objeto bem iluminado, fundo não preto (nada "some" no escuro).
+2. **Enquadramento:** objeto e personagem inteiros, no centro, sem cortar na borda e sem encostar no cartão/texto.
+3. **Personagem:** com forma (não um cilindro preto), proporção certa, de frente para a câmera.
+4. **Funções:** cada coisa que a cena promete aparece e funciona (número, seta, carimbo, placa, gráfico com as velas visíveis, luz do semáforo).
+5. **Texto:** legível, sem duplicar (o mesmo texto no cartão e no 3D) e sem palavra cortada.
+6. **Beleza:** comparar com a referência aprovada da marca/preset; se estiver mais feio que ela, não renderiza.
+Mudou a direção de arte (cor, luz, personagem, cenário novo)? Mostrar a folha ao usuário ANTES do render. Conferir só miniatura (folha de 150 px) não vale: foi assim que esses furos passaram.
