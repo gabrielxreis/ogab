@@ -210,17 +210,50 @@
       return new T.Mesh(new T.PlaneGeometry(larg, alt), m);
     }
     // holofote: cone de luz aditivo + spot com sombra + anel no chão
+    // ILUMINAÇÃO VARIADA (Gabriel, 27/10/2026: "não precisa ter aquele holofote de luz o tempo todo, pode explorar outras coisas").
+    // A luz de verdade (sombra/brilho) vem do POOL; aqui só o que se VÊ. Estilo por cena: c.luz ou automático, alternando.
+    const ESTILOS_LUZ = ["neon", "contraluz", "feixes", "grade", "janela", "cone"];
+    function gradiente(cor, a0 = .9, forma = "radial") {
+      const cv = document.createElement("canvas"); cv.width = cv.height = 256; const x = cv.getContext("2d");
+      const g = forma === "radial" ? x.createRadialGradient(128, 128, 0, 128, 128, 128) : x.createLinearGradient(0, 256, 0, 0);
+      const c = new T.Color(cor), rgb = `${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(c.b * 255)}`;
+      g.addColorStop(0, `rgba(${rgb},${a0})`); g.addColorStop(1, `rgba(${rgb},0)`); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+      const tx = new T.CanvasTexture(cv); tx.colorSpace = T.SRGBColorSpace; return tx; }
+    const matLuz = (tx, op = 1) => new T.MeshBasicMaterial({ map: tx, transparent: true, opacity: op, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false, side: T.DoubleSide });
     function holofote(grupo, x, z, raio = 1.1, alt = 9) {
-      const cone = new T.Mesh(new T.CylinderGeometry(.18, raio * 1.15, alt, 40, 1, true),
-        new T.MeshBasicMaterial({ color: T3.cone || COR, transparent: true, opacity: T3.cone ? .085 : .045, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false }));
-      cone.position.set(x, alt / 2, z); grupo.add(cone);
       (grupo.userData.luzes = grupo.userData.luzes || []).push({ x, z, alt });   // a luz de verdade vem do POOL (ver abaixo)
-      const sp = null;
-      const anelM = new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: .85, toneMapped: false });
-      const a = new T.Mesh(new T.RingGeometry(raio * .92, raio, 64), anelM); a.rotation.x = -Math.PI / 2; a.position.set(x, .012, z); grupo.add(a);
-      const d = new T.Mesh(new T.CircleGeometry(raio * .92, 64), new T.MeshBasicMaterial({ color: T3.disco || COR, transparent: true, opacity: .16, toneMapped: false }));
-      d.rotation.x = -Math.PI / 2; d.position.set(x, .011, z); grupo.add(d);
-      return { cone, sp, anel: a, disco: d };
+      const est = grupo.userData.estilo || "cone", corL = T3.cone || COR, primeira = grupo.userData.luzes.length === 1;
+      const chao = (op = .16) => { const d = new T.Mesh(new T.CircleGeometry(raio * .92, 64), new T.MeshBasicMaterial({ color: T3.disco || COR, transparent: true, opacity: op, toneMapped: false }));
+        d.rotation.x = -Math.PI / 2; d.position.set(x, .011, z); grupo.add(d); };
+      if (est === "cone") {
+        const cone = new T.Mesh(new T.CylinderGeometry(.18, raio * 1.15, alt, 40, 1, true),
+          new T.MeshBasicMaterial({ color: corL, transparent: true, opacity: T3.cone ? .085 : .045, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false }));
+        cone.position.set(x, alt / 2, z); grupo.add(cone);
+        const a = new T.Mesh(new T.RingGeometry(raio * .92, raio, 64), new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: .85, toneMapped: false }));
+        a.rotation.x = -Math.PI / 2; a.position.set(x, .012, z); grupo.add(a); chao();
+      } else if (est === "neon") {   // aro grosso de neon no chão + reflexo
+        [[raio, .055, 1], [raio * .72, .025, .55]].forEach(([r, tb, op]) => { const t = new T.Mesh(new T.TorusGeometry(r, tb, 12, 96), new T.MeshBasicMaterial({ transparent: true, opacity: op, toneMapped: false }));
+          t.material.color = new T.Color(corL); t.rotation.x = -Math.PI / 2; t.position.set(x, .03, z); grupo.add(t); });
+        const gl = new T.Mesh(new T.PlaneGeometry(raio * 3.4, raio * 3.4), matLuz(gradiente(corL, .5), .7)); gl.rotation.x = -Math.PI / 2; gl.position.set(x, .015, z); grupo.add(gl);
+      } else if (est === "contraluz") {   // halo grande atrás: o objeto vira silhueta com contorno de luz
+        if (primeira) { const h = new T.Mesh(new T.PlaneGeometry(7, 7), matLuz(gradiente(corL, .75), .95)); h.position.set(0, 2.6, -2.6); grupo.add(h);
+          const r = new T.Mesh(new T.RingGeometry(2.05, 2.1, 96), new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: .55, toneMapped: false })); r.position.set(0, 2.6, -2.55); grupo.add(r); }
+        chao(.1);
+      } else if (est === "feixes") {   // dois fachos cruzados vindo dos lados
+        [-1, 1].forEach(sd => { const f = new T.Mesh(new T.CylinderGeometry(.12, raio * .9, alt, 32, 1, true),
+            new T.MeshBasicMaterial({ color: corL, transparent: true, opacity: .06, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false }));
+          f.position.set(x + sd * alt * .22, alt / 2, z); f.rotation.z = sd * .42; grupo.add(f); });
+        chao(.2);
+      } else if (est === "grade") {   // chão com grade luminosa e brilho no horizonte
+        if (primeira) { const gr = new T.GridHelper(16, 16, corL, corL); gr.material.transparent = true; gr.material.opacity = .28; gr.position.y = .02; grupo.add(gr);
+          const hz = new T.Mesh(new T.PlaneGeometry(26, 6), matLuz(gradiente(corL, .55, "linear"), .8)); hz.position.set(0, 3, -9); grupo.add(hz); }
+        chao(.12);
+      } else if (est === "janela") {   // fachos verticais atrás, como luz entrando por janelas
+        if (primeira) [-2.2, -.75, .75, 2.2].forEach((jx, k) => { const b = new T.Mesh(new T.PlaneGeometry(.9, 9), matLuz(gradiente(corL, .5, "linear"), .55 - (k % 2) * .15));
+          b.position.set(jx, 4.5, -3.2); b.rotation.z = .12; grupo.add(b); });
+        chao(.14);
+      }
+      return { cone: null, sp: null, anel: null, disco: null };
     }
     function boneco(cabeca = T3.objeto) {   // low-poly: corpo escuro, cabeça clara
       const b = new T.Group();
@@ -241,7 +274,8 @@
     const cenas3d = [];   // {c, grupo, origem, upd(t), pose}
     let slot = 0;
     cenas.forEach((c, i) => { if (!c._3d) return;
-      const grupo = new T.Group(), O = new T.Vector3(slot * 46, 0, -(slot % 2) * 8); slot++;
+      const grupo = new T.Group(), O = new T.Vector3(slot * 46, 0, -(slot % 2) * 8);
+      grupo.userData.estilo = c.luz || (P.luzes ? P.luzes[slot % P.luzes.length] : ESTILOS_LUZ[(slot * 5 + 1) % ESTILOS_LUZ.length]); slot++;
       grupo.position.copy(O); sc.add(grupo);
       // parede ao fundo de cada canto do estúdio
       const par = new T.Mesh(new T.PlaneGeometry(44, 20), new T.MeshStandardMaterial({ color: T3.parede, roughness: .95 }));
