@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-7 (27/10/2026)
+- **Atualiza também no meio do projeto.** Antes o Gab só procurava atualização quando começava. Agora, numa conversa em que ele já está trabalhando, cada pedido seu confere se saiu versão nova (no máximo 1 vez por minuto, sem atrasar). Se tiver, ele baixa, relê as regras novas e avisa em uma linha antes de seguir. Vale a partir da próxima conversa depois desta atualização.
 ## 2026.10.27-6 (27/10/2026)
 - **Lúdico mais vivo.** A câmera não para mais: gira devagar e vai chegando perto durante a cena, e as palavras fortes da narração ganham uma batida (empurrão de câmera, pulso do cenário e faíscas na cor da sua marca, com um whoosh bem baixo). Se quiser o estilo mais calmo, peça "sem batidas".
 ## 2026.10.27-3 (27/10/2026)
