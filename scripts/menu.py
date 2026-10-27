@@ -36,6 +36,8 @@ EFEITOS_KIT = [
 PRESET_EN = {
     "painel": "Finance/data app: navy, 3D app cards with rolling numbers, a chart drawing itself, camera diving in.",
     "globo": "Full explainer style: 3D globe spinning to each city with dotted routes, data card (section, tag, counting number, source), bullets, stamp, CTA and karaoke captions.",
+    "linha": "The whole film is one continuous gold line on night blue: it writes words in script, draws shapes, closes a monogram that fills with gold and lands on a brand poster.",
+    "colagem": "Old photos cut out with scissors in halftone, glued on kraft or newsprint, torn-paper labels and stop-motion at 12 fps.",
     "launch": "Premium Apple-style launch film: black, one idea per scene, real product screens in 3D glass.",
     "vitrine": "Clean luxury interface: every line becomes a piece of UI (converter, profile, card, window, pill).",
     "kinetic": "Aggressive kinetic type: giant words swapping on the beat of the voice, red box, glitch, whip.",
@@ -66,7 +68,7 @@ CAT_EN = {"dados": "Numbers, charts and milestones", "produto": "Product, app an
           "marca": "Opener, brand and web delivery"}
 
 
-NOME_EN = {"Explicador de notícia": "News explainer", "Destaque": "Highlight", "Letreiro": "Big word behind", "Órbita": "Orbit", "Lente": "Lens"}   # nome em inglês no menu
+NOME_EN = {"Linha (um traço só)": "One line", "Colagem": "Collage", "Explicador de notícia": "News explainer", "Destaque": "Highlight", "Letreiro": "Big word behind", "Órbita": "Orbit", "Lente": "Lens"}   # nome em inglês no menu
 
 
 def it(id, pt, en, dpt, den, anim=None, gif=None, extra=None):

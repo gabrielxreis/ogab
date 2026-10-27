@@ -41,7 +41,7 @@
     // Uma frase forte, linha a linha, com a palavra-chave em degradê da marca. A câmera se aproxima devagar.
     // Frase forte, grande, uma de cada vez: "||" separa as batidas (a anterior sai subindo e desfocando antes da próxima).
     gancho(c, el, t, d) {
-      if (c.olho) { const o = linhaSuave(el, c.olho, 26, "olho"); Object.assign(o.style, { position: "absolute", left: 0, right: 0, top: `calc(50% - ${(VERT ? 300 : 210) * U}px)` });
+      if (c.olho) { const o = linhaSuave(el, c.olho, c.tamOlho || (VERT ? 40 : 26), "olho"); Object.assign(o.style, { position: "absolute", left: 0, right: 0, top: `calc(50% - ${(VERT ? 340 : 210) * U}px)` });
         aparece(o, t + .1); }
       const batidas = String(c.texto).split("||"), cada = d / batidas.length;
       batidas.forEach((txt, k) => {
@@ -101,7 +101,8 @@
           const fq = c.fpsQuadros || 12, ini = t + (c.inicioQuadros || 0);
           c.quadros.forEach((src, k) => { const q = mk("img", "", img, { position: k ? "absolute" : "relative", left: 0, top: 0, width: "100%", opacity: k ? 0 : 1 });
             q.src = src; if (k) { tl.set(q, { opacity: 1 }, ini + k / fq); tl.set(img.children[k - 1], { opacity: 0 }, ini + k / fq); } });
-        } else { img = mk("img", "", v); img.src = c.imagem; }
+        } else if (c.imagem) { img = mk("img", "", v); img.src = c.imagem; }   // sem imagem: a interface viva vem do "extra" do plano
+        else img = null;
         return { pn, img, topo };
       };
       const A = montar(palco);
@@ -111,7 +112,7 @@
       const jw = cel ? fw - 24 : fw, jh = cel ? fh - 24 : fh - A.topo;
       const prop = c.proporcao || (cel ? 4.9 : 2.5), rolar = Math.max(0, jw * prop - jh);
       const focos = c.foco && c.foco.length ? c.foco : [{ y: 0, zoom: 1 }, { y: .3, zoom: 1.04 }];
-      [A.img, B.img].forEach(img => {
+      [A.img, B.img].filter(Boolean).forEach(img => {
         tl.set(img, { y: -focos[0].y * rolar, scale: focos[0].zoom || 1 }, t);
         const passo = (d - 1.2) / Math.max(1, focos.length - 1);
         focos.slice(1).forEach((f, k) => tl.to(img, { y: -f.y * rolar, scale: f.zoom || 1, duration: passo * .9, ease: CAMERA }, t + 1 + k * passo));
@@ -125,7 +126,7 @@
     },
     // Recursos, um de cada vez, grandes; o anterior apaga para 28% enquanto o próximo nasce. Sem cartões, sem emoji.
     lista(c, el, t, d) {
-      if (c.olho) { const o = linhaSuave(el, c.olho, 26, "olho"); o.style.marginBottom = px(50); aparece(o, t + .1); }
+      if (c.olho) { const o = linhaSuave(el, c.olho, c.tamOlho || (VERT ? 40 : 26), "olho"); o.style.marginBottom = px(50); aparece(o, t + .1); }
       const itens = c.itens || [], cada = c.cada || (d - .5) / Math.max(1, itens.length), ini = c.inicio ?? .2;   // cada/inicio: itens na batida
       itens.forEach((it, k) => {
         const T = titulo(el, typeof it === "string" ? it : it.t, c.tam || (VERT ? 140 : 110)); T.el.style.margin = "0 0 -.2em";   // mesmo respiro da quebra de linha
@@ -250,11 +251,11 @@
 
   // Montagem: cada cena entra do escuro (dissolve, sem tranco) e sai sumindo um pouco para frente com desfoque.
   // Entre cenas, uma faixa de luz atravessa a tela quando o plano pede (luz: true).
-  let t = 0;
+  let t = 0; const INFO = [];
   P.cenas.forEach((c, i) => {
     const d = c.dur || 3, el = mk("div", "cena tipo-" + (c.tipo || "gancho"), box);
     if (c.flutuantes && c.flutuantes.length) flutuar(c, el, t, d);   // imagens nas bordas, atrás do texto
-    (TIPOS[c.tipo] || TIPOS.gancho)(c, el, t, d);
+    (TIPOS[c.tipo] || TIPOS.gancho)(c, el, t, d); INFO.push({ c, el, t, d, i });
     if (i) tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: rv(.6), ease: "power1.out" }, t);
     else tl.set(el, { opacity: 1 }, 0);   // a 1ª cena já está acesa no quadro 0 (o CSS esconde as cenas)
     if (i < P.cenas.length - 1) tl.to(el, { opacity: 0, scale: 1.035, filter: "blur(10px)", duration: rv(.55), ease: SAI }, t + d - rv(.5));
@@ -270,6 +271,8 @@
     const B = P.batida, passo = 60 / B.bpm * (B.cada || 4), f = B.forca || .012;
     for (let x = B.inicio || 0; x < t - .2; x += passo) tl.fromTo("#cenas", { scale: 1 + f }, { scale: 1, duration: Math.min(.45, passo * .8), ease: "power3.out" }, x);
   }
+  // Camada do projeto ("extra" no plano: BG animado, interfaces vivas, elementos por cena) entra na MESMA timeline.
+  if (window.LAUNCH_EXTRA) await window.LAUNCH_EXTRA({ tl, P, W, H, U, VERT, px, mk, titulo, revela, aparece, cenas: INFO, total: t, REVELA, CAMERA, SAI });
   tl.set({}, {}, t);
   window.__timelines = window.__timelines || {}; window.__timelines["launch"] = tl;
 })();

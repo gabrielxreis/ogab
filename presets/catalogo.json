@@ -1366,6 +1366,80 @@
      "@ultima"
     ]
    }
+  },
+  {
+   "id": "colagem",
+   "nome": "Colagem",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Fotos antigas recortadas à tesoura em meio-tom, coladas em kraft ou jornal, etiquetas de papel rasgado e movimento em stop-motion.",
+   "quando": "você sabia, curiosidade, história, personagem histórico, invenção, arquivo",
+   "nichos": [
+    "curiosidade",
+    "historia",
+    "invenc",
+    "arquivo",
+    "cultura"
+   ],
+   "sinais": [
+    "voce sabia",
+    "curiosidade",
+    "inventou",
+    "invencao",
+    "primeiro",
+    "seculo",
+    "antig",
+    "em 19",
+    "em 18",
+    "jornal",
+    "revista"
+   ],
+   "padroes": {
+    "historico": 1,
+    "pergunta": 1
+   },
+   "cenas": {}
+  },
+  {
+   "id": "linha",
+   "nome": "Linha (um traço só)",
+   "categoria": "marca",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "O filme inteiro é uma linha dourada contínua sobre azul-noite: escreve palavras em cursiva, desenha formas, fecha um monograma que se enche de ouro e assenta num pôster com a marca.",
+   "quando": "marca premium, luxo, arquitetura, imobiliária, joalheria, manifesto curto de 3 ideias, abertura ou fecho institucional",
+   "nichos": [
+    "luxo",
+    "premium",
+    "arquitet",
+    "imobili",
+    "joia",
+    "joalher",
+    "consultor",
+    "escritorio"
+   ],
+   "sinais": [
+    "um traco",
+    "legado",
+    "assinatura",
+    "feito a mao",
+    "desde",
+    "heranca",
+    "essencia",
+    "exclusiv"
+   ],
+   "padroes": {
+    "marca": 2
+   },
+   "cenas": {}
   }
  ],
  "pedidos": [

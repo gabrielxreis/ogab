@@ -1,0 +1,15 @@
+{
+ "_leia": "Tema neutro do preset Colagem (kraft, tinta preta, vermelho construtivista). Marca do cliente: copiar para temas/<marca>.json e trocar acento (cor da marca), tinta, claro e, se quiser, papel (kraft|jornal), kraft/jornal (tons do papel) e fontes (arquivos em kit/fontes/ ou caminho absoluto).",
+ "nome": "Padrão",
+ "papel": "kraft",
+ "tinta": "#16130F",
+ "acento": "#C8261C",
+ "claro": "#F2ECDF",
+ "fita": "#D9C48F",
+ "kraft": "#B9976B",
+ "jornal": "#E6DDC9",
+ "fonte": "Anton",
+ "fonte_arquivo": "fontes/Anton-Regular.ttf",
+ "fonte_pequena": "Courier Prime",
+ "fonte_pequena_arquivo": "fontes/CourierPrime-Bold.ttf"
+}

@@ -87,6 +87,12 @@ if os.name == "nt":
         if t == "vazio":
             vazio = "" if (k.get("text") or k.get("universal_newlines") or k.get("encoding")) else b""
             return _sp.CompletedProcess(args, 1, vazio, vazio)
+        # npx/npm no Windows são .cmd: sem shell o subprocess não acha ("WinError 2"; centro.py preto, 23/10/2026)
+        if isinstance(args, list) and args and str(args[0]).lower() in ("npx", "npm"):
+            import shutil as _sh
+            achado = _sh.which(str(args[0]))
+            if achado:
+                args = [achado] + list(args[1:])
         return _run_original(args, *a, **k)
 
     _sp.run = _run

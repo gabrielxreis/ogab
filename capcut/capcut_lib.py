@@ -715,6 +715,12 @@ class Rascunho:
         s = self.segmento(sid)[1]
         nomes = self.PROPS.get(prop, prop)
         nomes = nomes if isinstance(nomes, tuple) else (nomes,)
+        # O CapCut conta o time_offset no tempo do ARQUIVO (a partir de source_timerange.start, vezes a velocidade),
+        # não do início do clipe na timeline (relato de keyframe gravado pelo app 9.6 no Windows, 24/10/2026). Sem
+        # isso, clipe que não começa no 0 do arquivo fica com os keyframes fora do trecho e o app ignora a animação.
+        # Texto, imagem e clipe do começo do arquivo não mudam (base 0, velocidade 1).
+        src = s.get("source_timerange") or {}
+        base, vel = src.get("start", 0), s.get("speed", 1.0) or 1.0
         for nome in nomes:
             lista = []
             for t, v in chaves:
@@ -722,7 +728,8 @@ class Rascunho:
                 elif prop == "y": v = self._px(None, v)[1]
                 elif prop == "volume": v = 10 ** (v / 20)
                 lista.append({"curveType": "Line", "graphID": "", "id": _id(), "left_control": {"x": 0.0, "y": 0.0},
-                              "right_control": {"x": 0.0, "y": 0.0}, "time_offset": _us(t), "values": [v]})
+                              "right_control": {"x": 0.0, "y": 0.0}, "string_value": "",
+                              "time_offset": base + int(round(_us(t) * vel)), "values": [v]})
             s["common_keyframes"] = [k for k in s["common_keyframes"] if k["property_type"] != nome]
             s["common_keyframes"].append({"id": _id(), "keyframe_list": lista, "material_id": "", "property_type": nome})
         return sid

@@ -158,3 +158,10 @@ Mesma lib e mesma linha de comando; a `capcut_lib` detecta o Windows (`C.WIN`) e
 - **Rascunho criptografado:** a lib recusa com aviso claro se o arquivo não for JSON puro (o Jianying chinês criptografa desde a 6.0; o CapCut internacional não, até onde se sabe em 10/2026). Nesse caso: modo `nenhum` + `previa`.
 - **Testado:** simulação no Mac (criar, salvar, reabrir, registrar na tela inicial, `previa`). **Ainda não aberto num CapCut de Windows de verdade:** no primeiro uso, conferir que o rascunho aparece na tela inicial e abre; se não abrir, olhar se o CapCut gravou algum arquivo novo na pasta do projeto e registrar em docs/PROCESSO.md.
 - `previa`, `conferir`, `plano`, `cortes`, `faz`, `levar` e `davinci_para_capcut.py` rodam iguais (com `PYTHONUTF8=1`, que o `install.ps1` grava).
+
+**Relato de uso real no Windows (24/10/2026, Windows 10 + CapCut 9.6.0, vindo da comunidade):**
+- O rascunho gravado pela lib (versão 181) apareceu como 1a miniatura e o CapCut 9.6 abriu e regravou como 189.0.0 sem perder nada (cortes de MOV 4K com rotação do iPhone, motions MP4/MOV ProRes 4444 com alfa, dezenas de textos e áudios). O app criou sozinho `Timelines/<uuid>/`, `subdraft/`, `template-2.tmp` e `.bak`.
+- `font_size` gravado como 10 voltou como 7.0 depois que o app regravou: conferir a escala do tamanho de texto no 9.6 do Windows antes de confiar no número.
+- Sombra feita no app 9.6 fica só dentro de `content.styles[].shadows` (`alpha`, `distance`, `angle`, `diffuse`, com `useLetterColor: true`); os campos `has_shadow`/`shadow_*` do material ficam no padrão (has_shadow False) e `check_flag` vira 47 mesmo sem contorno. Com o contorno desligado, o app tira o `strokes` do estilo. Para copiar um estilo feito no app, ler esses campos.
+- Keyframe: o `time_offset` conta no tempo do arquivo (a partir de `source_timerange.start`), já tratado em `keyframes()`.
+- Relatado (não confirmado pelo autor): o computer-use do Claude existe no Windows; pedir acesso a `CapCut` e ao processo `capcut.exe`; com a janela minimizada o `open_application` não traz para a frente e o usuário precisa clicar na barra de tarefas.

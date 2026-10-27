@@ -122,5 +122,25 @@ pasta próprios; scripts de montagem não fecham projeto.
 - **Cache de disco cheio = MP4 cortado sem erro.** Antes do render `app.purge(PurgeTarget.ALL_CACHES)`; depois
   contar quadros (`ffprobe -count_frames`). Mover o cache: `app.preferences.savePrefAsString("Disk Cache Controls","Folder 7",...)`.
 - Envato pelo Chrome: escolher 1080p (o 4K ProRes tem ~650 MB).
+- **Achar a linha do erro:** embrulhar o script em `function __x(){...}` e rodar com `$.evalFile` dentro de try (dá a
+  linha real); marcar `ETAPA=n;` entre blocos e gravar uma linha num `.txt` de log a cada etapa (mostra onde travou).
+- `app.importFile` não existe: é `app.project.importFile`.
+- Ternário aninhado (`a?f():b?g():h()`) chegou a chamar duas funções no ExtendScript: usar if/else.
+- **Digitação letra a letra por keyframes de Source Text trava o AE** (~170 chaves = 10+ min sem resposta). Usar uma
+  camada de texto por frase + animador de Opacidade 0 com Range Selector (Start 0 a 100 linear, Smoothness 0).
+- **Comp com centenas de camadas e expressões fica mais lenta a cada camada nova:** montar em pré-comps por seção
+  (fundo, blocos, final) e juntar na principal.
+- **Nome de camada com quebra de linha (`\n`) quebra expressão com `thisComp.layer("nome")`** (o erro só aparece ao
+  recalcular a comp). Filho que segue o null: `parent.transform.opacity`, nunca o nome. Antes de entregar, varrer
+  `expressionError` em todas as comps. `layer("nome com Ç")` falhou pela ponte: achar a camada num loop por regex.
+- Gaussian Blur em camada de FORMA é cortado num retângulo (brilho sai quadrado): mancha/brilho macio = sólido +
+  máscara elíptica com feather grande.
+- `ADBE 4ColorGradient`: a propriedade 1 é o grupo "Positions & Colors" (sem valor). Ponto i = `property(2+2i)`,
+  cor i = `property(3+2i)`, Blend = `property(11)`.
+- **Fill com opacidade 0 apaga a camada inteira** (não volta à cor original). Flash de cor = **Tint** (preto e branco
+  na mesma cor) com "Amount to Tint" 0/100 em Hold.
+- **Noise com "Clip Result Values" desligado** puxa o quadro inteiro para outra cor em 8 bpc: sempre `Noise-0003 = 1`.
+- Roughen Edges: Scale mínimo 10; o tipo Spiky usa a "Edge Color" (padrão marrom): setar a cor para não sair halo.
+- Echo numa camada de pré-comp: operador Composite In Back (5); Add/Blend estoura a cor.
 
 Princípios de animação, ritmo, tokens de motion e o método de recriar referência: `docs/etapas/principios_animacao.md`.

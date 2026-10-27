@@ -272,7 +272,22 @@ _JS_COLOCAR = """
     // Overwrite do ITEM com in point (sem subclipe) cai em tempo + in (relato 3f81261bd5, 20/10/2026: música com
     // de=40 entrou em 40 s): compensa a posição; o subclipe (soVideo) já começa no zero e não precisa.
     const desloc = (fonte === it && c.de) ? c.de : 0;
-    const pos = Math.max(0, c.tempo - desloc);
+    if (c.tempo - desloc < 0) {
+      // de > tempo (ex.: 2º trecho da narração sem silêncio, de=5.36 em 5.2): a compensação daria posição negativa e o
+      // clipe caía no 0 por cima do 1º (Premiere 26.2, sem subclipe). Coloca depois do fim da trilha e MOVE para o tempo.
+      const tr = au >= 0 ? await s.getAudioTrack(au) : await s.getVideoTrack(v);
+      let fimTr = 0; for (const x of tr.getTrackItems(CLIPE, false)) fimTr = Math.max(fimTr, (await x.getEndTime()).seconds);
+      const x0 = fimTr + 1;
+      await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(x0), v, au)]);
+      let novo = null; for (const x of tr.getTrackItems(CLIPE, false)) { const st = (await x.getStartTime()).seconds; if (st >= x0 - 0.05) novo = x; }
+      if (!novo) throw new Error("não achou o clipe colocado depois do fim da trilha");
+      const st = (await novo.getStartTime()).seconds;
+      await tx(p, "Gab: mover " + it.name, () => [novo.createMoveAction(tt(c.tempo - st))]);
+      if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
+      saida.push({ nome: it.name, pedido: c.tempo, caiu: (await novo.getStartTime()).seconds });
+      continue;
+    }
+    const pos = c.tempo - desloc;
     await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(pos), v, au)]);
     if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
     let caiu = null;   // confere onde o clipe entrou (trilha de áudio, ou de vídeo se não tem áudio)
@@ -649,6 +664,28 @@ def lettering_ae(seq, modelo, valores, inicio, trilha=1, pasta=None, cores=None,
     r = lettering(seq, arq, None, inicio, spec["dur"], trilha=trilha)
     r["mogrt"] = arq
     return r
+
+
+def comp_ae(seq, aep, comp, tempo=0.0, trilha=1):
+    """Dynamic Link: importa a comp `comp` do `.aep` (Project.importAEComps da API UXP) no bin Motions e põe na trilha
+    de vídeo `trilha` em `tempo` (s). A comp fica LIGADA ao After: mexeu e salvou no AE, o Premiere atualiza sozinho
+    (sem render). AE e Premiere precisam ser do MESMO ano (ex.: Premiere 25.6 + AE 25.4). Devolve o nome do item."""
+    return js("""
+      const p = await proj(); const s = await seqPorNome(p, args.seq);
+      const b = await bin(p, "Motions");
+      const acha = async () => (await itens(b)).find(i => i.name === args.comp || i.name.startsWith(args.comp + "/"));
+      let it = await acha();
+      if (!it) {
+        const ok = await p.importAEComps(args.aep, [args.comp], b);
+        if (!ok) throw new Error("importAEComps recusou: confira se o .aep está salvo e o AE é do mesmo ano do Premiere");
+        it = await acha();
+      }
+      if (!it) throw new Error("comp importada mas não achada no bin Motions: " + (await itens(b)).map(i => i.name).join(", "));
+      const ed = P.SequenceEditor.getEditor(s);
+      await tx(p, "Gab: Dynamic Link " + it.name, () => [ed.createOverwriteItemAction(it, tt(args.tempo), args.trilha, -1)]);
+      await p.save();
+      return it.name;
+    """, "dynamic link", seq=seq, aep=_abs(aep), comp=comp, tempo=tempo, trilha=trilha)
 
 
 def efeitos_audio():

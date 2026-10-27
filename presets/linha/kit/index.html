@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=%W%, height=%H%" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: "Serifa"; src: url("fonts/EBGaramond-var.ttf"); font-weight: 400 800; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: %W%px; height: %H%px; overflow: hidden; background: #0B1320; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; }
+#sv { position: absolute; inset: 0; }
+#grao { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: soft-light; pointer-events: none; }
+text { font-family: "Serifa", "Cormorant Garamond", Georgia, serif; }
+</style></head><body>
+<div id="root" data-composition-id="linha" data-start="0" data-duration="%DUR%" data-width="%W%" data-height="%H%" data-fps="%FPS%">
+<svg id="sv" width="%W%" height="%H%" viewBox="0 0 %W% %H%" xmlns="http://www.w3.org/2000/svg"></svg>
+<canvas id="grao"></canvas>
+</div>
+<script src="plano.js"></script>
+<script src="linha.js"></script>
+</body></html>

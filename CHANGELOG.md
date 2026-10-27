@@ -1,4 +1,11 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-4 (27/10/2026)
+- **Estilo novo: Colagem.** Fotos antigas recortadas à tesoura em meio-tom, coladas em papel kraft ou jornal, etiquetas de papel rasgado e movimento em stop-motion. Ótimo para "você sabia", curiosidade histórica, invenção e personagem. Peça "no estilo colagem" ou marque **Colagem** no passo de estilo do `/ogab menu`.
+- **Estilo novo: Linha.** O vídeo inteiro é uma linha dourada fina e contínua: escreve as palavras em cursiva, desenha formas (casa, árvore, coroa, chave), fecha o monograma da marca e termina num pôster. Para marca premium, luxo, arquitetura e manifesto curto. Peça "no estilo linha" ou marque **Linha** no menu.
+- **Launch:** fundo na cor escura da sua marca (`"fundo"` no plano), camada animada própria por cima (`"extra"`) e tela vazia para mostrar uma interface viva no lugar do print.
+- **Premiere:** o trecho de narração que começava antes do ponto de entrada não cai mais no 0 por cima do anterior (Premiere 26.2). Novo: pôr uma composição do After Effects direto na sequência, sem render (ainda em teste).
+- **CapCut:** animação por keyframe em clipe aparado no começo agora acontece no trecho certo.
+- **Windows:** comandos `npx` não falham mais com "WinError 2". Envato: uma aba por download (ele travava depois de 2). After Effects: 12 armadilhas novas documentadas.
 ## 2026.10.27-2 (27/10/2026)
 - **Lúdico com 27 cenários novos:** bola que despenca e quica, bússola, cofre, escudo, placa de estrada, celular com o botão seguir, setas, moeda, martelo, ímã, dominó, escada, leilão, sismógrafo, cartão, foguete, chip de IA, planta, dado, urna, alvo, balão, ponte, pilha de moedas, casa, carnê e torneira. O Gab escolhe pelo sentido da frase e continua inventando cenas novas quando nenhum serve.
 ## 2026.10.27-3 (27/10/2026)

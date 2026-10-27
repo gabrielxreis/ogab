@@ -1,0 +1,6 @@
+{
+ "_leia": "Tema padrão do preset Linha: linha champanhe sobre azul-noite (premium). Marca do cliente: copiar para temas/<marca>.json e trocar as cores (fundo = cor de fundo da marca, linha = cor de destaque/metal da marca, texto = cor da marca escrita no fecho). Só cores do material do cliente.",
+ "nome": "Padrão (champanhe sobre azul-noite)",
+ "cores": {"fundo": "#0B1320", "linha": "#E9D7A5", "texto": "#EFE3C2"},
+ "grao": 0.07
+}

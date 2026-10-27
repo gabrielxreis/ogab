@@ -6,14 +6,15 @@ uma ideia por cena, revelações longas que freiam no fim, produto flutuando em 
 plano.json: { "w": 1080, "h": 1920, "fps": 60, "cor": "#C4A34F" (destaque), "cor2": "#F2E2B3" (luz do destaque),
   "letra": "apple" (padrão: Inter Tight pesada, branca, centralizada) | "editorial" (à esquerda, destaque em serifa itálica)
            | "cinema" (tudo em serifa grande, destaque em itálico),
-  "fonte": "Inter Tight" (padrão; troque só se a marca exigir), "batida": {bpm, inicio, cada, forca} (pulso das cenas a cada compasso), "marca": { "nome", "dominio", "logo" (png/svg) }, "cenas": [ ... ] }
+  "fonte": "Inter Tight" (padrão; troque só se a marca exigir), "batida": {bpm, inicio, cada, forca} (pulso das cenas a cada compasso), "marca": { "nome", "dominio", "logo" (png/svg) },
+  "fundo": "#000" (cor escura da marca no lugar do preto), "extra": ["camada.js", "camada.css"] (BG animado/interfaces vivas pelo gancho window.LAUNCH_EXTRA), "cenas": [ ... ] }
 Campos comuns da cena: tipo, dur (s), luz (true = faixa de luz atravessa na saída da cena),
   flutuantes [imagens] (cartões nas bordas, atrás do texto, com paralaxe: cena de texto mais viva).
 Texto: "*palavra*" = degradê metálico na cor da marca; "|" = quebra de linha. Frases curtas (2-4 palavras por linha).
 Tipos:
   gancho    texto ("||" = próxima batida: a frase sai e a seguinte entra, uma ideia por vez), olho, sub, tam
   logo      nome, frase, logo (padrão: o da marca; sem logo vira monograma), tamLogo, tamFrase
-  tela      imagem (print: desktop.png/celular.png do capturar.py; com quadros, é o reflexo), quadros [jpgs em sequência que
+  tela      imagem (print: desktop.png/celular.png do capturar.py; com quadros, é o reflexo; sem imagem nem quadros = vidro vazio para a interface viva do "extra"), quadros [jpgs em sequência que
             tocam dentro do painel] + fpsQuadros (12) + inicioQuadros (s), moldura navegador|celular, titulo, sub, url,
             proporcao (altura/largura do print; o gerar.py mede sozinho), foco [{y 0-1 do rolar, zoom}]
   lista     olho, itens ["Método.", {t, d}] (um de cada vez, grande; 3 é o ideal), tam, cada e inicio (s; itens na batida)
@@ -84,12 +85,24 @@ def gerar(plano, pasta, base):
     extra, fontes = "", []
     if plano.get("fonte") and plano["fonte"] not in ("Inter", "Inter Tight"):
         fontes.append(plano["fonte"]); extra += '#root { font-family: "%s", "Inter", sans-serif; }\n' % plano["fonte"]
+    # Fundo na cor escura da marca (ex.: "#02171c"); o padrão é preto. Escuro demais vira "quadro preto" no revisor.
+    if plano.get("fundo"):
+        extra += "html, body, #root, #fundo { background: %s; }\n" % plano["fundo"]
     open(os.path.join(pasta, "launch.css"), "w").write(css + "\n" + extra)
     html = open(os.path.join(K, "index.html")).read()
     if fontes:
         fam = "&".join("family=" + f.replace(" ", "+") + ":wght@300;400;500;600;700" for f in fontes)
         html = html.replace("<link rel=\"stylesheet\" href=\"launch.css\">",
                             '<link href="https://fonts.googleapis.com/css2?%s&display=block" rel="stylesheet">\n<link rel="stylesheet" href="launch.css">' % fam)
+    # "extra": [".js"/".css" do projeto] = camada própria (BG animado, interfaces vivas) que entra ANTES do launch.js e
+    # recebe a timeline pelo gancho window.LAUNCH_EXTRA (ver o fim do kit/launch.js).
+    for arq in plano.get("extra", []):
+        orig = arq if os.path.isabs(arq) else os.path.join(base, arq); nome = os.path.basename(orig)
+        shutil.copy(orig, os.path.join(pasta, nome))
+        if nome.endswith(".css"):
+            html = html.replace('<link rel="stylesheet" href="launch.css">', '<link rel="stylesheet" href="launch.css">\n<link rel="stylesheet" href="%s">' % nome)
+        else:
+            html = html.replace('<script src="launch.js"></script>', '<script src="%s"></script>\n<script src="launch.js"></script>' % nome)
     for a, b2 in (("%W%", plano["w"]), ("%H%", plano["h"]), ("%FPS%", plano["fps"]), ("%DUR%", dur)): html = html.replace(a, str(b2))
     if videos: html = html.replace('<div id="luz">', "\n".join(videos) + '\n<div id="luz">', 1)
     open(os.path.join(pasta, "index.html"), "w").write(html)

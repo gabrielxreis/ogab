@@ -1,0 +1,8 @@
+{ "formato": "vertical", "fps": 30,
+  "_leia": "Exemplo do preset Linha: marca fictícia (Aurum Arquitetura), sem fala. Com narração: 'em' de cada cena = segundo da palavra.",
+  "cenas": [
+    {"forma": "broto",  "palavra": "um traço",  "dur": 2.4},
+    {"forma": "casa",   "palavra": "uma casa",  "dur": 2.4},
+    {"forma": "arvore", "palavra": "um legado", "dur": 2.4},
+    {"tipo": "fecho", "inicial": "A", "marca": "Aurum", "frase": "arquitetura que atravessa gerações", "dur": 4.8}
+  ] }
