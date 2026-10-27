@@ -709,6 +709,9 @@ EXT_INVENCAO = (".py", ".js", ".mjs", ".css", ".html", ".md", ".json", ".sh", ".
 FORA_INVENCAO = ("presets/", "biblioteca_motions_local/", "clientes/", "assets/", "biblioteca_sfx/", "config.json",
                  "relatos/destino.json", "voz_local/modelos/")
 MIN_LINHAS_INVENCAO = 6   # menos que isso é ajuste, não invenção
+# pasta de temporário (scripts gerados na hora, com conteúdo de cliente) nunca é invenção (relato de 27/10/2026)
+TEMP_INVENCAO = re.compile(r"(^|/)(_?tmp|_?temp|_?cache)(/|$)|\.parcial$", re.I)
+RELEASE_LOCAL = os.path.expanduser("~/.claude/ogab_release_local.json")
 
 
 def _git(*args):
@@ -716,11 +719,32 @@ def _git(*args):
     return r.stdout if r.returncode == 0 else ""
 
 
+def _do_release():
+    """{caminho: sha256} que o update pelo servidor (atualizar.py) gravou. Quem atualiza pelo servidor fica com o git
+    parado na versão da instalação: sem isto, o próprio update oficial aparecia como "invenção" do usuário."""
+    try:
+        return json.load(open(RELEASE_LOCAL, encoding="utf-8")).get(SKILL, {})
+    except Exception:
+        return {}
+
+
+def _oficial(rel, release):
+    """O arquivo está igual ao do release oficial (não foi o usuário que mudou)."""
+    sha = release.get(rel)
+    if not sha:
+        return False
+    try:
+        return hashlib.sha256(open(os.path.join(SKILL, rel), "rb").read()).hexdigest() == sha
+    except Exception:
+        return False
+
+
 def _blocos_invencao():
     """[(rótulo, texto)] do que este usuário mudou ou criou na skill (fora presets, que vão pelo varrer de motions)."""
-    blocos = []
+    blocos, release = [], _do_release()
     for rel in sorted(_git("ls-files", "--others", "--exclude-standard").splitlines()):
-        if rel.startswith(FORA_INVENCAO) or not rel.endswith(EXT_INVENCAO) or "__pycache__" in rel:
+        if rel.startswith(FORA_INVENCAO) or not rel.endswith(EXT_INVENCAO) or "__pycache__" in rel \
+                or TEMP_INVENCAO.search(rel) or _oficial(rel, release):
             continue
         f = os.path.join(SKILL, rel)
         if os.path.getsize(f) > 200_000:
@@ -730,7 +754,9 @@ def _blocos_invencao():
         except Exception:
             pass
     fora = [f":(exclude){x}*" if x.endswith("/") else f":(exclude){x}" for x in FORA_INVENCAO]
-    d = _git("diff", "HEAD", "--", ".", *fora)
+    mudados = [r for r in _git("diff", "HEAD", "--name-only", "--", ".", *fora).splitlines()
+               if r and not TEMP_INVENCAO.search(r) and not _oficial(r, release)]
+    d = _git("diff", "HEAD", "--", *mudados) if mudados else ""
     if d.strip():
         blocos.append(("melhorias nos arquivos da skill (git diff)", d))
     for linha in _git("stash", "list").splitlines():   # o doctor guarda as mudanças locais antes do update
