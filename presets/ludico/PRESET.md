@@ -169,6 +169,9 @@ Referência: instagram.com/p/De56numApif (Ludificando, 22 s), medida quadro a qu
   `"manchete": "A *IA*:"` = título bold, palavra entre asteriscos na cor (não confundir com `titulo`, que é o texto 3D de placar/câmbio/cartão/urna).
   `"chips": [{"texto": "PESQUISOU", "em": 4.1}, ...]` = pílulas na cor que vão se SOMANDO.
   `"continua": true` = a cena segue a ideia da anterior: o cartão fica e só ganha os chips/tópicos novos (o "A IA: PESQUISOU > ESCREVEU > NARROU > MONTOU EM 3D" da referência).
+- **Glow (bloom):** feito em 1/4 da resolução, com o preto do limiar virando transparência e o halo somado só como luz. NÃO usar `mix-blend-mode` (o render do HyperFrames ignora e o quadro escurece). `"brilho": 0.3`.
+- **`continua` também no 3D:** a cena que continua a ideia fica no MESMO cenário (sem viagem de câmera) e o cenário evolui com os campos da continuação. Réplica fiel da referência: cenário `mesa` (monitor com play aceso, monte de moedas douradas que chovem e empilham, teclas com ícone que acendem em fases: `"acesas"`, `"acende_em"`, `"teclas"`, `"pilhas"`). Plano de teste: 3 cenas "A IA: PESQUISOU > ESCREVEU, NARROU > MONTOU EM 3D" com `continua`.
+- Conferir quadros: o PRIMEIRO quadro de um `snapshot` às vezes sai antes da cena carregar; pedir um tempo descartável primeiro (`--at 0.05,...`) ou conferir no MP4.
 - As outras luzes (`contraluz`, `neon`, `janela`, `feixes`, `grade`, `cone`) ficam para quando a frase pedir: `"luz": "<estilo>"` na cena ou `"luzes": [...]` no plano.
 - Marca de cliente: o tema dela troca as cores (fundo, objetos, destaque); a luz, a montagem e o cartão continuam os da referência.
 - Ao criar cenário novo, pensar como a referência: o cenário **acumula** entre frases da mesma ideia (o monitor fica, chegam as moedas, depois o teclado, depois o celular na frente), chuva de objetos que empilham, e um campo de peças acesas desfocadas ao fundo para dar densidade.

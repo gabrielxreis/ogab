@@ -14,8 +14,8 @@
   const tl = gsap.timeline({ paused: true });
   { // fundo infinito do estilo "estudio" (referência Ludificando): grafite com um leve clarão atrás do assunto, pintado no
     // #root; o canvas 3D fica transparente nessas cenas e só desenha objetos e sombras por cima
-    const F = Object.assign({ fundo: "#0c0c0c" }, P.tema3d || {}), cl = new THREE.Color(F.fundo).lerp(new THREE.Color(F.fundo_luz || "#ffffff"), F.fundo_luz ? .25 : .075);
-    root.style.background = `radial-gradient(ellipse 90% 46% at 50% 56%, #${cl.getHexString()} 0%, ${F.fundo} 64%, ${F.fundo_base || F.fundo} 100%)`; }
+    const F = Object.assign({ fundo: "#0c0c0c" }, P.tema3d || {}), cl = new THREE.Color(F.fundo).lerp(new THREE.Color(F.fundo_luz || "#ffffff"), F.fundo_luz ? .1 : .075);
+    root.style.background = `radial-gradient(ellipse 110% 58% at 50% 50%, #${cl.getHexString()} 0%, ${F.fundo} 64%, ${F.fundo_base || F.fundo} 100%)`; }
   const mk = (tag, cls, pai, css) => { const e = document.createElement(tag); if (cls) e.className = cls; if (css) Object.assign(e.style, css); if (pai) pai.appendChild(e); return e; };
   const px = v => (v * U).toFixed(2) + "px";
   const D2R = Math.PI / 180, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -29,7 +29,7 @@
   // ---------- qual linguagem cada cena usa ----------
   const TIPOS3D = new Set(["palco", "disjuntor", "barras", "blocos", "placas", "duelo", "grafico", "pregao", "elevador", "placar", "calculadora",
     "barco", "skyline", "cesta", "relogios", "gangorra", "semaforo", "balanca", "cambio", "termometro", "carrinho", "luneta",
-    "quique", "bussola", "cofre", "escudo", "bifurcacao", "seguir", "setas", "moeda", "martelo", "ima", "domino", "escada", "leilao", "sismografo", "cartao", "foguete", "chip", "planta", "dado", "urna", "alvo", "balao", "ponte", "pilha", "casa", "carne", "torneira", "instagram"]);
+    "quique", "bussola", "cofre", "escudo", "bifurcacao", "seguir", "setas", "moeda", "martelo", "ima", "domino", "escada", "leilao", "sismografo", "cartao", "foguete", "chip", "planta", "dado", "urna", "alvo", "balao", "ponte", "pilha", "casa", "carne", "torneira", "instagram", "mesa"]);
   cenas.forEach(c => { c._3d = TIPOS3D.has(c.tipo) || (c.tipo === "cta" && !!c.cenario && c.cenario !== "globo"); });
   // cena sem globo herda o foco do globo mais perto (a câmera do globo não gira à toa na volta)
   { let ult = null; cenas.forEach(c => { if (!c._3d && c.foco) ult = c.foco; else if (!c.foco) c._foco = ult; });
@@ -296,7 +296,9 @@
       const gola = new T.Mesh(new T.TorusGeometry(.2, .05, 10, 28), mCab); gola.rotation.x = Math.PI / 2; gola.position.y = 1.36; b.add(gola);
       const cab = new T.Mesh(new T.SphereGeometry(.34, 32, 24), mCab); cab.position.y = 1.72; cab.castShadow = true; b.add(cab);
       [-1, 1].forEach(sd => { const br = new T.Mesh(new T.CapsuleGeometry(.09, .5, 6, 12), mCorpo); br.position.set(sd * .43, .86, 0); br.rotation.z = sd * .18; br.castShadow = true; b.add(br);
-        const mao = new T.Mesh(new T.SphereGeometry(.1, 16, 12), mCab); mao.position.set(sd * .5, .55, 0); b.add(mao); });
+        const mao = new T.Mesh(new T.SphereGeometry(.1, 16, 12), mCab); mao.position.set(sd * .5, .55, 0); b.add(mao);
+        b.userData[sd > 0 ? "direito" : "esquerdo"] = { br, mao }; });   // cena que precisa do braço (luneta) reposiciona
+      b.userData.mCorpo = mCorpo; b.userData.mCab = mCab;
       [-1, 1].forEach(sd => { const ol = new T.Mesh(new T.SphereGeometry(.045, 12, 8), new T.MeshBasicMaterial({ color: "#1a1420" })); ol.position.set(sd * .12, 1.76, .31); b.add(ol); });
       const base = cil(.42, .46, .08, new T.MeshStandardMaterial({ color: T3.cinza, roughness: .6 }), 28); base.position.y = .04; b.add(base);
       return b;
@@ -313,6 +315,10 @@
     const cenas3d = [];   // {c, grupo, origem, upd(t), pose}
     let slot = 0;
     cenas.forEach((c, i) => { if (!c._3d) return;
+      // "continua": true = mesma ideia da frase anterior (referência: o monitor fica e só acende mais uma tecla): a câmera
+      // fica no MESMO cenário, sem viagem; o cenário lê os campos da continuação (ex.: mesa > "acesas", "acende_em")
+      if (c.continua && i > 0 && cenas[i - 1]._3d) { const ant = cenas3d.find(x => x.i === i - 1);
+        if (ant) { cenas3d.push(Object.assign({}, ant, { i, cont: true, monta: null, fx: null, upd: () => {} })); return; } }   // o original já monta e anima
       const grupo = new T.Group(), O = new T.Vector3(slot * 46, 0, -(slot % 2) * 8);
       grupo.userData.estilo = c.luz || (P.luzes ? P.luzes[slot % P.luzes.length] : ESTILOS_LUZ[slot % ESTILOS_LUZ.length]); slot++;
       grupo.position.copy(O); sc.add(grupo);
@@ -711,12 +717,25 @@
       } else if (c.tipo === "luneta") {
         // o mentor de luneta: olha para o que o mercado espera (o futuro), não só para o que aconteceu
         holofote(grupo, -.5, 0, 1.2);
-        const bo = boneco(); bo.position.set(-.75, 0, 0); bo.rotation.y = .5; grupo.add(bo);
-        const lun = cil(.09, .15, 1.2, mAcesa(), 16); lun.position.set(-.2, 1.95, .1); lun.rotation.z = -1.15; grupo.add(lun);
-        const alvoG = new T.Group(); alvoG.position.set(1.3, 3.1, -.3); grupo.add(alvoG);
+        // personagem em 3/4 com a luneta NO OLHO, segura pela mão direita, apontando de verdade para a placa (27/10/2026:
+        // a luneta antiga atravessava o rosto do personagem novo)
+        const bo = boneco(); bo.position.set(-.85, 0, .2); bo.rotation.y = .75; grupo.add(bo); grupo.updateMatrixWorld(true);
+        const V3 = (x, y, z) => new T.Vector3(x, y, z);
+        const alvoG = new T.Group(); alvoG.position.set(1.15, 2.85, -.2); grupo.add(alvoG);
         const pl = placaTexto([{ t: c.alvo || "O QUE ESPERA", tam: .16, cor: "#1a1420", mono: true }, { t: "?", tam: .36, cor: "#1a1420" }], 2.1, .9, COR); alvoG.add(pl);
-        const raio = new T.Mesh(new T.ConeGeometry(.75, 2.3, 24, 1, true), new T.MeshBasicMaterial({ color: T3.cone || COR, transparent: true, opacity: .12, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false }));
-        raio.position.set(.55, 2.55, -.1); raio.rotation.z = Math.PI / 2 + .42; grupo.add(raio);
+        const olho = grupo.worldToLocal(bo.localToWorld(V3(.08, 1.74, .3))), dir = alvoG.position.clone().sub(olho).normalize();
+        const lunG = new T.CylinderGeometry(.08, .14, 1.0, 20); lunG.rotateX(Math.PI / 2); lunG.translate(0, 0, .5);   // eixo em +z, base no olho
+        const lun = new T.Mesh(lunG, mAcesa()); lun.castShadow = true; lun.position.copy(olho); lun.lookAt(grupo.localToWorld(alvoG.position.clone())); grupo.add(lun);
+        const anel = new T.Mesh(new T.TorusGeometry(.15, .025, 8, 24), mObj); anel.position.copy(olho.clone().addScaledVector(dir, .98)); anel.lookAt(grupo.localToWorld(alvoG.position.clone())); grupo.add(anel);
+        { const D = bo.userData.direito; D.br.visible = false; D.mao.visible = false;   // braço direito sobe até a luneta
+          const ombro = grupo.worldToLocal(bo.localToWorld(V3(.4, 1.22, 0))), mao = olho.clone().addScaledVector(dir, .55).add(V3(0, -.12, 0));
+          const meio = ombro.clone().add(mao).multiplyScalar(.5), eixo = mao.clone().sub(ombro);
+          const br = new T.Mesh(new T.CapsuleGeometry(.09, Math.max(.1, eixo.length() - .18), 6, 12), bo.userData.mCorpo); br.position.copy(meio);
+          br.quaternion.setFromUnitVectors(V3(0, 1, 0), eixo.normalize()); br.castShadow = true; grupo.add(br);
+          const m2 = new T.Mesh(new T.SphereGeometry(.1, 16, 12), bo.userData.mCab); m2.position.copy(mao); grupo.add(m2); }
+        const ponta = olho.clone().addScaledVector(dir, 1.0), dist = alvoG.position.distanceTo(ponta);
+        const raio = new T.Mesh(new T.ConeGeometry(.6, dist, 24, 1, true), new T.MeshBasicMaterial({ color: T3.cone || COR, transparent: true, opacity: .12, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false }));
+        raio.position.copy(ponta.clone().addScaledVector(dir, dist / 2)); raio.quaternion.setFromUnitVectors(V3(0, 1, 0), dir.clone().negate()); raio.userData.deco = true; grupo.add(raio);
         const tE = em(c.em, 1);
         item.pose = { pos: [.25, 2.4, 9.4], alvo: [.25, 2.1, 0] };
         item.upd = t => { const k = eout(prog(t, tE, .6)); raio.material.opacity = .14 * k; pl.material.opacity = .25 + .75 * k; alvoG.scale.setScalar(.85 + .15 * k + .02 * Math.sin(t * 3)); };
@@ -1048,6 +1067,33 @@
         const tE = em(c.em, 1), tF = c.fim_em ?? tE + 3;
         item.pose = { pos: [0, 2.6, 9.6], alvo: [0, 1.4, 0] };
         item.upd = t => { const a = eio(prog(t, tE, tF - tE)); bo.position.set(-2.0 + 4.0 * a, 1.2 + Math.abs(Math.sin(a * 18)) * .05, 0); bo.rotation.y = Math.PI / 2 * (a > 0 && a < 1 ? 1 : .3); };
+      } else if (c.tipo === "mesa") {
+        // réplica da cena da referência Ludificando: monitor com play aceso sobre a base, monte de moedas douradas que
+        // chovem e empilham, fileira de teclas com ícone; as últimas "acesas" teclas acendem na palavra (acende_em)
+        holofote(grupo, 0, .3, 2.6);
+        const mOuro = new T.MeshStandardMaterial({ color: T3.ouro || "#D6B46C", roughness: .42, metalness: .25 });
+        const dx = -.35, base = caixa(2.7, .95, 1.55, mObj, dx, .475, 0); grupo.add(base);
+        const mon = new T.Group(); mon.position.set(dx, 0, -.05); grupo.add(mon);
+        mon.add(caixa(.62, .06, .38, mEsc, 0, .98, 0), caixa(.09, .55, .09, mEsc, 0, 1.25, -.02));
+        const tela = caixa(2.25, 1.3, .12, mObj, 0, 2.05, -.05); mon.add(tela);
+        const tri = new T.Shape(); tri.moveTo(-.2, -.25); tri.lineTo(.3, 0); tri.lineTo(-.2, .25); tri.closePath();
+        const play = new T.Mesh(new T.ShapeGeometry(tri), mAcesa()); play.position.set(0, 2.05, .02); mon.add(play);
+        const moedas = []; const pilhas = c.pilhas || [[2.35, -.35, 17], [1.85, -.1, 12], [2.85, -.05, 12], [2.3, .25, 10], [1.75, .45, 7], [2.85, .5, 7], [3.25, -.4, 9], [1.9, -.75, 9], [2.75, -.8, 11], [2.3, .75, 4], [3.3, .3, 5], [1.45, .1, 5]];
+        pilhas.forEach(([px, pz, h], k) => { for (let j = 0; j < h; j++) { const m = cil(.3, .3, .085, mOuro, 28); grupo.add(m); moedas.push({ m, x: px + dx, z: pz, y: .045 + j * .09, ord: k * 2 + j }); } });
+        moedas.forEach(o => { o.m.userData.luz = true; });   // a chuva já é a entrada das moedas (fora da montagem)
+        const nT = c.teclas || 7, acesas = c.acesas ?? 2, teclas = [];
+        for (let k = 0; k < nT; k++) { const x = dx - 2.1 + k * .72;
+          const tc = caixa(.6, .34, .6, mEsc, x, .17, 1.45); grupo.add(tc);
+          const ic = caixa(.3, .13, .2, new T.MeshStandardMaterial({ color: "#ffffff", emissive: new T.Color("#ffffff"), emissiveIntensity: .9 }), x, .41, 1.45); grupo.add(ic);
+          teclas.push({ tc }); }
+        const mOn = mAcesa(); if (P.acesos !== false) { mOn.userData.aceso = true; mOn.toneMapped = false; mOn.emissiveIntensity = 1.02; mOn.color = corA.clone().multiplyScalar(.18); }
+        const tChuva = em(c.em, .35), fases = [{ n: acesas, t: em(c.acende_em, 1.6) }];
+        for (let j = i + 1; cenas[j] && cenas[j].continua; j++) fases.push({ n: cenas[j].acesas ?? fases[fases.length - 1].n, t: cenas[j].acende_em ?? cenas[j].de + .6 });
+        const acesasEm = t => fases.reduce((n, f) => t >= f.t ? Math.max(n, f.n) : n, 0);
+        item.pose = { pos: [0, 3.0, 9.2], alvo: [.15, 1.0, .5] };
+        item.upd = t => { moedas.forEach(o => { const a = prog(t, tChuva + o.ord * .045, .5); o.m.visible = a > 0;
+            o.m.position.set(o.x + .02 * Math.sin(o.ord), o.y + 4.2 * (1 - a * a) , o.z); o.m.rotation.set(.6 * (1 - a), o.ord, .4 * (1 - a)); });
+          const na = acesasEm(t); teclas.forEach((o, k) => { o.tc.material = k >= nT - na ? mOn : mEsc; }); };
       } else if (c.tipo === "pilha") {
         // pilha de moedas que cresce (construir aos poucos); rotulo3d na placa da base
         holofote(grupo, 0, 0, 1.5);
@@ -1198,7 +1244,9 @@
         grupo.traverse(o => { if (!o.isMesh || !o.visible || o.userData.deco) return;
           if (!(o.material && o.material.isMeshStandardMaterial) && !o.userData.rotulo) return; tmp.setFromObject(o); if (isFinite(tmp.min.x)) box.union(tmp); });
         if (!box.isEmpty()) { const ctr = box.getCenter(new T.Vector3()).sub(O), sz = box.getSize(new T.Vector3());
-          const dist = Math.max(Math.max(sz.y, .9) * 2.7, Math.max(sz.x, .9) * 3.3, 4.4) / (c.zoom3d || 1);
+          // estilo "estudio": proporção medida na referência (cenário ~72% da largura e no máximo ~36% da altura)
+          const dist = (grupo.userData.estilo === "estudio" ? Math.max(Math.max(sz.y, .9) * 3.7, Math.max(sz.x, .9) * 3.3, 4.4)
+            : Math.max(Math.max(sz.y, .9) * 2.7, Math.max(sz.x, .9) * 3.3, 4.4)) / (c.zoom3d || 1);
           item.pose = { pos: [ctr.x, ctr.y + dist * .2, ctr.z + dist].map((v, k) => k === 2 ? ctr.z + dist / DIST : k === 1 ? ctr.y + dist * .2 / DIST : ctr.x), alvo: [ctr.x, ctr.y, ctr.z] }; }
       }
       // MONTAGEM (referência Ludificando): as peças do cenário nascem pequenas e crescem passando do ponto, da esquerda
@@ -1216,7 +1264,7 @@
     if (P.acesos !== false) sc.traverse(o => { const m = o.isMesh && o.material; if (!m || !m.isMeshStandardMaterial || m.userData.aceso) return;
       const perto = cc => cc && Math.abs(cc.r - corA.r) + Math.abs(cc.g - corA.g) + Math.abs(cc.b - corA.b) < .12;
       if (!perto(m.color) && !(perto(m.emissive) && m.emissiveIntensity > .2)) return;
-      m.userData.aceso = true; m.toneMapped = false; m.emissive = corA.clone(); m.emissiveIntensity = .78; m.color = corA.clone().multiplyScalar(.22); m.needsUpdate = true; });
+      m.userData.aceso = true; m.toneMapped = false; m.emissive = corA.clone(); m.emissiveIntensity = m.emissiveIntensity === 0 ? 0 : 1.02; m.color = corA.clone().multiplyScalar(.18); m.needsUpdate = true; });
     // placas: postes com cartaz que sobem do chão na palavra (até 4 lado a lado)
     function montaPlacas(grupo, lista, dx, em) {
       const n = lista.length, esp = 2.15, x0 = dx + (dx ? 0 : -(n - 1) * esp / 2);
@@ -1234,7 +1282,7 @@
     }
     const V = (a, O) => new T.Vector3(a[0] + O.x, a[1] + O.y, a[2] + O.z);
     function poseEm(t, item) {   // pose da cena com deriva lenta (órbita) e respiração
-      const dt = Math.max(0, t - item.c.de), p = item.pose, lado = item.i % 2 ? -1 : 1, ang = lado * (item.c.orbita ?? .06) * dt;
+      const dt = Math.max(0, t - item.c.de), p = item.pose, lado = item.i % 2 ? -1 : 1, ang = lado * (item.c.orbita ?? (item.grupo.userData.estilo === "estudio" ? .012 : .06)) * dt;   // estúdio: quase de frente, como a referência
       const pos = V(p.pos, item.O), alvo = V(p.alvo, item.O), d = pos.clone().sub(alvo);
       d.applyAxisAngle(new T.Vector3(0, 1, 0), ang); d.multiplyScalar(DIST * Math.max(.75, 1 - (item.c.aproxima ?? .022) * dt) * (1 - .055 * kickEm(t)));
       d.y += .18 * Math.sin(dt * .55);
@@ -1249,7 +1297,7 @@
         const lista = (it.grupo.userData.luzes || []).map(l => [it.grupo, l]).concat(em && ant ? (ant.grupo.userData.luzes || []).map(l => [ant.grupo, l]) : []);
         luzes(lista.slice(0, POOL.length)); }
       let { pos, alvo } = poseEm(t, it);
-      if (it.i === i && i > 0) { const k = eio(prog(t, c.de, TRANS)), ant = cenas3d.find(x => x.i === i - 1);
+      if (it.i === i && i > 0 && !it.cont) { const k = eio(prog(t, c.de, TRANS)), ant = cenas3d.find(x => x.i === i - 1);
         let p0, a0;
         if (ant) { const q = poseEm(c.de, ant); p0 = q.pos; a0 = q.alvo; }
         else { a0 = alvo.clone(); p0 = pos.clone().add(new T.Vector3(1.5, 2.2, 6)); }   // vindo do globo: entra de longe
@@ -1259,18 +1307,19 @@
         // neutro (sem roxo no chão), quase nenhum recorte colorido, lente longa de foto de produto. Mistura na troca de cena.
         const suave = x => x && x.grupo.userData.estilo === "estudio" ? 1 : 0, ant = cenas3d.find(x => x.i === it.i - 1);
         const k = it.i === i && i > 0 && ant ? eio(prog(t, c.de, TRANS)) : 1, s = suave(ant) * (1 - k) + suave(it) * k;
-        chao.material = s > .5 ? chaoSombra : chaoPalco; ren.setClearColor(T3.fundo, s > .5 ? 0 : 1);
+        chao.material = s > .5 ? chaoSombra : chaoPalco; sc.fog.near = 30 + 200 * s; sc.fog.far = 75 + 400 * s;   // fundo infinito: sem neblina
+        ren.setClearColor(T3.fundo, s > .5 ? 0 : 1);
         hemi.intensity = 1.25 - .45 * s; hemi.groundColor.copy(CHAO_PALCO).lerp(CHAO_ESTUDIO, s);
-        dirL.intensity = 1.0 + 2.4 * s; preench.intensity = .35 + .45 * s; recorte.intensity = 1.6 - 1.3 * s;
+        dirL.intensity = 1.0 + 1.1 * s; preench.intensity = .35 + .45 * s; recorte.intensity = 1.6 - 1.3 * s;
         const fov = 38 - (38 - (P.lente ?? 22)) * s; if (Math.abs(cam.fov - fov) > .01) { cam.fov = fov; cam.updateProjectionMatrix(); }
         // composição medida na referência: o cenário ocupa ~60% da largura (folga), fica no MEIO da tela entre o cartão e a
         // legenda (desce = 0) e a câmera olha de cima, ~26°, mostrando o topo das peças (elevacao)
-        const afasta = Math.tan(19 * D2R) / Math.tan(fov / 2 * D2R) * (1 + (P.folga ?? .8) * s);   // lente longa: recua para o enquadramento ficar igual
+        const afasta = Math.tan(19 * D2R) / Math.tan(fov / 2 * D2R) * (1 + (P.folga ?? 0) * s);   // lente longa: recua para o enquadramento ficar igual
         const d = pos.clone().sub(alvo).multiplyScalar(afasta), L = d.length(), el0 = Math.asin(clamp(d.y / L, -1, 1));
         const el = el0 + Math.max(0, (P.elevacao ?? 26) * D2R - el0) * s, hz = Math.hypot(d.x, d.z) || 1;
         d.set(d.x / hz * L * Math.cos(el), L * Math.sin(el), d.z / hz * L * Math.cos(el));
         cam.position.copy(alvo.clone().add(d)); cam.lookAt(alvo);
-        const desce = (P.estudio_desce ?? .1) * (1 - s) + (P.estudio_desce_ref ?? -.01) * s;
+        const desce = (P.estudio_desce ?? .1) * (1 - s) + (P.estudio_desce_ref ?? -.045) * s;
         if (cam.view && Math.abs(cam.view.offsetY + H * desce) > .5) cam.setViewOffset(W, H, 0, -H * desce, W, H); }
       const salvos = [];
       cenas3d.forEach(x => (x.monta || []).forEach(m => { const k = prog(t, m.t0, .85); if (k >= 1) return;
@@ -1283,6 +1332,7 @@
   }
 
   // ---------- quadro: globo, estúdio e poeira por cima ----------
+  let BLOOM = null, CV_BRILHO = null;
   function desenha(t) {
     const ag = alfaGlobo(t), cam = camEm(t); cam.zoom *= 1 + .035 * kickEm(t);
     if (ag > 0) desenhaGlobo(t, cam); else g.clearRect(0, 0, W, H);
@@ -1291,8 +1341,25 @@
     gp2.setTransform(1, 0, 0, 1, 0, 0); gp2.clearRect(0, 0, W, H);
     // brilho (bloom) da referência: só o que é aceso (amarelo, telas, teclas) vaza luz em volta. brightness+contrast
     // funciona como limiar (o cinza-argila vira preto e não soma nada); "brilho": 0 no plano desliga.
-    if (E3 && ag < 1 && (P.brilho ?? .4) > 0) { gp2.save(); gp2.globalCompositeOperation = "lighter"; gp2.globalAlpha = (P.brilho ?? .4) * (1 - ag);
-      gp2.filter = `brightness(.5) contrast(7) blur(${(30 * U).toFixed(1)}px)`; gp2.drawImage(cv3, 0, 0, W, H); gp2.restore(); }
+    if (E3 && ag < 1 && (P.brilho ?? .3) > 0) {   // em 1/4 da resolução: barato no render e a ampliação deixa o halo macio
+      const bw = Math.round(W / 4), bh = Math.round(H / 4);
+      if (!BLOOM) { BLOOM = [0, 1, 2].map(() => { const c = document.createElement("canvas"); c.width = bw; c.height = bh; return c; }); }
+      const [b0, b1, b2] = BLOOM, x0 = b0.getContext("2d"), x1 = b1.getContext("2d"), x2 = b2.getContext("2d");
+      x0.clearRect(0, 0, bw, bh); x0.filter = "brightness(.64) contrast(5)"; x0.drawImage(cv3, 0, 0, bw, bh); x0.filter = "none";
+      // o preto do limiar vira TRANSPARENTE (alpha = brilho): o halo só soma luz, sem depender de mix-blend (o render ignora)
+      const id = x0.getImageData(0, 0, bw, bh), d = id.data;
+      for (let p = 0; p < d.length; p += 4) { const a = Math.max(d[p], d[p + 1], d[p + 2]) * d[p + 3] / 255;
+        if (a < 6) { d[p + 3] = 0; continue; } const k = 255 / a; d[p] = Math.min(255, d[p] * k); d[p + 1] = Math.min(255, d[p + 1] * k); d[p + 2] = Math.min(255, d[p + 2] * k); d[p + 3] = a; }
+      x0.putImageData(id, 0, 0);
+      x1.clearRect(0, 0, bw, bh); x1.filter = `blur(${(2.4 * U).toFixed(2)}px)`; x1.drawImage(b0, 0, 0); x1.filter = "none";
+      x2.clearRect(0, 0, bw, bh); x2.filter = `blur(${(10 * U).toFixed(2)}px)`; x2.drawImage(b0, 0, 0); x2.filter = "none";
+      if (!CV_BRILHO) { CV_BRILHO = document.createElement("canvas"); CV_BRILHO.width = W; CV_BRILHO.height = H;
+        Object.assign(CV_BRILHO.style, { position: "absolute", inset: "0", width: "100%", height: "100%", pointerEvents: "none" });
+        cv3.after(CV_BRILHO); }
+      const gb = CV_BRILHO.getContext("2d"); gb.globalCompositeOperation = "source-over"; gb.globalAlpha = 1; gb.clearRect(0, 0, W, H);
+      gb.globalCompositeOperation = "lighter"; gb.imageSmoothingEnabled = true; gb.globalAlpha = Math.min(1, (P.brilho ?? .3) * (1 - ag));
+      gb.drawImage(b1, 0, 0, W, H); gb.globalAlpha *= .9; gb.drawImage(b2, 0, 0, W, H);
+    } else if (CV_BRILHO) CV_BRILHO.getContext("2d").clearRect(0, 0, W, H);
     poeira(gp2, t, cam.lon, false); poeira(gp2, t, cam.lon, true);
   }
   const relogio = { t: 0 };
@@ -1319,8 +1386,9 @@
   // ficando só as palavras-chave (etiqueta, número, tópicos). As fontes voltam discretas no CTA. "topo_ate": false desliga.
   const topoAte = P.topo_ate === false ? null : (P.topo_ate ?? (cenas[1] ? cenas[1].de : null));
   if (topoAte != null) { const semPilula = pil.style.display === "none";
-    const sobe = semPilula ? (fontesEl ? area.offsetTop - fontesEl.offsetTop : 0) : area.offsetTop;   // referência: o kicker "• SÉRIE" fica o vídeo todo, só as fontes saem
-    tl.to((semPilula ? [fontesEl] : [kick, pil, fontesEl]).filter(Boolean), { opacity: 0, duration: .35, ease: "power2.in" }, topoAte - .25);
+    const sai = !!P.serie_sai;   // "serie_sai": true = a série também sai depois da abertura (X-Trader: "aqui em cima eu acho muito sujo")
+    const sobe = semPilula && !sai ? (fontesEl ? area.offsetTop - fontesEl.offsetTop : 0) : area.offsetTop;   // referência: o kicker "• SÉRIE" fica o vídeo todo, só as fontes saem
+    tl.to((semPilula ? [fontesEl, sai ? kick : null] : [kick, pil, fontesEl]).filter(Boolean), { opacity: 0, duration: .35, ease: "power2.in" }, topoAte - .25);
     tl.to(area, { y: -sobe, duration: .5, ease: "power3.inOut" }, topoAte - .2); }
   const sinal = (v, n) => v < 0 ? "−" : (n.sinal && v > 0 ? "+" : "");
   const fmt = (v, n) => (n.prefixo || "") + sinal(v, n) + Math.abs(v).toLocaleString("pt-BR", { minimumFractionDigits: n.decimais || 0, maximumFractionDigits: n.decimais || 0 }) + (n.sufixo || "");
