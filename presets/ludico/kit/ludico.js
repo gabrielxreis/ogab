@@ -214,8 +214,8 @@
       const cone = new T.Mesh(new T.CylinderGeometry(.18, raio * 1.15, alt, 40, 1, true),
         new T.MeshBasicMaterial({ color: T3.cone || COR, transparent: true, opacity: T3.cone ? .085 : .045, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, toneMapped: false }));
       cone.position.set(x, alt / 2, z); grupo.add(cone);
-      const sp = new T.SpotLight(T3.luz, 16, 24, .17, .6, 1.4); sp.position.set(x, alt, z); sp.target.position.set(x, 0, z);
-      sp.castShadow = true; sp.shadow.mapSize.set(1024, 1024); grupo.add(sp, sp.target);
+      (grupo.userData.luzes = grupo.userData.luzes || []).push({ x, z, alt });   // a luz de verdade vem do POOL (ver abaixo)
+      const sp = null;
       const anelM = new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: .85, toneMapped: false });
       const a = new T.Mesh(new T.RingGeometry(raio * .92, raio, 64), anelM); a.rotation.x = -Math.PI / 2; a.position.set(x, .012, z); grupo.add(a);
       const d = new T.Mesh(new T.CircleGeometry(raio * .92, 64), new T.MeshBasicMaterial({ color: T3.disco || COR, transparent: true, opacity: .16, toneMapped: false }));
@@ -231,6 +231,13 @@
       const pe = cil(.34, .36, .12, mEsc, 10); pe.position.y = .06; b.add(pe);
       return b;
     }
+    // POOL de holofotes: quantidade FIXA de luzes com sombra (cena atual + anterior na transição). Uma SpotLight por
+    // cenário estourava o limite do WebGL com 20+ cenas e os objetos sumiam (material não compilava).
+    const POOL = [...Array(4)].map(() => { const sp = new T.SpotLight(T3.luz, 0, 24, .17, .6, 1.4); sp.castShadow = true; sp.shadow.mapSize.set(1024, 1024);
+      sc.add(sp, sp.target); return sp; });
+    function luzes(lista) {   // lista = [[grupo, {x,z,alt}], ...] (até 4)
+      POOL.forEach((sp, k) => { const L = lista[k]; if (!L) { sp.intensity = 0; return; } const [g, l] = L;
+        sp.intensity = 16; sp.position.set(g.position.x + l.x, l.alt, g.position.z + l.z); sp.target.position.set(g.position.x + l.x, 0, g.position.z + l.z); sp.target.updateMatrixWorld(); }); }
     const cenas3d = [];   // {c, grupo, origem, upd(t), pose}
     let slot = 0;
     cenas.forEach((c, i) => { if (!c._3d) return;
@@ -1139,6 +1146,9 @@
       if (!it) { // globo na tela: segura a pose da cena 3D mais perto (para o fade)
         it = cenas3d.filter(x => x.i < i).pop() || cenas3d.find(x => x.i > i); if (!it) return; }
       cenas3d.forEach(x => { x.upd(t); if (x.fx) x.fx(t); });
+      { const ant = cenas3d.find(x => x.i === it.i - 1), em = it.i === i && i > 0 && t < c.de + TRANS;
+        const lista = (it.grupo.userData.luzes || []).map(l => [it.grupo, l]).concat(em && ant ? (ant.grupo.userData.luzes || []).map(l => [ant.grupo, l]) : []);
+        luzes(lista.slice(0, POOL.length)); }
       let { pos, alvo } = poseEm(t, it);
       if (it.i === i && i > 0) { const k = eio(prog(t, c.de, TRANS)), ant = cenas3d.find(x => x.i === i - 1);
         let p0, a0;

@@ -28,6 +28,9 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 
 - **efeitos extras** (para qualquer motion, `presets/efeitos/EFEITOS.md`): física (palavras caindo e empilhando, Matter.js), esfera de "IA pensando" em 6 estados, ASCII, lupa que estufa o texto e rabiscos à mão com hachura (Rough.js). Acervo de 400+ vídeos de referência listado no mesmo guia.
 
+### Tela sempre mudando (regra do usuário, 27/10/2026)
+Em qualquer preset: um elemento novo na tela a cada ~2,5-4 s, acompanhando cada ideia da fala; nenhum cenário passa de ~4,5 s (CTA até 7 s). Frase longa vira 2-3 elementos.
+
 ### UM estilo por vídeo (regra do usuário, 27/10/2026)
 No menu, o passo "Estilo dos motions" aceita UM estilo só (batidas visuais, b-roll animado e efeitos extras podem somar). O vídeo inteiro nasce nesse estilo: o Gab NÃO fica preso às cenas que o preset já tem; cria cenas e animações novas para cada frase, sempre no padrão do estilo escolhido (paleta, fundo, tipografia, ritmo, jeito de entrar e sair). Trecho que pediria outro preset (dado com fonte, ranking, lista) vira cena nova desenhada no estilo escolhido, não troca de preset. Cena nova que ficou boa: registrar no `PRESET.md` do estilo.
 

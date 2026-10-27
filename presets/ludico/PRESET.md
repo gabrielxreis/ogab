@@ -148,3 +148,6 @@ Nenhum quadro parado: terminou uma animação, entra outra. O kit faz sozinho:
 - **Câmera viva:** órbita de 0,06 rad/s alternando o lado a cada cena (`"orbita"` na cena muda), aproximação contínua de 2,2%/s até 25% (`"aproxima"`), leve sobe e desce.
 - **Batidas** (`gerar.py` > `batidas`): em cada cena, nos vãos sem evento, a palavra forte seguinte (4+ letras ou número, 0,9 s longe de outro evento, 1,3 s da batida anterior) ganha empurrão de câmera, pulso do cenário, onda no chão e estouro de faíscas na cor da marca; no globo, um leve zoom. `"batidas": false` desliga; uma lista de segundos manda. Cada batida leva um whoosh curto bem baixo (-24 dB).
 - Ao criar um cenário novo, pensar também no que se mexe DEPOIS do movimento principal (respiração, segundo estágio), não só na entrada.
+
+## Tela sempre mudando (Gabriel, 27/10/2026: "ele cai a bola e fica um tempão na bola, sendo que já poderia ir para outra coisa")
+Cena = UM elemento por ideia da fala, de 2 a 4,5 s (CTA até 7 s). Frase longa vira 2-3 cenas seguidas, cada uma com um ambiente diferente (ex.: "queda histórica" > bola despenca; "sinais de recuperação" > candles voltando; "fatos x expectativas" > bússola e depois balança). O `gerar.py` para com `CENA_LONGA` e lista as cenas a quebrar; `"cena_max": <s>` no plano só com motivo.

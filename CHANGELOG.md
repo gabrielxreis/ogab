@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-8 (27/10/2026)
+- **Tela sempre mudando (todo vídeo):** cada ideia da fala ganha um elemento novo na tela, a cada 2,5 a 4 segundos; nenhuma cena fica mais de ~4,5 s (o convite final pode ir a 7 s). No Lúdico, o Gab nem gera o motion se alguma cena passar disso.
+- **Lúdico com muitas cenas:** vídeos com 20+ cenários não perdem mais objetos (a luz agora é compartilhada entre as cenas).
 ## 2026.10.27-4 (27/10/2026)
 - **Motion nunca parado (Lúdico):** a câmera anda o tempo todo e, nas palavras fortes da fala, entra uma batida (empurrão de câmera, pulso, onda e faíscas) com um whoosh baixinho. Acabou o quadro parado esperando a próxima frase.
 - **Progresso do motion no Terminal:** todo render de motion mostra uma linha com a porcentagem, a etapa e quanto falta, e o Gab manda o link da aba para você tocar e acompanhar. Vários vídeos aparecem em fila, com o total.

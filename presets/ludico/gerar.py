@@ -167,6 +167,10 @@ if __name__ == "__main__":
         if k in tema:
             plano.setdefault(k, tema[k])
     g = _globo()
+    longas = [(i + 1, c.get("tipo", "globo"), round(c["ate"] - c["de"], 1)) for i, c in enumerate(plano["cenas"])
+              if "ate" in c and c["ate"] - c["de"] > (7.0 if (c.get("tipo") == "cta" or c.get("cta")) else plano.get("cena_max", 4.5))]
+    if longas:   # tela sempre mudando (regra do usuário, 27/10/2026): uma ideia = um elemento novo, nada parado na tela
+        raise SystemExit("CENA_LONGA: quebrar em 2-3 elementos novos (máx. 4,5 s; CTA 7 s): " + ", ".join(f"cena {n} ({t}, {d} s)" for n, t, d in longas))
     resolver_3d(plano, base, g)
     batidas(plano, base, g)
     pasta = os.path.abspath(a[1])

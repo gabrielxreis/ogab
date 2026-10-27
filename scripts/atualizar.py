@@ -70,11 +70,23 @@ def _editados_local():
     return {l[3:].strip().strip('"') for l in r.stdout.splitlines() if l.strip()}
 
 
+def _e_dono():
+    """Clone do dono: tem .git e config.json com "dono_biblioteca": true."""
+    try:
+        import json
+        return os.path.isdir(os.path.join(SKILL, ".git")) and json.load(open(os.path.join(SKILL, "config.json"), encoding="utf-8")).get("dono_biblioteca") is True
+    except Exception:
+        return False
+
+
 def sync(calado=False):
     """Devolve (versão, baixados, removidos); versão None quando não sincronizou pelo servidor."""
     d = licenca._ler()
     if not d.get("key"):
         _git_pull()   # ainda sem key (1ª vez): tenta o git enquanto existir
+        return None, 0, 0
+    if _e_dono():   # no Mac do dono a fonte é o git: o release do servidor pode estar ATRÁS do último commit e
+        _git_pull()  # rebaixava arquivos já commitados (27/10/2026: o -7 publicado de outra sessão desfez o progresso.py)
         return None, 0, 0
     man = licenca._post("/v1/release", {"key": d["key"], "maquina": licenca.maquina()})
     if man is None:
