@@ -195,7 +195,7 @@ def main(a):
     if "--clipe" in a:   # transcrição que o usuário já fez no DaVinci (preferida para gravação de apresentador)
         saida = a[0]; tr = via_clipe(a[a.index("--clipe") + 1])
         os.makedirs(os.path.dirname(os.path.abspath(saida)), exist_ok=True)
-        json.dump(tr, open(saida, "w"), ensure_ascii=False, indent=1)
+        with open(saida, "w", encoding="utf-8") as f: json.dump(tr, f, ensure_ascii=False, indent=1)
         print(f"{saida}: {sum(len(s_['words']) for s_ in tr['segments'])} palavras ({tr['motor']})"); return
     if len(a) < 2:
         raise SystemExit(__doc__)
@@ -207,7 +207,7 @@ def main(a):
         print(f"DaVinci {'.'.join(map(str, v)) if v else '?'}: usando {motor}")
     tr = via_davinci(audio, idioma) if motor == "davinci" else via_whisper(audio, idioma)
     os.makedirs(os.path.dirname(os.path.abspath(saida)), exist_ok=True)
-    json.dump(tr, open(saida, "w"), ensure_ascii=False, indent=1)
+    with open(saida, "w", encoding="utf-8") as f: json.dump(tr, f, ensure_ascii=False, indent=1)
     n = sum(len(s["words"]) for s in tr["segments"])
     print(f"{saida}: {len(tr['segments'])} trechos, {n} palavras ({tr['motor']})")
 
