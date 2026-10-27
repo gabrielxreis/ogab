@@ -9,7 +9,8 @@ Tira 1 print por cena no estado quase final (85% da cena, quando tudo já entrou
 (360 px por quadro, 4 por linha; nunca miniatura) e faz a conferência automática que dá para fazer sem olho:
   - ESCURO: brilho médio da área do cenário abaixo de 38 (0-255) = cena escura demais;
   - BORDA: conteúdo claro encostando na borda esquerda/direita = objeto cortado ou fora do centro;
-  - VAZIO: quase nada além do fundo = objeto não apareceu (material/luz quebrados).
+  - VAZIO: quase nada além do fundo = objeto não apareceu (material/luz quebrados);
+  - TEXTO: objeto 3D encostando no texto do cartão, do CTA ou do carimbo (prints de novo sem o texto e compara).
 Sai com código 1 se algum alerta disparar. Depois disso, OLHAR a folha cena a cena com o checklist do SKILL.md
 ("Prints antes de renderizar") e só então renderizar.
 """
@@ -36,6 +37,32 @@ def medir(png):
     return media, claro, conteudo
 
 
+def texto_x_objeto(comp, tempos):
+    """Por cena, fração do TEXTO (cartão, CTA, carimbo) que encosta em OBJETO 3D (regra do usuário, 27/10/2026: "os
+    objetos estão atrapalhando a escrita, não pode ter isso"). Tira os prints de novo numa cópia sem o texto
+    (visibility hidden): texto = o que muda entre as duas; objeto = o que é claro no print sem texto."""
+    import shutil, tempfile
+    from PIL import Image, ImageChops, ImageFilter
+    copia = tempfile.mkdtemp(prefix="sem_texto_")
+    shutil.copytree(comp, copia, dirs_exist_ok=True, ignore=shutil.ignore_patterns(".hyperframes"))
+    for f in os.listdir(copia):
+        if f.endswith(".css"):
+            open(os.path.join(copia, f), "a", encoding="utf-8").write("\n#card, #cta, #carimbo, #legenda { visibility: hidden !important; }\n")
+    subprocess.run(["npx", "--yes", hf(), "snapshot", copia, "--at", ",".join(map(str, tempos))], capture_output=True, text=True)
+    sn = os.path.join(copia, ".hyperframes", "artifacts", "snapshots"); ps = max((os.path.join(sn, d) for d in os.listdir(sn)), key=os.path.getmtime)
+    return ps, sorted(f for f in os.listdir(ps) if f.startswith("frame-") and f.endswith(".png"))
+
+
+def sobrepoe(com, sem):
+    from PIL import Image, ImageChops, ImageFilter
+    A = Image.open(com).convert("L").resize((270, 480)); Bm = Image.open(sem).convert("L").resize((270, 480))
+    texto = ImageChops.difference(A, Bm).point(lambda v: 255 if v > 40 else 0).filter(ImageFilter.MaxFilter(9))
+    px = list(Bm.getdata()); fundo = sorted(px)[len(px) // 2]
+    obj = Bm.point(lambda v: 255 if v > fundo + 45 else 0).filter(ImageFilter.MinFilter(3))   # MinFilter tira a poeira
+    t = sum(1 for v in texto.getdata() if v); o = ImageChops.multiply(texto, obj); n = sum(1 for v in o.getdata() if v)
+    return (n / t) if t else 0.0
+
+
 def main(a):
     if len(a) < 2:
         raise SystemExit(__doc__)
@@ -55,6 +82,14 @@ def main(a):
         if media < 38: alertas.append(f"ESCURO  {nome}: brilho {media:.0f}")
         if borda > .04: alertas.append(f"BORDA   {nome}: conteúdo encostando na lateral ({borda:.0%})")
         if cont < .01 and c.get("tipo"): alertas.append(f"VAZIO   {nome}: quase nada além do fundo")
+    if "--sem-texto" not in a:   # objeto encostando no texto (cartão/CTA/carimbo)
+        try:
+            ps, fs2 = texto_x_objeto(comp, tempos)
+            for k, (c, f1, f2) in enumerate(zip(cenas, fs, fs2), 1):
+                fr = sobrepoe(os.path.join(pasta, f1), os.path.join(ps, f2))
+                if fr > .06: alertas.append(f"TEXTO   cena {k} ({c.get('tipo', 'globo')}, {c['de']:.1f}s): objeto encostando no texto ({fr:.0%} do texto)")
+        except Exception as e:
+            alertas.append(f"TEXTO   não consegui conferir texto x objeto: {e}")
     # folha: 4 por linha, 360 px por quadro, com o número da cena (Pillow; o ffmpeg nem sempre tem drawtext)
     from PIL import Image, ImageDraw, ImageFont
     qs = []

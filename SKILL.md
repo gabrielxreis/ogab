@@ -30,7 +30,8 @@ Logo depois de abrir, mandar na conversa o link da aba para a pessoa tocar e aco
 ## Prints antes de renderizar (REGRA do usuário, 27/10/2026: "o cenário tá mega preto, personagens bugados, funções bugadas e muito feio; salva isso para nunca mais dar esses furos")
 NENHUM motion é renderizado sem antes: `python3 SKILL_DIR/scripts/prints_cenas.py <pasta da composição> <plano.json>` (1 print por cena no estado final, folha em tamanho de leitura, 360 px por quadro, nunca miniatura; conferência automática de ESCURO, BORDA e VAZIO, sai com 1 se algo disparar). Depois OLHAR a folha cena a cena, com este checklist, e corrigir antes do render:
 1. **Luz:** cenário legível, objeto bem iluminado, fundo não preto (nada "some" no escuro).
-2. **Enquadramento:** objeto e personagem inteiros, no centro, sem cortar na borda e sem encostar no cartão/texto.
+2. **Enquadramento:** objeto e personagem inteiros, no centro, sem cortar na borda.
+2b. **Texto é intocável (regra do usuário, 27/10/2026: "os objetos estão atrapalhando a escrita, não pode ter isso"):** nenhum objeto, personagem, placa ou partícula passa por cima ou encosta no texto (cartão, número, manchete, tópicos, carimbo, CTA, legenda). O `prints_cenas.py` acusa TEXTO sozinho (refaz os prints sem o texto e compara); zerar antes do render, afastando a câmera da cena (`zoom3d` menor) ou descendo o assunto.
 3. **Personagem:** com forma (não um cilindro preto), proporção certa, de frente para a câmera.
 4. **Funções:** cada coisa que a cena promete aparece e funciona (número, seta, carimbo, placa, gráfico com as velas visíveis, luz do semáforo).
 5. **Texto:** legível, sem duplicar (o mesmo texto no cartão e no 3D) e sem palavra cortada.
