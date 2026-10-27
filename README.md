@@ -748,7 +748,7 @@ scripts/                 resolve_lib, legendas, legenda_ui, legenda_auto, legend
                          transcrever, marca, midia, pauta, baixar_video, broll, rastrear, sonorizar, sfx_auto,
                          sfx_conferir, projeto, retrato, doctor, novidades, biblioteca_motions, gerar_mogrts, silencios, musica,
                          inspiracao, morph_logo, svg_texto, movimentos.mjs
-tresd/                   3D no Blender: logo/texto extrudado e objetos (cenas/)
+tresd/                   3D no Blender: logo/texto extrudado e objetos (cenas/); bancos3d.py acha e baixa objeto grátis
 voz_local/               clonador de voz local opcional (motor do VoiceStudio, sem o app): voz.py, voicestudio.sh
 ograf/                   títulos OGraf (HTML editável no DaVinci): GabLettering + README de como criar
 capcut/                  CapCut (Mac e Windows, beta): escreve o rascunho do projeto e recria timeline do DaVinci

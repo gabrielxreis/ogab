@@ -2,6 +2,16 @@
 
 Quando uma cena precisa de um objeto 3D pronto (`tresd/tresd.py cena`), o Gab procura **primeiro nos bancos abaixo, na ordem**, antes de modelar do zero ou gerar por IA. Blender importa GLB/glTF, FBX, OBJ, STL e USD nativo: preferir **GLB** (já vem com textura embutida).
 
+## Busca e download automáticos
+
+```
+python3 tresd/bancos3d.py buscar trophy                        # Poly Haven + Sketchfab, já filtrado por licença
+python3 tresd/bancos3d.py baixar polyhaven <id> <pasta>        # glTF + texturas + LICENCA.txt
+python3 tresd/bancos3d.py baixar sketchfab <uid> <pasta>       # precisa SKETCHFAB_TOKEN; sem ele, Chrome logado
+```
+
+Buscar sempre em inglês. Os bancos sem busca aberta (Kenney, Quaternius, Poly Pizza, Smithsonian, NASA) aparecem como links no fim da busca, para abrir no Chrome.
+
 ## Regras de licença (vídeo de cliente é uso comercial)
 
 - **CC0 / domínio público:** usa sem pedir e sem crédito. É o padrão.
