@@ -1132,7 +1132,7 @@
         const fil = c.fileiras || 5, R0 = c.raio || 2.0, dR = .5, tot = c.n || 95, raios = [...Array(fil)].map((_, r) => R0 + r * dR);
         const soma = raios.reduce((a, b) => a + b, 0), mOnH = novoAceso(), assentos = [];
         const capGeo = new T.CapsuleGeometry(.1, .09, 6, 14), mApag = new T.MeshStandardMaterial({ color: T3.assento || "#3D3C38", roughness: .7 });
-        if (c.zoom3d == null) c.zoom3d = 1.12; if (c.elevacao == null) c.elevacao = 34;
+        if (c.zoom3d == null) c.zoom3d = 1.3; if (c.elevacao == null) c.elevacao = 34;
         raios.forEach((R, r) => { const n = Math.max(5, Math.round(tot * R / soma));
           for (let k = 0; k < n; k++) { const a = Math.PI * (.05 + .9 * k / (n - 1)), x = -Math.cos(a) * R, z = 1.0 - Math.sin(a) * R * .82;
             const g2 = new T.Group(); g2.position.set(x, r * .16, z); g2.rotation.y = Math.atan2(-x, 1.0 - z); grupo.add(g2);
@@ -1191,14 +1191,16 @@
         tela.position.set(0, y0 + Hd / 2 + .05, 0); tela.userData.rotulo = true; tela.castShadow = false; grupo.add(tela);
         const face = new T.Mesh(new T.PlaneGeometry(Wd - .08, Hd - .08), new T.MeshBasicMaterial({ map: txd, toneMapped: false }));
         face.position.set(0, y0 + Hd / 2 + .05, .052); face.userData.rotulo = true; grupo.add(face);
+        // a tela da referência BRILHA: halo branco suave em volta (aditivo, atrás)
+        const halo = new T.Mesh(new T.PlaneGeometry(Wd * 1.9, Hd * 2.1), matLuz(gradiente("#ffffff", .5), P.halo_tela ?? .55)); halo.position.set(0, y0 + Hd / 2 + .05, -.12); halo.userData.luz = true; grupo.add(halo);
         const linhas = (c.linhas || ["REPOUSO: 2 DIAS POR SEMANA,", { t: "UM DELES,", tam: 1.25 }, { t: "*PREFERENCIALMENTE*", tam: 1.25 }, "AOS DOMINGOS"]).map(l => typeof l === "string" ? { t: l, tam: 1 } : l);
         const tR = em(c.revela_em, 1.2), dR = c.revela_dur ?? 1.1;
         let ult = "";
         const pinta = (kr, kg, cur) => { const chave = kr.toFixed(3) + kg.toFixed(2) + cur; if (chave === ult) return; ult = chave;
           xd.fillStyle = "#F4F4EF"; xd.fillRect(0, 0, cw, ch); xd.textAlign = "center"; xd.textBaseline = "middle";
           xd.fillStyle = "#B1B1A8"; xd.font = `500 ${Math.round(ch * .042)}px 'Inter Tight'`; xd.fillText(c.titulo || "EMENDA CONSTITUCIONAL · FIM DA 6x1", cw / 2, ch * .1);
-          const base = ch * (c.tam_linha || .074); let tot = 0; linhas.forEach(l => { tot += base * l.tam * 1.45; });
-          let y = ch * .54 - tot / 2 + ch * .03;
+          const base = ch * (c.tam_linha || .088); let tot = 0; linhas.forEach(l => { tot += base * l.tam * 1.45; });
+          let y = ch * .52 - tot / 2;
           linhas.forEach(l => { const fs = Math.round(base * l.tam); xd.font = `700 ${fs}px '${FONTE}'`; let txt = l.t.replace(/\*/g, ""), marca = /\*/.test(l.t);
             let w = xd.measureText(txt).width; if (w > cw * .88) { const k = cw * .88 / w; xd.font = `700 ${Math.floor(fs * k)}px '${FONTE}'`; w *= k; }
             const yy = y + fs * .72;
@@ -1209,7 +1211,8 @@
             else { xd.fillStyle = "#77776F"; xd.fillText(txt, cw / 2, yy); }
             y += fs * 1.45; });
           txd.needsUpdate = true; };
-        item.pose = { pos: [0, y0 + Hd / 2 + .3, 7.4], alvo: [0, y0 + Hd / 2, 0] };
+        item.fixo = true; if (c.elevacao == null) c.elevacao = 6;   // referência: a tela no meio do quadro, quase de frente
+        item.pose = { pos: [0, y0 + Hd / 2 + .8, 6.3], alvo: [0, y0 + Hd / 2 + .45, 0] };
         item.upd = t => { const kr = prog(t, tR, dR), pisca = t >= tR - .5 && t < tR + dR + .6 && Math.floor(t * 3.2) % 2 === 0;
           pinta(kr, eout(prog(t, tR + dR + .25, .35)), pisca ? 1 : 0); };
       } else if (c.tipo === "pilha") {

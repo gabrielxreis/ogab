@@ -44,7 +44,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #0c0c0c; }
   letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
 .etapa.meio { color: var(--cor); background: rgba(20,20,18,.92); }
 .chips.centro { position: absolute; left: 0; right: 0; justify-content: center; }
-.chip.neutro { background: #2C2C29; color: #D9D9D0; }
+.chip.neutro { background: #393934; color: #DCDCD3; }
 .caixanum { background: rgba(16,16,15,.88); border: 2px solid #34342F; border-radius: 18px; }
 .caixanum .rot { font-family: var(--mono); font-weight: 500; color: #9A9A8E; letter-spacing: .14em; text-transform: uppercase; }
 .etapa { border: 2px solid transparent; }
