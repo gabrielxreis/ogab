@@ -69,6 +69,22 @@ Câmara), crédito na tela (`sub` do cartão) e no `CREDITOS.txt` da pasta `foto
 Campos de cada um: docstring do `gerar.py`. Tempos (`em`, `desliga`, `religa`): segundo ou palavra da fala.
 
 
+## Repertório da referência (estudo de 12 reels, 27/10/2026; ver GUIA_VIRAL.md)
+Cenários prontos no acabamento da réplica (argila arredondada, aceso com volume, luz no chão):
+| tipo | o que é | campos |
+|---|---|---|
+| `mesa` | monitor com play, monte de moedas que chovem, teclas que acendem em fases | `acesas`, `acende_em`, `teclas`, `pilhas` |
+| `hemiciclo` | plenário em arco de assentos-cápsula que acendem da esquerda para a direita junto com o contador | `acende: {fracao | n, total, em, dur}`, `fileiras`, `n`, `raio` |
+| `semana` | 7 cubos SEG-DOM com o dia no chão e ícone em cima (maleta = trabalho, cama = folga); a folga acende; o boneco "você" pousa | `folgas: [5, 6] ou [{dia, em}]`, `dias`, `voce`, `voce_em` |
+| `documento` | tela/documento em pé com o texto da lei; a palavra entre `*asteriscos*` começa sob tarja preta, que recua e vira grifo amarelo | `titulo`, `linhas`, `revela_em`, `revela_dur` |
+Estrutura anunciada no topo (fixa durante o miolo):
+- `"etapas": ["ONDE", "SINDICATO", "EMPRESA"]` no plano e `"etapa": n` na cena: cada slot mostra "n · ?" até a sua cena, aí revela e acende.
+- `"placar": {"esq": "PRESIDENTE", "dir": "SUPREMO"}` e, na cena, `"round": "ROUND 1 · A LEI"` e `"lado"`.
+Troca de bloco:
+- entre duas cenas `estudio` é CORTE com foco (a cena nova nasce desfocada e foca em 0,42 s), como a referência; `"troca": "viagem"` (cena ou plano) volta à câmera viajando;
+- `continua` segue no mesmo cenário.
+Legenda: a palavra de agora na cor e maior, a já dita amarelo-claro, a que vem cinza.
+
 ## Ambientes já inventados (exemplos de criatividade, NÃO catálogo: cada vídeo novo inventa os seus)
 Todos centrados no x = 0, simétricos, com holofote e anel no chão; campos na docstring/código do `kit/ludico.js`.
 | tipo | metáfora | usado em |
