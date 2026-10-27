@@ -1,7 +1,7 @@
 """Storyboard ANTES do render (regra do usuário, 16/10/2026): roteiro cena a cena + 3 quadros parados para aprovar.
 Ajuste vem por número de cena e só aquela cena muda; render só depois do "pode renderizar".
 
-  python3 storyboard.py <pasta_do_motion> [--tempos 1.2,6,13.5] [--cena 3] [--plano plano.json]
+  python3 storyboard.py <pasta_do_motion> [--tempos 1.2,6,13.5] [--cena 3] [--plano plano.json] [--referencia referencia.json]
 
 <pasta_do_motion> é a pasta HyperFrames (index.html com data-composition-id). Sem --tempos, escolhe 3 momentos:
 o gancho, a cena principal e o fecho, cada um depois da entrada dos elementos (65% da cena). --cena N fotografa só
@@ -16,6 +16,10 @@ Leituras (ideia do ClaudeAnimationBase, MIT): o que o espectador precisa ENTENDE
 início e fim (s, relativos à cena), sem duas ao mesmo tempo: causa, depois reação; ação rápida, significado segurado.
 No plano: "leituras": [{"t": "o gráfico sobe", "ini": 0.4, "fim": 1.6}, ...]. Leitura sobreposta a outra, ou que acaba
 depois da cena, sai marcada com ⚠ na tabela e no terminal.
+
+Referência ("faz igual esse Reel", ideia do ReelMimic, MIT): com --referencia (ou "referencia" no topo do plano) a tabela
+ganha a coluna "Plano da referência" e cada cena precisa de "ref_plano": N e "ref_o_que" (o recurso daquele plano).
+Cena sem ref_plano, plano inexistente, duração ou média de cena fora de 30% da referência saem com ⚠ (referencia.py).
 """
 import json, os, re, shutil, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,22 +43,26 @@ def _txt(x):
     return str(x)
 
 
-def cenas_do_plano(pasta, plano=None):
+def ler_plano(pasta, plano=None):
     try:
         if plano:
-            P = json.load(open(plano, encoding="utf-8"))
-        else:
-            txt = open(os.path.join(pasta, "plano.js"), encoding="utf-8").read()
-            P = json.loads(re.sub(r"^\s*window\.PLANO\s*=\s*|;\s*$", "", txt.strip()))
+            return json.load(open(plano, encoding="utf-8"))
+        txt = open(os.path.join(pasta, "plano.js"), encoding="utf-8").read()
+        return json.loads(re.sub(r"^\s*window\.PLANO\s*=\s*|;\s*$", "", txt.strip()))
     except Exception:
-        return []
+        return {}
+
+
+def cenas_do_plano(pasta, plano=None):
+    P = ler_plano(pasta, plano)
     t, out = 0.0, []
     for i, c in enumerate(P.get("cenas", []), 1):
         d = float(c.get("dur", 3))
         texto = _txt(c.get("texto") or c.get("titulo") or c.get("frase") or c.get("nome") or c.get("linhas")
                      or c.get("palavras") or c.get("grupos") or c.get("antes") or c.get("itens") or "")
         out.append({"n": i, "ini": t, "dur": d, "tipo": c.get("tipo", ""), "texto": re.sub(r"[*|]+", " ", texto).replace("  ", " ").strip(),
-                    "som": c.get("som", ""), "leituras": c.get("leituras") or []})
+                    "som": c.get("som", ""), "leituras": c.get("leituras") or [],
+                    "ref_plano": c.get("ref_plano"), "ref_o_que": c.get("ref_o_que", "")})
         t += d
     return out
 
@@ -133,16 +141,32 @@ def main(a):
     fotos = rodar("quadros.mjs", [os.path.join(pasta, "index.html"), tmp, ",".join(map(str, tempos)), W, H])
     rot = [(f"Cena {cena_de(t, cenas)} · " if cenas else "") + f"{t:.1f} s" for t in tempos]
     folha(fotos, rot, os.path.join(pasta, "storyboard.jpg"))
+    # Referência (referencia.py decupar): --referencia ou "referencia" no topo do plano; cada cena aponta o plano que recria.
+    arq_ref = op("--referencia") or ler_plano(pasta, op("--plano")).get("referencia")
+    ref = json.load(open(arq_ref, encoding="utf-8")) if arq_ref and os.path.exists(arq_ref) else None
+    planos_ref = {p["plano"]: p for p in (ref or {}).get("planos", [])}
     linhas = ["# Storyboard", "", f"{W}x{H}, {dur:g} s. Aprovar antes do render; ajuste por número de cena (só ela muda).", "",
-              "| Cena | Tempo | Tipo | Mensagem | Leituras | Som |", "|---|---|---|---|---|---|"]
+              "| Cena | Tempo | Tipo | Mensagem | Leituras | Som |" + (" Plano da referência |" if ref else ""),
+              "|---|---|---|---|---|---|" + ("---|" if ref else "")]
     avisos = []
     for c in cenas:
         txt, av = leituras(c); avisos += av
-        linhas.append(f"| {c['n']} | {c['ini']:.1f}-{c['ini'] + c['dur']:.1f} s | {c['tipo']} | {c['texto']} | {txt or '(preencher)'} | {c['som']} |")
+        lin = f"| {c['n']} | {c['ini']:.1f}-{c['ini'] + c['dur']:.1f} s | {c['tipo']} | {c['texto']} | {txt or '(preencher)'} | {c['som']} |"
+        if ref:
+            p = planos_ref.get(int(c["ref_plano"])) if str(c["ref_plano"] or "").isdigit() else None
+            lin += f" {p['plano']} ({p['dur']:.1f} s, {'+'.join(p['camera']['tipo'])}): {c['ref_o_que']} |" if p else " (falta ref_plano) |"
+        linhas.append(lin)
     if not cenas:
-        linhas.append("| (sem plano) | | | descrever as cenas à mão | uma leitura por vez, com início e fim | |")
+        linhas.append("| (sem plano) | | | descrever as cenas à mão | uma leitura por vez, com início e fim | |" + (" |" if ref else ""))
     for av in avisos:
         print("⚠ leitura:", av)
+    if ref:
+        from referencia import conferir_plano
+        av_ref = conferir_plano(cenas, ref)
+        if av_ref:
+            linhas += ["", "Ritmo contra a referência (ajustar ou justificar antes de aprovar):", ""] + [f"- ⚠ {x}" for x in av_ref]
+        for x in av_ref:
+            print("⚠ referência:", x)
     open(os.path.join(pasta, "storyboard.md"), "w", encoding="utf-8").write("\n".join(linhas) + "\n")
     shutil.rmtree(tmp, ignore_errors=True)
     print(os.path.join(pasta, "storyboard.md")); print(os.path.join(pasta, "storyboard.jpg"))

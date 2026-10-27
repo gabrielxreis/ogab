@@ -1,6 +1,6 @@
 """Revisor com nota ANTES de entregar (regra do usuário, 16/10/2026). Duas partes:
 
-  python3 revisor.py <video.mp4> [--pasta <pasta_hyperframes>] [--rodada 1] [--saida <pasta>]
+  python3 revisor.py <video.mp4> [--pasta <pasta_hyperframes>] [--rodada 1] [--saida <pasta>] [--referencia referencia.json]
 
 1) Conferência automática (este script): gera as provas e a lista de defeitos com o tempo de cada um.
    - folha.jpg (12 quadros) e folha_celular.jpg (mesmos quadros no tamanho de tela de celular)
@@ -10,7 +10,10 @@
    - tempo de leitura de cada frase na tela (OCR do macOS, scripts/leitura.py texto): lista em revisao.md
    - som: volume integrado (-14 LUFS, +-1), pico (<= -1 dBTP), trecho mudo
    - com --pasta: clichês proibidos no código do motion (docs/etapas/motion_proibidos.md)
-2) Nota de 0 a 10 em 7 critérios, dada por um revisor de OLHOS NOVOS (subagente sem o contexto da edição) que lê
+   - com --referencia (vídeo feito "igual a um Reel"): ritmo vs referência (referencia.py comparar): plano médio fora
+     de 30% é ERRO; câmera parada demais, luz diferente e cortes fora da batida são aviso; lado_a_lado.jpg de prova
+     e um 8º critério na nota
+2) Nota de 0 a 10 em 7 critérios (8 com referência), dada por um revisor de OLHOS NOVOS (subagente sem o contexto da edição) que lê
    revisao.md e as imagens e preenche a tabela com evidência (arquivo e tempo). Ver docs/etapas/revisor.md.
 
 Regra de entrega: nenhum ERRO, todos os critérios >= 8 e pelo menos 2 rodadas. A cada rodada corrigir os 3 piores
@@ -224,6 +227,14 @@ def main(a):
         for arq, msg, n in lint(os.path.abspath(op("--pasta"))):
             (avisos if "linear" in msg else erros).append((arq, f"proibido: {msg} ({n}x)"))
         avisos += gemeos(os.path.abspath(op("--pasta")))
+    # Ritmo vs referência: as mesmas medidas do referencia.py decupar, no nosso vídeo.
+    criterios, ref_md = list(CRITERIOS), []
+    if op("--referencia"):
+        from referencia import comparar
+        e_ref, a_ref, ref_md = comparar(v, os.path.abspath(op("--referencia")), out)
+        erros += e_ref; avisos += a_ref
+        criterios.append(("Ritmo vs referência", "lado_a_lado.jpg e a tabela de ritmo: mesmo tamanho de plano, câmera tão viva "
+                          "quanto, pico no mesmo lugar da música; recria a LINGUAGEM sem copiar imagem, texto ou marca"))
     for f in os.listdir(out):
         if f.startswith(("_t", "_g", "_f", "_c")):
             os.remove(os.path.join(out, f))
@@ -235,9 +246,11 @@ def main(a):
         L += ["", "## Tempo de leitura (OCR, mínimo 0,3 s por palavra + 0,5 s)", "",
               "Texto que repete a fala pode ser mais rápido (quem ouve já leu). Texto que só aparece escrito precisa do tempo.", ""]
         L += [f"- {x['nivel']} [{x['ini']:.2f} s] \"{x['texto']}\" fica {x['dur']:.2f} s (mínimo {x['minimo']:.1f} s)" for x in leit]
+    if ref_md:
+        L += ["", "## Ritmo vs referência (prova: `lado_a_lado.jpg`, referência em cima)", ""] + ref_md
     L += ["", "## Nota (preencher: revisor de olhos novos, com evidência de arquivo e tempo)", "",
           "| # | Critério | O que olhar | Nota 0-10 | Evidência (arquivo, tempo) | Correção |", "|---|---|---|---|---|---|"]
-    L += [f"| {i} | {n} | {o} |  |  |  |" for i, (n, o) in enumerate(CRITERIOS, 1)]
+    L += [f"| {i} | {n} | {o} |  |  |  |" for i, (n, o) in enumerate(criterios, 1)]
     L += ["", "Entrega: nenhum ERRO, todos >= 8 e pelo menos 2 rodadas. Senão: corrigir os 3 piores e rodar com "
           f"`--rodada {rodada + 1}`. Depois da rodada 3, entregar listando o que ficou em aberto."]
     open(os.path.join(out, "revisao.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
