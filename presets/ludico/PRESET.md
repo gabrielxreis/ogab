@@ -83,7 +83,22 @@ Estrutura anunciada no topo (fixa durante o miolo):
 Troca de bloco:
 - entre duas cenas `estudio` é CORTE com foco (a cena nova nasce desfocada e foca em 0,42 s), como a referência; `"troca": "viagem"` (cena ou plano) volta à câmera viajando;
 - `continua` segue no mesmo cenário.
-Legenda: a palavra de agora na cor e maior, a já dita amarelo-claro, a que vem cinza.
+Cartão no estilo NOTÍCIA da referência (tema padrão; medido 1:1 nos virais da 6x1 e do Senado, 27/10/2026):
+- **Topo:**
+  - kicker cinza-oliva sem ponto ("LUDIFICANDO · FOLGA"; `"kicker_ponto": true` põe o ponto do estilo "kit");
+  - pílula com bolinha amarela grande e "• SEÇÃO", que troca a cada bloco (`secao` em toda cena);
+  - kicker e pílula ficam o vídeo todo; só as fontes saem (`"serie_sai": true` = topo limpo do X-Trader).
+- **Sem manchete grande** nos vídeos de notícia. A `manchete` fica para o estilo "kit/anúncio".
+- **Chips CENTRALIZADOS na tela:**
+  - grafite com texto claro; `"destaque": true` = amarelo;
+  - ficam abaixo da pílula (ou das etapas, ou da caixa do número);
+  - `"chips_esquerda": true` volta ao antigo.
+- **Número na CAIXA escura:** borda fina, rótulo mono em cima (`numero.rotulo`) e número amarelo. `"caixa": false` = número solto.
+- **Etapas** logo abaixo da pílula, centralizadas: o slot ainda não revelado tem só contorno fino.
+- **Legenda:** palavra de agora na cor e maior, o já dito TAMBÉM na cor (medido 244,253,131), o que vem em cinza; caixa grafite a 72% da altura.
+
+Manequim (`manequim()` no kit): o boneco da referência, articulado de juntas esféricas, sem rosto, argila clara (`tema3d.manequim`). Na `semana` com `"voce": true`, ele nasce num disco amarelo que desce: só o que está acima do disco aparece (plano de recorte).
+Câmera por cena: `"elevacao"` (graus; a semana usa 7, câmera baixa; o hemiciclo usa 34) e `"zoom3d"`.
 
 ## Ambientes já inventados (exemplos de criatividade, NÃO catálogo: cada vídeo novo inventa os seus)
 Todos centrados no x = 0, simétricos, com holofote e anel no chão; campos na docstring/código do `kit/ludico.js`.

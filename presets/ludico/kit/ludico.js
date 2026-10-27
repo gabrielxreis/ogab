@@ -295,6 +295,21 @@
       grupo.children.slice(n0).forEach(o => { o.userData.luz = true; });   // luz não entra na montagem
       return { cone: null, sp: null, anel: null, disco: null };
     }
+    function manequim() {   // referência Ludificando: manequim articulado sem rosto, argila clara, ~1,9 de altura
+      const b = new T.Group(), m = new T.MeshStandardMaterial({ color: T3.manequim || "#A19D92", roughness: .72 }), mats = [m];
+      const peca = (geo, x, y, z, rz = 0) => { const o = new T.Mesh(geo, m); o.position.set(x, y, z); o.rotation.z = rz; o.castShadow = true; b.add(o); return o; };
+      const bola = r => new T.SphereGeometry(r, 20, 14), osso = (r, h) => new T.CapsuleGeometry(r, h, 6, 14);
+      const cab = peca(bola(.17), 0, 1.74, 0); cab.scale.set(.9, 1.18, .95);
+      peca(osso(.05, .08), 0, 1.53, 0);
+      const peito = peca(osso(.17, .26), 0, 1.24, 0); peito.scale.set(1.25, 1, .78);
+      peca(bola(.08), 0, 1.0, 0);
+      const quad = peca(osso(.15, .1), 0, .9, 0); quad.scale.set(1.2, 1, .8);
+      [-1, 1].forEach(sd => { peca(bola(.07), sd * .27, 1.42, 0); peca(osso(.055, .26), sd * .31, 1.24, 0, sd * .1);
+        peca(bola(.055), sd * .34, 1.05, 0); peca(osso(.05, .24), sd * .36, .87, .02, sd * .05); peca(bola(.06), sd * .37, .69, .03);
+        peca(bola(.075), sd * .1, .8, 0); peca(osso(.07, .3), sd * .11, .6, 0); peca(bola(.065), sd * .11, .42, 0);
+        peca(osso(.06, .28), sd * .11, .24, 0); const pe = peca(new T.BoxGeometry(.11, .06, .2), sd * .11, .03, .04); });
+      b.userData.mats = mats; return b;
+    }
     function boneco(cabeca = T3.objeto) {   // personagem: cápsula na cor da marca, cabeça clara, braços, base (substituiu o cilindro preto)
       const b = new T.Group(), mCorpo = new T.MeshStandardMaterial({ color: T3.personagem || "#6B4BA3", roughness: .45 }), mCab = new T.MeshStandardMaterial({ color: cabeca, roughness: .35 });
       const corpo = new T.Mesh(new T.CapsuleGeometry(.36, .7, 8, 24), mCorpo); corpo.position.y = .78; corpo.castShadow = true; b.add(corpo);
@@ -1114,71 +1129,89 @@
         // plenário da referência: fileiras em arco de assentos-cápsula que acendem assento a assento, da esquerda para a
         // direita, junto com o contador do cartão. "acende": {"fracao": 0.6 | "n": 308, "total": 513, "em", "dur"}
         holofote(grupo, 0, .6, 3.6);
-        const fil = c.fileiras || 6, R0 = c.raio || 2.1, dR = .46, tot = c.n || 170, raios = [...Array(fil)].map((_, r) => R0 + r * dR);
+        const fil = c.fileiras || 5, R0 = c.raio || 2.0, dR = .5, tot = c.n || 95, raios = [...Array(fil)].map((_, r) => R0 + r * dR);
         const soma = raios.reduce((a, b) => a + b, 0), mOnH = novoAceso(), assentos = [];
+        const capGeo = new T.CapsuleGeometry(.1, .09, 6, 14), mApag = new T.MeshStandardMaterial({ color: T3.assento || "#3D3C38", roughness: .7 });
+        if (c.zoom3d == null) c.zoom3d = 1.12; if (c.elevacao == null) c.elevacao = 34;
         raios.forEach((R, r) => { const n = Math.max(5, Math.round(tot * R / soma));
           for (let k = 0; k < n; k++) { const a = Math.PI * (.05 + .9 * k / (n - 1)), x = -Math.cos(a) * R, z = 1.0 - Math.sin(a) * R * .82;
-            const g2 = new T.Group(); g2.position.set(x, .06 + r * .13, z); g2.rotation.y = Math.atan2(-x, 1.0 - z); grupo.add(g2);
-            const as = caixa(.27, .15, .25, mObj, 0, .075, 0), en = caixa(.27, .26, .07, mObj, 0, .2, -.11); g2.add(as, en);
-            assentos.push({ a, r, ms: [as, en] }); } });
-        assentos.sort((p, q) => p.a - q.a || p.r - q.r);
+            const g2 = new T.Group(); g2.position.set(x, r * .16, z); g2.rotation.y = Math.atan2(-x, 1.0 - z); grupo.add(g2);
+            const cap = new T.Mesh(capGeo, mApag); cap.position.y = .15; cap.castShadow = true; g2.add(cap);
+            assentos.push({ a, r, ms: [cap], ord: a + (rnd3() - .5) * .55 }); } });
+        assentos.sort((p, q) => p.ord - q.ord);   // onda da esquerda para a direita, salpicada (como a referência)
         const ac = c.acende || {}, alvo = ac.fracao ?? (ac.n != null ? ac.n / (ac.total || ac.n) : 1), tA = em(ac.em, .5), dA = ac.dur ?? 1.6;
         item.pose = { pos: [0, 4.4, 8.4], alvo: [0, .5, -.6] };
         item.upd = t => { const na = Math.round(assentos.length * alvo * eout(prog(t, tA, dA)));
-          assentos.forEach((p, k) => { const m = k < na ? mOnH : mObj; p.ms[0].material = m; p.ms[1].material = m; }); };
+          assentos.forEach((p, k) => { p.ms[0].material = k < na ? mOnH : mApag; }); };
       } else if (c.tipo === "semana") {
-        // fileira dos dias da referência (6x1): 7 cubos com o dia no chão e o ícone em cima (maleta = trabalho, cama = folga);
-        // a folga acende na palavra com luz derramada; "voce": true faz o boneco pousar na 1ª folga. "folgas": [5, 6] ou [{"dia": 5, "em"}]
-        holofote(grupo, 0, 0, 3.2);
-        const dias = c.dias || ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"], n = dias.length, passo = .8, mOnS = novoAceso(), mBranco = matBranco();
+        // fileira dos dias, como no viral da 6x1: cubos largos e baixos com o DIA GRAVADO NA FRENTE, maleta branca em cima
+        // (trabalho) que vira cama (folga) quando o cubo acende; câmera BAIXA e perto, a fileira sai cortada no quadro;
+        // "voce": true faz o manequim nascer na 1ª folga num disco amarelo que desce. "folgas": [5, 6] ou [{"dia": 5, "em"}]
+        holofote(grupo, 0, 0, 3.6);
+        const dias = c.dias || ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"], n = dias.length, passo = 1.16, mOnS = novoAceso(), mBranco = matBranco();
         if (!TX_DERRAME) TX_DERRAME = gradiente(COR, .55);
+        const mCubo = new T.MeshStandardMaterial({ color: T3.cinza || "#57564F", roughness: .75 });
         const fol = (c.folgas || [n - 2, n - 1]).map((f, j) => typeof f === "number" ? { dia: f, em: em(null, .8 + j * .6) } : { dia: f.dia, em: em(f.em, .8 + j * .6) });
         const cubos = dias.map((d, k) => { const x = (k - (n - 1) / 2) * passo;
-          const cb = caixa(.64, .42, .64, mObj, x, .21, 0); grupo.add(cb);
-          const rt = placaTexto([{ t: d, tam: .15, cor: "#d6d6cf", mono: true }], .74, .22); rt.rotation.x = -Math.PI / 2; rt.position.set(x, .014, .52); rt.userData.rotulo = true; grupo.add(rt);
-          const mal = new T.Group(); mal.position.set(x, .42, 0); grupo.add(mal);
-          mal.add(caixa(.32, .21, .13, mBranco, 0, .105, 0), caixa(.13, .06, .04, mBranco, 0, .24, 0));
-          const cama = new T.Group(); cama.position.set(x, .42, 0); cama.visible = false; grupo.add(cama);
-          cama.add(caixa(.4, .07, .26, mBranco, 0, .035, 0), caixa(.12, .06, .2, mBranco, -.13, .1, 0));
-          const der = new T.Mesh(new T.PlaneGeometry(1.2, 1.2), matLuz(TX_DERRAME, 0)); der.rotation.x = -Math.PI / 2; der.position.set(x, .012, .18); der.userData.luz = true; grupo.add(der);
+          const cb = caixa(1.0, .5, .86, mCubo, x, .25, 0); grupo.add(cb);
+          const rt = placaTexto([{ t: d, tam: .15, cor: "#AEAEA4", mono: true, peso: 700 }], .9, .26); rt.position.set(x, .2, .432); rt.userData.rotulo = true; grupo.add(rt);
+          const mal = new T.Group(); mal.position.set(x, .5, 0); grupo.add(mal);
+          mal.add(caixa(.5, .32, .17, mBranco, 0, .16, 0));
+          const al = new T.Mesh(new T.TorusGeometry(.085, .022, 8, 20, Math.PI), mBranco); al.position.set(0, .32, 0); mal.add(al);
+          const cama = new T.Group(); cama.position.set(x, .5, 0); cama.visible = false; grupo.add(cama);
+          cama.add(caixa(.7, .1, .48, mEsc, 0, .05, 0), caixa(.64, .1, .44, mBranco, 0, .15, 0), caixa(.2, .08, .36, mBranco, -.2, .24, 0), caixa(.7, .26, .06, mEsc, -.33, .13, 0));
+          const der = new T.Mesh(new T.PlaneGeometry(1.6, 1.6), matLuz(TX_DERRAME, 0)); der.rotation.x = -Math.PI / 2; der.position.set(x, .012, .3); der.userData.luz = true; grupo.add(der);
           const f = fol.find(q => q.dia === k); return { cb, mal, cama, der, t: f ? f.em : null }; });
-        let bo = null; const f0 = fol[0];
-        if (c.voce && f0) { bo = boneco(); bo.scale.setScalar(.42); grupo.add(bo); }
-        const tV = em(c.voce_em, f0 ? (f0.em - c.de) + .25 : 1);
-        item.pose = { pos: [0, 2.5, 7.6], alvo: [0, .5, 0] };
+        const f0 = fol[0], xf = f0 ? (f0.dia - (n - 1) / 2) * passo : 0;
+        let bo = null, disco = null; const corte = new T.Plane(new T.Vector3(0, 1, 0), 0);
+        if (c.voce && f0) { bo = manequim(); bo.position.set(xf - .08, .5, -.1); grupo.add(bo); ren.localClippingEnabled = true;
+          bo.userData.mats.forEach(m => { m.clippingPlanes = [corte]; });
+          disco = cil(.42, .42, .05, novoAceso(), 40); disco.position.set(xf - .08, .5, -.1); disco.castShadow = false; grupo.add(disco); }
+        const tV = em(c.voce_em, f0 ? (f0.em - c.de) + .2 : 1);
+        item.fixo = true;   // câmera baixa da referência, sem enquadramento automático
+        if (c.elevacao == null) c.elevacao = 7;
+        const xc = c.foco_x ?? (f0 ? xf - passo * 1.2 : 0);
+        item.pose = { pos: [xc + .3, 1.75, 6.2], alvo: [xc, 1.05, 0] };
         item.upd = t => { cubos.forEach(o => { const a = o.t == null ? 0 : prog(t, o.t, .3);
-            o.cb.material = a > 0 ? mOnS : mObj; o.cb.scale.setScalar(1 + .07 * Math.sin(Math.PI * a)); o.mal.visible = a <= 0; o.cama.visible = a > 0;
+            o.cb.material = a > 0 ? mOnS : mCubo; o.cb.scale.setScalar(1 + .05 * Math.sin(Math.PI * a)); o.mal.visible = a <= 0; o.cama.visible = a > 0;
             o.der.material.opacity = (P.derrame ?? .34) * eout(a); });
-          if (bo) { const a = prog(t, tV, .55), x = (f0.dia - (n - 1) / 2) * passo; bo.visible = a > 0; bo.position.set(x, .42 + 2.4 * (1 - eback(a)), 0); } };
+          if (bo) { const a = prog(t, tV, .75), yD = .5 + 2.05 * (1 - eio(a)), wy = grupo.position.y + yD;   // o disco desce e o manequim aparece acima dele
+            bo.visible = a > 0; disco.visible = a > 0 && a < 1; disco.position.y = yD; disco.material.opacity = 1;
+            corte.constant = -(a >= 1 ? -99 : wy); } };
       } else if (c.tipo === "documento") {
-        // monitor/documento da referência: texto da lei; a palavra entre *asteriscos* começa coberta por tarja preta, que recua
-        // letra por letra na palavra ("revela_em") e ganha grifo amarelo. "titulo", "linhas": ["...", "UM DELES, *PREFERENCIALMENTE*", ...]
-        holofote(grupo, 0, 0, 2.4);
-        const Wd = c.largura || 3.4, Hd = c.altura || 2.2, y0 = 1.35;
-        grupo.add(caixa(1.2, .06, .62, mEsc, 0, .03, 0), caixa(.14, y0, .14, mEsc, 0, y0 / 2, -.04));
-        const moldura = caixa(Wd + .18, Hd + .18, .14, mObj, 0, y0 + Hd / 2, 0); moldura.castShadow = false; grupo.add(moldura);   // sem sombra comprida no chão
+        // tela/documento do viral da 6x1: TELA BRANCA ACESA (brilha), sem moldura escura, título pequeno cinza no topo e o
+        // texto centralizado em cinza; a palavra entre *asteriscos* aparece letra por letra com um cursor amarelo ("revela_em")
+        // e depois ganha grifo. "linhas": ["...", {"t": "UM DELES,", "tam": 1.25}, "*PREFERENCIALMENTE*", ...]
+        holofote(grupo, 0, 0, 2.6);
+        const Wd = c.largura || 3.7, Hd = c.altura || 2.5, y0 = .95;
+        const pe = caixa(1.0, y0, .62, mObj, 0, y0 / 2, -.05); grupo.add(pe);
         const cw = 1024, ch = Math.round(cw * Hd / Wd), cvd = document.createElement("canvas"); cvd.width = cw; cvd.height = ch; const xd = cvd.getContext("2d");
         const txd = new T.CanvasTexture(cvd); txd.colorSpace = T.SRGBColorSpace; txd.anisotropy = 4;
-        const tela = new T.Mesh(new T.PlaneGeometry(Wd, Hd), new T.MeshBasicMaterial({ map: txd, toneMapped: false })); tela.position.set(0, y0 + Hd / 2, .072); tela.userData.rotulo = true; grupo.add(tela);
-        const linhas = c.linhas || ["REPOUSO: 2 DIAS POR SEMANA,", "UM DELES, *PREFERENCIALMENTE*,", "AOS DOMINGOS."], tR = em(c.revela_em, 1.2);
+        const tela = new T.Mesh(caixaArred(Wd, Hd, .1), new T.MeshBasicMaterial({ color: "#E9E9E3", toneMapped: false }));
+        tela.position.set(0, y0 + Hd / 2 + .05, 0); tela.userData.rotulo = true; tela.castShadow = false; grupo.add(tela);
+        const face = new T.Mesh(new T.PlaneGeometry(Wd - .08, Hd - .08), new T.MeshBasicMaterial({ map: txd, toneMapped: false }));
+        face.position.set(0, y0 + Hd / 2 + .05, .052); face.userData.rotulo = true; grupo.add(face);
+        const linhas = (c.linhas || ["REPOUSO: 2 DIAS POR SEMANA,", { t: "UM DELES,", tam: 1.25 }, { t: "*PREFERENCIALMENTE*", tam: 1.25 }, "AOS DOMINGOS"]).map(l => typeof l === "string" ? { t: l, tam: 1 } : l);
+        const tR = em(c.revela_em, 1.2), dR = c.revela_dur ?? 1.1;
         let ult = "";
-        const pinta = (kr, kg) => { const chave = kr.toFixed(2) + kg.toFixed(2); if (chave === ult) return; ult = chave;
-          xd.fillStyle = "#F1F0EB"; xd.fillRect(0, 0, cw, ch);
-          xd.fillStyle = "#3A3A37"; xd.fillRect(0, 0, cw, ch * .17); xd.fillStyle = "#EDEDE6"; xd.font = `800 ${Math.round(ch * .062)}px 'JetBrains Mono'`; xd.textBaseline = "middle";
-          xd.letterSpacing = "4px"; xd.fillText(c.titulo || "EMENDA CONSTITUCIONAL", cw * .06, ch * .085); xd.letterSpacing = "0px";
-          let fs = Math.round(ch * (c.tam_linha || .095)); xd.font = `800 ${fs}px '${FONTE}'`;
-          const maior = Math.max(...linhas.map(l => xd.measureText(l.replace(/\*/g, "")).width));   // linha longa encolhe para caber
-          if (maior > cw * .86) { fs = Math.floor(fs * cw * .86 / maior); xd.font = `800 ${fs}px '${FONTE}'`; }
-          const lh = fs * 1.42;
-          linhas.forEach((ln, j) => { let x = cw * .06; const y = ch * .3 + j * lh + fs / 2;
-            ln.split(/(\*[^*]+\*)/).forEach(p => { if (!p) return; const marca = p[0] === "*", t2 = p.replace(/\*/g, ""), w = xd.measureText(t2).width;
-              if (marca && kg > 0) { xd.globalAlpha = kg; xd.fillStyle = COR; xd.fillRect(x - 6, y - fs * .62, w + 12, fs * 1.2); xd.globalAlpha = 1; }
-              xd.fillStyle = "#2A2A27"; xd.fillText(t2, x, y);
-              if (marca && kr < 1) { xd.fillStyle = "#141413"; xd.fillRect(x - 6 + (w + 12) * kr, y - fs * .62, (w + 12) * (1 - kr), fs * 1.2); }
-              x += w; }); });
+        const pinta = (kr, kg, cur) => { const chave = kr.toFixed(3) + kg.toFixed(2) + cur; if (chave === ult) return; ult = chave;
+          xd.fillStyle = "#F4F4EF"; xd.fillRect(0, 0, cw, ch); xd.textAlign = "center"; xd.textBaseline = "middle";
+          xd.fillStyle = "#B1B1A8"; xd.font = `500 ${Math.round(ch * .042)}px 'Inter Tight'`; xd.fillText(c.titulo || "EMENDA CONSTITUCIONAL · FIM DA 6x1", cw / 2, ch * .1);
+          const base = ch * (c.tam_linha || .074); let tot = 0; linhas.forEach(l => { tot += base * l.tam * 1.45; });
+          let y = ch * .54 - tot / 2 + ch * .03;
+          linhas.forEach(l => { const fs = Math.round(base * l.tam); xd.font = `700 ${fs}px '${FONTE}'`; let txt = l.t.replace(/\*/g, ""), marca = /\*/.test(l.t);
+            let w = xd.measureText(txt).width; if (w > cw * .88) { const k = cw * .88 / w; xd.font = `700 ${Math.floor(fs * k)}px '${FONTE}'`; w *= k; }
+            const yy = y + fs * .72;
+            if (marca) { const nL = Math.round(txt.length * kr), vis = txt.slice(0, nL), wv = xd.measureText(vis).width, x0 = cw / 2 - w / 2;
+              if (kg > 0) { xd.globalAlpha = kg * .9; xd.fillStyle = COR; xd.fillRect(x0 - 10, yy - fs * .62, w + 20, fs * 1.22); xd.globalAlpha = 1; }
+              xd.textAlign = "left"; xd.fillStyle = "#6E6E66"; xd.fillText(vis, x0, yy); xd.textAlign = "center";
+              if (cur) { xd.fillStyle = COR; xd.fillRect(x0 + wv + 4, yy - fs * .55, Math.max(6, fs * .09), fs * 1.1); } }
+            else { xd.fillStyle = "#77776F"; xd.fillText(txt, cw / 2, yy); }
+            y += fs * 1.45; });
           txd.needsUpdate = true; };
-        item.pose = { pos: [0, y0 + Hd / 2 + .4, 7.2], alvo: [0, y0 + Hd / 2, 0] };
-        item.upd = t => pinta(eio(prog(t, tR, c.revela_dur ?? 1.1)), eout(prog(t, tR + (c.revela_dur ?? 1.1), .35)));
+        item.pose = { pos: [0, y0 + Hd / 2 + .3, 7.4], alvo: [0, y0 + Hd / 2, 0] };
+        item.upd = t => { const kr = prog(t, tR, dR), pisca = t >= tR - .5 && t < tR + dR + .6 && Math.floor(t * 3.2) % 2 === 0;
+          pinta(kr, eout(prog(t, tR + dR + .25, .35)), pisca ? 1 : 0); };
       } else if (c.tipo === "pilha") {
         // pilha de moedas que cresce (construir aos poucos); rotulo3d na placa da base
         holofote(grupo, 0, 0, 1.5);
@@ -1323,7 +1356,7 @@
             f.o.position.copy(f.dir).multiplyScalar(f.v * eout(y)).add(new T.Vector3(0, 1.6 - .9 * y * y, .3)); f.o.rotation.set(x * 6, x * 4, 0); }); };
       }
       if (c.camera3d) item.pose = { pos: c.camera3d.pos || item.pose.pos, alvo: c.camera3d.alvo || item.pose.alvo };
-      else if (c.enquadrar !== false) {   // ENQUADRAMENTO AUTOMÁTICO (27/10/2026): objetos e textos no estado final da cena, centrados,
+      else if (c.enquadrar !== false && !item.fixo) {   // ENQUADRAMENTO AUTOMÁTICO (27/10/2026): objetos e textos no estado final da cena, centrados,
         try { item.upd(Math.min(c.ate - .2, c.de + 3.5)); } catch (e) {}   // ocupando a área livre abaixo do cartão. As poses à mão deixavam
         grupo.updateMatrixWorld(true);                                     // objeto pequeno, cortado ou fora do centro.
         const box = new T.Box3(), tmp = new T.Box3();
@@ -1403,7 +1436,7 @@
         // legenda (desce = 0) e a câmera olha de cima, ~26°, mostrando o topo das peças (elevacao)
         const afasta = Math.tan(19 * D2R) / Math.tan(fov / 2 * D2R) * (1 + (P.folga ?? 0) * s);   // lente longa: recua para o enquadramento ficar igual
         const d = pos.clone().sub(alvo).multiplyScalar(afasta), L = d.length(), el0 = Math.asin(clamp(d.y / L, -1, 1));
-        const el = el0 + Math.max(0, (P.elevacao ?? 26) * D2R - el0) * s, hz = Math.hypot(d.x, d.z) || 1;
+        const el = el0 + Math.max(0, (it.c.elevacao ?? P.elevacao ?? 26) * D2R - el0) * s, hz = Math.hypot(d.x, d.z) || 1;
         d.set(d.x / hz * L * Math.cos(el), L * Math.sin(el), d.z / hz * L * Math.cos(el));
         cam.position.copy(alvo.clone().add(d)); cam.lookAt(alvo);
         const desce = (P.estudio_desce ?? .1) * (1 - s) + (P.estudio_desce_ref ?? -.045) * s;
@@ -1461,9 +1494,11 @@
 
   // ---------- cartão (DOM) ----------
   const card = document.getElementById("card");
-  Object.assign(card.style, VERT ? { left: px(90), top: (H * .152).toFixed(1) + "px" } : { left: px(80), top: px(80) });
+  Object.assign(card.style, VERT ? { left: px(66), top: (H * (P.cartao_y ?? .136)).toFixed(1) + "px" } : { left: px(80), top: px(80) });
+  const FIXO = (P.kicker_fixo ?? T3.kicker_fixo ?? false) && !P.serie_sai;   // referência: kicker e pílula ficam o vídeo todo
   let kick = null;
-  if (P.serie) { const k = mk("div", "kicker", card, { fontSize: px(30), marginBottom: px(18) }); k.textContent = P.serie; kick = k;
+  if (P.serie) { const k = mk("div", "kicker" + (P.kicker_ponto ? " ponto" : ""), card, { fontSize: px(24), marginBottom: px(16) }); k.textContent = P.serie; kick = k;
+    if (FIXO) k.style.color = P.cor_kicker || "#A3A396";   // referência: kicker cinza-oliva apagado (inline: não mexe nas trocas dos temas)
     tl.fromTo(k, { opacity: 0 }, { opacity: 1, duration: .5, ease: "power2.out" }, 0); }
   const pil = mk("div", "pilula", card, { height: px(62), paddingRight: px(26) });
   if (!cenas.some(c => c.secao)) pil.style.display = "none";   // referência Ludificando: sem pílula de seção, só o kicker
@@ -1478,7 +1513,8 @@
   // topo limpo (pedido do Gabriel, 27/10/2026): série, pílula e fontes só na abertura; depois somem e o cartão sobe,
   // ficando só as palavras-chave (etiqueta, número, tópicos). As fontes voltam discretas no CTA. "topo_ate": false desliga.
   const topoAte = P.topo_ate === false ? null : (P.topo_ate ?? (cenas[1] ? cenas[1].de : null));
-  if (topoAte != null) { const semPilula = pil.style.display === "none";
+  if (topoAte != null && FIXO) { if (fontesEl) tl.to(fontesEl, { opacity: 0, duration: .35, ease: "power2.in" }, topoAte - .25); }
+  else if (topoAte != null) { const semPilula = pil.style.display === "none";
     const sai = !!P.serie_sai;   // "serie_sai": true = a série também sai depois da abertura (X-Trader: "aqui em cima eu acho muito sujo")
     const sobe = semPilula && !sai ? (fontesEl ? area.offsetTop - fontesEl.offsetTop : 0) : area.offsetTop;   // referência: o kicker "• SÉRIE" fica o vídeo todo, só as fontes saem
     tl.to((semPilula ? [fontesEl, sai ? kick : null] : [kick, pil, fontesEl]).filter(Boolean), { opacity: 0, duration: .35, ease: "power2.in" }, topoAte - .25);
@@ -1500,22 +1536,32 @@
       c.manchete.split(/(\*[^*]+\*)/).forEach(p => { if (!p) return; const s = mk("span", p[0] === "*" ? "dest" : "", e); s.textContent = p.replace(/\*/g, ""); });
       tl.fromTo(e, { opacity: 0, y: px(20) }, { opacity: 1, y: 0, duration: .55, ease: "expo.out" }, c.manchete_em ?? t0); }
     // chips: pílulas na cor da marca que vão se SOMANDO na palavra (PESQUISOU > ESCREVEU > NARROU...), "chips": [{texto, em}]
-    if ((c.chips || []).length) { const L = cartoes[i].chips || (cartoes[i].chips = mk("div", "chips", gp, { marginTop: px(20), gap: px(12), maxWidth: px(VERT ? 880 : 740) }));
-      c.chips.forEach(ch => { const e = mk("div", "chip", L, { fontSize: px(31), padding: `${px(13)} ${px(28)}` }); e.textContent = ch.texto;
-        tl.fromTo(e, { opacity: 0, scale: .4 }, { opacity: 1, scale: 1, duration: .45, ease: "back.out(2.2)" }, ch.em ?? t0); }); }
+    if ((c.chips || []).length) { const cen = P.chips_esquerda !== true, herdou = !!cartoes[i].chips;   // referência: chips centralizados na tela
+      const L = cartoes[i].chips || (cartoes[i].chips = cen
+        ? mk("div", "chips centro", root, { top: (H * (c.chips_y ?? P.chips_y ?? (c.numero && (c.numero.caixa ?? P.numero_caixa ?? T3.kicker_fixo) ? .338 : P.etapas ? .262 : .226))).toFixed(1) + "px", gap: px(12), padding: `0 ${px(60)}` })
+        : mk("div", "chips", gp, { marginTop: px(20), gap: px(12), maxWidth: px(VERT ? 880 : 740) }));
+      c.chips.forEach(ch => { const am = ch.destaque ?? (P.chips_amarelos === true);
+        const e = mk("div", "chip" + (am ? "" : " neutro"), L, { fontSize: px(cen ? 25 : 31), padding: cen ? `${px(12)} ${px(24)}` : `${px(13)} ${px(28)}` }); e.textContent = ch.texto;
+        tl.fromTo(e, { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .4, ease: "back.out(2.2)" }, ch.em ?? t0); });
+      if (cen) { let j = i; while (cenas[j + 1] && cenas[j + 1].continua) j++;
+        if (cenas[j + 1] && !herdou) tl.to(L, { opacity: 0, duration: .25, ease: "power2.in" }, cenas[j + 1].de - .2); } }
     const n = c.numero;
-    if (n) { const em = n.em ?? c.de + .4, el = mk("div", "numero", gp, { fontSize: px(n.tamanho || 158), marginTop: px(14) });
+    const caixa = n && (n.caixa ?? P.numero_caixa ?? T3.kicker_fixo ?? false);
+    const hostN = caixa ? mk("div", "caixanum", gp, { marginTop: px(16), padding: `${px(16)} ${px(26)} ${px(18)}`, width: px(VERT ? 905 : 700) }) : gp;
+    if (caixa && (n.rotulo || c.rotulo)) { const rl = mk("div", "rot", hostN, { fontSize: px(19) }); rl.textContent = n.rotulo || c.rotulo; }
+    if (caixa) tl.fromTo(hostN, { opacity: 0, y: px(16) }, { opacity: 1, y: 0, duration: .45, ease: "power3.out" }, n.em ?? c.de + .4);
+    if (n) { const em = n.em ?? c.de + .4, el = mk("div", "numero", hostN, { fontSize: px(n.tamanho || (caixa ? 112 : 158)), marginTop: px(caixa ? 6 : 14) });
       if (n.texto) el.textContent = n.texto;
       else { const o = { v: 0 }; el.textContent = fmt(n.de ?? 0, n);
         tl.fromTo(o, { v: n.de ?? 0 }, { v: n.valor, duration: n.conta ?? 1.3, ease: "expo.out", immediateRender: false,
           onUpdate: () => { el.textContent = fmt(o.v, n); } }, em); }
       tl.fromTo(el, { opacity: 0, y: px(26) }, { opacity: 1, y: 0, duration: .6, ease: "expo.out" }, em);
-      const dv = mk("div", "divisor", gp, { width: px(110), height: px(4), marginTop: px(16), transformOrigin: "0 50%" });
-      tl.fromTo(dv, { scaleX: 0 }, { scaleX: 1, duration: .55, ease: "power3.out" }, em + .12); }
+      if (!caixa) { const dv = mk("div", "divisor", gp, { width: px(110), height: px(4), marginTop: px(16), transformOrigin: "0 50%" });
+      tl.fromTo(dv, { scaleX: 0 }, { scaleX: 1, duration: .55, ease: "power3.out" }, em + .12); } }
     const tx = (cls, txt, tam, mt, quando) => { if (!txt) return; const e = mk("div", cls, gp, { fontSize: px(tam), marginTop: px(mt), maxWidth: px(VERT ? 880 : 740) });
       e.textContent = txt; tl.fromTo(e, { opacity: 0, y: px(14) }, { opacity: 1, y: 0, duration: .5, ease: "power3.out" }, quando); };
     const base = n ? (n.em ?? c.de + .4) : t0;
-    tx("rotulo", c.rotulo, 25, 12, base + .18); tx("sub", c.sub, 21, 6, base + .26);
+    if (!caixa) tx("rotulo", c.rotulo, 25, 12, base + .18); tx("sub", c.sub, 21, 6, base + .26);
     if ((c.topicos || []).length) { const L = mk("div", "topicos", gp, { marginTop: px(n || c.rotulo ? 22 : 12), gap: px(6), maxWidth: px(VERT ? 880 : 740) });
       const els = c.topicos.map(tp => { const e = mk("div", "topico", L, { fontSize: px(36) }); e.textContent = "• " + tp.texto; return e; });
       c.topicos.forEach((tp, j) => { tl.fromTo(els[j], { opacity: 0, x: px(-18), color: COR }, { opacity: 1, x: 0, duration: .45, ease: "power3.out" }, tp.em);
@@ -1533,18 +1579,20 @@
   // "etapas": ["ONDE VOCÊ TRABALHA", "O SINDICATO", "A EMPRESA"] no plano + "etapa": n (1..) na cena: barra fixa no topo,
   // cada slot mostra "n · ?" até a cena dele, aí revela o nome e acende; depois fica revelado e apagado.
   // "placar": {"esq": "PRESIDENTE", "dir": "SUPREMO"} + "round": "ROUND 1 · A LEI" e "lado": "esq"|"dir" na cena.
-  const topoBar = (P.etapas || P.placar) ? mk("div", "estrutura", root, { top: (H * (P.estrutura_y ?? .088)).toFixed(1) + "px", gap: px(10) }) : null;
+  const topoBar = (P.etapas || P.placar) ? mk("div", "estrutura", root, { top: (H * (P.estrutura_y ?? .214)).toFixed(1) + "px", gap: px(10) }) : null;
   const ini0 = cenas.find(c => c.etapa || c.round), tIni = ini0 ? ini0.de : 0;
   if (topoBar) tl.fromTo(topoBar, { opacity: 0, y: px(-14) }, { opacity: 1, y: 0, duration: .45, ease: "power3.out", immediateRender: true }, tIni);
   if (P.etapas) P.etapas.forEach((nome, k) => {
-    const sl = mk("div", "etapa", topoBar, { fontSize: px(22), padding: `${px(10)} ${px(18)}` });
+    const sl = mk("div", "etapa", topoBar, { fontSize: px(19), padding: `${px(9)} ${px(16)}` });
     const q = mk("span", "", sl); q.textContent = `${k + 1} · ?`;
     const r = mk("span", "", sl, { display: "none" }); r.textContent = `${k + 1} · ${nome}`;
     const cs = cenas.filter(c => c.etapa === k + 1), t1 = cs.length ? cs[0].de : null;
     if (t1 != null) { tl.set(q, { display: "none" }, t1); tl.set(r, { display: "inline" }, t1);
       tl.fromTo(sl, { scale: .82 }, { scale: 1, duration: .4, ease: "back.out(2.4)", immediateRender: false }, t1); }
     cenas.forEach(c => { if (!c.etapa) return; const on = c.etapa === k + 1;
-      tl.set(sl, { backgroundColor: on ? COR : "rgba(30,30,28,.86)", color: on ? "#151515" : (t1 != null && c.de >= t1 ? "#F2F2EE" : "#8C8C86") }, c.de); });
+      const rev = t1 != null && c.de >= t1;
+      tl.set(sl, { backgroundColor: on ? COR : rev ? "rgba(44,44,41,.95)" : "rgba(0,0,0,0)", color: on ? "#151515" : rev ? "#E8E8E0" : "#8C8C86",
+        borderColor: on ? COR : rev ? "rgba(44,44,41,.95)" : "#4A4A44" }, c.de); });
   });
   if (P.placar) {
     const lado = (txt, k) => { const e = mk("div", "etapa", topoBar, { fontSize: px(22), padding: `${px(10)} ${px(18)}` }); e.textContent = txt; return e; };
@@ -1567,15 +1615,16 @@
 
   // ---------- legenda karaokê (só quando o plano pede) ----------
   const PAL = P.legenda ? (P.palavras || []) : [];
-  const COR_DITA = (() => { const c = new THREE.Color(COR).lerp(new THREE.Color("#ffffff"), .45); return "#" + c.getHexString(); })();
+  const COR_DITA = P.cor_dita || COR;   // medido na referência: o que já foi dito fica no amarelo da marca
   if (PAL.length) {
-    const leg = document.getElementById("legenda"); Object.assign(leg.style, { top: (H * (P.legenda_y ?? (VERT ? .775 : .86))).toFixed(1) + "px" });
+    const leg = document.getElementById("legenda"); Object.assign(leg.style, { top: (H * (P.legenda_y ?? (VERT ? .725 : .86))).toFixed(1) + "px" });
     const blocos = []; let cur = [];
     PAL.forEach((w, i) => { cur.push(w); const fimFrase = /[.,!?:;]$/.test(w.t), chars = cur.map(x => x.t).join(" ").length;
       if (fimFrase || cur.length >= (P.palavras_bloco || 6) || chars >= 28 || i === PAL.length - 1) { blocos.push(cur); cur = []; } });
     blocos.forEach((b, i) => {
       const ini = b[0].s - .04, fimB = i < blocos.length - 1 ? blocos[i + 1][0].s - .04 : Math.min(dur, b[b.length - 1].e + .8);
-      const el = mk("div", "bloco", leg, { fontSize: px(P.legenda_tam || 48), padding: `${px(20)} ${px(44)} ${px(22)}`, maxWidth: px(740), borderRadius: px(18) });
+      const el = mk("div", "bloco", leg, { fontSize: px(P.legenda_tam || 50), padding: `${px(24)} ${px(52)} ${px(26)}`, maxWidth: px(800), minWidth: px(640), borderRadius: px(18) });
+      if (FIXO) el.style.background = "rgba(19,19,17,.9)";
       b.forEach((w, j) => { const s = mk("span", "w", el, j < b.length - 1 ? { marginRight: ".26em" } : null); s.textContent = w.t;
         // referência: a palavra falada AGORA fica na cor e um pouco maior, a já dita fica amarelo-claro, a que vem fica cinza
         const solta = Math.max(w.s + .05, (b[j + 1] ? b[j + 1].s : w.e + .15));

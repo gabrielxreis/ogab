@@ -25,7 +25,8 @@
   "luz": "#FFFFFF",
   "ouro": "#B8955A",
   "chao_luz": "#3b3c35",
-  "fundo_luz": "#C9CDB4"
+  "fundo_luz": "#C9CDB4",
+  "kicker_fixo": true
  },
  "cta_botao": "COMENTA AQUI"
 }
