@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-6 (27/10/2026)
+- **Lúdico mais vivo.** A câmera não para mais: gira devagar e vai chegando perto durante a cena, e as palavras fortes da narração ganham uma batida (empurrão de câmera, pulso do cenário e faíscas na cor da sua marca, com um whoosh bem baixo). Se quiser o estilo mais calmo, peça "sem batidas".
 ## 2026.10.27-3 (27/10/2026)
 - **Lúdico: CTA de seguir com o Instagram de verdade.** Quando a fala pede para seguir, entra um celular 3D com o perfil igual ao app (foto, bio, seguidores, seguindo, destaques e as capas dos últimos posts) e um toque em "Seguir". Vídeo sem essa fala ganha a cena no fim.
 - **Lúdico: cartão mais limpo.** Série, seção e fontes aparecem só na abertura; depois fica só o que importa (etiqueta, número, tópicos). As fontes voltam discretas no final.
