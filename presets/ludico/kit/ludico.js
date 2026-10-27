@@ -250,6 +250,7 @@
       const c = new T.Color(cor), rgb = `${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(c.b * 255)}`;
       g.addColorStop(0, `rgba(${rgb},${a0})`); g.addColorStop(1, `rgba(${rgb},0)`); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
       const tx = new T.CanvasTexture(cv); tx.colorSpace = T.SRGBColorSpace; return tx; }
+    let TX_DERRAME = null;
     const matLuz = (tx, op = 1) => new T.MeshBasicMaterial({ map: tx, transparent: true, opacity: op, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false, side: T.DoubleSide });
     function holofote(grupo, x, z, raio = 1.1, alt = 9) {
       const est = grupo.userData.estilo || "cone", n0 = grupo.children.length;
@@ -1084,12 +1085,18 @@
         pilhas.forEach(([px, pz, h], k) => { for (let j = 0; j < h; j++) { const m = cil(.235, .235, .066, mOuro, 28); grupo.add(m); moedas.push({ m, x: px + dx, z: pz, y: .034 + j * .07, ord: k * 2 + j }); } });
         moedas.forEach(o => { o.m.userData.luz = true; });   // a chuva já é a entrada das moedas (fora da montagem)
         const nT = c.teclas || 7, acesas = c.acesas ?? 2, teclas = [];
+        if (!TX_DERRAME) TX_DERRAME = gradiente(COR, .55);
+        const mIcone = new T.MeshStandardMaterial({ color: "#d8d8d4", emissive: new T.Color("#ffffff"), emissiveIntensity: .62, roughness: .5 }); mIcone.toneMapped = false; mIcone.userData.aceso = true;
         for (let k = 0; k < nT; k++) { const x = dx - 2.1 + k * .72;
           const tc = caixa(.6, .34, .6, mEsc, x, .17, 1.45); grupo.add(tc);
-          const on = caixa(.606, .346, .606, null, x, .17, 1.45); on.visible = false; on.castShadow = false; grupo.add(on); tc.userData.casca = on;
-          const ic = caixa(.3, .13, .2, new T.MeshStandardMaterial({ color: "#ffffff", emissive: new T.Color("#ffffff"), emissiveIntensity: .9 }), x, .41, 1.45); grupo.add(ic);
+          const on = caixa(.608, .348, .608, null, x, .172, 1.45); on.visible = false; on.castShadow = false; grupo.add(on); tc.userData.casca = on;
+          // luz da tecla derramada no chão (o "glow" da referência é isto: amarelo suave no chão em volta, não um halo branco)
+          const der = new T.Mesh(new T.PlaneGeometry(1.25, 1.25), matLuz(TX_DERRAME, 0)); der.rotation.x = -Math.PI / 2; der.position.set(x, .012, 1.62);
+          der.userData.luz = true; grupo.add(der); tc.userData.derrame = der;
+          const ic = caixa(.3, .13, .2, mIcone, x, .43, 1.45); grupo.add(ic);
+          grupo.add(caixa(.4, .03, .3, mEsc, x, .36, 1.45));   // bandeja escura sob o ícone (como a referência)
           teclas.push({ tc }); }
-        const novaOn = () => { const m = mAcesa(); m.transparent = true; if (P.acesos !== false) { m.userData.aceso = true; m.toneMapped = false; m.emissiveIntensity = 1.02; m.color = corA.clone().multiplyScalar(.18); } return m; };
+        const novaOn = () => { const m = mAcesa(); m.transparent = true; if (P.acesos !== false) { m.userData.aceso = true; m.toneMapped = false; m.emissiveIntensity = .7; m.color = corA.clone().multiplyScalar(.42); m.roughness = .55; } return m; };
         teclas.forEach(o => { o.tc.userData.casca.material = novaOn(); });
         const tChuva = em(c.em, .35), fases = [{ n: acesas, t: em(c.acende_em, 1.6) }];
         for (let j = i + 1; cenas[j] && cenas[j].continua; j++) fases.push({ n: cenas[j].acesas ?? fases[fases.length - 1].n, t: cenas[j].acende_em ?? cenas[j].de + .6 });
@@ -1098,7 +1105,8 @@
         item.upd = t => { moedas.forEach(o => { const a = prog(t, tChuva + o.ord * .045, .5); o.m.visible = a > 0;
             o.m.position.set(o.x + .02 * Math.sin(o.ord), o.y + 4.2 * (1 - a * a) , o.z); o.m.rotation.set(.6 * (1 - a), o.ord, .4 * (1 - a)); });
           teclas.forEach((o, k) => { const a = prog(t, quandoAcende(k), .28), cs = o.tc.userData.casca;   // acende em .28 s com pulso
-            cs.visible = a > 0; cs.material.opacity = eout(a); cs.scale.setScalar(1 + .12 * Math.sin(Math.PI * a)); }); };
+            cs.visible = a > 0; cs.material.opacity = eout(a); cs.scale.setScalar(1 + .12 * Math.sin(Math.PI * a));
+            o.tc.userData.derrame.material.opacity = (P.derrame ?? .34) * eout(a); }); };
       } else if (c.tipo === "pilha") {
         // pilha de moedas que cresce (construir aos poucos); rotulo3d na placa da base
         holofote(grupo, 0, 0, 1.5);
@@ -1270,7 +1278,7 @@
     if (P.acesos !== false) sc.traverse(o => { const m = o.isMesh && o.material; if (!m || !m.isMeshStandardMaterial || m.userData.aceso) return;
       const perto = cc => cc && Math.abs(cc.r - corA.r) + Math.abs(cc.g - corA.g) + Math.abs(cc.b - corA.b) < .12;
       if (!perto(m.color) && !(perto(m.emissive) && m.emissiveIntensity > .2)) return;
-      m.userData.aceso = true; m.toneMapped = false; m.emissive = corA.clone(); m.emissiveIntensity = m.emissiveIntensity === 0 ? 0 : 1.02; m.color = corA.clone().multiplyScalar(.18); m.needsUpdate = true; });
+      m.userData.aceso = true; m.toneMapped = false; m.emissive = corA.clone(); m.emissiveIntensity = m.emissiveIntensity === 0 ? 0 : .7; m.color = corA.clone().multiplyScalar(.42); m.roughness = .55; m.needsUpdate = true; });
     // placas: postes com cartaz que sobem do chão na palavra (até 4 lado a lado)
     function montaPlacas(grupo, lista, dx, em) {
       const n = lista.length, esp = 2.15, x0 = dx + (dx ? 0 : -(n - 1) * esp / 2);
@@ -1347,7 +1355,7 @@
     gp2.setTransform(1, 0, 0, 1, 0, 0); gp2.clearRect(0, 0, W, H);
     // brilho (bloom) da referência: só o que é aceso (amarelo, telas, teclas) vaza luz em volta. brightness+contrast
     // funciona como limiar (o cinza-argila vira preto e não soma nada); "brilho": 0 no plano desliga.
-    if (E3 && ag < 1 && (P.brilho ?? .3) > 0) {   // em 1/4 da resolução: barato no render e a ampliação deixa o halo macio
+    if (E3 && ag < 1 && (P.brilho ?? .24) > 0) {   // em 1/4 da resolução: barato no render e a ampliação deixa o halo macio
       const bw = Math.round(W / 4), bh = Math.round(H / 4);
       if (!BLOOM) { BLOOM = [0, 1, 2].map(() => { const c = document.createElement("canvas"); c.width = bw; c.height = bh; return c; }); }
       const [b0, b1, b2] = BLOOM, x0 = b0.getContext("2d"), x1 = b1.getContext("2d"), x2 = b2.getContext("2d");
@@ -1358,14 +1366,14 @@
       for (let p = 0; p < d.length; p += 4) { const m = d[p] + d[p + 1] + d[p + 2];
         d[p + 3] = m <= LIM ? 0 : Math.min(255, (m - LIM) / FAIXA * 255) * d[p + 3] / 255; }
       x0.putImageData(id, 0, 0);
-      x1.clearRect(0, 0, bw, bh); x1.filter = `blur(${(2.4 * U).toFixed(2)}px)`; x1.drawImage(b0, 0, 0); x1.filter = "none";
-      x2.clearRect(0, 0, bw, bh); x2.filter = `blur(${(10 * U).toFixed(2)}px)`; x2.drawImage(b0, 0, 0); x2.filter = "none";
+      x1.clearRect(0, 0, bw, bh); x1.filter = `blur(${(1.6 * U).toFixed(2)}px)`; x1.drawImage(b0, 0, 0); x1.filter = "none";
+      x2.clearRect(0, 0, bw, bh); x2.filter = `blur(${(7 * U).toFixed(2)}px)`; x2.drawImage(b0, 0, 0); x2.filter = "none";
       if (!CV_BRILHO) { CV_BRILHO = document.createElement("canvas"); CV_BRILHO.width = W; CV_BRILHO.height = H;
         Object.assign(CV_BRILHO.style, { position: "absolute", inset: "0", width: "100%", height: "100%", pointerEvents: "none" });
         cv3.after(CV_BRILHO); }
       const gb = CV_BRILHO.getContext("2d"); gb.globalCompositeOperation = "source-over"; gb.globalAlpha = 1; gb.clearRect(0, 0, W, H);
-      gb.globalCompositeOperation = "lighter"; gb.imageSmoothingEnabled = true; gb.globalAlpha = Math.min(1, (P.brilho ?? .3) * (1 - ag));
-      gb.drawImage(b1, 0, 0, W, H); gb.globalAlpha *= .9; gb.drawImage(b2, 0, 0, W, H);
+      gb.globalCompositeOperation = "lighter"; gb.imageSmoothingEnabled = true; gb.globalAlpha = Math.min(1, (P.brilho ?? .24) * (1 - ag));
+      gb.drawImage(b1, 0, 0, W, H); gb.globalAlpha *= .45; gb.drawImage(b2, 0, 0, W, H);
     } else if (CV_BRILHO) CV_BRILHO.getContext("2d").clearRect(0, 0, W, H);
     poeira(gp2, t, cam.lon, false); poeira(gp2, t, cam.lon, true);
   }
