@@ -1,0 +1,16 @@
+{
+ "_leia": "Tema padrão do preset Mimic (cortina azul de veludo, franja dourada, placa de papel creme, linha grande em vermelho tijolo). Marca do cliente: copiar para temas/<marca>.json e trocar acento (cor da linha grande da placa: a cor da marca entra aqui), cortina/cortina_escura (veludo), dourado (franja e corda), papel (placa) e, se quiser, as fontes (arquivos em kit/fontes/ ou caminho absoluto).",
+ "nome": "Padrão",
+ "acento": "#A8322A",
+ "tinta": "#2B2622",
+ "papel": "#F3E8D2",
+ "papel_borda": "#D9C49C",
+ "cortina": "#2F4D9A",
+ "cortina_escura": "#14244F",
+ "dourado": "#D4A84A",
+ "madeira": "#B7814E",
+ "fonte_titulo": "Cardo",
+ "fonte_titulo_arquivo": "fontes/Cardo-Bold.ttf",
+ "fonte_texto": "Inter Tight",
+ "fonte_texto_arquivo": "fontes/InterTight-500.woff2"
+}

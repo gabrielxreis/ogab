@@ -1405,6 +1405,57 @@
    "cenas": {}
   },
   {
+   "id": "mimic",
+   "nome": "Mimic",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Teatrinho de bonecos de papel: cortina azul, placas penduradas no barbante que descem e balançam, bonecos que sobem do alçapão e cenário que troca como telão.",
+   "quando": "história bíblica, parábola, o que Jesus diria, fábula, lição de moral, devocional, história para criança",
+   "nichos": [
+    "biblia",
+    "biblic",
+    "igreja",
+    "crista",
+    "evangel",
+    "devocional",
+    "fabula",
+    "parabola",
+    "infantil",
+    "catequese"
+   ],
+   "sinais": [
+    "jesus",
+    "deus",
+    "biblia",
+    "versiculo",
+    "passagem",
+    "parabola",
+    "discipulo",
+    "profeta",
+    "davi",
+    "moises",
+    "pedro",
+    "paulo",
+    "senhor",
+    "fabula",
+    "era uma vez",
+    "licao",
+    "moral da historia",
+    "teatro",
+    "boneco",
+    "fantoche"
+   ],
+   "padroes": {
+    "historico": 1,
+    "pergunta": 1
+   },
+   "cenas": {}
+  },
+  {
    "id": "linha",
    "nome": "Linha (um traço só)",
    "categoria": "marca",

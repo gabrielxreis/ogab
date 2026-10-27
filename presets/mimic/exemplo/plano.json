@@ -1,0 +1,192 @@
+{
+ "w": 1080,
+ "h": 1920,
+ "fps": 30,
+ "cenas": [
+  {
+   "dur": 3.4,
+   "cenario": "campo",
+   "plateia": true,
+   "placas": [
+    {
+     "l1": "O que você faz",
+     "em": -0.25,
+     "rot": -1.5
+    },
+    {
+     "texto": "diante de um|gigante?",
+     "em": 1.0,
+     "empilha": true,
+     "rot": 2
+    }
+   ],
+   "bonecos": [
+    {
+     "personagem": "gigante",
+     "x": 190,
+     "olha": -1,
+     "em": -0.25,
+     "acoes": [
+      {
+       "em": 1.9,
+       "anda": -70,
+       "dur": 0.8
+      }
+     ]
+    },
+    {
+     "personagem": "menino",
+     "x": -250,
+     "objeto": "funda",
+     "roupa": "#d9b35a",
+     "em": 0,
+     "acoes": [
+      {
+       "em": 1.4,
+       "pose": "gira"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "dur": 3.2,
+   "cenario": "por_do_sol",
+   "placas": [
+    {
+     "texto": "ele pegou|cinco pedras",
+     "ref": "1 Samuel 17:40",
+     "em": 0,
+     "rot": -2
+    }
+   ],
+   "bonecos": [
+    {
+     "personagem": "menino",
+     "x": -170,
+     "objeto": "funda",
+     "roupa": "#d9b35a",
+     "em": 0.15,
+     "acoes": [
+      {
+       "em": 0.9,
+       "anda": 150,
+       "dur": 1.0
+      },
+      {
+       "em": 2.1,
+       "pose": "acena"
+      }
+     ]
+    }
+   ],
+   "aderecos": [
+    {
+     "tipo": "sol",
+     "x": 250,
+     "y": 190,
+     "raio": 78,
+     "em": 0.35
+    },
+    {
+     "tipo": "pedra",
+     "x": -10,
+     "y": 622,
+     "escala": 3.2,
+     "em": 0.6
+    },
+    {
+     "tipo": "pedra",
+     "x": 62,
+     "y": 622,
+     "escala": 3.2,
+     "em": 0.78
+    },
+    {
+     "tipo": "pedra",
+     "x": 134,
+     "y": 622,
+     "escala": 3.2,
+     "em": 0.96
+    },
+    {
+     "tipo": "pedra",
+     "x": 206,
+     "y": 622,
+     "escala": 3.2,
+     "em": 1.1400000000000001
+    },
+    {
+     "tipo": "pedra",
+     "x": 278,
+     "y": 622,
+     "escala": 3.2,
+     "em": 1.3199999999999998
+    }
+   ]
+  },
+  {
+   "dur": 3.6,
+   "cenario": "campo",
+   "placas": [
+    {
+     "texto": "uma pedra só",
+     "em": 0.1,
+     "rot": 1.5
+    },
+    {
+     "texto": "e o gigante|caiu",
+     "ref": "1 Samuel 17:49",
+     "em": 1.45,
+     "rot": -1.5
+    }
+   ],
+   "bonecos": [
+    {
+     "personagem": "gigante",
+     "x": 280,
+     "olha": -1,
+     "em": 0.1,
+     "acoes": [
+      {
+       "em": 1.5,
+       "cai": "esquerda"
+      }
+     ]
+    },
+    {
+     "personagem": "menino",
+     "x": -320,
+     "objeto": "funda",
+     "roupa": "#d9b35a",
+     "pose": "gira",
+     "em": 0.2,
+     "acoes": [
+      {
+       "em": 1.4,
+       "pose": "golpe"
+      },
+      {
+       "em": 2.3,
+       "pose": "vitoria"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "dur": 2.6,
+   "cenario": "noite",
+   "cortina": "fecha",
+   "auto": false,
+   "placas": [
+    {
+     "texto": "Segue o|perfil",
+     "em": 0.6,
+     "rot": -2
+    }
+   ],
+   "plateia": true
+  }
+ ]
+}
