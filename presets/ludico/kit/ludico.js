@@ -304,8 +304,11 @@
       const peito = peca(osso(.17, .26), 0, 1.24, 0); peito.scale.set(1.25, 1, .78);
       peca(bola(.08), 0, 1.0, 0);
       const quad = peca(osso(.15, .1), 0, .9, 0); quad.scale.set(1.2, 1, .8);
-      [-1, 1].forEach(sd => { peca(bola(.07), sd * .27, 1.42, 0); peca(osso(.055, .26), sd * .31, 1.24, 0, sd * .1);
-        peca(bola(.055), sd * .34, 1.05, 0); peca(osso(.05, .24), sd * .36, .87, .02, sd * .05); peca(bola(.06), sd * .37, .69, .03);
+      b.userData.bracos = [];
+      [-1, 1].forEach(sd => { peca(bola(.07), sd * .27, 1.42, 0);
+        const om = new T.Group(); om.position.set(sd * .27, 1.42, 0); b.add(om); b.userData.bracos.push({ om, sd });   // pivô no ombro
+        const pb = (geo, x, y, z, rz = 0) => { const o = new T.Mesh(geo, m); o.position.set(x - sd * .27, y - 1.42, z); o.rotation.z = rz; o.castShadow = true; om.add(o); };
+        pb(osso(.055, .26), sd * .31, 1.24, 0, sd * .1); pb(bola(.055), sd * .34, 1.05, 0); pb(osso(.05, .24), sd * .36, .87, .02, sd * .05); pb(bola(.06), sd * .37, .69, .03);
         peca(bola(.075), sd * .1, .8, 0); peca(osso(.07, .3), sd * .11, .6, 0); peca(bola(.065), sd * .11, .42, 0);
         peca(osso(.06, .28), sd * .11, .24, 0); const pe = peca(new T.BoxGeometry(.11, .06, .2), sd * .11, .03, .04); });
       b.userData.mats = mats; return b;
@@ -1154,6 +1157,7 @@
         const fol = (c.folgas || [n - 2, n - 1]).map((f, j) => typeof f === "number" ? { dia: f, em: em(null, .8 + j * .6) } : { dia: f.dia, em: em(f.em, .8 + j * .6) });
         const cubos = dias.map((d, k) => { const x = (k - (n - 1) / 2) * passo;
           const cb = caixa(1.0, .5, .86, mCubo, x, .25, 0); grupo.add(cb);
+          const mCs = novoAceso(); mCs.transparent = true; const cs = caixa(1.008, .508, .868, mCs, x, .25, 0); cs.visible = false; cs.castShadow = false; grupo.add(cs);   // casca acesa que entra em fade
           const rt = placaTexto([{ t: d, tam: .15, cor: "#AEAEA4", mono: true, peso: 700 }], .9, .26); rt.position.set(x, .2, .432); rt.userData.rotulo = true; grupo.add(rt);
           const mal = new T.Group(); mal.position.set(x, .5, 0); grupo.add(mal);
           mal.add(caixa(.5, .32, .17, mBranco, 0, .16, 0));
@@ -1161,23 +1165,37 @@
           const cama = new T.Group(); cama.position.set(x, .5, 0); cama.visible = false; grupo.add(cama);
           cama.add(caixa(.7, .1, .48, mEsc, 0, .05, 0), caixa(.64, .1, .44, mBranco, 0, .15, 0), caixa(.2, .08, .36, mBranco, -.2, .24, 0), caixa(.7, .26, .06, mEsc, -.33, .13, 0));
           const der = new T.Mesh(new T.PlaneGeometry(1.6, 1.6), matLuz(TX_DERRAME, 0)); der.rotation.x = -Math.PI / 2; der.position.set(x, .012, .3); der.userData.luz = true; grupo.add(der);
-          const f = fol.find(q => q.dia === k); return { cb, mal, cama, der, t: f ? f.em : null }; });
-        const f0 = fol[0], xf = f0 ? (f0.dia - (n - 1) / 2) * passo : 0;
+          const f = fol.find(q => q.dia === k); return { cb, cs, mal, cama, der, t: f ? f.em : null }; });
+        const f0 = fol[0], xf = f0 ? (f0.dia - (n - 1) / 2) * passo : 0, fUlt = fol[fol.length - 1];
+        // gancho da referência: placa branca acesa (ex.: "6x1") sobre a fileira que inclina para trás, encolhe e afunda
+        let placa = null; const tPl = em(c.placa_cai, 1.5);
+        if (c.placa) { placa = new T.Group(); placa.position.set(c.placa_x ?? xf - passo * .6, 1.75, -.4); grupo.add(placa);
+          const pb = caixa(2.3, 1.15, .5, matBranco(), 0, 0, 0); pb.castShadow = false; placa.add(pb);
+          const pt = placaTexto([{ t: c.placa, tam: .34, cor: "#7A7A72", peso: 600 }], 2.0, .6); pt.position.z = .252; pt.userData.rotulo = true; placa.add(pt); placa.userData.luz = true; }
         let bo = null, disco = null; const corte = new T.Plane(new T.Vector3(0, 1, 0), 0);
-        if (c.voce && f0) { bo = manequim(); bo.position.set(xf - .08, .5, -.1); grupo.add(bo); ren.localClippingEnabled = true;
+        const bx = xf - .27, bz = -.22;   // ao lado da cama, um pouco atrás (como a referência)
+        if (c.voce && f0) { bo = manequim(); bo.scale.setScalar(c.voce_escala ?? .78); bo.position.set(bx, .5, bz); grupo.add(bo); ren.localClippingEnabled = true;
           bo.userData.mats.forEach(m => { m.clippingPlanes = [corte]; });
-          disco = cil(.42, .42, .05, novoAceso(), 40); disco.position.set(xf - .08, .5, -.1); disco.castShadow = false; grupo.add(disco); }
+          disco = cil(.36, .36, .045, novoAceso(), 40); disco.position.set(bx, .5, bz); disco.castShadow = false; disco.userData.luz = true; grupo.add(disco); }
+        const tBr = em(c.bracos_em, fUlt ? (fUlt.em - c.de) + .1 : 9e9);   // braços para cima quando a última folga acende
         const tV = em(c.voce_em, f0 ? (f0.em - c.de) + .2 : 1);
         item.fixo = true;   // câmera baixa da referência, sem enquadramento automático
         if (c.elevacao == null) c.elevacao = 7;
-        const xc = c.foco_x ?? (f0 ? xf - passo * 1.2 : 0);
+        if (c.montagem == null) c.montagem = false;   // referência: a fileira já está lá no 1º quadro
+        if (c.trilho == null) c.trilho = .16;          // e a câmera desliza de lado devagar
+        const xc = c.foco_x ?? (f0 ? xf - passo * .55 : 0);   // até o domingo dentro do quadro
         item.pose = { pos: [xc + .3, 1.75, 6.2], alvo: [xc, 1.05, 0] };
-        item.upd = t => { cubos.forEach(o => { const a = o.t == null ? 0 : prog(t, o.t, .3);
-            o.cb.material = a > 0 ? mOnS : mCubo; o.cb.scale.setScalar(1 + .05 * Math.sin(Math.PI * a)); o.mal.visible = a <= 0; o.cama.visible = a > 0;
+        item.upd = t => { cubos.forEach(o => { const a = o.t == null ? 0 : prog(t, o.t, .3), sai = o.t == null ? 0 : prog(t, o.t - .05, .22), ent = o.t == null ? 0 : prog(t, o.t + .12, .42);
+            o.cs.visible = a > 0; o.cs.material.opacity = eout(a); const pu = 1 + .05 * Math.sin(Math.PI * a); o.cb.scale.setScalar(pu); o.cs.scale.setScalar(pu);
+            o.mal.visible = sai < 1; o.mal.scale.setScalar(Math.max(.001, 1 - eio(sai))); o.mal.position.y = .5 + .25 * eout(sai);   // a maleta sobe e some
+            o.cama.visible = ent > 0; o.cama.scale.setScalar(Math.max(.001, eback(ent)));                                         // a cama entra com sobra
             o.der.material.opacity = (P.derrame ?? .34) * eout(a); });
+          if (placa) { const k = prog(t, tPl, 1.4), e = eio(k); placa.visible = k < 1; placa.rotation.x = -1.15 * e; placa.position.y = 1.75 - 1.6 * e * e;
+            placa.scale.setScalar(Math.max(.001, 1 - .75 * e)); placa.position.x = (c.placa_x ?? xf - passo * .6) + .15 * Math.sin(t * .8); }
           if (bo) { const a = prog(t, tV, .75), yD = .5 + 2.05 * (1 - eio(a)), wy = grupo.position.y + yD;   // o disco desce e o manequim aparece acima dele
-            bo.visible = a > 0; disco.visible = a > 0 && a < 1; disco.position.y = yD; disco.material.opacity = 1;
-            corte.constant = -(a >= 1 ? -99 : wy); } };
+            bo.visible = a > 0; disco.visible = a > 0 && t < tV + 1.3; disco.position.y = a < 1 ? yD : .5 + 2.2 * eout(prog(t, tV + .75, .45));   // depois sobe e sai
+            corte.constant = -(a >= 1 ? -99 : wy);
+            const br = eback(prog(t, tBr, .45)); bo.userData.bracos.forEach(({ om, sd }) => { om.rotation.z = sd * (2.75 * br + .02 * Math.sin(t * 2)); }); } };
       } else if (c.tipo === "documento") {
         // tela/documento do viral da 6x1: TELA BRANCA ACESA (brilha), sem moldura escura, título pequeno cinza no topo e o
         // texto centralizado em cinza; a palavra entre *asteriscos* aparece letra por letra com um cursor amarelo ("revela_em")
@@ -1406,7 +1424,8 @@
     const V = (a, O) => new T.Vector3(a[0] + O.x, a[1] + O.y, a[2] + O.z);
     function poseEm(t, item) {   // pose da cena com deriva lenta (órbita) e respiração
       const dt = Math.max(0, t - item.c.de), p = item.pose, lado = (item.i0 ?? item.i) % 2 ? -1 : 1, ang = lado * (item.c.orbita ?? (item.grupo.userData.estilo === "estudio" ? .012 : .06)) * dt;   // estúdio: quase de frente, como a referência
-      const pos = V(p.pos, item.O), alvo = V(p.alvo, item.O), d = pos.clone().sub(alvo);
+      const pos = V(p.pos, item.O), alvo = V(p.alvo, item.O), tr = (item.c.trilho || 0) * dt; pos.x += tr; alvo.x += tr;   // trilho lateral
+      const d = pos.clone().sub(alvo);
       d.applyAxisAngle(new T.Vector3(0, 1, 0), ang); d.multiplyScalar(DIST * Math.max(.75, 1 - (item.c.aproxima ?? .022) * dt) * (1 - .055 * kickEm(t)));
       d.y += .18 * Math.sin(dt * .55);
       return { pos: alvo.clone().add(d), alvo };

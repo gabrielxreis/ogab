@@ -75,7 +75,7 @@ Cenários prontos no acabamento da réplica (argila arredondada, aceso com volum
 |---|---|---|
 | `mesa` | monitor com play, monte de moedas que chovem, teclas que acendem em fases | `acesas`, `acende_em`, `teclas`, `pilhas` |
 | `hemiciclo` | plenário em arco de assentos-cápsula que acendem da esquerda para a direita junto com o contador | `acende: {fracao | n, total, em, dur}`, `fileiras`, `n`, `raio` |
-| `semana` | 7 cubos SEG-DOM com o dia no chão e ícone em cima (maleta = trabalho, cama = folga); a folga acende; o boneco "você" pousa | `folgas: [5, 6] ou [{dia, em}]`, `dias`, `voce`, `voce_em` |
+| `semana` | igual ao viral da 6x1. Fileira já montada no 1º quadro e câmera baixa que desliza de lado (`trilho`). Opcional: placa branca acesa do gancho (`placa`: "6x1") que inclina, encolhe e afunda (`placa_cai`). Na folga, a maleta sobe e some, a cama entra com sobra e o cubo acende em fade. O manequim nasce no disco ao lado da cama e levanta os braços quando a última folga acende (`bracos_em`) | `folgas: [5, 6] ou [{dia, em}]`, `dias`, `voce`, `voce_em`, `placa`, `placa_cai`, `bracos_em`, `foco_x` |
 | `documento` | tela/documento em pé com o texto da lei; a palavra entre `*asteriscos*` começa sob tarja preta, que recua e vira grifo amarelo | `titulo`, `linhas`, `revela_em`, `revela_dur` |
 Estrutura anunciada no topo (fixa durante o miolo):
 - `"etapas": ["ONDE", "SINDICATO", "EMPRESA"]` no plano e `"etapa": n` na cena: cada slot mostra "n · ?" até a sua cena, aí revela e acende.
