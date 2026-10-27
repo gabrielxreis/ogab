@@ -1,5 +1,6 @@
 # Novidades do Gab (/ogab)
-## 2026.10.27-11 (27/10/2026)
+## 2026.10.27-12 (27/10/2026)
+- **Storyboard voltou nos estilos Colagem, Gravura e Mimic:** os quadros de aprovação antes do render davam "tempo esgotado" nesses três estilos. Agora saem normalmente, e se alguma composição não carregar o Gab diz o motivo em vez de só "tempo esgotado".
 - **Lúdico com o visual da referência Ludificando:** fundo infinito grafite sem linha de horizonte, objetos de argila cinza com canto arredondado, luz suave de estúdio (o holofote saiu do padrão), amarelo aceso que brilha, lente longa de foto de produto e poeira bem desfocada. Cada cenário se monta na frente de quem assiste: as peças nascem pequenas e crescem passando do ponto. No cartão: manchete com a palavra-chave em destaque e chips que vão se somando de uma frase para a outra.
 - **Personagens e cenas mais claros no Lúdico:** boneco novo (cápsula com braços e olhos), enquadramento automático centrado no objeto e exposição maior nos estúdios de palco.
 ## 2026.10.27-11 (27/10/2026)
