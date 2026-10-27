@@ -1,0 +1,16 @@
+{
+ "_leia": "Tema neutro do preset Lúdico (estúdio escuro, globo azul-marinho, destaque amarelo). Marca nova: copiar este arquivo para temas/<marca>.json, trocar cor, serie, fonte e tema3d; em trocas, cada par é [texto do kit, texto novo] (ver temas/xtrader.json de exemplo).",
+ "nome": "Padrão",
+ "cor": "#F4F78A",
+ "trocas": [],
+ "serie": "O MUNDO EM 1 MINUTO",
+ "fonte": "Inter Tight",
+ "tema3d": {
+  "cone": "#F4F78A",
+  "disco": "#F4F78A",
+  "queda": "#DC2626",
+  "vela_alta": "#20BD5A",
+  "vela_baixa": "#DC2626"
+ },
+ "cta_botao": "COMENTA AQUI"
+}

@@ -1,0 +1,15 @@
+{ "w": 1080, "h": 1920, "fps": 24, "legenda": false,
+  "serie": "EXEMPLO · O PREÇO DO CAFÉ",
+  "fontes": "FONTES: DADOS FICTÍCIOS · EXEMPLO DO PRESET",
+  "cenas": [
+    { "de": 0, "ate": 5.5, "tipo": "balanca", "secao": "O CAFÉ", "etiqueta": "EXEMPLO", "esq": "OFERTA", "dir": "PROCURA",
+      "em": 0.6, "inclina": 14, "numero": {"texto": "+18%", "em": 1.2}, "rotulo": "NUM MÊS SÓ", "sub": "NÚMERO FICTÍCIO" },
+    { "de": 5.5, "ate": 11.5, "tipo": "termometro", "secao": "O PREÇO", "etiqueta": "SACA DE CAFÉ", "max": 30, "marcas": [0, 10, 20, 30],
+      "inicio_em": 5.8, "fim_em": 11.2, "valor": 24, "limite": {"valor": 15, "texto": "MÉDIA DO ANO", "em": 8.0},
+      "numero": {"valor": 24, "sufixo": "%", "sinal": true, "em": 6.5}, "rotulo": "ALTA NO MÊS" },
+    { "de": 11.5, "ate": 17.0, "secao": "DE ONDE VEM", "etiqueta": "PORTO DE SANTOS", "foco": "santos", "zoom": 1.1, "inclina": 4,
+      "rotas": [ {"de": "santos", "para": "hamburgo", "em": 12.5, "arco": 0.2, "dur": 1.2} ],
+      "topicos": [ {"texto": "Safra menor", "em": 13.0}, {"texto": "Mais procura lá fora", "em": 14.5} ] },
+    { "de": 17.0, "ate": 21.0, "tipo": "balanca", "cta": true, "esq": "OFERTA", "dir": "PROCURA", "em": 17.0, "inclina": 14,
+      "selo": "?", "pergunta": "O café continua subindo?", "botao": "COMENTA AQUI" }
+  ] }

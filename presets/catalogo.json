@@ -1279,6 +1279,93 @@
      "@ultima"
     ]
    }
+  },
+  {
+   "id": "ludico",
+   "nome": "Lúdico (explicador 3D)",
+   "categoria": "dados",
+   "papel": "linguagem",
+   "apresentador": "sem",
+   "formato": [
+    "vertical"
+   ],
+   "resumo": "Explicador viral de notícia em estúdio 3D escuro: holofote em cone, objetos low-poly claros, um destaque de cor, câmera que viaja entre cenários inventados para cada frase (balança, termômetro, elevador, placar, globo), cartão no canto, carimbo e CTA, nas cores da marca.",
+   "quando": "notícia explicada em 1 minuto de forma lúdica: mercado, dólar, bolsa, eleição, economia do dia a dia, 'o que isso tem a ver comigo', metáfora com objeto do cotidiano",
+   "sinais": [
+    "no seu bolso",
+    "o que isso tem a ver",
+    "circuit breaker",
+    "disparou",
+    "despencou",
+    "reeleito",
+    "eleicao",
+    "dolar",
+    "bolsa",
+    "ibovespa",
+    "juros",
+    "inflacao",
+    "preco",
+    "mercado"
+   ],
+   "nichos": [
+    "mercado",
+    "bolsa",
+    "dolar",
+    "economi",
+    "financ",
+    "investiment",
+    "trader",
+    "eleica",
+    "noticia",
+    "politic"
+   ],
+   "padroes": {
+    "numero": 1,
+    "porcentagem": 2,
+    "fonte": 2,
+    "dinheiro": 1
+   },
+   "cenas": {
+    "palco": [
+     "por que",
+     "a licao",
+     "quem decide"
+    ],
+    "barras": [
+     "antes",
+     "depois",
+     "compar"
+    ],
+    "blocos": [
+     " de cada",
+     "%"
+    ],
+    "placas": [
+     "no seu bolso",
+     "consequ"
+    ],
+    "duelo": [
+     " x ",
+     "contra",
+     "eleito",
+     "venceu"
+    ],
+    "grafico": [
+     "indice",
+     "caiu",
+     "subiu",
+     "fechou"
+    ],
+    "cidade": [
+     "nova york",
+     "la fora",
+     "china",
+     "europa"
+    ],
+    "cta": [
+     "@ultima"
+    ]
+   }
   }
  ],
  "pedidos": [

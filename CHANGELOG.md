@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-1 (27/10/2026)
+- **Estilo novo: Lúdico.** Explicador viral de notícia em estúdio 3D escuro: holofote em cone, objetos claros e um destaque de cor, com um cenário inventado para cada frase (balança, termômetro, elevador que despenca, placar, globo quando a frase é de lugar), cartão no canto, carimbo e chamada no fim, tudo nas cores da sua marca. Peça "no estilo lúdico" ou marque **Lúdico** no passo de estilo do `/ogab menu`.
+- **Menu: um estilo por vídeo.** No passo "Estilo dos motions" agora você marca UM estilo (marcar outro troca o anterior); batidas visuais, b-roll animado e efeitos extras continuam somando. O Gab cria cenas e animações novas no padrão desse estilo, sem ficar preso às que o preset já tem.
 ## 2026.10.26-3 (26/10/2026)
 - **Estilo novo: Explicador de notícia.** O estilo completo dos vídeos explicadores de mercado e notícia: globo 3D que gira até cada cidade da história, rotas pontilhadas ligando os lugares, cartão de dado no canto (seção, etiqueta, número contando e a fonte), tópicos, carimbo, chamada no fim e legenda karaokê. Bom para dólar, bolsa, economia, eleição, exportação e viagem. Peça "no estilo explicador de notícia" ou marque **Explicador de notícia** no passo de estilo do `/ogab menu`.
 - **Menu:** um preset que já é oficial não aparece mais duas vezes (uma como "seu").

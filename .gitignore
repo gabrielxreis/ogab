@@ -29,3 +29,6 @@ scripts/publicar_release.py
 scripts/licenca_admin.py
 scripts/presets_vps.py
 presets/whiteboard/exemplo/exemplo.mp4
+
+# temas de marca de cliente do preset ludico: só nesta máquina
+presets/ludico/temas/xtrader.json

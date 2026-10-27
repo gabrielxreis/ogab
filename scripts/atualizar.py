@@ -54,6 +54,14 @@ def _git_pull():
         subprocess.run(["git", "-C", SKILL, "pull", "--ff-only", "--quiet"], capture_output=True)
 
 
+def _editados_local():
+    """Arquivos mudados e ainda não commitados no clone do dono: o update não pode sobrescrever trabalho em andamento."""
+    if not os.path.isdir(os.path.join(SKILL, ".git")):
+        return set()
+    r = subprocess.run(["git", "-C", SKILL, "status", "--porcelain", "--untracked-files=no"], capture_output=True, text=True)
+    return {l[3:].strip().strip('"') for l in r.stdout.splitlines() if l.strip()}
+
+
 def sync():
     d = licenca._ler()
     if not d.get("key"):
@@ -69,7 +77,10 @@ def sync():
         return 0
     antigos = _cache()
     baixados = 0
+    editados = _editados_local()
     for path, sha in arquivos.items():
+        if path in editados:
+            continue
         if _sha(os.path.join(SKILL, path)) != sha:
             r = licenca._post("/v1/release/baixar", {"key": d["key"], "maquina": licenca.maquina(), "path": path})
             if r and r.get("b64") is not None:

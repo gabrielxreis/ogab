@@ -116,7 +116,7 @@ def presets_do_usuario(C):
         r.append(it("local:" + p["id"], p["nome"], p["nome"], p.get("resumo") or "", p.get("resumo") or "",
                     gif=(p["pasta"] + "/" + p["gif"]) if p.get("gif") else None,
                     extra={"aba": cat, "cat": cat, "catn": {"pt": C["categorias"].get(cat, ""), "en": CAT_EN.get(cat, "")},
-                           "formato": p.get("formato") or [], "seu": True, "pasta": p["pasta"]}))
+                           "formato": p.get("formato") or [], "seu": True, "pasta": p["pasta"], "base": True}))
     return r
 
 
@@ -147,7 +147,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
     presets = [p for p in C["presets"] if p["id"] not in FORA_DO_MENU]
     est = [it(p["id"], p["nome"], NOME_EN.get(p["nome"], p["nome"]), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
               gif=p.get("gif") or None, extra={"aba": p["categoria"], "cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
-              "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or []}) for p in presets]
+              "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or [], "base": True}) for p in presets]
     est += presets_do_usuario(C)
     EST = estilos_prontos()
     est += EST.get("batida", []) + EST.get("broll", [])   # batidas e b-roll animado: abas no passo de estilo dos motions
@@ -203,12 +203,14 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("equilibrado", "Equilibrado", "Balanced", "Nos momentos que pedem imagem, com respiro de pessoa falando.", "Where an image helps, with talking breathers.", "dens d2"),
             it("muitos", "Muitos", "Lots", "Uma ideia, uma imagem: quase o vídeo todo.", "One idea, one image: almost the whole video.", "dens d3"),
             it("sem", "Sem motion", "No motion", "Só a pessoa, legenda e lettering.", "Just the person, captions and lettering.", "none")]},
-        {"id": "estilo", "letra": "E", "unico": False, "max": 6, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
+        # UM estilo base por vídeo (itens "base"); batidas, b-roll e efeitos somam
+        {"id": "estilo", "letra": "E", "unico": False, "max": 4, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
          "abas": [{"id": "todos", "nome": {"pt": "Todos", "en": "All"}}, {"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [x for x in (
                   {"id": "batida", "nome": {"pt": "Batidas visuais", "en": "Visual beats"}}, {"id": "broll", "nome": {"pt": "B-roll animado", "en": "Animated b-roll"}})
                   if EST.get(x["id"])] + [{"id": "efeitos", "nome": {"pt": "Efeitos extras", "en": "Extra effects"}}] + [{"id": c, "nome": {"pt": C["categorias"][c], "en": CAT_EN.get(c, c)}}
                   for c in ("apresentador", "ideia", "lista", "dados", "produto", "social", "marca") if c in C["categorias"]],
-         "sub": {"pt": "Como os motions vão parecer: presets, batidas visuais e b-roll animado. Eles se misturam trecho a trecho.", "en": "How the motion graphics will look: presets, visual beats and animated b-roll. They mix section by section."},
+         "sub": {"pt": "Escolha UM estilo: o vídeo inteiro nasce nele. O Gab cria cenas e animações novas no mesmo padrão, sem ficar preso às do preset. Batidas visuais, b-roll animado e efeitos extras podem somar.",
+                 "en": "Pick ONE style: the whole video is built on it. Gab creates new scenes and animations in the same look, not limited to the preset's. Visual beats, animated b-roll and extra effects can be added."},
          "itens": est},
         *[g for g in (
             {"id": "gancho", "letra": "G", "unico": False, "max": 2, "nome": {"pt": "Gancho", "en": "Hook"},
@@ -333,7 +335,7 @@ def sugestoes(pedido, roteiro, formato, cliente, pasta):
             if cliente: cmd += ["--cliente", cliente]
             subprocess.run(cmd, capture_output=True, timeout=60)
             d = json.load(open(out, encoding="utf-8"))
-            sug.add(d.get("linguagem")); sug |= {t.get("preset") for t in d.get("trechos", [])}
+            sug.add(d.get("linguagem"))   # um estilo por vídeo: só a linguagem é sugerida, não o preset de cada trecho
         elif pedido:
             r = subprocess.run([sys.executable, os.path.join(AQUI, "escolher_preset.py"), "pedido", pedido, "--formato", formato],
                                capture_output=True, text=True, timeout=60).stdout
@@ -658,7 +660,10 @@ document.addEventListener("click", e => {
   const b = e.target.closest(".card"); if (b) {
     const g = D.grupos.find(x => x.id === b.dataset.g), s = sel[g.id], id = b.dataset.i;
     if (s.has(id)) s.delete(id);
-    else { if (g.unico || id === "sem") s.clear(); else s.delete("sem"); if (g.max && s.size >= g.max) return; s.add(id); }
+    else {
+      if (g.unico || id === "sem") s.clear(); else s.delete("sem");
+      if ((g.itens.find(x => x.id === id) || {}).base) g.itens.forEach(x => { if (x.base) s.delete(x.id); });   // estilo: um só, o novo troca o anterior
+      if (g.max && s.size >= g.max) return; s.add(id); }
     autoPasso[g.id] = false;
     const gr = $(".grid"), y = gr ? gr.scrollTop : 0; render(); if ($(".grid")) $(".grid").scrollTop = y; return;
   }
