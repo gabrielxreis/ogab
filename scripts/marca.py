@@ -2,6 +2,13 @@
 
   python3 marca.py https://site-da-empresa.com ~/Desktop/<Empresa>/marca
   python3 marca.py inverter logo.png [saida.png]   -> versão oposta da logo (branca <-> preta), mantendo a transparência
+  python3 marca.py paleta logo.png [print.png ...] [--salvar identidade.json]   -> cores MEDIDAS nos pixels
+  python3 marca.py conferir quadro.png identidade.json [--limite 12]          -> o quadro saiu nas cores da marca?
+
+paleta: agrupa os pixels (ignora transparência e as cores da interface do Instagram), junta tons quase iguais (ΔE) e
+devolve hex + fatia da imagem + papel (fundo, principal, destaque). Olhar no olho puxa a cor para um tom "conhecido";
+medir não. conferir: cada cor que ocupa 3% ou mais do quadro tem que estar perto (ΔE) de uma cor da marca ou de um
+neutro; as que não estão saem como aviso. Ideia do design-dna (zanwei, MIT), refeita em Pillow.
 
 Salva em <destino>/:
   logos/          todos os candidatos a logo (img/svg com "logo" no nome/classe/alt, favicons, apple-touch-icon, og:image)
@@ -107,6 +114,98 @@ def main(site, destino):
     print(len([s for s in salvos if "arquivo" in s]), "arquivos em", os.path.join(destino, "logos"))
 
 
+INTERFACE_IG = ["#ff3040", "#f83040", "#0095f6", "#efefef", "#dbdbdb", "#8e8e8e", "#262626", "#363636", "#737373"]
+
+
+def _lab(h):
+    r, g, b = (int(h[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    r, g, b = (((c + .055) / 1.055) ** 2.4 if c > .04045 else c / 12.92 for c in (r, g, b))
+    x, y, z = ((r * .4124 + g * .3576 + b * .1805) / .95047, r * .2126 + g * .7152 + b * .0722,
+               (r * .0193 + g * .1192 + b * .9505) / 1.08883)
+    f = lambda t: t ** (1 / 3) if t > .008856 else 7.787 * t + 16 / 116
+    return 116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z))
+
+
+def delta_e(h1, h2):
+    a, b = _lab(h1), _lab(h2)
+    return sum((p - q) ** 2 for p, q in zip(a, b)) ** .5
+
+
+def _sat(h):
+    r, g, b = (int(h[i:i + 2], 16) for i in (1, 3, 5))
+    return (max(r, g, b) - min(r, g, b)) / 255
+
+
+def medir(arquivos, k=12, juntar=8.0, sem_interface=True):
+    """[{hex, fatia, papel}] das imagens juntas, maior fatia primeiro."""
+    from PIL import Image
+    conta, total, transparente = {}, 0, False
+    for arq in arquivos:
+        im = Image.open(arq).convert("RGBA"); im.thumbnail((400, 400))
+        fundo = Image.new("RGB", im.size, (0, 0, 0)); mascara = im.split()[3].point(lambda a: 255 if a >= 128 else 0)
+        fundo.paste(im.convert("RGB"), mask=mascara)
+        q = fundo.quantize(colors=k, method=Image.Quantize.MEDIANCUT)
+        pal = q.getpalette()[:k * 3]
+        visiveis = [p for p, m in zip(q.tobytes(), mascara.tobytes()) if m]
+        transparente |= len(visiveis) < .95 * im.size[0] * im.size[1]   # logo recortada: sem cor de fundo
+        for idx in visiveis:
+            h = "#%02x%02x%02x" % tuple(pal[idx * 3:idx * 3 + 3])
+            conta[h] = conta.get(h, 0) + 1
+        total += len(visiveis)
+    grupos = []                      # junta tons quase iguais, ficando com o tom de maior fatia
+    for h, n in sorted(conta.items(), key=lambda x: -x[1]):
+        if sem_interface and any(delta_e(h, ui) < 6 for ui in INTERFACE_IG):
+            total -= n; continue
+        for g in grupos:
+            if delta_e(h, g["hex"]) < juntar:
+                g["n"] += n; break
+        else:
+            grupos.append({"hex": h, "n": n})
+    out = [{"hex": g["hex"], "fatia": round(g["n"] / max(total, 1), 3)} for g in grupos if g["n"] / max(total, 1) >= .01]
+    if out:
+        out[0]["papel"] = "principal" if transparente else "fundo"
+        resto = out[1:]
+        if resto:
+            max(resto, key=lambda c: delta_e(c["hex"], out[0]["hex"]) * c["fatia"] ** .3)["papel"] = "secundária" if transparente else "principal"
+            cor = [c for c in resto if "papel" not in c and _sat(c["hex"]) > .35]
+            if cor:
+                max(cor, key=lambda c: _sat(c["hex"]))["papel"] = "destaque"
+    return out
+
+
+def paleta(arquivos, salvar=None):
+    cs = medir(arquivos)
+    for c in cs:
+        print(f"{c['hex']}  {c['fatia'] * 100:5.1f}%  {c.get('papel', '')}")
+    if salvar:
+        d = json.load(open(salvar, encoding="utf-8")) if os.path.exists(salvar) else {}
+        d["paleta_medida"] = {"fontes": [os.path.basename(a) for a in arquivos], "cores": cs}
+        json.dump(d, open(salvar, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        print(f"gravado em {salvar} (paleta_medida)")
+    return cs
+
+
+def conferir(quadro, identidade, limite=12.0):
+    d = json.load(open(identidade, encoding="utf-8"))
+    marca = [c["hex"] for c in d.get("paleta_medida", {}).get("cores", [])]
+    marca += [c if isinstance(c, str) else c.get("hex", "") for c in (d.get("cores") or [])][:8]
+    marca = [hex6(m) for m in marca if re.fullmatch(r"#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?", m or "")]
+    if not marca:
+        raise SystemExit("identidade.json sem cores: rodar `marca.py paleta ... --salvar` antes")
+    neutros = ["#ffffff", "#000000", "#808080", "#f2f2f2", "#1a1a1a", "#c0c0c0", "#404040"]
+    fora = []
+    for c in medir([quadro], sem_interface=False):
+        if c["fatia"] < .03:
+            continue
+        perto = min(marca, key=lambda m: delta_e(c["hex"], m))
+        de = delta_e(c["hex"], perto)
+        if de > limite and min(delta_e(c["hex"], n) for n in neutros) > limite:
+            fora.append((c, perto, de))
+        print(f"{c['hex']}  {c['fatia'] * 100:5.1f}%  -> {perto} ΔE {de:4.1f}  {'FORA' if (c, perto, de) in fora else 'ok'}")
+    print("PASSA: o quadro está nas cores da marca" if not fora else f"AVISO: {len(fora)} cor(es) fora da marca (ΔE > {limite:g})")
+    return not fora
+
+
 def inverter(ent, sai=None):
     """Branco vira preto e preto vira branco (inverte só o RGB; o canal alfa fica igual, então o fundo transparente
     continua transparente). Para logo monocromática: gera a versão para fundo claro a partir da branca e vice-versa.
@@ -124,5 +223,9 @@ def inverter(ent, sai=None):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3: print(__doc__); sys.exit()
-    if sys.argv[1] == "inverter": inverter(os.path.expanduser(sys.argv[2]), sys.argv[3] if len(sys.argv) > 3 else None)
+    a = sys.argv[1:]
+    op = lambda k: a[a.index(k) + 1] if k in a else None
+    if a[0] == "inverter": inverter(os.path.expanduser(a[1]), a[2] if len(a) > 2 else None)
+    elif a[0] == "paleta": paleta([os.path.expanduser(x) for x in a[1:] if not x.startswith("--") and x != op("--salvar")], op("--salvar"))
+    elif a[0] == "conferir": sys.exit(0 if conferir(os.path.expanduser(a[1]), os.path.expanduser(a[2]), float(op("--limite") or 12)) else 1)
     else: main(sys.argv[1], os.path.expanduser(sys.argv[2]))

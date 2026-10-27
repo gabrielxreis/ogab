@@ -8,9 +8,14 @@ o gancho, a cena principal e o fecho, cada um depois da entrada dos elementos (6
 a cena N (depois de um ajuste). Lê as cenas do plano.js (presets) ou do --plano.
 
 Saída na própria pasta:
-  storyboard.md    tabela de batidas: cena, tempo, tipo, mensagem e som (vai para o usuário)
+  storyboard.md    tabela de batidas: cena, tempo, tipo, mensagem, leituras e som (vai para o usuário)
   storyboard.jpg   os quadros lado a lado, com o número da cena e o tempo
 O Gab manda os dois e PARA. Nada de render antes da aprovação.
+
+Leituras (ideia do ClaudeAnimationBase, MIT): o que o espectador precisa ENTENDER em cada cena, em ordem, cada uma com
+início e fim (s, relativos à cena), sem duas ao mesmo tempo: causa, depois reação; ação rápida, significado segurado.
+No plano: "leituras": [{"t": "o gráfico sobe", "ini": 0.4, "fim": 1.6}, ...]. Leitura sobreposta a outra, ou que acaba
+depois da cena, sai marcada com ⚠ na tabela e no terminal.
 """
 import json, os, re, shutil, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -49,9 +54,25 @@ def cenas_do_plano(pasta, plano=None):
         texto = _txt(c.get("texto") or c.get("titulo") or c.get("frase") or c.get("nome") or c.get("linhas")
                      or c.get("palavras") or c.get("grupos") or c.get("antes") or c.get("itens") or "")
         out.append({"n": i, "ini": t, "dur": d, "tipo": c.get("tipo", ""), "texto": re.sub(r"[*|]+", " ", texto).replace("  ", " ").strip(),
-                    "som": c.get("som", "")})
+                    "som": c.get("som", ""), "leituras": c.get("leituras") or []})
         t += d
     return out
+
+
+def leituras(c):
+    """Texto da coluna e avisos: leituras sobrepostas ou fora da cena."""
+    ls = sorted(([str(l.get("t", "")), float(l.get("ini", 0)), float(l.get("fim", 0))] if isinstance(l, dict)
+                 else [str(l), None, None]) for l in c["leituras"])
+    ls.sort(key=lambda l: -1 if l[1] is None else l[1])
+    partes, avisos = [], []
+    for i, (t, a, b) in enumerate(ls):
+        if a is None:
+            partes.append(t); continue
+        ruim = (i and ls[i - 1][2] is not None and a < ls[i - 1][2]) or b > c["dur"] + 1e-6 or b <= a
+        if ruim:
+            avisos.append(f"cena {c['n']}: \"{t}\" ({a:g}-{b:g} s) sobrepõe a anterior ou sai da cena")
+        partes.append(f"{'⚠ ' if ruim else ''}{t} ({a:g}-{b:g})")
+    return " → ".join(partes), avisos
 
 
 def escolher(cenas, dur):
@@ -113,11 +134,15 @@ def main(a):
     rot = [(f"Cena {cena_de(t, cenas)} · " if cenas else "") + f"{t:.1f} s" for t in tempos]
     folha(fotos, rot, os.path.join(pasta, "storyboard.jpg"))
     linhas = ["# Storyboard", "", f"{W}x{H}, {dur:g} s. Aprovar antes do render; ajuste por número de cena (só ela muda).", "",
-              "| Cena | Tempo | Tipo | Mensagem | Som |", "|---|---|---|---|---|"]
+              "| Cena | Tempo | Tipo | Mensagem | Leituras | Som |", "|---|---|---|---|---|---|"]
+    avisos = []
     for c in cenas:
-        linhas.append(f"| {c['n']} | {c['ini']:.1f}-{c['ini'] + c['dur']:.1f} s | {c['tipo']} | {c['texto']} | {c['som']} |")
+        txt, av = leituras(c); avisos += av
+        linhas.append(f"| {c['n']} | {c['ini']:.1f}-{c['ini'] + c['dur']:.1f} s | {c['tipo']} | {c['texto']} | {txt or '(preencher)'} | {c['som']} |")
     if not cenas:
-        linhas.append("| (sem plano) | | | descrever as cenas à mão | |")
+        linhas.append("| (sem plano) | | | descrever as cenas à mão | uma leitura por vez, com início e fim | |")
+    for av in avisos:
+        print("⚠ leitura:", av)
     open(os.path.join(pasta, "storyboard.md"), "w", encoding="utf-8").write("\n".join(linhas) + "\n")
     shutil.rmtree(tmp, ignore_errors=True)
     print(os.path.join(pasta, "storyboard.md")); print(os.path.join(pasta, "storyboard.jpg"))

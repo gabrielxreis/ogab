@@ -139,6 +139,27 @@ def lint(pasta):
     return achados
 
 
+def gemeos(pasta):
+    """Elementos irmãos animando em sincronia perfeita (ideia do ClaudeAnimationBase, MIT): 3+ movimentos com o mesmo
+    início, duração, ease e propriedades, ou um movimento com 3+ alvos sem stagger. Lê o movimentos.json da pasta
+    (`OUT=<pasta>/movimentos.json node movimentos.mjs <base> <id>`); sem ele, não confere."""
+    arq = os.path.join(pasta, "movimentos.json")
+    if not os.path.exists(arq):
+        return []
+    from collections import Counter
+    achados = []
+    for cid, tws in json.load(open(arq, encoding="utf-8")).items():
+        iguais = Counter((t[0], t[1], t[3], t[4]) for t in tws if t[5] == 1 and t[1] > 0)
+        for (ini, d, props, ease), n in iguais.items():
+            if n >= 3:
+                achados.append((f"{cid} {ini:.2f} s", f"{n} elementos com o mesmo movimento ({props}, {d:g} s, {ease or 'padrão'}) "
+                                                       "ao mesmo tempo: variar início/duração (stagger ou distribute)"))
+        for t in tws:
+            if t[5] >= 3 and not (len(t) > 6 and t[6]):
+                achados.append((f"{cid} {t[0]:.2f} s", f"{t[5]} alvos ({t[2]}) entrando juntos sem stagger"))
+    return achados
+
+
 def main(a):
     if not a:
         raise SystemExit(__doc__)
@@ -200,6 +221,7 @@ def main(a):
     if op("--pasta"):
         for arq, msg, n in lint(os.path.abspath(op("--pasta"))):
             (avisos if "linear" in msg else erros).append((arq, f"proibido: {msg} ({n}x)"))
+        avisos += gemeos(os.path.abspath(op("--pasta")))
     for f in os.listdir(out):
         if f.startswith(("_t", "_g", "_f", "_c")):
             os.remove(os.path.join(out, f))
