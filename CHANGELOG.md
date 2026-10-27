@@ -1,5 +1,8 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.27-11 (27/10/2026)
+- **Lúdico com o visual da referência Ludificando:** fundo infinito grafite sem linha de horizonte, objetos de argila cinza com canto arredondado, luz suave de estúdio (o holofote saiu do padrão), amarelo aceso que brilha, lente longa de foto de produto e poeira bem desfocada. Cada cenário se monta na frente de quem assiste: as peças nascem pequenas e crescem passando do ponto. No cartão: manchete com a palavra-chave em destaque e chips que vão se somando de uma frase para a outra.
+- **Personagens e cenas mais claros no Lúdico:** boneco novo (cápsula com braços e olhos), enquadramento automático centrado no objeto e exposição maior nos estúdios de palco.
+## 2026.10.27-11 (27/10/2026)
 - **Relatos mais limpos e mais privados:** quando você atualiza o Gab, as novidades oficiais não são mais confundidas com "invenção sua" e enviadas de volta. Só vai o que você realmente criou ou mudou na skill, e arquivos de pastas temporárias (como scripts gerados na hora com conteúdo do seu cliente) nunca saem do seu computador.
 ## 2026.10.27-10 (27/10/2026)
 - **Faz igual esse Reel:** mande o link (ou o arquivo) de um vídeo que você gosta com `/ogab referencia <link>`, ou só diga "nesse estilo" junto com o link. O Gab decupa a referência sozinho: quantos planos, quanto dura cada um, o que a câmera faz em cada plano, luz e cores, BPM da música, onde estão os picos e se os cortes caem na batida. Cada cena do seu vídeo aponta para o plano da referência que ela recria, e no fim o revisor compara o seu vídeo com a referência lado a lado e reprova se o ritmo ficar longe. Só a linguagem vem da referência: imagem, texto e marca são sempre seus.

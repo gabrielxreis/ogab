@@ -17,7 +17,7 @@ cada frase no mesmo jeito de desenhar (ver Regras do estilo). Nunca misturar com
   Marca nova: copiar para `temas/<marca>.json` e trocar as cores. **Sempre no tema do cliente** (pedido do Rick).
 
 ## REGRAS DO ESTILO (pedidas pelo Rick em 26/10/2026, valem para todo vídeo deste preset)
-1. **O preset é o JEITO DE DESENHAR, não um catálogo.** Estilo fixo: cores do cliente, estúdio escuro com iluminação de palco (variando por cena, ver Iluminação variada),
+1. **O preset é o JEITO DE DESENHAR, não um catálogo.** Estilo fixo: cores do cliente, estúdio de fundo infinito grafite com luz suave (ver VISUAL = a referência Ludificando),
    objetos low-poly claros, um destaque de cor, cartão no canto, câmera que viaja, carimbo e CTA. Os CENÁRIOS são inventados
    para cada vídeo: "as animações estão muito iguais, um vídeo igual ao outro; tem que ser criativo". Cada vídeo novo cria
    ambientes próprios para a metáfora daquele assunto (elevador que despenca e o freio trava; balança real x dólar;
@@ -155,3 +155,19 @@ Cena = UM elemento por ideia da fala, de 2 a 4,5 s (CTA até 7 s). Frase longa v
 ## Iluminação variada (Gabriel, 27/10/2026: "não precisa ter aquele holofote de luz o tempo todo, pode explorar outras coisas")
 O holofote em cone NÃO é a assinatura do estilo: cada cena alterna sozinha entre 6 iluminações (a luz de verdade, com sombra, vem do pool fixo; muda só o que se vê):
 `neon` (aro grosso de neon no chão com reflexo), `contraluz` (halo grande atrás, objeto em silhueta com contorno), `feixes` (dois fachos cruzados dos lados), `grade` (chão com grade luminosa e brilho no horizonte), `janela` (fachos verticais atrás) e `cone` (o holofote clássico, ~1 a cada 6 cenas). `"luz": "<estilo>"` na cena força um; `"luzes": [...]` no plano define a sequência. Cenário novo: chamar `holofote(grupo, x, z, raio)` normalmente (ele desenha o estilo da cena) e pensar se a cena pede outra luz.
+
+## VISUAL = a referência Ludificando, igual (Gabriel, 27/10/2026: "esse tá muito mais bonito e lapidado, o lúdico não precisa ter o holofote o tempo todo"; depois: "exatamente igual, olhe todos os detalhes")
+Referência: instagram.com/p/De56numApif (Ludificando, 22 s), medida quadro a quadro. O estilo de luz `estudio` reproduz e é o PADRÃO de todas as cenas:
+- **Fundo infinito:** grafite uniforme (#1E1E1C) com um clarão leve atrás do assunto, sem parede nem linha de horizonte. O canvas 3D fica transparente e o fundo é pintado no `#root`; o chão vira só sombra (`ShadowMaterial`).
+- **Argila:** objetos cinza quente (#7A7870 / #4E4D48 / #5E5D57 no tema padrão), caixas com canto arredondado (`"cantos": false` volta ao cubo), luz-chave branca de frente-alto e sombra macia.
+- **Destaque aceso:** tudo que está na cor da marca sai saturado e emissivo (fora do tone mapping) e vaza brilho em volta (bloom em 2D). Campos: `"brilho": 0.4` (0 desliga) e `"acesos": false`.
+- **Lente longa** (foto de produto, quase sem distorção): `"lente": 22` (graus) e `"folga": 0.08` (recuo extra).
+- **Montagem:** as peças do cenário nascem pequenas e crescem passando do ponto, da esquerda para a direita, enquanto a câmera chega (`"montagem": false` na cena ou no plano desliga).
+- **Poeira bokeh:** poucas bolas grandes e bem desfocadas (`"poeira": 18`).
+- **Cartão:** kicker `• SÉRIE` em mono branco com ponto na cor, fixo o vídeo todo; sem pílula de seção (ela só aparece se alguma cena tiver `secao`).
+  `"manchete": "A *IA*:"` = título bold, palavra entre asteriscos na cor (não confundir com `titulo`, que é o texto 3D de placar/câmbio/cartão/urna).
+  `"chips": [{"texto": "PESQUISOU", "em": 4.1}, ...]` = pílulas na cor que vão se SOMANDO.
+  `"continua": true` = a cena segue a ideia da anterior: o cartão fica e só ganha os chips/tópicos novos (o "A IA: PESQUISOU > ESCREVEU > NARROU > MONTOU EM 3D" da referência).
+- As outras luzes (`contraluz`, `neon`, `janela`, `feixes`, `grade`, `cone`) ficam para quando a frase pedir: `"luz": "<estilo>"` na cena ou `"luzes": [...]` no plano.
+- Marca de cliente: o tema dela troca as cores (fundo, objetos, destaque); a luz, a montagem e o cartão continuam os da referência.
+- Ao criar cenário novo, pensar como a referência: o cenário **acumula** entre frases da mesma ideia (o monitor fica, chegam as moedas, depois o teclado, depois o celular na frente), chuva de objetos que empilham, e um campo de peças acesas desfocadas ao fundo para dar densidade.

@@ -1,5 +1,5 @@
 {
- "_leia": "Tema neutro do preset Lúdico (estúdio escuro, globo azul-marinho, destaque amarelo). Marca nova: copiar este arquivo para temas/<marca>.json, trocar cor, serie, fonte e tema3d; em trocas, cada par é [texto do kit, texto novo] (ver temas/xtrader.json de exemplo).",
+ "_leia": "Tema neutro do preset Lúdico = o visual da referência Ludificando (27/10/2026): grafite uniforme sem horizonte, objetos cinza-argila, destaque amarelo-limão aceso. Marca nova: copiar este arquivo para temas/<marca>.json, trocar cor, serie, fonte e tema3d; em trocas, cada par é [texto do kit, texto novo] (ver temas/xtrader.json de exemplo).",
  "nome": "Padrão",
  "cor": "#F4F78A",
  "trocas": [],
@@ -10,7 +10,21 @@
   "disco": "#F4F78A",
   "queda": "#DC2626",
   "vela_alta": "#20BD5A",
-  "vela_baixa": "#DC2626"
+  "vela_baixa": "#DC2626",
+  "escuro": "#4E4D48",
+  "cinza": "#5E5D57",
+  "chao": "#151514",
+  "personagem": "#9A968C",
+  "fundo_topo": "#242422",
+  "fundo_meio": "#1E1E1C",
+  "fundo_base": "#1A1A18",
+  "fundo": "#1E1E1C",
+  "parede": "#1E1E1C",
+  "objeto": "#7A7870",
+  "ceu": "#F2F0EA",
+  "luz": "#FFFFFF",
+  "ouro": "#C9A35A",
+  "chao_luz": "#3a3934"
  },
  "cta_botao": "COMENTA AQUI"
 }
