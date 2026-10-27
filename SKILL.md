@@ -51,3 +51,11 @@ Só a LINGUAGEM (ritmo, câmera, luz, recursos): nunca copiar imagem, texto, mar
 
 ## Objeto 3D que não existe: buscar antes de modelar
 Precisou de um objeto 3D (cadeira, troféu, planeta, ferramenta, animal...) que o preset não tem: ANTES de modelar do zero ou gerar por IA, rodar `python3 tresd/bancos3d.py buscar <objeto em inglês>` (Poly Haven CC0 + Sketchfab CC0/CC-BY) e baixar com `bancos3d.py baixar polyhaven|sketchfab <id> <pasta do cliente>`; sem resultado bom, os sites sem busca aberta (Kenney, Quaternius, Poly Pizza, Smithsonian, NASA) pelo Chrome. Ordem, licenças e cuidados em `docs/BANCOS_3D.md`: só CC0/CC-BY/Royalty Free (CC-BY = crédito na descrição do post), nunca NC nem marca de terceiros em anúncio, um estilo por vídeo (low-poly OU realista). O objeto baixado ainda passa pelo acabamento da base (material, luz, escala) e pelos prints. IA 3D só perguntando, porque custa crédito.
+
+## Instituição ou marca citada = a LOGO real dela (REGRA do usuário, 27/10/2026, todo vídeo e todo preset)
+"Quando fala de instituições e marcas você tem que pegar sempre a logo e usar ela; a logo tá na internet." Banco (Bradesco, Itaú, Nubank), órgão (Banco Central, Tesouro Nacional, Fed, B3), bolsa (Nasdaq), empresa (Celestica, Apple, Nvidia): a cena que fala dela mostra a LOGO oficial, não o nome escrito numa placa genérica. Como:
+1. Buscar a logo oficial: SVG do site da empresa ou da página de imprensa/marca, Wikimedia Commons ("<nome> logo svg"), Wikipedia (infobox). Preferir SVG ou PNG transparente grande; nunca print borrado, versão antiga ou logo de terceiro.
+2. Salvar em `<pasta do cliente>/marca/logos/<nome>.svg|png` (reaproveita nos próximos vídeos) e conferir que é a atual.
+3. Usar a logo no cenário: textura no letreiro/fachada/placa do objeto 3D (prédio do banco com a logo na fachada, cartão com a logo, tela com a logo), ou no cartão/chip do texto. Cor original da logo (pode ganhar contorno/plaquinha clara para ler sobre o fundo escuro); não recolorir para a paleta do cliente.
+4. Conferir nos prints que a logo está legível e não encosta no texto.
+Exceção: anúncio pago (Meta Ads etc.) com marca de terceiro só com o ok do usuário. Conteúdo informativo/notícia usa a logo normalmente.

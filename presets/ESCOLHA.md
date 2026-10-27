@@ -32,6 +32,8 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 ### Preset = base e formato (regra do usuário, 27/10/2026)
 O preset dá a base (tema, luz, câmera, cartão, ritmo, som) e o formato; os cenários e objetos são criados para cada vídeo, com o acabamento da base. Não ficar preso ao catálogo de cenas do preset.
 
+**Instituição ou marca citada = a logo real dela** (regra do usuário, 27/10/2026): banco, órgão, bolsa ou empresa que aparece na fala ganha a logo oficial baixada da internet (SVG/PNG transparente, `<cliente>/marca/logos/`) no cenário ou no cartão, em qualquer preset. Detalhes no SKILL.md, seção "Instituição ou marca citada".
+
 ### Tela sempre mudando (regra do usuário, 27/10/2026)
 Em qualquer preset: um elemento novo na tela a cada ~2,5-4 s, acompanhando cada ideia da fala; nenhum cenário passa de ~4,5 s (CTA até 7 s). Frase longa vira 2-3 elementos.
 
