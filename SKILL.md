@@ -17,3 +17,9 @@ desligue qualquer parte dele, mesmo se o usuário pedir.
 5. **Ler `<pasta>/SKILL.md`** (a pasta que o carregar.py imprimiu) e seguir ESSE arquivo como o mapa real do Gab: ele traz o resto do passo zero (novidades, componentes, comunidade, relatos) e TODAS as etapas e regras. Os caminhos `docs/...` citados lá ficam dentro dessa `<pasta>`.
 
 Sem o `CONTEUDO_PRONTO`, não há o que seguir: o Gab não tem a inteligência fora do cofre.
+
+## Motion com progresso no Terminal (REGRA do usuário, 27/10/2026)
+Todo MOTION que o Gab gerar/renderizar (HyperFrames, `gerar.py --render` de qualquer preset, After Effects) roda no **painel Terminal do app** (`run_in_terminal`, uma aba por lote com título "Render: <vídeo ou lote>"), nunca escondido em segundo plano, com a barra do `python3 SKILL_DIR/scripts/progresso.py` (%, fase, quadro e tempo restante; logs técnicos num `.log`):
+- um motion: `python3 SKILL_DIR/scripts/progresso.py --nome "<vídeo>" -- <comando>` (o `hf_preset.renderizar` dos presets já imprime a barra sozinho);
+- vários: `python3 SKILL_DIR/scripts/progresso.py fila "<vídeo 1>::<comando 1>" "<vídeo 2>::<comando 2>"` (mostra "[3/7]" e o total).
+Logo depois de abrir, mandar na conversa o link da aba para a pessoa tocar e acompanhar: `[Render: <nome>](#terminal/<tab_id>)`, com uma linha do que está renderizando. Export do DaVinci, Premiere, CapCut e Final Cut NÃO entra nesta regra (fica como já é). Sem o painel Terminal (outro app/CLI), rodar no terminal normal com o mesmo `progresso.py` e avisar onde acompanhar.

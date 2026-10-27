@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-4 (27/10/2026)
+- **Motion nunca parado (Lúdico):** a câmera anda o tempo todo e, nas palavras fortes da fala, entra uma batida (empurrão de câmera, pulso, onda e faíscas) com um whoosh baixinho. Acabou o quadro parado esperando a próxima frase.
+- **Progresso do motion no Terminal:** todo render de motion mostra uma linha com a porcentagem, a etapa e quanto falta, e o Gab manda o link da aba para você tocar e acompanhar. Vários vídeos aparecem em fila, com o total.
 ## 2026.10.27-7 (27/10/2026)
 - **Atualiza também no meio do projeto.** Antes o Gab só procurava atualização quando começava. Agora, numa conversa em que ele já está trabalhando, cada pedido seu confere se saiu versão nova (no máximo 1 vez por minuto, sem atrasar). Se tiver, ele baixa, relê as regras novas e avisa em uma linha antes de seguir. Vale a partir da próxima conversa depois desta atualização.
 ## 2026.10.27-6 (27/10/2026)
