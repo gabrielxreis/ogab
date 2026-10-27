@@ -116,6 +116,43 @@ def resolver_3d(plano, base, g):
         anda(c)
 
 
+def batidas(plano, base, g):
+    """Movimento contínuo (Gabriel, 27/10/2026: "ele termina o movimento tem que entrar outra coisa, senão não retém"):
+    em cada cena, nos vãos sem nenhum evento, uma batida na palavra forte (empurrão de câmera, pulso, onda e faíscas no kit).
+    Palavra forte = 5+ letras ou número; longe 1,1 s de qualquer evento da cena e 1,6 s da batida anterior.
+    "batidas": false no plano desliga; uma lista de segundos no plano manda."""
+    if plano.get("batidas") is False or isinstance(plano.get("batidas"), list) or not plano.get("transcricao"):
+        return
+    pal = g._palavras_transcricao(plano["transcricao"], base)
+    out = []
+    for c in plano.get("cenas", []):
+        ev = []
+        def junta(o):
+            if isinstance(o, dict):
+                for k, v in o.items():
+                    if (k in ("em", "em_valor", "desliga", "religa", "apaga", "botao_em") or k.endswith("_em")) and isinstance(v, (int, float)):
+                        ev.append(float(v))
+                    else:
+                        junta(v)
+            elif isinstance(o, list):
+                for x in o:
+                    junta(x)
+        junta(c)
+        ev.append(c["de"])
+        ult = -9
+        for w in pal:
+            if not (c["de"] + .9 <= w["s"] <= c.get("ate", 1e9) - .5):
+                continue
+            n = g._norm(w["t"])
+            if len(n) < 5 and not any(ch.isdigit() for ch in n):
+                continue
+            if min(abs(w["s"] - e) for e in ev) < 1.1 or w["s"] - ult < 1.6:
+                continue
+            out.append(round(w["s"], 3)); ult = w["s"]
+    plano["batidas"] = out
+    print(f"batidas: {len(out)}")
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if len(a) < 2:
@@ -131,6 +168,7 @@ if __name__ == "__main__":
             plano.setdefault(k, tema[k])
     g = _globo()
     resolver_3d(plano, base, g)
+    batidas(plano, base, g)
     pasta = os.path.abspath(a[1])
     copiar_fotos(plano, base, pasta)
     pasta = g.gerar(plano, pasta, base)

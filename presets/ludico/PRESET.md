@@ -142,3 +142,9 @@ globo NY > palco > placas > plenário acendendo > CTA no globo. 9 cenas, 88,8 s.
 
 ## Cartão: topo limpo (Gabriel, 27/10/2026: "aqui em cima eu acho muito sujo, para um início tudo bem, mas seria legal depois sair")
 A série, a pílula da seção e a linha de fontes aparecem só na primeira cena; depois somem e o cartão sobe, ficando só as palavras-chave (etiqueta, número, tópicos, carimbo). As fontes voltam discretas no CTA. `"topo_ate": <segundo>` muda quando some; `"topo_ate": false` mantém o topo o vídeo todo.
+
+## Movimento contínuo (Gabriel, 27/10/2026: "achei todos os motions muito parados; ele termina o movimento, tem que entrar outra coisa, senão não retém a pessoa")
+Nenhum quadro parado: terminou uma animação, entra outra. O kit faz sozinho:
+- **Câmera viva:** órbita de 0,06 rad/s alternando o lado a cada cena (`"orbita"` na cena muda), aproximação contínua de 2,2%/s até 25% (`"aproxima"`), leve sobe e desce.
+- **Batidas** (`gerar.py` > `batidas`): em cada cena, nos vãos sem evento, a palavra forte seguinte (5+ letras ou número, 1,1 s longe de outro evento, 1,6 s da batida anterior) ganha empurrão de câmera, pulso do cenário, onda no chão e estouro de faíscas na cor da marca; no globo, um leve zoom. `"batidas": false` desliga; uma lista de segundos manda. Cada batida leva um whoosh curto bem baixo (-24 dB).
+- Ao criar um cenário novo, pensar também no que se mexe DEPOIS do movimento principal (respiração, segundo estágio), não só na entrada.

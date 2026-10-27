@@ -55,6 +55,10 @@
   }
   const ve = s => s[2] > 0 || !s[3];
   const TRANS = P.transicao || 1.15, DERIVA = P.deriva ?? .45;
+  // batidas (gerar.py): palavras fortes nos vãos sem evento; cada uma dá um empurrão de câmera, pulso, onda e faíscas
+  const BAT = (P.batidas || []).map(b => +b).sort((a, b) => a - b);
+  const ultBat = t => { let u = null; for (const b of BAT) { if (b <= t) u = b; else break; } return u; };
+  const kickEm = t => { const u = ultBat(t); if (u == null) return 0; const x = t - u; return x < .12 ? x / .12 : Math.exp(-(x - .12) * 5); };
   const alvos = cenas.map(c => { const f = C[c.foco || c._foco] || { lat: 0, lon: 0 };
     return { lat: (c.cam && c.cam.lat != null ? c.cam.lat : f.lat + (c.inclina ?? 7)), lon: (c.cam && c.cam.lon != null ? c.cam.lon : f.lon + (c.giro || 0)),
       zoom: c.zoom ?? (c.tipo === "cta" ? .8 : 1), y: c.y ?? (c.tipo === "cta" ? .6 : .57) }; });
@@ -1092,6 +1096,18 @@
         holofote(grupo, 0, 0, 1.15); const bo = boneco(); grupo.add(bo);
         item.pose = { pos: [0, 2.2, 7.5], alvo: [0, 1.6, 0] };
       }
+      { // efeitos de batida desta cena
+        const onda = new T.Mesh(new T.RingGeometry(1.0, 1.08, 64), new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+        onda.rotation.x = -Math.PI / 2; onda.position.y = .02; grupo.add(onda);
+        const fa = [...Array(12)].map((_, k) => { const m = new T.MeshBasicMaterial({ color: k % 3 ? COR : (T3.cone || COR), transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+          const o = new T.Mesh(new T.OctahedronGeometry(.06 + (k % 3) * .02), m); grupo.add(o); const a = k * 2.399, el = .35 + (k % 4) * .22;
+          return { o, dir: new T.Vector3(Math.cos(a) * Math.cos(el), Math.sin(el), Math.sin(a) * Math.cos(el)), v: 1.8 + (k % 5) * .35 }; });
+        item.fx = t => { const u = ultBat(t), x = u == null || u < c.de || u > c.ate ? 9 : t - u, k = kickEm(t) * (x < 9 ? 1 : 0);
+          grupo.scale.setScalar(1 + .03 * k);
+          const w = Math.min(1, x / .9); onda.material.opacity = x < .9 ? .7 * (1 - w) : 0; onda.scale.setScalar(.6 + 2.6 * eout(w));
+          fa.forEach(f => { const y = Math.min(1, x / 1.1); f.o.material.opacity = x < 1.1 ? .95 * (1 - y) : 0;
+            f.o.position.copy(f.dir).multiplyScalar(f.v * eout(y)).add(new T.Vector3(0, 1.6 - .9 * y * y, .3)); f.o.rotation.set(x * 6, x * 4, 0); }); };
+      }
       if (c.camera3d) item.pose = { pos: c.camera3d.pos || item.pose.pos, alvo: c.camera3d.alvo || item.pose.alvo };
       cenas3d.push(item);
     });
@@ -1112,16 +1128,17 @@
     }
     const V = (a, O) => new T.Vector3(a[0] + O.x, a[1] + O.y, a[2] + O.z);
     function poseEm(t, item) {   // pose da cena com deriva lenta (órbita) e respiração
-      const dt = Math.max(0, t - item.c.de), p = item.pose, ang = (item.c.orbita ?? .025) * dt;
+      const dt = Math.max(0, t - item.c.de), p = item.pose, lado = item.i % 2 ? -1 : 1, ang = lado * (item.c.orbita ?? .06) * dt;
       const pos = V(p.pos, item.O), alvo = V(p.alvo, item.O), d = pos.clone().sub(alvo);
-      d.applyAxisAngle(new T.Vector3(0, 1, 0), ang); d.multiplyScalar(DIST * (1 - .012 * dt));
+      d.applyAxisAngle(new T.Vector3(0, 1, 0), ang); d.multiplyScalar(DIST * Math.max(.75, 1 - (item.c.aproxima ?? .022) * dt) * (1 - .055 * kickEm(t)));
+      d.y += .18 * Math.sin(dt * .55);
       return { pos: alvo.clone().add(d), alvo };
     }
     function render(t) {
       const i = idx(t), c = cenas[i]; let it = cenas3d.find(x => x.i === i);
       if (!it) { // globo na tela: segura a pose da cena 3D mais perto (para o fade)
         it = cenas3d.filter(x => x.i < i).pop() || cenas3d.find(x => x.i > i); if (!it) return; }
-      cenas3d.forEach(x => x.upd(t));
+      cenas3d.forEach(x => { x.upd(t); if (x.fx) x.fx(t); });
       let { pos, alvo } = poseEm(t, it);
       if (it.i === i && i > 0) { const k = eio(prog(t, c.de, TRANS)), ant = cenas3d.find(x => x.i === i - 1);
         let p0, a0;
@@ -1135,7 +1152,7 @@
 
   // ---------- quadro: globo, estúdio e poeira por cima ----------
   function desenha(t) {
-    const ag = alfaGlobo(t), cam = camEm(t);
+    const ag = alfaGlobo(t), cam = camEm(t); cam.zoom *= 1 + .035 * kickEm(t);
     if (ag > 0) desenhaGlobo(t, cam); else g.clearRect(0, 0, W, H);
     cv.style.opacity = ag.toFixed(3);
     if (E3 && ag < 1) { cv3.style.opacity = "1"; E3.render(t); } else cv3.style.opacity = "0";
