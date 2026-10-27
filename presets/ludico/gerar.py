@@ -53,7 +53,7 @@ def aplicar_tema(pasta, tema):
 
 
 def copiar_fotos(plano, base, pasta):
-    """Fotos do "duelo" e do "instagram" vão para <pasta>/fotos/ e o plano passa a apontar para elas (o render só enxerga a pasta)."""
+    """Fotos do "duelo", do "instagram" e a "logo" das cenas vão para <pasta>/fotos/ e o plano passa a apontar para elas (o render só enxerga a pasta)."""
     import shutil
     def leva(rel):   # copia para <pasta>/fotos/ e devolve o caminho que o render enxerga
         orig = rel if os.path.isabs(rel) else os.path.join(base, rel)
@@ -63,6 +63,8 @@ def copiar_fotos(plano, base, pasta):
         shutil.copy(orig, os.path.join(pasta, "fotos", os.path.basename(orig)))
         return "fotos/" + os.path.basename(orig)
     for c in plano.get("cenas", []):
+        if c.get("logo"):   # logo real da instituição/marca citada (regra 27/10/2026)
+            c["logo"] = leva(c["logo"])
         pf = c.get("perfil")
         if pf:   # cenário "instagram": foto de perfil e capas da grade
             if pf.get("foto"):
