@@ -132,3 +132,9 @@ Para o próximo vídeo: ler o roteiro, perguntar "qual objeto do dia a dia mostr
 ## Primeiro vídeo feito com ele
 `CLAUDE BRAIN/X-Trader/Ludico/planos_dos_videos/plano_Circuit_Breaker.json` (26/10/2026): disjuntor > globo > blocos caindo > barras >
 globo NY > palco > placas > plenário acendendo > CTA no globo. 9 cenas, 88,8 s.
+
+## SFX: quando cada som cai (aprendido em 27/10/2026, timing revisado a pedido do Gabriel)
+- **Troca de cena:** o pico do whoosh vai no MEIO do movimento, não no corte. Estúdio > estúdio: a câmera viaja 1,15 s (eio) a partir do `de` da cena, pico em `de + 0,55`. Globo <> estúdio: fade de `de - 0,12` a `de + 0,33`, pico em `de + 0,15`. Medido por diferença de quadros no render: o movimento cai entre +0,25 e +0,95 s, nunca antes do `de`.
+- **Objeto que bate ou cai** (bola, flecha, peso no telhado, dardo, peça de dominó): o som vai no instante do contato, não na palavra (bola: `cai_em + 0,65`; flecha k: `em + 0,45 + 0,45k`; peso: `peso_em + 0,45`; dardo: `em + 0,5`; dominó: um som por peça em `em + 0,32`).
+- **Arquivo com mais de uma batida** (martelo do juiz): cortar a duração para ficar com uma só.
+- Os tempos de palavra da transcrição do DaVinci batem com o áudio (0,05 a 0,15 s); se o som parecer fora, o erro está no instante escolhido, não na transcrição.
