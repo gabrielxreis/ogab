@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-2 (27/10/2026)
+- **Lúdico com 27 cenários novos:** bola que despenca e quica, bússola, cofre, escudo, placa de estrada, celular com o botão seguir, setas, moeda, martelo, ímã, dominó, escada, leilão, sismógrafo, cartão, foguete, chip de IA, planta, dado, urna, alvo, balão, ponte, pilha de moedas, casa, carnê e torneira. O Gab escolhe pelo sentido da frase e continua inventando cenas novas quando nenhum serve.
 ## 2026.10.27-3 (27/10/2026)
 - **Motions mais firmes.** Morph de logo, traço se desenhando, texto entrando letra a letra e 3D no navegador ganharam as armadilhas conhecidas já resolvidas (forma que cruzava no meio do morph, texto que pulava ao dividir, modelo 3D saindo preto ou com cor lavada). O revisor agora também acusa sorteio sem semente escondido. A logo do morph entra sem o quique.
 ## 2026.10.27-2 (27/10/2026)

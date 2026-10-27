@@ -88,6 +88,30 @@ Todos centrados no x = 0, simétricos, com holofote e anel no chão; campos na d
 | `termometro` | sobe até o limite, o limite é ampliado, continua subindo | Dólar disparou |
 | `carrinho` | produtos caem no carrinho com a etiqueta ▲ | Dólar disparou |
 | `luneta` | o mentor olha para o que o investidor espera | Dólar disparou |
+| `quique` | bola despenca e quica de volta (queda e reação); `cai_em`, `sobe_em` | Mercado reagindo |
+| `bussola` | agulha sai de FATOS e aponta EXPECTATIVAS; `baixo`, `cima`, `em` | Mercado reagindo |
+| `cofre` | cofre abre e as pilhas de US$ acendem (patrimônio); `rotulo`, `em` | Mercado reagindo |
+| `escudo` | flechas vermelhas batem no escudo do RISCO e caem; `selo`, `em` | Mercado reagindo |
+| `bifurcacao` | placa de estrada com dois caminhos e o "?" (CTA de escolha); `esq`, `dir`, `esq_em`, `dir_em` | Mercado reagindo |
+| `seguir` | celular com o perfil: o dedo aperta SEGUIR e vira SEGUINDO; `perfil`, `bio`, `inicial`, `em` | todos os 6 de 27/10 ("me segue aqui") |
+| `setas` | duas setas no mesmo dia, uma despenca e outra sobe; `lados: [{rotulo, valor, dir: sobe|desce, em}]` | Brasil despenca, Nasdaq sobe |
+| `moeda` | moeda gigante gira: frente e verso (oportunidade x risco, sobe x cai); `frente`, `verso`, `em` | Brasil despenca / Washington (CTA) |
+| `pilha` | pilha de moedas cresce (construir aos poucos); `rotulo3d`, `em`, `fim_em` | Brasil despenca |
+| `martelo` | martelo da decisão bate no bloco; `placa`, `em` | Decisão em Washington |
+| `ima` | ímã puxa as moedas de um lado para o outro (capital que sai/vai); `esq`, `dir`, `em` | Washington / Por que reagiu |
+| `domino` | efeito dominó com rótulo em cada peça; `pecas: [{t, em}]` | Decisão em Washington |
+| `escada` | boneco sobe degraus rotulados; `degraus: [{t, em}]` | Decisão em Washington |
+| `leilao` | carimbo CANCELADO no leilão e os títulos voltam para a caixa; `cancela_em`, `recompra_em`, `placa`, `caixa` | Governo agiu |
+| `sismografo` | agulha risca o papel e o tremor cresce na palavra; `rotulo3d`, `em` | Governo agiu |
+| `cartao` | cartão de crédito e a etiqueta do juro que vira; `de_txt`, `para_txt`, `em` | Governo agiu |
+| `foguete` | foguete sobe com chama e fumaça (ação disparou); `em`, `altura` | Celestica disparou |
+| `chip` | chip de IA liga os servidores; `chip`, `em`, `servidores_em` | Celestica disparou |
+| `planta` | planta cresce no vaso e brota moedas (tendência, tempo); `em`, `fim_em` | Celestica disparou |
+| `dado` | dado rolando (não é garantia); `em` | Celestica disparou |
+| `urna` | cédulas caem na urna e sobe o resultado; `titulo`, `resultado`, `em` | Por que o mercado reagiu |
+| `alvo` | a aposta mirava o centro e o dardo cai fora (expectativa frustrada); `mira`, `em` | Por que o mercado reagiu |
+| `balao` | balão que enche (gastos, dívida, desconfiança); `rotulo3d`, `em`, `raio` | Por que o mercado reagiu |
+| `ponte` | boneco atravessa a ponte de um lado ao outro; `esq`, `dir`, `selo`, `em`, `fim_em` | Por que o mercado reagiu |
 Para o próximo vídeo: ler o roteiro, perguntar "qual objeto do dia a dia mostra isso?" e criar o ambiente novo no `ludico.js`
 (mesmo jeito de desenhar), registrando aqui. Repetir só o que a frase pedir igual (ex.: fotos no resultado da eleição).
 

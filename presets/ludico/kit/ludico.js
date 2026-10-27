@@ -24,7 +24,8 @@
 
   // ---------- qual linguagem cada cena usa ----------
   const TIPOS3D = new Set(["palco", "disjuntor", "barras", "blocos", "placas", "duelo", "grafico", "pregao", "elevador", "placar", "calculadora",
-    "barco", "skyline", "cesta", "relogios", "gangorra", "semaforo", "balanca", "cambio", "termometro", "carrinho", "luneta"]);
+    "barco", "skyline", "cesta", "relogios", "gangorra", "semaforo", "balanca", "cambio", "termometro", "carrinho", "luneta",
+    "quique", "bussola", "cofre", "escudo", "bifurcacao", "seguir", "setas", "moeda", "martelo", "ima", "domino", "escada", "leilao", "sismografo", "cartao", "foguete", "chip", "planta", "dado", "urna", "alvo", "balao", "ponte", "pilha", "casa", "carne", "torneira"]);
   cenas.forEach(c => { c._3d = TIPOS3D.has(c.tipo) || (c.tipo === "cta" && !!c.cenario && c.cenario !== "globo"); });
   // cena sem globo herda o foco do globo mais perto (a câmera do globo não gira à toa na volta)
   { let ult = null; cenas.forEach(c => { if (!c._3d && c.foco) ult = c.foco; else if (!c.foco) c._foco = ult; });
@@ -633,6 +634,388 @@
         const tE = em(c.em, 1);
         item.pose = { pos: [.25, 2.4, 9.4], alvo: [.25, 2.1, 0] };
         item.upd = t => { const k = eout(prog(t, tE, .6)); raio.material.opacity = .14 * k; pl.material.opacity = .25 + .75 * k; alvoG.scale.setScalar(.85 + .15 * k + .02 * Math.sin(t * 3)); };
+      } else if (c.tipo === "quique") {
+        // a bola despenca (o tombo) e quica de volta (a reação): cai_em, sobe_em
+        holofote(grupo, 0, 0, 1.7);
+        const pc = placaTexto([{ t: c.chao || "FUNDO", tam: .15, cor: "#cfc8d8", mono: true }], 2.2, .34); pc.rotation.x = -Math.PI / 2; pc.position.set(0, .02, 1.35); grupo.add(pc);
+        const bola = new T.Mesh(new T.SphereGeometry(.55, 32, 20), mAcesa()); bola.castShadow = true; grupo.add(bola);
+        const tC = em(c.cai_em, .3), tS = em(c.sobe_em, 3), topo = 4.4, alto = c.altura_volta ?? 2.3;
+        item.pose = { pos: [0, 2.4, 9.6], alvo: [0, 2.0, 0] };
+        item.upd = t => { let y;
+          if (t < tC) y = topo + .05 * Math.sin(t * 2);
+          else if (t < tS) { const k = prog(t, tC, .65), b = t - tC - .65; y = k < 1 ? topo - (topo - .55) * k * k : .55 + Math.abs(Math.sin(b * 5.5)) * .9 * Math.exp(-b * 2.4); }
+          else y = .55 + (alto - .55) * eback(prog(t, tS, 1.1)) + .06 * Math.sin((t - tS) * 2.2) * prog(t, tS + 1.1, .5);
+          bola.position.y = y; const sq = y < .6 ? .8 : 1; bola.scale.set(1 / Math.sqrt(sq), sq, 1 / Math.sqrt(sq)); };
+      } else if (c.tipo === "bussola") {
+        // bússola: a agulha sai de "FATOS" e aponta para "EXPECTATIVAS" na palavra
+        holofote(grupo, 0, 0, 1.9);
+        grupo.add(caixa(.3, .8, .3, mCinza, 0, .4, 0));
+        const bus = new T.Group(); bus.position.set(0, 2.5, 0); grupo.add(bus);
+        const aro = cil(1.75, 1.75, .3, mObj, 64); aro.rotation.x = Math.PI / 2; bus.add(aro);
+        const face = cil(1.6, 1.6, .32, mEsc, 64); face.rotation.x = Math.PI / 2; bus.add(face);
+        for (let k = 0; k < 8; k++) bus.add(caixa(.05, k % 2 ? .12 : .22, .02, mObj, Math.sin(k * Math.PI / 4) * 1.4, Math.cos(k * Math.PI / 4) * 1.4, .17));
+        const ag = new T.Group(); ag.position.z = .24; bus.add(ag);
+        const pN = new T.Mesh(new T.ConeGeometry(.17, 1.25, 4), mAcesa()); pN.position.y = .62; ag.add(pN);
+        const pS = new T.Mesh(new T.ConeGeometry(.17, 1.25, 4), mObj); pS.position.y = -.62; pS.rotation.z = Math.PI; ag.add(pS);
+        const eixo = cil(.13, .13, .12, mObj, 16); eixo.rotation.x = Math.PI / 2; eixo.position.z = .3; bus.add(eixo);
+        const cima = placaTexto([{ t: c.cima || "EXPECTATIVAS", tam: .17, cor: "#1a1420", mono: true }], 2.7, .42, COR); cima.position.set(0, 4.55, .2); grupo.add(cima);
+        const baixo = placaTexto([{ t: c.baixo || "FATOS", tam: .17, cor: "#F2F2EE", mono: true }], 1.8, .42, "#2E2536"); baixo.position.set(0, .3, 1.1); grupo.add(baixo);
+        const tE = em(c.em, 1.5);
+        item.pose = { pos: [0, 2.6, 10.6], alvo: [0, 2.5, 0] };
+        item.upd = t => { const k = eback(prog(t, tE, 1.0)); ag.rotation.z = Math.PI * (1 - k) + (.22 * Math.sin(t * 2.6)) * (1 - k) + .03 * Math.sin(t * 1.7);
+          cima.material.opacity = .3 + .7 * eout(prog(t, tE, .5)); baixo.material.opacity = 1 - .5 * eout(prog(t, tE, .5)); };
+      } else if (c.tipo === "cofre") {
+        // cofre que abre na palavra: pilhas de moedas acendem lá dentro (o patrimônio)
+        holofote(grupo, 0, 0, 2.0);
+        grupo.add(caixa(2.4, 2.4, .15, mEsc, 0, 1.2, -.75), caixa(.15, 2.4, 1.6, mEsc, -1.15, 1.2, 0), caixa(.15, 2.4, 1.6, mEsc, 1.15, 1.2, 0),
+          caixa(2.4, .15, 1.6, mEsc, 0, 2.33, 0), caixa(2.4, .15, 1.6, mEsc, 0, .08, 0));
+        const porta = new T.Group(); porta.position.set(-1.2, 1.2, .85); grupo.add(porta);
+        porta.add(caixa(2.4, 2.4, .16, mObj, 1.2, 0, 0));
+        const roda = new T.Group(); roda.position.set(1.2, 0, .12); porta.add(roda);
+        const rd = new T.Mesh(new T.TorusGeometry(.38, .05, 8, 24), mCinza); roda.add(rd); for (let k = 0; k < 3; k++) { const r2 = caixa(.76, .05, .05, mCinza, 0, 0, 0); r2.rotation.z = k * Math.PI / 3; roda.add(r2); }
+        const pilhas = [-.55, 0, .55].map(x => { const g2 = new T.Group(); g2.position.set(x, .16, .1); grupo.add(g2);
+          for (let j = 0; j < 7; j++) { const m = cil(.22, .22, .07, mAcesa(), 24); m.position.y = j * .085; g2.add(m); } return g2; });
+        const tag = placaTexto([{ t: c.rotulo || "US$", tam: .28, cor: "#1a1420" }], 1.6, .55, COR); tag.position.set(0, 3.0, .3); grupo.add(tag);
+        const tE = em(c.em, 1);
+        item.pose = { pos: [0, 2.3, 9.0], alvo: [0, 1.5, 0] };
+        item.upd = t => { roda.rotation.z = eio(prog(t, tE - .7, .7)) * Math.PI * 1.5; porta.rotation.y = -eio(prog(t, tE, 1.0)) * 1.75;
+          pilhas.forEach((g2, i) => g2.scale.y = Math.max(.001, eback(prog(t, tE + .5 + i * .25, .5))));
+          tag.material.opacity = eout(prog(t, tE + 1.1, .4)); tag.scale.setScalar(Math.max(.001, eback(prog(t, tE + 1.1, .4)))); };
+      } else if (c.tipo === "escudo") {
+        // escudo do gerenciamento de risco: as flechas vermelhas batem e caem
+        holofote(grupo, 0, 0, 1.8);
+        const esc = new T.Group(); esc.position.set(0, 2.3, .3); grupo.add(esc);
+        const f = new T.Shape(); f.moveTo(0, 1.3); f.quadraticCurveTo(1.1, 1.25, 1.15, .9); f.lineTo(1.0, -.3); f.quadraticCurveTo(.6, -1.1, 0, -1.45);
+        f.quadraticCurveTo(-.6, -1.1, -1.0, -.3); f.lineTo(-1.15, .9); f.quadraticCurveTo(-1.1, 1.25, 0, 1.3);
+        const sh = new T.Mesh(new T.ExtrudeGeometry(f, { depth: .25, bevelEnabled: true, bevelSize: .06, bevelThickness: .06, bevelSegments: 2 }), mObj); sh.castShadow = true; esc.add(sh);
+        const selo = placaTexto([{ t: c.selo || "RISCO", tam: .2, cor: "#1a1420", mono: true }], 1.7, .42, COR); selo.position.set(0, .1, .4); esc.add(selo);
+        const vm = T3.vela_baixa || "#DC2626", mV = new T.MeshStandardMaterial({ color: vm, emissive: new T.Color(vm), emissiveIntensity: .5 });
+        const fl = [-1, 0, 1].map(s => { const g2 = new T.Group(); const h = cil(.05, .05, 1.0, mV, 8); g2.add(h); const p = new T.Mesh(new T.ConeGeometry(.15, .32, 12), mV); p.position.y = -.64; p.rotation.z = Math.PI; g2.add(p);
+          g2.rotation.x = Math.PI / 2; g2.visible = false; grupo.add(g2); return { g2, s }; });
+        const tE = em(c.em, 1);
+        item.pose = { pos: [0, 2.5, 9.8], alvo: [0, 2.1, 0] };
+        item.upd = t => { let tr = 0; fl.forEach((o, k) => { const t0 = tE + k * .45, a = prog(t, t0, .45), cai = prog(t, t0 + .45, .7);
+            o.g2.visible = t >= t0; o.g2.position.set(o.s * (.55 + 1.2 * (1 - a)), 2.5 + o.s * .25 - cai * cai * 2.2, 7.5 - 6.4 * eio(a) + cai * .9);
+            o.g2.rotation.set(Math.PI / 2 + cai * 1.4, 0, cai * o.s * .8); if (a >= 1 && cai < .2) tr += (1 - cai * 5) * .07; });
+          esc.position.x = Math.sin(t * 70) * tr; esc.rotation.y = .06 * Math.sin(t * .8); };
+      } else if (c.tipo === "bifurcacao") {
+        // placa de estrada com dois caminhos (esq e dir) e o "?" no alto
+        holofote(grupo, 0, 0, 1.6);
+        const poste = cil(.08, .1, 3.9, mCinza, 12); poste.position.y = 1.95; grupo.add(poste);
+        const seta = (txt, s, y, cor, corT, t0) => { const g2 = new T.Group(); g2.position.set(0, y, .1); grupo.add(g2);
+          const pl = placaTexto([{ t: txt, tam: .15, cor: corT, mono: true }], 2.1, .52, cor); pl.position.set(s * 1.1, 0, 0); g2.add(pl);
+          const pt = new T.Mesh(new T.CircleGeometry(.36, 3), new T.MeshBasicMaterial({ color: cor, toneMapped: false })); pt.position.set(s * 2.3, 0, 0); pt.rotation.z = s > 0 ? 0 : Math.PI; g2.add(pt);
+          return { g2, s, t0 }; };
+        const A = seta(c.esq || "OPORTUNIDADE", -1, 3.0, COR, "#1a1420", em(c.esq_em, .5)), Bb = seta(c.dir || "RISCO", 1, 2.25, "#2E2536", "#F2F2EE", em(c.dir_em, 1.1));
+        const q = placaTexto([{ t: c.selo || "?", tam: .4, cor: "#1a1420" }], .8, .7, COR); q.position.set(0, 4.2, .1); grupo.add(q);
+        item.pose = { pos: [0, 2.6, 10.4], alvo: [0, 2.4, 0] };
+        item.upd = t => { [A, Bb].forEach(o => { const k = eback(prog(t, o.t0, .6)); o.g2.rotation.y = (1 - k) * o.s * 1.4; o.g2.scale.setScalar(Math.max(.001, Math.min(1, k * 1.2))); });
+          q.scale.setScalar(Math.max(.001, eback(prog(t, Math.max(A.t0, Bb.t0) + .5, .4)) * (1 + .04 * Math.sin(t * 4)))); };
+      } else if (c.tipo === "seguir") {
+        // celular com o perfil: o dedo aperta SEGUIR e vira SEGUINDO
+        holofote(grupo, 0, 0, 1.5);
+        const cel = new T.Group(); cel.position.set(0, 2.45, 0); grupo.add(cel);
+        cel.add(caixa(1.85, 3.6, .16, mEsc, 0, 0, 0));
+        const tela = (bot, cor, corT) => { const k = 256, cv = document.createElement("canvas"); cv.width = 1.65 * k; cv.height = 3.3 * k; const x = cv.getContext("2d");
+          x.fillStyle = "#120d16"; x.fillRect(0, 0, cv.width, cv.height);
+          x.fillStyle = COR; x.beginPath(); x.arc(cv.width / 2, 300, 130, 0, Math.PI * 2); x.fill();
+          x.fillStyle = "#1a1420"; x.font = `800 120px '${FONTE}'`; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(c.inicial || "X", cv.width / 2, 306);
+          const nomeP = c.perfil || "ESTÉFANO SANTOS"; let fsP = 46; x.font = `800 ${fsP}px '${FONTE}'`; const lP = x.measureText(nomeP).width; if (lP > cv.width * .86) fsP *= cv.width * .86 / lP;
+          x.fillStyle = "#F2F2EE"; x.font = `800 ${fsP}px '${FONTE}'`; x.fillText(nomeP, cv.width / 2, 520);
+          x.fillStyle = "#a69ab2"; x.font = `700 30px 'JetBrains Mono'`; x.fillText(c.bio || "MERCADO AMERICANO", cv.width / 2, 580);
+          x.fillStyle = cor; const bw = 300, bh = 96; x.beginPath(); x.roundRect(cv.width / 2 - bw / 2, 650, bw, bh, 26); x.fill();
+          x.fillStyle = corT; x.font = `800 44px '${FONTE}'`; x.fillText(bot, cv.width / 2, 700);
+          for (let i = 0; i < 6; i++) { x.fillStyle = "#241b2c"; x.fillRect(30 + (i % 3) * 138, 800 + Math.floor(i / 3) * 140, 130, 130); }
+          const tx = new T.CanvasTexture(cv); tx.colorSpace = T.SRGBColorSpace; const m = new T.Mesh(new T.PlaneGeometry(1.65, 3.3), new T.MeshBasicMaterial({ map: tx, toneMapped: false })); m.position.z = .085; cel.add(m); return m; };
+        const t1 = tela(c.botao || "SEGUIR", COR, "#1a1420"), t2 = tela(c.botao2 || "SEGUINDO ✓", "#2E2536", "#F2F2EE"); t2.position.z = .086;
+        const dedo = new T.Group(); grupo.add(dedo); const d1 = cil(.16, .18, 1.4, mObj, 16); d1.rotation.x = Math.PI / 2.4; dedo.add(d1);
+        const tE = em(c.em, 1.2);
+        item.pose = { pos: [0, 2.5, 8.6], alvo: [0, 2.45, 0] };
+        item.upd = t => { const ida = eio(prog(t, tE - .7, .7)), volta = eio(prog(t, tE + .15, .6)), k = ida - volta;
+          dedo.position.set(.25 + (1 - k) * 1.1, 1.55 - (1 - k) * 1.2, .9 + (1 - k) * .9); dedo.visible = k > .02; t2.visible = t >= tE; cel.rotation.y = .12 * Math.sin(t * .7);
+          t1.scale.setScalar(t >= tE - .05 && t < tE + .15 ? .97 : 1); };
+      } else if (c.tipo === "setas") {
+        // duas setas grandes no mesmo dia: uma despenca (vermelha), a outra sobe (verde)
+        const L = (c.lados || []).slice(0, 2).map((l, k) => { const x = (k ? 1 : -1) * 1.5, sobe = l.dir === "sobe"; holofote(grupo, x, 0, 1.0);
+          const cor = sobe ? (T3.vela_alta || "#20BD5A") : (T3.vela_baixa || "#DC2626"), m = new T.MeshStandardMaterial({ color: cor, emissive: new T.Color(cor), emissiveIntensity: .45, roughness: .4 });
+          const s2 = new T.Group(); grupo.add(s2); s2.add(caixa(.5, 1.6, .5, m, 0, 0, 0)); const p = new T.Mesh(new T.ConeGeometry(.62, .8, 4), m); p.rotation.y = Math.PI / 4; p.position.y = 1.2; s2.add(p);
+          if (!sobe) s2.rotation.z = Math.PI;
+          const nome = placaTexto([{ t: l.rotulo || "", tam: .16, cor: "#F2F2EE", mono: true }], 2.4, .4); nome.rotation.x = -1.2; nome.position.set(x, .03, 1.15); grupo.add(nome);
+          const val = placaTexto([{ t: l.valor || "", tam: .3, cor: sobe ? "#1a1420" : "#F7F7F7" }], 2.0, .58, cor); grupo.add(val);
+          return { s2, val, sobe, x, t0: em(l.em, .4 + k * 1.2) }; });
+        item.pose = { pos: [0, 2.6, 10.8], alvo: [0, 2.1, 0] };
+        item.upd = t => L.forEach(o => { const k = eback(prog(t, o.t0, .9)), y = o.sobe ? .8 + 1.8 * k : 3.0 - 1.8 * k;
+          o.s2.position.set(o.x, y, 0); o.s2.scale.setScalar(Math.max(.001, Math.min(1, prog(t, o.t0 - .1, .25))));
+          o.val.position.set(o.x, o.sobe ? y + 1.95 : y + 1.25, .3); o.val.material.opacity = eout(prog(t, o.t0 + .6, .4)); });
+      } else if (c.tipo === "moeda") {
+        // moeda gigante girando: frente e verso (oportunidade e risco no mesmo cenário)
+        holofote(grupo, 0, 0, 1.6);
+        const mo = new T.Group(); mo.position.set(0, 2.3, 0); grupo.add(mo);
+        const mM = new T.MeshStandardMaterial({ color: COR, emissive: corA, emissiveIntensity: .2, roughness: .35, metalness: .45 });
+        const disco = cil(1.3, 1.3, .2, mM, 64); disco.rotation.x = Math.PI / 2; mo.add(disco);
+        const borda = new T.Mesh(new T.TorusGeometry(1.15, .04, 8, 64), mObj); mo.add(borda); const b2 = borda.clone(); b2.position.z = -.0; mo.add(b2);
+        const fr = placaTexto([{ t: c.frente || "OPORTUNIDADE", tam: .16, cor: "#1a1420", mono: true }], 2.1, .5); fr.position.z = .11; mo.add(fr);
+        const vs = placaTexto([{ t: c.verso || "RISCO", tam: .22, cor: "#1a1420", mono: true }], 2.1, .5); vs.position.z = -.11; vs.rotation.y = Math.PI; mo.add(vs);
+        const tE = em(c.em, .8), giros = c.giros ?? 3;
+        item.pose = { pos: [0, 2.4, 8.8], alvo: [0, 2.3, 0] };
+        item.upd = t => { const k = prog(t, tE, 2.4); mo.rotation.y = eout(k) * Math.PI * 2 * giros + (k >= 1 ? Math.sin((t - tE - 2.4) * 1.1) * .45 : 0); mo.position.y = 2.3 + Math.sin(k * Math.PI) * .9; };
+      } else if (c.tipo === "martelo") {
+        // martelo da decisão: bate no bloco na palavra (placa = o que está sendo decidido)
+        holofote(grupo, 0, 0, 1.8);
+        grupo.add(caixa(3.0, .95, 1.4, mEsc, 0, .475, 0));
+        if (c.placa) { const pl = placaTexto([{ t: c.placa, tam: .15, cor: "#1a1420", mono: true }], 2.6, .4, COR); pl.position.set(0, .5, .72); grupo.add(pl); }
+        const bloco = cil(.55, .6, .25, mObj, 32); bloco.position.set(-.2, 1.07, 0); grupo.add(bloco);
+        const mar = new T.Group(); mar.position.set(1.15, 1.42, 0); grupo.add(mar);
+        const cabo = cil(.06, .07, 1.3, mObj, 12); cabo.rotation.z = Math.PI / 2; cabo.position.x = -.65; mar.add(cabo);
+        const cab = cil(.24, .24, .8, mAcesa(), 24); cab.rotation.x = Math.PI / 2; cab.position.x = -1.35; mar.add(cab);
+        const onda = new T.Mesh(new T.RingGeometry(.6, .66, 48), new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: 0, toneMapped: false })); onda.rotation.x = -Math.PI / 2; onda.position.set(-.2, 1.21, 0); grupo.add(onda);
+        const tE = em(c.em, 1.2);
+        item.pose = { pos: [0, 2.4, 8.4], alvo: [0, 1.4, 0] };
+        item.upd = t => { let a; if (t < tE - .45) a = -.95 + .05 * Math.sin(t * 3); else if (t < tE) a = -.95 * (1 - Math.pow(prog(t, tE - .45, .45), 2)); else a = -.55 * eout(prog(t, tE + .25, .6));
+          mar.rotation.z = a; const k = prog(t, tE, .7); onda.material.opacity = t >= tE ? .8 * (1 - k) : 0; onda.scale.setScalar(1 + k * 2.2); };
+      } else if (c.tipo === "ima") {
+        // ímã: o dinheiro corre de um lado para o outro na palavra (esq = de onde sai, dir = para onde vai)
+        holofote(grupo, 0, 0, 2.6);
+        const im = new T.Group(); im.position.set(1.6, 1.6, 0); grupo.add(im);
+        const u = new T.Mesh(new T.TorusGeometry(.62, .24, 14, 32, Math.PI), mAcesa()); u.rotation.z = Math.PI / 2; im.add(u);
+        [-1, 1].forEach(s => { im.add(caixa(.55, .48, .48, mObj, -.3, s * .62, 0)); });
+        const pe = cil(.6, .7, .25, mEsc, 24); pe.position.set(-1.6, .12, 0); grupo.add(pe);
+        const le = placaTexto([{ t: c.esq || "BRASIL", tam: .16, cor: "#F2F2EE", mono: true }], 1.8, .38); le.rotation.x = -1.2; le.position.set(-1.6, .03, 1.15); grupo.add(le);
+        const ld = placaTexto([{ t: c.dir || "EUA", tam: .16, cor: "#1a1420", mono: true }], 1.6, .38, COR); ld.position.set(1.6, 3.0, .1); grupo.add(ld);
+        const tE = em(c.em, 1), mo = [...Array(8)].map((_, k) => { const m = cil(.2, .2, .06, mObj, 20); m.rotation.x = Math.PI / 2; grupo.add(m); return { m, k }; });
+        item.pose = { pos: [0, 2.3, 9.4], alvo: [0, 1.5, 0] };
+        item.upd = t => { im.position.x = 1.6 + .03 * Math.sin(t * 9) * prog(t, tE - .3, .3); mo.forEach(o => { const a = eio(prog(t, tE + o.k * .17, .8));
+          const x0 = -1.6 + (o.k % 3 - 1) * .3, y0 = .3 + Math.floor(o.k / 3) * .14 + o.k * .02;
+          o.m.position.set(x0 + (.75 - x0) * a, y0 + (1.6 + (o.k % 4 - 1.5) * .25 - y0) * a + Math.sin(a * Math.PI) * .9, 0); o.m.rotation.y = a * 6; }); };
+      } else if (c.tipo === "domino") {
+        // efeito dominó: uma peça derruba a próxima (pecas: [{t, em}], a primeira acesa)
+        const Pc = (c.pecas || []).slice(0, 5), n = Pc.length, gap = 1.15;
+        holofote(grupo, 0, 0, 2.7);
+        const ps = Pc.map((p, k) => { const x = (k - (n - 1) / 2) * gap, g2 = new T.Group(); g2.position.set(x - .16, 0, 0); grupo.add(g2);
+          const pc = caixa(.3, 1.9, .9, k === 0 ? mAcesa() : mObj, .16, .95, 0); g2.add(pc);
+          const lb = placaTexto([{ t: p.t || "", tam: .1, cor: k === 0 ? "#1a1420" : "#F2F2EE", mono: true }], 1.1, .32, k === 0 ? COR : "#2E2536"); lb.position.set(x, .2, 1.0); grupo.add(lb);
+          return { g2, lb, t0: em(p.em, .5 + k * .5), ult: k === n - 1 }; });
+        item.pose = { pos: [0, 2.3, 9.4], alvo: [0, 1.1, 0] };
+        item.upd = t => ps.forEach(o => { o.g2.rotation.z = -(o.ult ? 1.5 : 1.05) * Math.pow(prog(t, o.t0, .4), 2); o.lb.material.opacity = .35 + .65 * eout(prog(t, o.t0, .3)); });
+      } else if (c.tipo === "escada") {
+        // escada de degraus com rótulo: o boneco sobe um degrau a cada palavra (degraus: [{t, em}])
+        const Dg = (c.degraus || []).slice(0, 4), n = Dg.length, dh = .7, dw = 1.25;
+        holofote(grupo, 0, 0, 2.6);
+        const x0 = -(n - 1) * dw / 2;
+        const dd = Dg.map((d, k) => { const x = x0 + k * dw, h = (k + 1) * dh; const bl = caixa(dw, h, 1.3, k === n - 1 ? mAcesa() : mObj, x, h / 2, 0); grupo.add(bl);
+          const lb = placaTexto([{ t: d.t || "", tam: .11, cor: k === n - 1 ? "#1a1420" : "#F2F2EE", mono: true }], 1.2, .3, k === n - 1 ? COR : "#2E2536"); lb.position.set(x, h / 2, .66); grupo.add(lb);
+          return { x, h, t0: em(d.em, .5 + k * .7) }; });
+        const bo = boneco(); bo.scale.setScalar(.62); grupo.add(bo);
+        item.pose = { pos: [0, 2.6, 9.6], alvo: [0, 1.5, 0] };
+        item.upd = t => { let x = x0 - dw, y = 0; dd.forEach((d, k) => { const a = eio(prog(t, d.t0, .5)); if (a > 0) { const px0 = k ? dd[k - 1].x : x0 - dw, py0 = k ? dd[k - 1].h : 0;
+            x = px0 + (d.x - px0) * a; y = py0 + (d.h - py0) * a + Math.sin(a * Math.PI) * .35; } });
+          bo.position.set(x, y, .1); bo.rotation.y = .5; };
+      } else if (c.tipo === "leilao") {
+        // leilão do Tesouro: o carimbo CANCELADO bate; depois os títulos voltam para a caixa (recompra)
+        holofote(grupo, 0, 0, 2.3);
+        grupo.add(caixa(1.4, 1.3, .9, mEsc, -.9, .65, 0)); const tp = placaTexto([{ t: c.placa || "LEILÃO", tam: .14, cor: "#1a1420", mono: true }], 1.25, .34, COR); tp.position.set(-.9, .95, .46); grupo.add(tp);
+        const mart = new T.Group(); mart.position.set(-.9, 1.4, 0); grupo.add(mart); const ca = cil(.04, .04, .7, mObj, 8); ca.rotation.z = 1.1; mart.add(ca); const hd = cil(.11, .11, .32, mObj, 12); hd.rotation.x = Math.PI / 2; hd.position.set(-.28, .15, 0); mart.add(hd);
+        const vm = T3.vela_baixa || "#DC2626", car = placaTexto([{ t: c.carimbo3d || "CANCELADO", tam: .2, cor: "#F7F7F7", mono: true }], 2.2, .5, vm); car.position.set(-.9, 2.15, .6); car.rotation.z = .12; grupo.add(car);
+        const cx = new T.Group(); cx.position.set(1.15, 0, 0); grupo.add(cx); cx.add(caixa(1.5, .9, 1.1, mObj, 0, .45, 0));
+        const tc = placaTexto([{ t: c.caixa || "TESOURO", tam: .13, cor: "#1a1420", mono: true }], 1.3, .3); tc.position.set(0, .45, .56); cx.add(tc);
+        const pap = [...Array(6)].map((_, k) => { const p = caixa(.7, .04, .5, mAcesa(), 0, 0, 0); grupo.add(p); return { p, k }; });
+        const tC = em(c.cancela_em, 1), tR = em(c.recompra_em, 3);
+        item.pose = { pos: [0, 2.4, 9.2], alvo: [0, 1.3, 0] };
+        item.upd = t => { const k = prog(t, tC, .3); car.scale.setScalar(Math.max(.001, 1.6 - .6 * eout(k)) * (k > 0 ? 1 : .001)); car.material.opacity = eout(k);
+          mart.rotation.z = -.4 * Math.max(0, Math.sin(prog(t, tC - .4, .4) * Math.PI));
+          pap.forEach(o => { const a = eio(prog(t, tR + o.k * .22, .7)); o.p.position.set(2.6 - 1.45 * a, 2.6 - (2.6 - (.95 + o.k * .05)) * a + Math.sin(a * Math.PI) * .6, 0); o.p.rotation.z = (1 - a) * 2; o.p.visible = t >= tR + o.k * .22; }); };
+      } else if (c.tipo === "sismografo") {
+        // sismógrafo: a agulha risca o papel e o tremor cresce na palavra (rotulo = o que está tremendo)
+        holofote(grupo, 0, 0, 2.4);
+        grupo.add(caixa(4.8, .5, 1.2, mEsc, 0, .9, 0)); [-2.3, 2.3].forEach(x => { const r = cil(.22, .22, 1.2, mCinza, 20); r.rotation.x = Math.PI / 2; r.position.set(x, 2.35, 0); grupo.add(r); });
+        const k = 256, cv = document.createElement("canvas"); cv.width = 4.4 * k; cv.height = 2.0 * k; const x = cv.getContext("2d");
+        const tx = new T.CanvasTexture(cv); tx.colorSpace = T.SRGBColorSpace; const pap = new T.Mesh(new T.PlaneGeometry(4.4, 2.0), new T.MeshBasicMaterial({ map: tx, toneMapped: false })); pap.position.set(0, 2.35, .02); grupo.add(pap);
+        const ag = caixa(.05, .9, .05, mAcesa(), 0, 0, .1); grupo.add(ag);
+        if (c.rotulo3d) { const lb = placaTexto([{ t: c.rotulo3d, tam: .16, cor: "#1a1420", mono: true }], 1.8, .4, COR); lb.position.set(0, .9, .62); grupo.add(lb); }
+        const tE = em(c.em, 2), dur = c.ate - c.de;
+        item.pose = { pos: [0, 2.3, 9.2], alvo: [0, 2.0, 0] };
+        item.upd = t => { const N = 220, ate = Math.max(2, Math.floor(N * prog(t, c.de + .2, dur - .5)));
+          x.fillStyle = "#EEEAF2"; x.fillRect(0, 0, cv.width, cv.height); x.strokeStyle = "rgba(60,40,80,.15)"; x.lineWidth = 2;
+          for (let i = 1; i < 8; i++) { x.beginPath(); x.moveTo(0, i * cv.height / 8); x.lineTo(cv.width, i * cv.height / 8); x.stroke(); }
+          x.strokeStyle = T3.vela_baixa || "#DC2626"; x.lineWidth = 9; x.lineJoin = "round"; x.beginPath(); let yy = 0;
+          for (let i = 0; i < ate; i++) { const ti = c.de + .2 + (dur - .5) * i / N, amp = .04 + .4 * eio(prog(ti, tE, 2.0));
+            yy = cv.height / 2 + amp * cv.height * Math.sin(i * 1.7) * Math.sin(i * .41 + 1.3); const px = cv.width * i / N; i ? x.lineTo(px, yy) : x.moveTo(px, yy); }
+          x.stroke(); tx.needsUpdate = true; ag.position.set(-2.2 + 4.4 * ate / N, 2.35 + (yy - cv.height / 2) / k * -1 + .45, .1); };
+      } else if (c.tipo === "cartao") {
+        // cartão de crédito: a etiqueta do juro vira de "de" para "para" na palavra
+        holofote(grupo, 0, 0, 1.9);
+        const ct = new T.Group(); ct.position.set(0, 2.0, 0); grupo.add(ct);
+        ct.add(caixa(3.0, 1.85, .08, mEsc, 0, 0, 0)); ct.add(caixa(3.0, .32, .09, new T.MeshStandardMaterial({ color: "#0b080d" }), 0, .45, .005));
+        ct.add(caixa(.45, .35, .1, mAcesa(), -1.0, -.1, .01));
+        const nm = placaTexto([{ t: c.titulo || "CRÉDITO", tam: .15, cor: "#F2F2EE", mono: true }], 2.0, .32); nm.position.set(.2, -.55, .05); ct.add(nm);
+        const de = placaTexto([{ t: c.de_txt || "JURO", tam: .2, cor: "#F2F2EE", mono: true }], 2.2, .55, "#2E2536"), para = placaTexto([{ t: c.para_txt || "▲ JURO MAIS CARO", tam: .2, cor: "#F7F7F7", mono: true }], 2.2, .55, T3.vela_baixa || "#DC2626");
+        [de, para].forEach(p => { p.position.set(0, 3.55, .1); grupo.add(p); });
+        const fio = caixa(.02, .6, .02, mCinza, 0, 3.05, .05); grupo.add(fio);
+        const tE = em(c.em, 1.2);
+        item.pose = { pos: [0, 2.6, 9.0], alvo: [0, 2.5, 0] };
+        item.upd = t => { const k = prog(t, tE, .35); de.rotation.x = eio(Math.min(1, k * 2)) * Math.PI / 2; de.visible = k < .5; para.rotation.x = -(1 - eio(Math.max(0, k * 2 - 1))) * Math.PI / 2; para.visible = k >= .5;
+          ct.rotation.set(-.15 + .04 * Math.sin(t), .25 * Math.sin(t * .6), 0); ct.position.y = 2.0 - .25 * eout(k); };
+      } else if (c.tipo === "foguete") {
+        // foguete: sobe da base na palavra com chama e fumaça; depois paira
+        holofote(grupo, 0, 0, 1.6);
+        grupo.add(caixa(2.0, .25, 1.4, mEsc, 0, .125, 0));
+        const fg = new T.Group(); grupo.add(fg);
+        const corpo = cil(.38, .42, 1.9, mObj, 24); corpo.position.y = 1.2; fg.add(corpo);
+        const nariz = new T.Mesh(new T.ConeGeometry(.38, .7, 24), mAcesa()); nariz.position.y = 2.5; fg.add(nariz);
+        const jan = cil(.15, .15, .06, new T.MeshStandardMaterial({ color: "#2a1f3a", emissive: new T.Color(T3.cone || COR), emissiveIntensity: .5 }), 20); jan.rotation.x = Math.PI / 2; jan.position.set(0, 1.6, .4); fg.add(jan);
+        [0, 1, 2].forEach(k => { const a = k * Math.PI * 2 / 3, al = caixa(.06, .55, .5, mAcesa(), Math.sin(a) * .42, .45, Math.cos(a) * .42); al.rotation.y = a; fg.add(al); });
+        const ch = new T.Mesh(new T.ConeGeometry(.3, .9, 16), new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: .9, toneMapped: false })); ch.rotation.z = Math.PI; ch.position.y = -.2; fg.add(ch);
+        const fum = [...Array(8)].map((_, k) => { const s = new T.Mesh(new T.SphereGeometry(.35, 12, 8), new T.MeshBasicMaterial({ color: "#E9E4F2", transparent: true, opacity: 0, depthWrite: false, toneMapped: false })); grupo.add(s); return { s, k }; });
+        const tE = em(c.em, .8), alto = c.altura ?? 1.6;
+        item.pose = { pos: [0, 2.6, 9.6], alvo: [0, 2.3, 0] };
+        item.upd = t => { const k = eio(prog(t, tE, 1.4)); fg.position.y = .25 + alto * k + .07 * Math.sin(t * 3) * k; fg.rotation.y = t * .4;
+          ch.visible = t >= tE - .3; ch.scale.set(1, .7 + .3 * Math.sin(t * 30) + .4 * (1 - k), 1);
+          fum.forEach(o => { const a = prog(t, tE + o.k * .12, 2.2); o.s.material.opacity = t >= tE ? .22 * (1 - a) : 0; o.s.position.set(Math.sin(o.k * 2.4) * (.4 + 1.4 * a), .3 + .2 * a, Math.cos(o.k * 2.4) * (.3 + .9 * a)); o.s.scale.setScalar(.5 + 1.2 * a); }); };
+      } else if (c.tipo === "chip") {
+        // chip de IA no centro: as trilhas acendem e ligam os servidores (em, servidores_em)
+        holofote(grupo, 0, 0, 2.6);
+        const ch = new T.Group(); ch.position.set(0, .2, .6); grupo.add(ch);
+        ch.add(caixa(1.4, .25, 1.4, mEsc, 0, .125, 0)); const top = caixa(.9, .06, .9, mAcesa(), 0, .28, 0); ch.add(top);
+        for (let s = 0; s < 4; s++) for (let k = 0; k < 5; k++) { const p = caixa(.08, .06, .22, mObj, 0, .06, 0); const d = -.48 + k * .24, a = s * Math.PI / 2;
+          p.position.set(Math.sin(a) * .8 + Math.cos(a) * d, .06, Math.cos(a) * .8 - Math.sin(a) * d); p.rotation.y = a; ch.add(p); }
+        const lb = placaTexto([{ t: c.chip || "IA", tam: .3, cor: "#1a1420" }], .8, .5); lb.rotation.x = -Math.PI / 2; lb.position.set(0, .32, 0); ch.add(lb);
+        const srv = [-1.9, -.65, .65, 1.9].map((x, k) => { const g2 = new T.Group(); g2.position.set(x, 0, -1.4); grupo.add(g2); g2.add(caixa(.95, 2.4, .9, mEsc, 0, 1.2, 0));
+          const luz = [...Array(5)].map((_, j) => { const m = new T.MeshStandardMaterial({ color: "#2a2230", emissive: corA, emissiveIntensity: 0 }); const l = caixa(.7, .08, .02, m, 0, .45 + j * .42, .46); g2.add(l); return m; });
+          const tr = caixa(.06, .02, 1, new T.MeshBasicMaterial({ color: COR, transparent: true, opacity: 0, toneMapped: false }), 0, .02, 0); grupo.add(tr);
+          const dx = x - 0, dz = -1.4 - .6, L = Math.hypot(dx, dz); tr.scale.z = L; tr.position.set(x / 2, .02, (-1.4 + .6) / 2); tr.rotation.y = Math.atan2(dx, dz);
+          return { luz, tr, k }; });
+        const tE = em(c.em, .8), tS = em(c.servidores_em, 2.5);
+        item.pose = { pos: [0, 3.2, 8.4], alvo: [0, 1.0, -.4] };
+        item.upd = t => { top.material.emissiveIntensity = .3 + .5 * eout(prog(t, tE, .5)) + .1 * Math.sin(t * 5);
+          srv.forEach(s => { const a = prog(t, tS + s.k * .3, .5); s.tr.material.opacity = .9 * a; s.luz.forEach((m, j) => { const on = a > 0 && Math.sin(t * 9 + j * 1.7 + s.k) > -.2; m.emissiveIntensity = on ? .9 * a : 0; m.color.set(on && a > 0 ? COR : "#2a2230"); }); }); };
+      } else if (c.tipo === "planta") {
+        // planta que cresce no vaso: as folhas abrem e brotam moedas (construir com o tempo)
+        holofote(grupo, 0, 0, 1.6);
+        grupo.add(cil(.75, .55, .9, mEsc, 24)); grupo.children[grupo.children.length - 1].position.y = .45;
+        const terra = cil(.7, .7, .05, new T.MeshStandardMaterial({ color: "#2a1f2e" }), 24); terra.position.y = .88; grupo.add(terra);
+        const caule = cil(.06, .08, 1, new T.MeshStandardMaterial({ color: T3.vela_alta || "#20BD5A", roughness: .6 }), 10); grupo.add(caule);
+        const folhas = [...Array(6)].map((_, k) => { const f = new T.Mesh(new T.SphereGeometry(.32, 12, 8), new T.MeshStandardMaterial({ color: T3.vela_alta || "#20BD5A", roughness: .5 })); f.scale.set(1, .25, .55); grupo.add(f); return { f, k }; });
+        const moedas = [...Array(3)].map((_, k) => { const m = cil(.2, .2, .05, mAcesa(), 20); m.rotation.x = Math.PI / 2; grupo.add(m); return { m, k }; });
+        const tE = em(c.em, .5), tF = c.fim_em ?? c.ate - .8, HC = 2.4;
+        item.pose = { pos: [0, 2.3, 8.4], alvo: [0, 1.8, 0] };
+        item.upd = t => { const g = eio(prog(t, tE, tF - tE)), h = .05 + HC * g; caule.scale.y = h; caule.position.y = .9 + h / 2;
+          folhas.forEach(o => { const a = eback(prog(g, o.k / 7, .25)), y = .9 + HC * (o.k + 1) / 7.5, s = o.k % 2 ? 1 : -1; o.f.visible = a > 0; o.f.position.set(s * .32 * a, y, 0); o.f.rotation.z = s * -.5; o.f.scale.set(Math.max(.001, a), .25 * Math.max(.001, a), .55 * Math.max(.001, a)); });
+          moedas.forEach(o => { const a = eback(prog(t, tF - .6 + o.k * .25, .5)); o.m.visible = a > 0; o.m.scale.setScalar(Math.max(.001, a)); o.m.position.set((o.k - 1) * .55, .9 + HC * (.55 + o.k % 2 * .2), .15); o.m.rotation.y = t * 2; }); };
+      } else if (c.tipo === "dado") {
+        // dado rolando: o resultado não é garantido
+        holofote(grupo, 0, 0, 1.9);
+        const dd = new T.Group(); grupo.add(dd); dd.add(caixa(1.1, 1.1, 1.1, mObj, 0, 0, 0));
+        const pt = (x, y, z) => { const p = new T.Mesh(new T.SphereGeometry(.09, 10, 8), mEsc); p.position.set(x, y, z); dd.add(p); };
+        const F = .56, o = .28; pt(0, 0, F); [[-o, -o], [o, o]].forEach(([a, b]) => pt(a, b, -F)); [[-o, o], [0, 0], [o, -o]].forEach(([a, b]) => pt(F, a, b));
+        [[-o, -o], [o, o], [-o, o], [o, -o]].forEach(([a, b]) => pt(-F, a, b)); [[-o, -o], [o, o], [-o, o], [o, -o], [0, 0]].forEach(([a, b]) => pt(a, F, b)); [[-o, -o], [o, o], [-o, o], [o, -o], [-o, 0], [o, 0]].forEach(([a, b]) => pt(a, -F, b));
+        const tE = em(c.em, .5);
+        item.pose = { pos: [0, 2.4, 8.4], alvo: [0, 1.4, 0] };
+        item.upd = t => { const k = prog(t, tE, 1.8), e = eout(k); dd.position.set(-2.2 + 2.2 * e, .55 + Math.abs(Math.sin(k * Math.PI * 3)) * 1.4 * (1 - k), 0);
+          dd.rotation.set((1 - e) * 9 + .1, (1 - e) * 6 + .5 + .05 * Math.sin(t), (1 - e) * 7); };
+      } else if (c.tipo === "urna") {
+        // urna: as cédulas caem dentro; na palavra sobe a placa do resultado
+        holofote(grupo, 0, 0, 1.8);
+        grupo.add(caixa(1.8, 1.5, 1.3, mObj, 0, .75, 0), caixa(.8, .05, .12, mEsc, 0, 1.52, 0));
+        const nm = placaTexto([{ t: c.titulo || "URNA", tam: .16, cor: "#1a1420", mono: true }], 1.4, .34, COR); nm.position.set(0, .8, .66); grupo.add(nm);
+        const ced = [...Array(6)].map((_, k) => { const p = caixa(.55, .02, .38, mObj, 0, 0, 0); grupo.add(p); return { p, k }; });
+        const res = placaTexto([{ t: c.resultado || "RESULTADO", tam: .2, cor: "#1a1420", mono: true }], 2.6, .55, COR); res.position.set(0, 3.0, .2); grupo.add(res);
+        const tE = em(c.em, 2.5);
+        item.pose = { pos: [0, 2.3, 9.0], alvo: [0, 1.5, 0] };
+        item.upd = t => { ced.forEach(o => { const a = prog(t, c.de + .2 + o.k * .35, .6); o.p.visible = a > 0 && a < 1; o.p.position.set((o.k % 2 ? .3 : -.3) * (1 - a), 4.2 - 2.65 * a, 0); o.p.rotation.set(a * 2, o.k, (1 - a) * 1.5); });
+          res.scale.setScalar(Math.max(.001, eback(prog(t, tE, .5)))); res.material.opacity = eout(prog(t, tE, .3)); };
+      } else if (c.tipo === "alvo") {
+        // alvo: a aposta mirava o centro ("mira") e o dardo cai fora na palavra (expectativa frustrada)
+        holofote(grupo, 0, 0, 1.9);
+        const al = new T.Group(); al.position.set(0, 2.5, 0); grupo.add(al);
+        [1.5, 1.15, .8, .45].forEach((r, k) => { const d = cil(r, r, .12 + k * .02, k % 2 ? mObj : mEsc, 48); d.rotation.x = Math.PI / 2; d.position.z = k * .02; al.add(d); });
+        const cen = cil(.18, .18, .2, mAcesa(), 24); cen.rotation.x = Math.PI / 2; cen.position.z = .1; al.add(cen);
+        grupo.add(caixa(.2, 1.0, .2, mCinza, 0, .5, -.2));
+        const mira = placaTexto([{ t: c.mira || "MUDANÇA", tam: .16, cor: "#1a1420", mono: true }], 2.0, .4, COR); mira.position.set(0, 4.35, .2); grupo.add(mira);
+        const dar = new T.Group(); grupo.add(dar); const hs = cil(.035, .035, .9, mObj, 8); hs.rotation.x = Math.PI / 2; dar.add(hs);
+        const pn = new T.Mesh(new T.ConeGeometry(.07, .22, 10), mEsc); pn.rotation.x = -Math.PI / 2; pn.position.z = -.55; dar.add(pn);
+        const pena = caixa(.3, .02, .25, mAcesa(), 0, 0, .4); dar.add(pena);
+        const tE = em(c.em, 2), fx = 1.05, fy = -1.25;
+        item.pose = { pos: [0, 2.6, 9.6], alvo: [0, 2.3, 0] };
+        item.upd = t => { const a = eio(prog(t, tE, .5)); dar.visible = t >= tE - .1; dar.position.set(fx * a, 2.5 + .6 * (1 - a) + fy * a, 7 - 6.6 * a); dar.rotation.z = a * .3;
+          mira.material.opacity = 1 - .55 * eout(prog(t, tE + .5, .4)); al.rotation.z = a >= 1 ? .03 * Math.sin((t - tE) * 25) * Math.exp(-(t - tE - .5) * 4) : 0; };
+      } else if (c.tipo === "balao") {
+        // balão que enche na palavra (rotulo = o que cresce: gastos, dívida)
+        holofote(grupo, 0, 0, 1.6);
+        const bl = new T.Mesh(new T.SphereGeometry(1, 32, 24), new T.MeshStandardMaterial({ color: T3.vela_baixa || "#DC2626", roughness: .35, emissive: new T.Color(T3.vela_baixa || "#DC2626"), emissiveIntensity: .15 })); grupo.add(bl);
+        const no = new T.Mesh(new T.ConeGeometry(.12, .2, 12), bl.material); no.rotation.z = Math.PI; grupo.add(no);
+        const fio = caixa(.015, 1, .015, mCinza, 0, 0, 0); grupo.add(fio);
+        grupo.add(caixa(.7, .3, .7, mEsc, 0, .15, 0));
+        const lb = placaTexto([{ t: c.rotulo3d || "DÍVIDA", tam: .2, cor: "#F7F7F7", mono: true }], 1.6, .45); grupo.add(lb);
+        const tE = em(c.em, .6), tF = c.fim_em ?? c.ate - .8, r0 = .35, r1 = c.raio ?? 1.45;
+        item.pose = { pos: [0, 2.4, 9.4], alvo: [0, 2.3, 0] };
+        item.upd = t => { const r = r0 + (r1 - r0) * eio(prog(t, tE, tF - tE)) + .02 * Math.sin(t * 3); const cy = .3 + 1.1 + r; bl.scale.set(r, r * 1.1, r); bl.position.set(.05 * Math.sin(t * .8), cy, 0);
+          no.position.set(bl.position.x, cy - r * 1.1 - .05, 0); fio.scale.y = cy - r * 1.1 - .3; fio.position.set(0, .3 + (cy - r * 1.1 - .3) / 2, 0); lb.position.set(bl.position.x, cy, r + .02); lb.scale.setScalar(.6 + .4 * r / r1); };
+      } else if (c.tipo === "ponte") {
+        // ponte entre dois lados: o boneco atravessa (esq -> dir) na palavra
+        holofote(grupo, 0, 0, 2.6);
+        grupo.add(caixa(1.4, 1.2, 1.4, mEsc, -2.0, .6, 0), caixa(1.4, 1.2, 1.4, mAcesa(), 2.0, .6, 0), caixa(2.8, .12, .9, mObj, 0, 1.15, 0));
+        [-1, 1].forEach(s => { grupo.add(caixa(2.8, .05, .05, mCinza, 0, 1.6, s * .42)); for (let k = 0; k < 6; k++) grupo.add(caixa(.04, .45, .04, mCinza, -1.25 + k * .5, 1.38, s * .42)); });
+        const le = placaTexto([{ t: c.esq || "BRASIL", tam: .15, cor: "#F2F2EE", mono: true }], 1.4, .34); le.position.set(-2.0, .6, .71); grupo.add(le);
+        const ld = placaTexto([{ t: c.dir || "EUA", tam: .15, cor: "#1a1420", mono: true }], 1.4, .34); ld.position.set(2.0, .6, .71); grupo.add(ld);
+        if (c.selo) { const sl = placaTexto([{ t: c.selo, tam: .14, cor: "#1a1420", mono: true }], 2.6, .36, COR); sl.position.set(0, 2.0, .45); grupo.add(sl); }
+        const bo = boneco(); bo.scale.setScalar(.55); grupo.add(bo);
+        const tE = em(c.em, 1), tF = c.fim_em ?? tE + 3;
+        item.pose = { pos: [0, 2.6, 9.6], alvo: [0, 1.4, 0] };
+        item.upd = t => { const a = eio(prog(t, tE, tF - tE)); bo.position.set(-2.0 + 4.0 * a, 1.2 + Math.abs(Math.sin(a * 18)) * .05, 0); bo.rotation.y = Math.PI / 2 * (a > 0 && a < 1 ? 1 : .3); };
+      } else if (c.tipo === "pilha") {
+        // pilha de moedas que cresce (construir aos poucos); rotulo3d na placa da base
+        holofote(grupo, 0, 0, 1.5);
+        const n = c.n || 16, mo = [...Array(n)].map((_, k) => { const m = cil(.6, .6, .14, k % 4 === 3 ? mObj : mAcesa(), 32); grupo.add(m); return { m, k }; });
+        const lb = placaTexto([{ t: c.rotulo3d || "US$", tam: .22, cor: "#1a1420", mono: true }], 1.3, .45, COR); lb.position.set(0, .25, 1.0); grupo.add(lb);
+        const tE = em(c.em, .5), tF = c.fim_em ?? c.ate - 1;
+        item.pose = { pos: [0, 2.4, 8.8], alvo: [0, 1.6, 0] };
+        item.upd = t => mo.forEach(o => { const t0 = tE + (tF - tE) * o.k / n, a = prog(t, t0, .35); o.m.visible = a > 0; o.m.position.set(.03 * Math.sin(o.k * 2.1), .07 + o.k * .15 + 2.5 * (1 - eout(a)), .03 * Math.cos(o.k * 1.3)); o.m.rotation.y = o.k; });
+      } else if (c.tipo === "casa") {
+        // a casa própria: janelas acesas; na palavra o peso (rotulo do peso) cai no telhado; etiqueta de preço opcional
+        holofote(grupo, 0, 0, 2.0);
+        const ca = new T.Group(); grupo.add(ca);
+        ca.add(caixa(2.2, 1.5, 1.6, mObj, 0, .75, 0));
+        const tel = new T.Mesh(new T.ConeGeometry(1.75, 1.1, 4), mEsc); tel.rotation.y = Math.PI / 4; tel.position.y = 2.05; tel.scale.z = .85; tel.castShadow = true; ca.add(tel);
+        ca.add(caixa(.45, .8, .05, mEsc, 0, .4, .81));
+        const mJ = new T.MeshStandardMaterial({ color: COR, emissive: corA, emissiveIntensity: .7 });
+        [-.65, .65].forEach(x => ca.add(caixa(.4, .4, .05, mJ, x, .95, .81)));
+        let peso = null; if (c.peso) { peso = new T.Group(); grupo.add(peso); peso.add(caixa(1.3, .75, 1.0, mEsc, 0, 0, 0));
+          const pl = placaTexto([{ t: c.peso, tam: .17, cor: "#F7F7F7", mono: true }], 1.2, .4, T3.vela_baixa || "#DC2626"); pl.position.z = .51; peso.add(pl); }
+        let tag = null; if (c.etiqueta3d) { tag = placaTexto([{ t: c.etiqueta3d, tam: c.etiqueta3d.length < 3 ? .3 : .16, cor: "#1a1420", mono: true }], Math.max(.8, Math.min(2.6, c.etiqueta3d.length * .12 + .4)), c.etiqueta3d.length < 3 ? .6 : .45, COR); tag.position.set(0, 3.35, .3); grupo.add(tag); }
+        const tP = em(c.peso_em, 1.5), tT = em(c.etiqueta_em, 1);
+        item.pose = { pos: [0, 2.5, 9.2], alvo: [0, 1.6, 0] };
+        item.upd = t => { if (peso) { const a = prog(t, tP, .45); peso.visible = t >= tP - .05; peso.position.set(0, 6.5 - (6.5 - 2.95) * a * a, 0);
+            const sq = a >= 1 ? .93 + .07 * (1 - Math.exp(-(t - tP - .45) * 3)) * 0 : 1; ca.scale.y = a >= 1 ? .94 : 1; }
+          if (tag) { tag.scale.setScalar(Math.max(.001, eback(prog(t, tT, .45)))); tag.material.opacity = eout(prog(t, tT, .3)); tag.position.y = (peso && t >= tP ? 4.1 : 3.35); }
+          mJ.emissiveIntensity = .55 + .15 * Math.sin(t * 1.3); };
+      } else if (c.tipo === "carne") {
+        // carnê: duas pilhas de boletos (antes x agora); a de agora cresce mais na palavra
+        holofote(grupo, 0, 0, 2.4);
+        const L = [{ x: -1.15, n: c.n_antes || 6, rot: c.antes || "ANTES", cor: mObj }, { x: 1.15, n: c.n_agora || 10, rot: c.agora || "AGORA", cor: null }];
+        const vm = new T.MeshStandardMaterial({ color: T3.vela_baixa || "#DC2626", emissive: new T.Color(T3.vela_baixa || "#DC2626"), emissiveIntensity: .35 });
+        const P2 = L.map((l, s) => { const fs = [...Array(l.n)].map((_, k) => { const b = caixa(1.5, .16, 1.0, l.cor || (k >= L[0].n ? vm : mObj), l.x, .08 + k * .2, 0); b.rotation.y = (k % 3 - 1) * .05; grupo.add(b); return b; });
+          const lb = placaTexto([{ t: l.rot, tam: .16, cor: s ? "#1a1420" : "#F2F2EE", mono: true }], 1.6, .38, s ? COR : "#2E2536"); lb.position.set(l.x, .2, .85); grupo.add(lb);
+          return { fs, s }; });
+        const tE = em(c.em, 1.5);
+        item.pose = { pos: [0, 2.4, 9.4], alvo: [0, 1.4, 0] };
+        item.upd = t => P2.forEach(o => o.fs.forEach((b, k) => { const t0 = o.s && k >= L[0].n ? tE + (k - L[0].n) * .22 : c.de + .2 + k * .08, a = prog(t, t0, .3);
+          b.visible = a > 0; b.position.y = .08 + k * .2 + 1.5 * (1 - eout(a)); }));
+      } else if (c.tipo === "torneira") {
+        // torneira do dinheiro: as moedas pingam no banco; na palavra a etiqueta de custo sobe e a torneira fica vermelha
+        holofote(grupo, 0, 0, 2.0);
+        grupo.add(caixa(.3, 3.6, .3, mCinza, -1.4, 1.8, -.2), caixa(1.6, .3, .3, mCinza, -.75, 3.45, -.2));
+        const mT = new T.MeshStandardMaterial({ color: T3.objeto, roughness: .35, emissive: new T.Color(T3.vela_baixa || "#DC2626"), emissiveIntensity: 0 });
+        const bico = cil(.2, .26, .5, mT, 20); bico.position.set(0, 3.2, -.2); grupo.add(bico);
+        const reg = cil(.08, .08, .5, mT, 12); reg.rotation.z = Math.PI / 2; reg.position.set(0, 3.6, -.2); grupo.add(reg);
+        grupo.add(caixa(1.9, 1.1, 1.3, mEsc, 0, .55, 0));
+        const bc = placaTexto([{ t: c.caixa || "BANCO", tam: .16, cor: "#1a1420", mono: true }], 1.4, .36, COR); bc.position.set(0, .6, .66); grupo.add(bc);
+        const go = [...Array(8)].map((_, k) => { const m = cil(.17, .17, .05, mAcesa(), 18); m.rotation.x = Math.PI / 2; grupo.add(m); return { m, k }; });
+        const tag = placaTexto([{ t: c.etiqueta3d || "▲ CUSTO DE CAPTAR", tam: .15, cor: "#F7F7F7", mono: true }], 2.6, .45, T3.vela_baixa || "#DC2626"); tag.position.set(.3, 4.25, 0); grupo.add(tag);
+        const tE = em(c.em, 2);
+        item.pose = { pos: [0, 2.5, 9.4], alvo: [0, 2.1, 0] };
+        item.upd = t => { const lento = t >= tE ? 2.2 : 1; go.forEach(o => { const per = .9 * lento, f = ((t - c.de) / per + o.k / go.length) % 1;
+            o.m.visible = t > c.de + o.k * .1; o.m.position.set(0, 2.9 - 1.85 * f * f, -.2 + .1 * f); o.m.rotation.y = t * 3 + o.k; });
+          const a = eout(prog(t, tE, .4)); mT.emissiveIntensity = .5 * a; tag.material.opacity = a; tag.scale.setScalar(Math.max(.001, eback(prog(t, tE, .45)))); };
       } else if (c.tipo === "cta") {
         holofote(grupo, 0, 0, 1.15); const bo = boneco(); grupo.add(bo);
         item.pose = { pos: [0, 2.2, 7.5], alvo: [0, 1.6, 0] };
