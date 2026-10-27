@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-15 (27/10/2026)
+- **Tirar silêncios sem perder o sincronismo:** em gravação de 30 fps numa timeline de 24 fps, a voz podia sair levemente fora da boca depois de tirar os silêncios, e às vezes o áudio ia parar na trilha A2. Agora vídeo e áudio voltam juntos na V1/A1, ligados.
 ## 2026.10.27-14 (27/10/2026)
 - **Transcrição com acento não quebra mais:** a transcrição do DaVinci às vezes saía cortada ou dava erro em palavras com acento (ê, ó, ç) quando o Gab rodava vários vídeos em lote. Corrigido.
 ## 2026.10.27-13 (27/10/2026)

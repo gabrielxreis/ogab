@@ -189,7 +189,18 @@ def main():
         if its: nova.DeleteClips(its)
     if abs(float(nova.GetSetting("timelineFrameRate")) - fps_tl) > 0.01:
         raise SystemExit("a cópia mudou de fps; conferir (a original está guardada como backup)")
-    res = mp.AppendToTimeline(infos) or []
+    if narracao:
+        res = mp.AppendToTimeline(infos) or []
+    else:
+        # vídeo (V1) e áudio (A1) em appends SEPARADOS no mesmo quadro e depois ligados: o append junto, sem trilha,
+        # cai na trilha de destino da interface (áudio foi parar na A2) e, com fps da gravação != fps da timeline
+        # (30 numa de 24), dessincroniza o áudio (relato 27/10/2026)
+        res, rec = [], nova.GetStartFrame()
+        for info in infos:
+            v = mp.AppendToTimeline([dict(info, mediaType=1, trackIndex=1, recordFrame=rec)]) or []
+            au = mp.AppendToTimeline([dict(info, mediaType=2, trackIndex=1, recordFrame=rec)]) or []
+            if v and au: nova.SetClipsLinked([v[0], au[0]], True)
+            if v: res.append(v[0]); rec = v[0].GetEnd()
     dur = (nova.GetEndFrame() - nova.GetStartFrame()) / fps_tl
     if len(res) != len(infos):
         print(f"AVISO: entraram {len(res)} de {len(infos)} trechos; conferir a timeline")
