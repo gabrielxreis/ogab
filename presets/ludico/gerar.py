@@ -63,8 +63,9 @@ def copiar_fotos(plano, base, pasta):
         shutil.copy(orig, os.path.join(pasta, "fotos", os.path.basename(orig)))
         return "fotos/" + os.path.basename(orig)
     for c in plano.get("cenas", []):
-        if c.get("logo"):   # logo real da instituição/marca citada (regra 27/10/2026)
-            c["logo"] = leva(c["logo"])
+        for k in ("logo", "logo_chip"):   # logo real da instituição/marca citada (regra 27/10/2026)
+            if c.get(k):
+                c[k] = leva(c[k])
         pf = c.get("perfil")
         if pf:   # cenário "instagram": foto de perfil e capas da grade
             if pf.get("foto"):
