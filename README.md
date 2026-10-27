@@ -757,6 +757,7 @@ navegador/downloads.md   como baixar no Envato, Artlist e Magnific pelo Chrome
 docs/PROCESSO.md         referência detalhada, armadilhas e decisões
 docs/PROVEDORES.md       o que conectar e quanto custa cada etapa
 docs/BACKGROUNDS.md      fundos animados para os motions
+docs/BANCOS_3D.md        bancos de objetos 3D grátis (ordem de busca e licenças)
 instagram/               parte de Instagram: 9 especialidades (legenda, carrossel, hashtags, humanizer...), referências e lib de publicação
 instagram/carrossel/     gerador de carrossel em imagem (Next.js): carrossel.py novo | previa | exportar
 instagram/carrossel_motion/  carrossel em vídeo (HyperFrames): gerar.py plano.json <saída> -> MP4 + PNG por slide

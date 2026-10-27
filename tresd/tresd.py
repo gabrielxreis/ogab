@@ -4,6 +4,7 @@
   python3 tresd.py cena cena.py saida.mov [--dur 4]   # OBJETO 3D: script bpy que monta a cena (usa tresd/cena_base.py)
   python3 tresd.py progresso <saida.mov | pasta>      # barra de progresso do render (quadros, %, tempo restante)
 Motor: EEVEE SEMPRE (rápido; cena_base.eevee_qualidade()). Cycles só se o usuário quiser abrir/renderizar na interface.
+Objeto pronto: procurar antes nos bancos grátis de docs/BANCOS_3D.md (ordem e licenças).
 Ver tresd/logo3d.py para os campos do plano. O .blend fica ao lado do MOV (editável no Blender).
 """
 import glob, json, os, shutil, subprocess, sys
