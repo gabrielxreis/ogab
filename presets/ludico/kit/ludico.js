@@ -30,7 +30,8 @@
   const TIPOS3D = new Set(["palco", "disjuntor", "barras", "blocos", "placas", "duelo", "grafico", "pregao", "elevador", "placar", "calculadora",
     "barco", "skyline", "cesta", "relogios", "gangorra", "semaforo", "balanca", "cambio", "termometro", "carrinho", "luneta",
     "quique", "bussola", "cofre", "escudo", "bifurcacao", "seguir", "setas", "moeda", "martelo", "ima", "domino", "escada", "leilao", "sismografo", "cartao", "foguete", "chip", "planta", "dado", "urna", "alvo", "balao", "ponte", "pilha", "casa", "carne", "torneira", "instagram", "mesa"]);
-  cenas.forEach(c => { c._3d = TIPOS3D.has(c.tipo) || (c.tipo === "cta" && !!c.cenario && c.cenario !== "globo"); });
+  const EXTRA = window.CENAS_EXTRA || {};   // cenários do cliente fora do kit ("cenas_extra" no plano), mesmo contrato dos nativos
+  cenas.forEach(c => { c._3d = TIPOS3D.has(c.tipo) || !!EXTRA[c.tipo] || (c.tipo === "cta" && !!c.cenario && c.cenario !== "globo"); });
   // cena sem globo herda o foco do globo mais perto (a câmera do globo não gira à toa na volta)
   { let ult = null; cenas.forEach(c => { if (!c._3d && c.foco) ult = c.foco; else if (!c.foco) c._foco = ult; });
     let prox = null; for (let i = cenas.length - 1; i >= 0; i--) { const c = cenas[i]; if (!c._3d && c.foco) prox = c.foco; else if (!c.foco && !c._foco) c._foco = prox; } }
@@ -205,7 +206,7 @@
     // caixa com canto arredondado (o acabamento "argila" da referência Ludificando); "cantos": false no plano volta ao cubo seco
     const GEO_RB = new Map();
     function caixaArred(w, h, d) {
-      const r = Math.min(.07, Math.min(w, h, d) * .18), key = [w, h, d].map(v => v.toFixed(3)).join("x");
+      const r = Math.min(.11, Math.min(w, h, d) * .2), key = [w, h, d].map(v => v.toFixed(3)).join("x");
       if (r < .006 || P.cantos === false) return new T.BoxGeometry(w, h, d);
       if (GEO_RB.has(key)) return GEO_RB.get(key);
       const s = 5, g = new T.BoxGeometry(1, 1, 1, s, s, s).toNonIndexed(), pos = g.attributes.position.array, nor = g.attributes.normal.array;
@@ -308,17 +309,18 @@
     const POOL = [...Array(4)].map(() => { const sp = new T.SpotLight(T3.luz, 0, 24, .17, .6, 1.4); sp.castShadow = true; sp.shadow.mapSize.set(1024, 1024);
       sc.add(sp, sp.target); return sp; });
     function luzes(lista) {   // lista = [[grupo, {x,z,alt}], ...] (até 4)
+      // estúdio: luz mais de frente (frente clara, topo mais escuro, como a referência)
       POOL.forEach((sp, k) => { const L = lista[k]; if (!L) { sp.intensity = 0; return; } const [g, l] = L, suave = l.est === "estudio";
         // estúdio: luz larga e macia vinda da frente e de cima (sombra suave); os outros estilos: o spot fechado de palco
         sp.angle = suave ? .5 : .17; sp.penumbra = suave ? 1 : .6; sp.intensity = suave ? 8 : 16;
-        sp.position.set(g.position.x + l.x, l.alt, g.position.z + l.z + (suave ? 1.6 : 0)); sp.target.position.set(g.position.x + l.x, 0, g.position.z + l.z); sp.target.updateMatrixWorld(); }); }
+        sp.position.set(g.position.x + l.x, suave ? l.alt * .72 : l.alt, g.position.z + l.z + (suave ? 6.5 : 0)); sp.target.position.set(g.position.x + l.x, 0, g.position.z + l.z); sp.target.updateMatrixWorld(); }); }
     const cenas3d = [];   // {c, grupo, origem, upd(t), pose}
     let slot = 0;
     cenas.forEach((c, i) => { if (!c._3d) return;
       // "continua": true = mesma ideia da frase anterior (referência: o monitor fica e só acende mais uma tecla): a câmera
       // fica no MESMO cenário, sem viagem; o cenário lê os campos da continuação (ex.: mesa > "acesas", "acende_em")
       if (c.continua && i > 0 && cenas[i - 1]._3d) { const ant = cenas3d.find(x => x.i === i - 1);
-        if (ant) { cenas3d.push(Object.assign({}, ant, { i, cont: true, monta: null, fx: null, upd: () => {} })); return; } }   // o original já monta e anima
+        if (ant) { cenas3d.push(Object.assign({}, ant, { i, i0: ant.i0 ?? ant.i, cont: true, monta: null, fx: null, upd: () => {} })); return; } }   // o original já monta e anima
       const grupo = new T.Group(), O = new T.Vector3(slot * 46, 0, -(slot % 2) * 8);
       grupo.userData.estilo = c.luz || (P.luzes ? P.luzes[slot % P.luzes.length] : ESTILOS_LUZ[slot % ESTILOS_LUZ.length]); slot++;
       grupo.position.copy(O); sc.add(grupo);
@@ -1071,29 +1073,32 @@
         // réplica da cena da referência Ludificando: monitor com play aceso sobre a base, monte de moedas douradas que
         // chovem e empilham, fileira de teclas com ícone; as últimas "acesas" teclas acendem na palavra (acende_em)
         holofote(grupo, 0, .3, 2.6);
-        const mOuro = new T.MeshStandardMaterial({ color: T3.ouro || "#D6B46C", roughness: .42, metalness: .25 });
+        const mOuro = new T.MeshStandardMaterial({ color: T3.ouro || "#B8955A", roughness: .5, metalness: .3 });   // ouro pálido da referência (não brilha)
         const dx = -.35, base = caixa(2.7, .95, 1.55, mObj, dx, .475, 0); grupo.add(base);
         const mon = new T.Group(); mon.position.set(dx, 0, -.05); grupo.add(mon);
         mon.add(caixa(.62, .06, .38, mEsc, 0, .98, 0), caixa(.09, .55, .09, mEsc, 0, 1.25, -.02));
         const tela = caixa(2.25, 1.3, .12, mObj, 0, 2.05, -.05); mon.add(tela);
         const tri = new T.Shape(); tri.moveTo(-.2, -.25); tri.lineTo(.3, 0); tri.lineTo(-.2, .25); tri.closePath();
         const play = new T.Mesh(new T.ShapeGeometry(tri), mAcesa()); play.position.set(0, 2.05, .02); mon.add(play);
-        const moedas = []; const pilhas = c.pilhas || [[2.35, -.35, 17], [1.85, -.1, 12], [2.85, -.05, 12], [2.3, .25, 10], [1.75, .45, 7], [2.85, .5, 7], [3.25, -.4, 9], [1.9, -.75, 9], [2.75, -.8, 11], [2.3, .75, 4], [3.3, .3, 5], [1.45, .1, 5]];
-        pilhas.forEach(([px, pz, h], k) => { for (let j = 0; j < h; j++) { const m = cil(.3, .3, .085, mOuro, 28); grupo.add(m); moedas.push({ m, x: px + dx, z: pz, y: .045 + j * .09, ord: k * 2 + j }); } });
+        const moedas = []; const pilhas = c.pilhas || [[2.3, -.4, 19], [1.85, -.15, 14], [2.75, -.1, 14], [2.3, .2, 12], [1.8, .4, 9], [2.75, .45, 9], [3.2, -.35, 10], [1.85, -.7, 11], [2.75, -.8, 12], [2.3, .7, 6], [3.2, .3, 6], [1.4, .1, 6], [3.25, .75, 3], [1.4, .65, 3]];
+        pilhas.forEach(([px, pz, h], k) => { for (let j = 0; j < h; j++) { const m = cil(.235, .235, .066, mOuro, 28); grupo.add(m); moedas.push({ m, x: px + dx, z: pz, y: .034 + j * .07, ord: k * 2 + j }); } });
         moedas.forEach(o => { o.m.userData.luz = true; });   // a chuva já é a entrada das moedas (fora da montagem)
         const nT = c.teclas || 7, acesas = c.acesas ?? 2, teclas = [];
         for (let k = 0; k < nT; k++) { const x = dx - 2.1 + k * .72;
           const tc = caixa(.6, .34, .6, mEsc, x, .17, 1.45); grupo.add(tc);
+          const on = caixa(.606, .346, .606, null, x, .17, 1.45); on.visible = false; on.castShadow = false; grupo.add(on); tc.userData.casca = on;
           const ic = caixa(.3, .13, .2, new T.MeshStandardMaterial({ color: "#ffffff", emissive: new T.Color("#ffffff"), emissiveIntensity: .9 }), x, .41, 1.45); grupo.add(ic);
           teclas.push({ tc }); }
-        const mOn = mAcesa(); if (P.acesos !== false) { mOn.userData.aceso = true; mOn.toneMapped = false; mOn.emissiveIntensity = 1.02; mOn.color = corA.clone().multiplyScalar(.18); }
+        const novaOn = () => { const m = mAcesa(); m.transparent = true; if (P.acesos !== false) { m.userData.aceso = true; m.toneMapped = false; m.emissiveIntensity = 1.02; m.color = corA.clone().multiplyScalar(.18); } return m; };
+        teclas.forEach(o => { o.tc.userData.casca.material = novaOn(); });
         const tChuva = em(c.em, .35), fases = [{ n: acesas, t: em(c.acende_em, 1.6) }];
         for (let j = i + 1; cenas[j] && cenas[j].continua; j++) fases.push({ n: cenas[j].acesas ?? fases[fases.length - 1].n, t: cenas[j].acende_em ?? cenas[j].de + .6 });
-        const acesasEm = t => fases.reduce((n, f) => t >= f.t ? Math.max(n, f.n) : n, 0);
+        const quandoAcende = k => { const f = fases.filter(f => k >= nT - f.n).sort((a, b) => a.t - b.t)[0]; return f ? f.t + (k - (nT - f.n)) * .07 : 1e9; };
         item.pose = { pos: [0, 3.0, 9.2], alvo: [.15, 1.0, .5] };
         item.upd = t => { moedas.forEach(o => { const a = prog(t, tChuva + o.ord * .045, .5); o.m.visible = a > 0;
             o.m.position.set(o.x + .02 * Math.sin(o.ord), o.y + 4.2 * (1 - a * a) , o.z); o.m.rotation.set(.6 * (1 - a), o.ord, .4 * (1 - a)); });
-          const na = acesasEm(t); teclas.forEach((o, k) => { o.tc.material = k >= nT - na ? mOn : mEsc; }); };
+          teclas.forEach((o, k) => { const a = prog(t, quandoAcende(k), .28), cs = o.tc.userData.casca;   // acende em .28 s com pulso
+            cs.visible = a > 0; cs.material.opacity = eout(a); cs.scale.setScalar(1 + .12 * Math.sin(Math.PI * a)); }); };
       } else if (c.tipo === "pilha") {
         // pilha de moedas que cresce (construir aos poucos); rotulo3d na placa da base
         holofote(grupo, 0, 0, 1.5);
@@ -1220,6 +1225,7 @@
           const ap = prog(t, tE - .35, .35), so = prog(t, tE, .3); toque.material.opacity = .55 * ap * (1 - so); toque.scale.setScalar(1 - .25 * ap);
           const o = prog(t, tE, .6); onda.material.opacity = t >= tE ? .7 * (1 - o) : 0; onda.scale.setScalar(1 + 1.8 * o);
           tB.visible = t >= tE + .05; tA.scale.setScalar(t >= tE - .05 && t < tE + .08 ? .995 : 1); };
+      } else if (EXTRA[c.tipo]) { EXTRA[c.tipo]({ c, i, grupo, item, O, em, T, caixa, cil, placaTexto, holofote, boneco, gradiente, mObj, mEsc, mCinza, mAcesa, COR, corA, T3, FONTE, prog, eio, eout, eback, D2R, montaPlacas });
       } else if (c.tipo === "cta") {
         holofote(grupo, 0, 0, 1.15); const bo = boneco(); grupo.add(bo);
         item.pose = { pos: [0, 2.2, 7.5], alvo: [0, 1.6, 0] };
@@ -1282,7 +1288,7 @@
     }
     const V = (a, O) => new T.Vector3(a[0] + O.x, a[1] + O.y, a[2] + O.z);
     function poseEm(t, item) {   // pose da cena com deriva lenta (órbita) e respiração
-      const dt = Math.max(0, t - item.c.de), p = item.pose, lado = item.i % 2 ? -1 : 1, ang = lado * (item.c.orbita ?? (item.grupo.userData.estilo === "estudio" ? .012 : .06)) * dt;   // estúdio: quase de frente, como a referência
+      const dt = Math.max(0, t - item.c.de), p = item.pose, lado = (item.i0 ?? item.i) % 2 ? -1 : 1, ang = lado * (item.c.orbita ?? (item.grupo.userData.estilo === "estudio" ? .012 : .06)) * dt;   // estúdio: quase de frente, como a referência
       const pos = V(p.pos, item.O), alvo = V(p.alvo, item.O), d = pos.clone().sub(alvo);
       d.applyAxisAngle(new T.Vector3(0, 1, 0), ang); d.multiplyScalar(DIST * Math.max(.75, 1 - (item.c.aproxima ?? .022) * dt) * (1 - .055 * kickEm(t)));
       d.y += .18 * Math.sin(dt * .55);
@@ -1309,7 +1315,7 @@
         const k = it.i === i && i > 0 && ant ? eio(prog(t, c.de, TRANS)) : 1, s = suave(ant) * (1 - k) + suave(it) * k;
         chao.material = s > .5 ? chaoSombra : chaoPalco; sc.fog.near = 30 + 200 * s; sc.fog.far = 75 + 400 * s;   // fundo infinito: sem neblina
         ren.setClearColor(T3.fundo, s > .5 ? 0 : 1);
-        hemi.intensity = 1.25 - .45 * s; hemi.groundColor.copy(CHAO_PALCO).lerp(CHAO_ESTUDIO, s);
+        hemi.intensity = 1.25 - .65 * s; hemi.groundColor.copy(CHAO_PALCO).lerp(CHAO_ESTUDIO, s);
         dirL.intensity = 1.0 + 1.1 * s; preench.intensity = .35 + .45 * s; recorte.intensity = 1.6 - 1.3 * s;
         const fov = 38 - (38 - (P.lente ?? 22)) * s; if (Math.abs(cam.fov - fov) > .01) { cam.fov = fov; cam.updateProjectionMatrix(); }
         // composição medida na referência: o cenário ocupa ~60% da largura (folga), fica no MEIO da tela entre o cartão e a
@@ -1345,11 +1351,12 @@
       const bw = Math.round(W / 4), bh = Math.round(H / 4);
       if (!BLOOM) { BLOOM = [0, 1, 2].map(() => { const c = document.createElement("canvas"); c.width = bw; c.height = bh; return c; }); }
       const [b0, b1, b2] = BLOOM, x0 = b0.getContext("2d"), x1 = b1.getContext("2d"), x2 = b2.getContext("2d");
-      x0.clearRect(0, 0, bw, bh); x0.filter = "brightness(.64) contrast(5)"; x0.drawImage(cv3, 0, 0, bw, bh); x0.filter = "none";
-      // o preto do limiar vira TRANSPARENTE (alpha = brilho): o halo só soma luz, sem depender de mix-blend (o render ignora)
-      const id = x0.getImageData(0, 0, bw, bh), d = id.data;
-      for (let p = 0; p < d.length; p += 4) { const a = Math.max(d[p], d[p + 1], d[p + 2]) * d[p + 3] / 255;
-        if (a < 6) { d[p + 3] = 0; continue; } const k = 255 / a; d[p] = Math.min(255, d[p] * k); d[p + 1] = Math.min(255, d[p + 1] * k); d[p + 2] = Math.min(255, d[p + 2] * k); d[p + 3] = a; }
+      x0.clearRect(0, 0, bw, bh); x0.drawImage(cv3, 0, 0, bw, bh);
+      // limiar pela MÉDIA dos canais: só o que é aceso (amarelo da marca, ícone branco) brilha; ouro e cinza não. O resto vira
+      // transparente e o halo só soma luz (sem mix-blend, que o render ignora)
+      const id = x0.getImageData(0, 0, bw, bh), d = id.data, LIM = (P.brilho_limiar ?? .74) * 765, FAIXA = 765 * .16;
+      for (let p = 0; p < d.length; p += 4) { const m = d[p] + d[p + 1] + d[p + 2];
+        d[p + 3] = m <= LIM ? 0 : Math.min(255, (m - LIM) / FAIXA * 255) * d[p + 3] / 255; }
       x0.putImageData(id, 0, 0);
       x1.clearRect(0, 0, bw, bh); x1.filter = `blur(${(2.4 * U).toFixed(2)}px)`; x1.drawImage(b0, 0, 0); x1.filter = "none";
       x2.clearRect(0, 0, bw, bh); x2.filter = `blur(${(10 * U).toFixed(2)}px)`; x2.drawImage(b0, 0, 0); x2.filter = "none";
