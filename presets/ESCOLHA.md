@@ -29,6 +29,9 @@ Estilos completos (ritmo, transições, visual, som e kit de motions): o usuári
 
 - **efeitos extras** (para qualquer motion, `presets/efeitos/EFEITOS.md`): física (palavras caindo e empilhando, Matter.js), esfera de "IA pensando" em 6 estados, ASCII, lupa que estufa o texto e rabiscos à mão com hachura (Rough.js). Acervo de 400+ vídeos de referência listado no mesmo guia.
 
+### Preset = base e formato (regra do usuário, 27/10/2026)
+O preset dá a base (tema, luz, câmera, cartão, ritmo, som) e o formato; os cenários e objetos são criados para cada vídeo, com o acabamento da base. Não ficar preso ao catálogo de cenas do preset.
+
 ### Tela sempre mudando (regra do usuário, 27/10/2026)
 Em qualquer preset: um elemento novo na tela a cada ~2,5-4 s, acompanhando cada ideia da fala; nenhum cenário passa de ~4,5 s (CTA até 7 s). Frase longa vira 2-3 elementos.
 

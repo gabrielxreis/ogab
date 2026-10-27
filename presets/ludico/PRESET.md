@@ -176,3 +176,6 @@ Referência: instagram.com/p/De56numApif (Ludificando, 22 s), medida quadro a qu
 - As outras luzes (`contraluz`, `neon`, `janela`, `feixes`, `grade`, `cone`) ficam para quando a frase pedir: `"luz": "<estilo>"` na cena ou `"luzes": [...]` no plano.
 - Marca de cliente: o tema dela troca as cores (fundo, objetos, destaque); a luz, a montagem e o cartão continuam os da referência.
 - Ao criar cenário novo, pensar como a referência: o cenário **acumula** entre frases da mesma ideia (o monitor fica, chegam as moedas, depois o teclado, depois o celular na frente), chuva de objetos que empilham, e um campo de peças acesas desfocadas ao fundo para dar densidade.
+
+## Cenários do cliente fora do kit ("cenas_extra")
+O preset é só a base (regra do Gabriel, 27/10/2026). Cenário criado para um cliente/vídeo vai num .js do CLIENTE, não no kit: `"cenas_extra": "<caminho.js>"` no plano. O `gerar.py` copia para a composição como `cenas_extra.js` e carrega antes do `ludico.js`; o arquivo registra `window.CENAS_EXTRA[tipo] = ctx => {...}` (ctx traz c, grupo, item, em, T, caixa, cil, placaTexto, holofote, boneco, materiais, COR, T3, prog/eio/eout/eback) e define `item.upd` como os nativos. Exemplo: `CLAUDE BRAIN/X-Trader/Ludico/cenas_xtrader.js` (mesa_trader, bolsa_cidade, banco, notas, cofre_redondo, casa_quintal).

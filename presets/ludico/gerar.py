@@ -176,6 +176,14 @@ if __name__ == "__main__":
     pasta = os.path.abspath(a[1])
     copiar_fotos(plano, base, pasta)
     pasta = g.gerar(plano, pasta, base)
+    if plano.get("cenas_extra"):   # cenários do cliente fora do kit (regra: o preset é só a base; os cenários são criados)
+        import shutil
+        orig = plano["cenas_extra"] if os.path.isabs(plano["cenas_extra"]) else os.path.join(base, plano["cenas_extra"])
+        shutil.copy(orig, os.path.join(pasta, "cenas_extra.js"))
+        ih = os.path.join(pasta, "index.html"); html = open(ih, encoding="utf-8").read()
+        if "cenas_extra.js" not in html:
+            html = html.replace('<script src="ludico.js"></script>', '<script src="cenas_extra.js"></script>\n<script src="ludico.js"></script>', 1)
+            open(ih, "w", encoding="utf-8").write(html)
     aplicar_tema(pasta, tema)
     print("tema", tema["nome"])
     saida, gif = g.args_render(a)
