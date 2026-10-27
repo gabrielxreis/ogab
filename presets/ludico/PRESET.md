@@ -161,7 +161,8 @@ Referência: instagram.com/p/De56numApif (Ludificando, 22 s), medida quadro a qu
 - **Fundo infinito:** grafite uniforme (#1E1E1C) com um clarão leve atrás do assunto, sem parede nem linha de horizonte. O canvas 3D fica transparente e o fundo é pintado no `#root`; o chão vira só sombra (`ShadowMaterial`).
 - **Argila:** objetos cinza quente (#7A7870 / #4E4D48 / #5E5D57 no tema padrão), caixas com canto arredondado (`"cantos": false` volta ao cubo), luz-chave branca de frente-alto e sombra macia.
 - **Destaque aceso:** tudo que está na cor da marca sai saturado e emissivo (fora do tone mapping) e vaza brilho em volta (bloom em 2D). Campos: `"brilho": 0.4` (0 desliga) e `"acesos": false`.
-- **Lente longa** (foto de produto, quase sem distorção): `"lente": 22` (graus) e `"folga": 0.08` (recuo extra).
+- **Lente longa e composição da referência:** `"lente": 22` (graus), `"folga": 0.8` (o cenário ocupa ~60% da largura), `"elevacao": 26` (câmera olhando de cima, mostra o topo das peças) e o assunto no meio da tela entre o cartão e a legenda.
+- **Legenda (quando o plano pede):** caixa escura arredondada, a palavra falada agora na cor, a já dita branca, a que vem cinza; quebra em 2 linhas.
 - **Montagem:** as peças do cenário nascem pequenas e crescem passando do ponto, da esquerda para a direita, enquanto a câmera chega (`"montagem": false` na cena ou no plano desliga).
 - **Poeira bokeh:** poucas bolas grandes e bem desfocadas (`"poeira": 18`).
 - **Cartão:** kicker `• SÉRIE` em mono branco com ponto na cor, fixo o vídeo todo; sem pílula de seção (ela só aparece se alguma cena tiver `secao`).

@@ -197,7 +197,7 @@
     const chao = new T.Mesh(new T.PlaneGeometry(600, 600), new T.MeshStandardMaterial({ color: T3.chao, roughness: .92 }));
     chao.rotation.x = -Math.PI / 2; chao.receiveShadow = true; sc.add(chao);
     // fundo infinito da referência: no "estudio" o chão some (só a sombra aparece sobre a cor do fundo), sem linha de horizonte
-    const chaoPalco = chao.material, chaoSombra = new T.ShadowMaterial({ opacity: .55 });
+    const chaoPalco = chao.material, chaoSombra = new T.ShadowMaterial({ opacity: .24 });
     const corA = new T.Color(COR);
     const mObj = new T.MeshStandardMaterial({ color: T3.objeto, roughness: .55 }), mEsc = new T.MeshStandardMaterial({ color: T3.escuro, roughness: .7 });
     const mCinza = new T.MeshStandardMaterial({ color: T3.cinza, roughness: .7 });
@@ -308,8 +308,8 @@
     function luzes(lista) {   // lista = [[grupo, {x,z,alt}], ...] (até 4)
       POOL.forEach((sp, k) => { const L = lista[k]; if (!L) { sp.intensity = 0; return; } const [g, l] = L, suave = l.est === "estudio";
         // estúdio: luz larga e macia vinda da frente e de cima (sombra suave); os outros estilos: o spot fechado de palco
-        sp.angle = suave ? .42 : .17; sp.penumbra = suave ? 1 : .6; sp.intensity = suave ? 7 : 16;
-        sp.position.set(g.position.x + l.x, l.alt, g.position.z + l.z + (suave ? 4.5 : 0)); sp.target.position.set(g.position.x + l.x, 0, g.position.z + l.z); sp.target.updateMatrixWorld(); }); }
+        sp.angle = suave ? .5 : .17; sp.penumbra = suave ? 1 : .6; sp.intensity = suave ? 8 : 16;
+        sp.position.set(g.position.x + l.x, l.alt, g.position.z + l.z + (suave ? 1.6 : 0)); sp.target.position.set(g.position.x + l.x, 0, g.position.z + l.z); sp.target.updateMatrixWorld(); }); }
     const cenas3d = [];   // {c, grupo, origem, upd(t), pose}
     let slot = 0;
     cenas.forEach((c, i) => { if (!c._3d) return;
@@ -1263,8 +1263,15 @@
         hemi.intensity = 1.25 - .45 * s; hemi.groundColor.copy(CHAO_PALCO).lerp(CHAO_ESTUDIO, s);
         dirL.intensity = 1.0 + 2.4 * s; preench.intensity = .35 + .45 * s; recorte.intensity = 1.6 - 1.3 * s;
         const fov = 38 - (38 - (P.lente ?? 22)) * s; if (Math.abs(cam.fov - fov) > .01) { cam.fov = fov; cam.updateProjectionMatrix(); }
-        const afasta = Math.tan(19 * D2R) / Math.tan(fov / 2 * D2R) * (1 + (P.folga ?? .08) * s);   // lente longa: recua para o enquadramento ficar igual
-        cam.position.copy(alvo.clone().add(pos.clone().sub(alvo).multiplyScalar(afasta))); cam.lookAt(alvo); }
+        // composição medida na referência: o cenário ocupa ~60% da largura (folga), fica no MEIO da tela entre o cartão e a
+        // legenda (desce = 0) e a câmera olha de cima, ~26°, mostrando o topo das peças (elevacao)
+        const afasta = Math.tan(19 * D2R) / Math.tan(fov / 2 * D2R) * (1 + (P.folga ?? .8) * s);   // lente longa: recua para o enquadramento ficar igual
+        const d = pos.clone().sub(alvo).multiplyScalar(afasta), L = d.length(), el0 = Math.asin(clamp(d.y / L, -1, 1));
+        const el = el0 + Math.max(0, (P.elevacao ?? 26) * D2R - el0) * s, hz = Math.hypot(d.x, d.z) || 1;
+        d.set(d.x / hz * L * Math.cos(el), L * Math.sin(el), d.z / hz * L * Math.cos(el));
+        cam.position.copy(alvo.clone().add(d)); cam.lookAt(alvo);
+        const desce = (P.estudio_desce ?? .1) * (1 - s) + (P.estudio_desce_ref ?? -.01) * s;
+        if (cam.view && Math.abs(cam.view.offsetY + H * desce) > .5) cam.setViewOffset(W, H, 0, -H * desce, W, H); }
       const salvos = [];
       cenas3d.forEach(x => (x.monta || []).forEach(m => { const k = prog(t, m.t0, .85); if (k >= 1) return;
         const e = Math.max(eback(k), .001); salvos.push([m.o, m.o.scale.clone(), m.o.position.y]);
@@ -1296,7 +1303,7 @@
   const card = document.getElementById("card");
   Object.assign(card.style, VERT ? { left: px(90), top: (H * .152).toFixed(1) + "px" } : { left: px(80), top: px(80) });
   let kick = null;
-  if (P.serie) { const k = mk("div", "kicker", card, { fontSize: px(24), marginBottom: px(14) }); k.textContent = P.serie; kick = k;
+  if (P.serie) { const k = mk("div", "kicker", card, { fontSize: px(30), marginBottom: px(18) }); k.textContent = P.serie; kick = k;
     tl.fromTo(k, { opacity: 0 }, { opacity: 1, duration: .5, ease: "power2.out" }, 0); }
   const pil = mk("div", "pilula", card, { height: px(62), paddingRight: px(26) });
   if (!cenas.some(c => c.secao)) pil.style.display = "none";   // referência Ludificando: sem pílula de seção, só o kicker
@@ -1328,12 +1335,12 @@
     if (c.etiqueta) { const e = mk("div", "etiqueta", gp, { fontSize: px(21), padding: `${px(7)} ${px(14)}` }); e.textContent = c.etiqueta;
       tl.fromTo(e, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: .45, ease: "power3.out" }, t0); }
     // título da referência Ludificando: frase curta em bold, a palavra-chave entre *asteriscos* sai na cor da marca
-    if (c.manchete) { const e = mk("div", "titulo", gp, { fontSize: px(c.manchete_tam || 68), marginTop: px(c.etiqueta ? 14 : 0), maxWidth: px(VERT ? 880 : 740) });
+    if (c.manchete) { const e = mk("div", "titulo", gp, { fontSize: px(c.manchete_tam || 78), marginTop: px(c.etiqueta ? 14 : 0), maxWidth: px(VERT ? 880 : 740) });
       c.manchete.split(/(\*[^*]+\*)/).forEach(p => { if (!p) return; const s = mk("span", p[0] === "*" ? "dest" : "", e); s.textContent = p.replace(/\*/g, ""); });
       tl.fromTo(e, { opacity: 0, y: px(20) }, { opacity: 1, y: 0, duration: .55, ease: "expo.out" }, c.manchete_em ?? t0); }
     // chips: pílulas na cor da marca que vão se SOMANDO na palavra (PESQUISOU > ESCREVEU > NARROU...), "chips": [{texto, em}]
-    if ((c.chips || []).length) { const L = cartoes[i].chips || (cartoes[i].chips = mk("div", "chips", gp, { marginTop: px(16), gap: px(10), maxWidth: px(VERT ? 880 : 740) }));
-      c.chips.forEach(ch => { const e = mk("div", "chip", L, { fontSize: px(24), padding: `${px(8)} ${px(18)}` }); e.textContent = ch.texto;
+    if ((c.chips || []).length) { const L = cartoes[i].chips || (cartoes[i].chips = mk("div", "chips", gp, { marginTop: px(20), gap: px(12), maxWidth: px(VERT ? 880 : 740) }));
+      c.chips.forEach(ch => { const e = mk("div", "chip", L, { fontSize: px(31), padding: `${px(13)} ${px(28)}` }); e.textContent = ch.texto;
         tl.fromTo(e, { opacity: 0, scale: .4 }, { opacity: 1, scale: 1, duration: .45, ease: "back.out(2.2)" }, ch.em ?? t0); }); }
     const n = c.numero;
     if (n) { const em = n.em ?? c.de + .4, el = mk("div", "numero", gp, { fontSize: px(n.tamanho || 158), marginTop: px(14) });
@@ -1379,9 +1386,10 @@
       if (fimFrase || cur.length >= (P.palavras_bloco || 6) || chars >= 28 || i === PAL.length - 1) { blocos.push(cur); cur = []; } });
     blocos.forEach((b, i) => {
       const ini = b[0].s - .04, fimB = i < blocos.length - 1 ? blocos[i + 1][0].s - .04 : Math.min(dur, b[b.length - 1].e + .8);
-      const el = mk("div", "bloco", leg, { fontSize: px(P.legenda_tam || 48), padding: `${px(10)} ${px(24)} ${px(12)}`, maxWidth: px(800) });
+      const el = mk("div", "bloco", leg, { fontSize: px(P.legenda_tam || 48), padding: `${px(20)} ${px(44)} ${px(22)}`, maxWidth: px(740), borderRadius: px(18) });
       b.forEach((w, j) => { const s = mk("span", "w", el, j < b.length - 1 ? { marginRight: ".26em" } : null); s.textContent = w.t;
-        tl.set(s, { color: COR }, w.s);
+        // referência: a palavra falada AGORA fica na cor, a que já foi dita fica branca, a que vem fica cinza
+        tl.set(s, { color: COR }, w.s); tl.set(s, { color: "#F2F2EE" }, Math.max(w.s + .05, (b[j + 1] ? b[j + 1].s : w.e + .15)));
         tl.fromTo(s, { scale: 1.1 }, { scale: 1, duration: .22, ease: "power2.out", immediateRender: false }, w.s); });
       tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: .08, ease: "power1.out", immediateRender: false }, ini);
       tl.set(el, { opacity: 0 }, fimB);
