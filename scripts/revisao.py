@@ -61,6 +61,7 @@ def buracos(t, mp, corrigir):
                 if not corrigir:
                     ERROS.append("VÃO " + onde + ": a imagem de baixo pisca (rodar com --corrigir)"); continue
                 mpa = a.GetMediaPoolItem(); tot = int(float(mpa.GetClipProperty("Frames") or 0))
+                props = {pr: float(a.GetProperty(pr) or 0) for pr in ("ZoomX", "ZoomY", "Pan", "Tilt")}
                 fps_a = float(mpa.GetClipProperty("FPS") or F)
                 la = a.GetLeftOffset(); da = a.GetDuration()
                 # fontes em outro fps: o offset vem em quadros da timeline; a mídia conta em quadros dela
@@ -73,6 +74,7 @@ def buracos(t, mp, corrigir):
                                               "startFrame": ini_src, "endFrame": fim_src}])
                 else:   # sem sobra no anterior: puxa o início do seguinte para trás
                     mpb = b.GetMediaPoolItem(); fps_b = float(mpb.GetClipProperty("FPS") or F)
+                    props = {pr: float(b.GetProperty(pr) or 0) for pr in ("ZoomX", "ZoomY", "Pan", "Tilt")}
                     lb = b.GetLeftOffset(); db = b.GetDuration()
                     if lb < g:
                         ERROS.append("VÃO " + onde + ": nenhum dos dois clipes tem sobra, refazer o trecho"); continue
@@ -83,6 +85,10 @@ def buracos(t, mp, corrigir):
                 if tentativas[onde] > 3:
                     ERROS.append("VÃO " + onde + ": não fechou em 3 tentativas, ajustar à mão"); continue
                 if x:
+                    orig = a if x[0].GetName() == a.GetName() else b
+                    for pr in ("ZoomX", "ZoomY", "Pan", "Tilt"):
+                        v = props.get(pr)
+                        if v is not None: x[0].SetProperty(pr, v)
                     AVISOS.append("corrigido: " + onde); mudou = True; break
                 ERROS.append("VÃO " + onde + ": não consegui recolocar o clipe")
 
@@ -155,8 +161,9 @@ def bordas(t):
 
 
 def fala(t):
-    """LEI 1 e 2: repetição, gaguejo, retake e silêncio no que ficou na timeline, pela transcrição LITERAL da gravação
-    (a do DaVinci esconde repetição). Pausa > 0,35 s entre palavras ou começo sem fala = ERRO."""
+    """LEI 1 e 2. SILÊNCIO pela energia do áudio da gravação, no que ficou na timeline (pausa sem voz > 0,35 s, ou
+    começo sem fala > 0,45 s). REPETIÇÃO/RETAKE/GAGUEJO pela transcrição literal de trechos grandes (palavra que
+    atravessa um corte não some; 28/10/2026: transcrever pedacinho por pedacinho dava silêncio falso)."""
     try:
         import limpar_fala as LF
     except Exception as e:
@@ -165,23 +172,45 @@ def fala(t):
     if not its: return
     arq = its[0].GetMediaPoolItem().GetClipProperty("File Path")
     if not arq or not os.path.exists(arq): return
+    pedacos = [(x.GetLeftOffset() / F, x.GetLeftOffset() / F + x.GetDuration() / F, (x.GetStart() - S) / F) for x in its]
+    env = LF._envelope(arq)
+    if env:
+        db, passo = env
+        topo = sorted(db)[int(len(db) * 0.6):]; ref = topo[len(topo) // 2] if topo else -20
+        voz = []
+        for lo, hi, rec in pedacos:
+            voz += [db[k] > ref - 16 for k in range(int(lo / passo), min(len(db), int(hi / passo)))]
+        k0 = next((k for k, v in enumerate(voz) if v), 0)
+        if k0 * passo > 0.45: ERROS.append(f"SILÊNCIO no começo: a voz começa em {k0 * passo:.2f} s")
+        k = k0
+        while k < len(voz):
+            if not voz[k]:
+                j = k
+                while j < len(voz) and not voz[j]: j += 1
+                if (j - k) * passo > 0.35 and j < len(voz):
+                    ERROS.append(f"SILÊNCIO de {(j - k) * passo:.2f} s em {k * passo:.2f} s")
+                k = j
+            else:
+                k += 1
+    # trechos grandes da gravação (cortes próximos juntos) para a transcrição literal
+    grandes = []
+    for lo, hi, rec in sorted(pedacos):
+        if grandes and lo - grandes[-1][1] < 1.5: grandes[-1][1] = max(grandes[-1][1], hi)
+        else: grandes.append([lo, hi])
+    try:
+        ws = LF.literal_trechos(arq, grandes)
+    except Exception as e:
+        AVISOS.append(f"FALA: sem transcrição literal ({e})"); return
     seq = []
-    for x in its:
-        lo = x.GetLeftOffset() / F; hi = lo + x.GetDuration() / F; rec = (x.GetStart() - S) / F
-        try:
-            ws = LF.literal_trechos(arq, [[lo, hi]])
-        except Exception as e:
-            AVISOS.append(f"FALA: sem transcrição literal ({e})"); return
-        for w in ws:
-            if w["start"] >= lo - 0.02 and w["end"] <= hi + 0.05:
-                seq.append({"text": w["text"], "start": rec + w["start"] - lo, "end": rec + min(w["end"], hi) - lo})
-    if not seq: return
-    if seq[0]["start"] > 0.45: ERROS.append(f"SILÊNCIO no começo: a fala começa em {seq[0]['start']:.2f} s")
-    for a, b in zip(seq, seq[1:]):
-        if b["start"] - a["end"] > 0.35:
-            ERROS.append(f"SILÊNCIO de {b['start'] - a['end']:.2f} s em {a['end']:.2f} s ('{a['text']}' | '{b['text']}')")
+    for w in ws:
+        m = (w["start"] + w["end"]) / 2
+        for lo, hi, rec in pedacos:
+            if lo - 0.03 <= m <= hi + 0.03:
+                seq.append({"text": w["text"], "start": rec + max(w["start"], lo) - lo, "end": rec + min(w["end"], hi) - lo}); break
+    seq.sort(key=lambda w: w["start"])
     for a, b, motivo, txt in LF.detectar(seq):
-        ERROS.append(f"FALA {motivo} em {a:.2f} s: '{txt}' (tirar, fica só a última tentativa)")
+        if motivo != "HESITAÇÃO" or b - a > 0.15:
+            ERROS.append(f"FALA {motivo} em {a:.2f} s: '{txt}' (tirar, fica só a última tentativa)")
 
 
 def motions_ligados(t):

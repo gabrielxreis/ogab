@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-8 (28/10/2026)
+- **Silêncio medido pelo áudio na revisão:** a revisão acusava pausas que não existiam (transcrevia cada pedacinho da timeline separado e o tempo das palavras saía torto). Agora o silêncio é medido pela energia do áudio no que ficou na timeline, e a repetição de fala pela transcrição de trechos inteiros.
+- **Sem pausa escondida nos cortes:** a limpeza de fala agora também apara o começo e o fim mudos de cada trecho; antes o fim calado de um trecho somava com o começo calado do seguinte e virava meio segundo de silêncio no corte.
+- **Borda preta não volta mais:** ao fechar um vão entre takes, a revisão recolocava o take sem o zoom de preencher. Agora mantém zoom, pan e tilt.
 ## 2026.10.28-7 (28/10/2026)
 - **Leis da edição:** fala sem repetição, gaguejo, retake ou silêncio; legenda nunca em cima de motion; motions seguidos sempre ligados; motion que termina perto de um corte cobre o corte; contexto visual real do assunto; logo de marca citada; SFX sincronizado com o motion; motion validado em movimento. A revisão barra fala repetida, silêncio, motion desligado e corte exposto.
 - **Limpeza de fala literal:** a transcrição do DaVinci escondia repetição (juntava a fala repetida numa palavra só). Agora a fala é transcrita palavra por palavra, do jeito que foi dita; a primeira tentativa de um retake sai, o gaguejo sai e o silêncio é medido pelo áudio. Frase de propósito repetida ("tem gente dizendo que sim, tem gente dizendo que não") fica.

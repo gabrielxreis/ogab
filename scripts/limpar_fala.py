@@ -161,13 +161,19 @@ def limpar(arquivo, trechos=None, pausa=0.25, respiro=0.08):
         ref = topo[len(topo) // 2] if topo else -20
         voz = [x > ref - 16 for x in db]
         refinado = []
+        # as PONTAS de cada trecho também: dois trechos colados somavam o fim mudo de um com o começo mudo do outro
+        # (03 HORA EXTRA: 0,56 s de silêncio num corte). Fim guarda 0,12 s (cauda baixa da última palavra).
         for a, b in limpo:
             i0, i1 = int(a / passo), min(len(voz), int(b / passo)); cur = a; k = i0
             while k < i1:
                 if not voz[k]:
                     j = k
                     while j < i1 and not voz[j]: j += 1
-                    if (j - k) * passo > pausa and k > i0 and j < i1:
+                    if k == i0 and j < i1 and (j - k) * passo > respiro:
+                        cur = max(cur, j * passo - respiro)
+                    elif j >= i1 and k > i0 and (j - k) * passo > 0.12:
+                        b = min(b, k * passo + 0.12)
+                    elif (j - k) * passo > pausa and k > i0 and j < i1:
                         x, y = k * passo + respiro, j * passo - respiro
                         if x - cur > 0.05: refinado.append([round(cur, 3), round(x, 3)])
                         cur = y
