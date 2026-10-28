@@ -16,7 +16,7 @@ Confere:
      (parede, camiseta, papel): azul muito abaixo do vermelho = AMARELADO; o contrário = AZULADO; verde demais = VERDE.
   4. ÁUDIO x IMAGEM: a A1 cobre a V1 inteira (mesmo início e fim de cada clipe da gravação).
 """
-import os, sys, statistics as st
+import os, sys, math, statistics as st
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import resolve_lib as R
 
@@ -47,6 +47,7 @@ def buracos(t, mp, corrigir):
             if g > 0:
                 ERROS.append(f"BURACO na {k[0].upper()}1 em {(a.GetEnd() - S) / F:.2f} s ({g} quadros): remontar a gravação")
     if corrigir: R.pagina_edit()
+    tentativas = {}
     for n in range(2, t.GetTrackCount("video") + 1):
         mudou = True
         while mudou:
@@ -63,7 +64,9 @@ def buracos(t, mp, corrigir):
                 fps_a = float(mpa.GetClipProperty("FPS") or F)
                 la = a.GetLeftOffset(); da = a.GetDuration()
                 # fontes em outro fps: o offset vem em quadros da timeline; a mídia conta em quadros dela
-                ini_src = int(round(la * fps_a / F)); fim_src = int(round((la + da + g) * fps_a / F))
+                # arredonda o fim para CIMA: com round() um take de outro fps (4K 25/29,97 numa timeline 24) voltava
+                # com o mesmo tamanho, o vão nunca fechava e o laço rodava para sempre (27/10/2026, 06 HORA EXTRA)
+                ini_src = int(round(la * fps_a / F)); fim_src = int(math.ceil((la + da + g) * fps_a / F)) + tentativas.get(onde, 0)
                 if tot and fim_src <= tot:
                     rec = a.GetStart(); t.DeleteClips([a], False)
                     x = mp.AppendToTimeline([{"mediaPoolItem": mpa, "mediaType": 1, "trackIndex": n, "recordFrame": rec,
@@ -76,6 +79,9 @@ def buracos(t, mp, corrigir):
                     rec = a.GetEnd(); t.DeleteClips([b], False)
                     x = mp.AppendToTimeline([{"mediaPoolItem": mpb, "mediaType": 1, "trackIndex": n, "recordFrame": rec,
                                               "startFrame": int(round((lb - g) * fps_b / F)), "endFrame": int(round((lb + db) * fps_b / F))}])
+                tentativas[onde] = tentativas.get(onde, 0) + 1
+                if tentativas[onde] > 3:
+                    ERROS.append("VÃO " + onde + ": não fechou em 3 tentativas, ajustar à mão"); continue
                 if x:
                     AVISOS.append("corrigido: " + onde); mudou = True; break
                 ERROS.append("VÃO " + onde + ": não consegui recolocar o clipe")

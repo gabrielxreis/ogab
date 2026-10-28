@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-2 (28/10/2026)
+- **Revisão não trava mais com take 4K:** quando um take de banco em outro fps (4K a 25 ou 30 quadros) ficava a 1 quadro do clipe seguinte, a revisão tentava fechar o vão para sempre e o Gab parecia congelado. Agora ela fecha o vão de primeira e, se não conseguir em 3 tentativas, avisa em vez de travar.
 ## 2026.10.28-1 (28/10/2026)
 - **Novo preset Pôster:** cada frase vira um pôster editorial. Fundo cinza de estúdio ou preto, recorte em preto e branco com um disco, quadro ou pedestal vermelho atrás, rótulos miúdos de pôster, texto entrando palavra a palavra e uma palavra gigante desfocada atravessando a tela, com a câmera sempre em movimento e a marca no fecho. Bom para frase de efeito, reflexão, criatividade e portfólio. Peça com `/ogab faz um reels no preset poster sobre <tema>` ou escolha no menu.
 ## 2026.10.27-16 (27/10/2026)
