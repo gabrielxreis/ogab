@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-5 (28/10/2026)
+- **Revisão pega borda preta em take:** take de banco mais estreito ou mais largo que a tela (ex.: 4K 2160x4096) sem o zoom de preencher agora é barrado na revisão.
+- **Cor medida pelo fundo:** o teste de cor olha a parede e a estante no alto do quadro, então camisa azul ou preta não dá mais falso alarme.
 ## 2026.10.28-4 (28/10/2026)
 - **Enquadramento não corta mais a cabeça:** em gravação muito fechada (rosto grande e baixo no celular), o ajuste automático dava zoom de até 1,8x para tirar o queixo da faixa da legenda. Agora o zoom para em 1,2x, sobe só o que cabe sem cortar o alto da cabeça e a revisão só avisa.
 - **Camisa preta não vira mais "amarelado":** a revisão só acusa cor amarelada quando os tons neutros (parede, branco) também estão quentes.

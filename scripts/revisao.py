@@ -127,8 +127,10 @@ def cor(p, t, pasta):
         rb.append(r_ - b_); gb.append(g_ - (r_ + b_) / 2)
         # AZULADO só nos tons quase sem cor: camisa jeans/azul clara entrava como "tom claro" e dava falso
         # COR AZULADA com a cor certa (28/10/2026, 4 vídeos do Ediel de camisa azul)
-        nt = [c for c in todos if sum(c) / 3 > 140 and max(c) - min(c) < 40]
-        if len(nt) >= 200: rb_neutro.append(st.mean(c[0] - c[2] for c in nt))
+        # só o terço de cima do quadro (parede/estante atrás): a camisa fica embaixo e enganava (azul ou preta)
+        topo = todos[: len(todos) * 2 // 5]
+        nt = [c for c in topo if sum(c) / 3 > 140 and max(c) - min(c) < 40]
+        if len(nt) >= 120: rb_neutro.append(st.mean(c[0] - c[2] for c in nt))
     if not rb: AVISOS.append("COR: poucos tons claros para medir"); return
     d, v = st.mean(rb), st.mean(gb); dn = st.mean(rb_neutro) if rb_neutro else d
     # camisa preta deixa só pele como "tom claro" e dava falso AMARELADA (28/10/2026): exige os neutros quentes também
@@ -136,6 +138,20 @@ def cor(p, t, pasta):
     elif dn < -18: ERROS.append(f"COR AZULADA: azul {-dn:.0f} acima do vermelho nos tons neutros")
     if v > 12: ERROS.append(f"COR ESVERDEADA: verde {v:.0f} acima nos tons claros")
     AVISOS.append(f"cor medida em {len(rb)} quadros: vermelho-azul {d:.0f} (neutros {dn:.0f}), verde {v:.0f}")
+
+
+def bordas(t):
+    """Take mais estreito/largo que a timeline (ex.: 4K 2160x4096 numa 1080x1920) precisa de zoom de preencher, senão
+    sobra borda preta dos lados (usuário, 28/10/2026: "tem take que precisa dar um scale para completar as bordas")."""
+    for n in range(2, t.GetTrackCount("video") + 1):
+        for x in itens(t, "video", n):
+            mpi = x.GetMediaPoolItem()
+            if not mpi: continue
+            fp = mpi.GetClipProperty("File Path") or ""
+            if not fp.lower().endswith((".mp4", ".mov", ".m4v")) or "/motions/" in fp: continue
+            z = R._zoom_preencher(mpi, t); atual = float(x.GetProperty("ZoomX") or 1)
+            if z > 1.001 and atual < z - 0.002:
+                ERROS.append(f"BORDA no take {os.path.basename(fp)} (V{n}, {mpi.GetClipProperty('Resolution')}): zoom {atual:.3f}, precisa {z:.3f}")
 
 
 def audio(t):
@@ -153,7 +169,7 @@ if __name__ == "__main__":
     t = tl_por_nome(p, nome); p.SetCurrentTimeline(t)
     buracos(t, mp, corrigir)
     if corrigir: R.salvar(r)
-    audio(t); rosto(t); cor(p, t, pasta)
+    audio(t); bordas(t); rosto(t); cor(p, t, pasta)
     for x in AVISOS: print("  ·", x)
     for x in dict.fromkeys(ERROS): print("ERRO", x)
     print(f"revisão {nome!r}: {len(ERROS)} erro(s)")
