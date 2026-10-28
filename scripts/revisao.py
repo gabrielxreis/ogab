@@ -165,13 +165,13 @@ def fala(t):
     if not its: return
     arq = its[0].GetMediaPoolItem().GetClipProperty("File Path")
     if not arq or not os.path.exists(arq): return
-    try:
-        ws = [w for sg in LF.literal(arq)["segments"] for w in sg["words"]]
-    except Exception as e:
-        AVISOS.append(f"FALA: sem transcrição literal ({e})"); return
     seq = []
     for x in its:
         lo = x.GetLeftOffset() / F; hi = lo + x.GetDuration() / F; rec = (x.GetStart() - S) / F
+        try:
+            ws = LF.literal_trechos(arq, [[lo, hi]])
+        except Exception as e:
+            AVISOS.append(f"FALA: sem transcrição literal ({e})"); return
         for w in ws:
             if w["start"] >= lo - 0.02 and w["end"] <= hi + 0.05:
                 seq.append({"text": w["text"], "start": rec + w["start"] - lo, "end": rec + min(w["end"], hi) - lo})

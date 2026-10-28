@@ -43,6 +43,28 @@ def literal(arquivo):
     return out
 
 
+def literal_trechos(arquivo, trechos, folga=0.4):
+    """Transcrição literal TRECHO A TRECHO (28/10/2026: a do arquivo inteiro desalinha os tempos no começo, depois de
+    silêncio: "Por que que na parede..." caía 5 s antes da fala real e o corte comia frase). Cache por trecho."""
+    import mlx_whisper
+    cache = arquivo + ".trechos.json"
+    c = json.load(open(cache, encoding="utf-8")) if os.path.exists(cache) else {}
+    out = []
+    for a, b in trechos:
+        x, y = max(0.0, a - folga), b + folga; k = f"{x:.2f}-{y:.2f}"
+        if k not in c:
+            wav = os.path.join(tempfile.mkdtemp(), "t.wav")
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{x:.3f}", "-to", f"{y:.3f}", "-i", arquivo, "-ac", "1", "-ar", "16000", wav], check=True)
+            r = mlx_whisper.transcribe(wav, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language="pt",
+                                       word_timestamps=True, condition_on_previous_text=False, initial_prompt=PROMPT)
+            c[k] = [{"text": w["word"].strip(), "start": round(x + w["start"], 3), "end": round(x + w["end"], 3)}
+                    for sg in r["segments"] for w in sg.get("words", []) if w["word"].strip()]
+            json.dump(c, open(cache, "w", encoding="utf-8"), ensure_ascii=False)
+        # só as palavras que caem dentro do trecho (a folga é para não cortar a 1ª/última sílaba na transcrição)
+        out += [w for w in c[k] if w["end"] > a + 0.03 and w["start"] < b - 0.03 and not (out and w["start"] < out[-1]["end"] - 0.02)]
+    return out
+
+
 def _envelope(arquivo, passo=0.02):
     """nível (dB) a cada 20 ms do áudio da gravação, ou None"""
     try:
@@ -84,14 +106,19 @@ def detectar(ws):
             i = j
         else:
             i += 1
-    return tira
+    # palavra abandonada ("Já... já... Por que"): o whisper marca com reticências; sai, e a pausa junto
+    for k, w in enumerate(ws):
+        if w["text"].endswith(("...", "…")) and not any(a <= w["start"] < b for a, b, *_ in tira):
+            fim = ws[k + 1]["start"] if k + 1 < len(ws) else w["end"]
+            tira.append((w["start"], fim, "HESITAÇÃO", w["text"]))
+    return sorted(tira)
 
 
 def limpar(arquivo, trechos=None, pausa=0.25, respiro=0.08):
-    d = literal(arquivo)
-    ws = [w for s in d["segments"] for w in s["words"]]
     if trechos is None:
-        trechos = [[0.0, ws[-1]["end"] + 0.5]] if ws else []
+        d = literal(arquivo); ws0 = [w for s in d["segments"] for w in s["words"]]
+        trechos = [[0.0, ws0[-1]["end"] + 0.5]] if ws0 else []
+    ws = literal_trechos(arquivo, trechos)
     # palavra conta se ENCOSTA no trecho (o tempo do whisper é impreciso: "Por" do começo caía fora pelo meio)
     dentro = lambda w: any(w["end"] > a + 0.05 and w["start"] < b - 0.05 for a, b in trechos)
     ws = [w for w in ws if dentro(w)]
@@ -145,6 +172,8 @@ def limpar(arquivo, trechos=None, pausa=0.25, respiro=0.08):
             if b - cur > 0.05: refinado.append([round(cur, 3), round(b, 3)])
         limpo = refinado
     texto = " ".join(w["text"] for w in fica)
+    json.dump({"segments": [{"start": fica[0]["start"] if fica else 0, "end": fica[-1]["end"] if fica else 0, "words": fica}]},
+              open(arquivo + ".literal.json", "w", encoding="utf-8"), ensure_ascii=False)
     return {"trechos": limpo, "removidos": [{"ini": round(a, 2), "fim": round(b, 2), "motivo": m, "texto": t} for a, b, m, t in tira],
             "texto": texto, "total": round(sum(b - a for a, b in limpo), 2)}
 
