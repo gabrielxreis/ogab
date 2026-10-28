@@ -35,16 +35,24 @@ def _captura(r):
                                           Quartz.kCGNullWindowID, Quartz.kCGWindowImageDefault)
 
 
+def _escalar(img, k=3):
+    """Amplia a captura antes do OCR: em tela sem Retina (monitor ultrawide, 1x) o texto do Inspector é pequeno demais
+    e o Vision lia lixo ("CapOon"); a 3x lê certo (28/10/2026)."""
+    w, h = Quartz.CGImageGetWidth(img) * k, Quartz.CGImageGetHeight(img) * k
+    ctx = Quartz.CGBitmapContextCreate(None, w, h, 8, w * 4, Quartz.CGColorSpaceCreateDeviceRGB(), Quartz.kCGImageAlphaPremultipliedLast)
+    Quartz.CGContextSetInterpolationQuality(ctx, Quartz.kCGInterpolationHigh)
+    Quartz.CGContextDrawImage(ctx, Quartz.CGRectMake(0, 0, w, h), img)
+    return Quartz.CGBitmapContextCreateImage(ctx)
+
+
 def ocr(r):
     """[(texto, cx, cy, x0, y0, x1, y1)] em pontos da tela."""
     img = _captura(r); x, y, w, h = r
+    if Quartz.CGImageGetWidth(img) <= w * 1.01: img = _escalar(img)   # tela 1x: amplia
+    # nível Fast: o Accurate falha (e5rtError) ou TRAVA sem resposta no macOS 27 (28/10/2026)
     req = Vision.VNRecognizeTextRequest.alloc().init()
-    req.setRecognitionLevel_(Vision.VNRequestTextRecognitionLevelAccurate); req.setUsesLanguageCorrection_(False)
-    ok, _ = Vision.VNImageRequestHandler.alloc().initWithCGImage_options_(img, None).performRequests_error_([req], None)
-    if not ok:   # macOS 27: o nível Accurate falha (e5rtError) e devolve vazio; o Fast funciona
-        req = Vision.VNRecognizeTextRequest.alloc().init()
-        req.setRecognitionLevel_(Vision.VNRequestTextRecognitionLevelFast); req.setUsesLanguageCorrection_(False)
-        Vision.VNImageRequestHandler.alloc().initWithCGImage_options_(img, None).performRequests_error_([req], None)
+    req.setRecognitionLevel_(Vision.VNRequestTextRecognitionLevelFast); req.setUsesLanguageCorrection_(False)
+    Vision.VNImageRequestHandler.alloc().initWithCGImage_options_(img, None).performRequests_error_([req], None)
     out = []
     for o in req.results() or []:
         t = o.topCandidates_(1)[0].string(); b = o.boundingBox()
@@ -158,7 +166,7 @@ def coberta():
 # ---------- helpers de OCR ----------
 def _norm(s):
     s = unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
-    return re.sub(r"[^a-z0-9 ]", "", s).strip()
+    return re.sub(r"[^a-z0-9 ]", "", s).strip().replace("l", "i")   # OCR rápido troca i por l ("Captlon")
 
 
 def achar(obs, texto, exato=True):
@@ -190,13 +198,23 @@ def legenda_atual(obs, caps, fps):
 
 
 def _campo_y(obs):
-    """(x, y, texto) do valor Y na linha Position."""
-    pos = [o for o in obs if _norm(o[0]) == "position"]
+    """(x, y, texto, rótulo) do valor Y na linha Position. O OCR rápido junta rótulo e número num pedaço só
+    ("Position x 540.0", "Y 724.0(X)", 28/10/2026): tira o número de dentro e clica sobre ele."""
+    pos = [o for o in obs if "position" in _norm(o[0])]
     if not pos: return None
-    py = pos[-1][2]
-    nums = sorted([o for o in obs if abs(o[2] - py) < 8 and re.fullmatch(r"-?\d+(\.\d+)?", o[0].strip())], key=lambda o: o[1])
+    lab = pos[-1]; py = lab[2]
+    nums = []
+    for o in obs:
+        if abs(o[2] - py) >= 10: continue
+        m = list(re.finditer(r"-?\d+(?:[.,]\d+)?", o[0].replace("(X)", "00").replace("O", "0")))
+        if not m: continue
+        ult = m[-1]; L = max(1, len(o[0]))
+        cx = o[3] + (o[5] - o[3]) * ((ult.start() + ult.end()) / 2) / L      # centro do número dentro do pedaço
+        nums.append((cx, o[2], ult.group().replace(",", ".")))
     if len(nums) < 2: return None
-    return nums[-1][1], nums[-1][2], nums[-1][0], pos[-1]
+    x, y, txt = sorted(nums)[-1]
+    rotulo = (lab[0], lab[3] + 12, lab[2])       # clicar no começo do rótulo "Position" confirma o valor
+    return x, y, txt, rotulo
 
 
 def setar_y(valor, rolagem=True):
@@ -283,7 +301,8 @@ def y_legenda():
     buf = Quartz.CGDataProviderCopyData(Quartz.CGImageGetDataProvider(img)); bpr = Quartz.CGImageGetBytesPerRow(img)
     a = np.frombuffer(buf, np.uint8).reshape(H, bpr)[:, :W * 4].reshape(H, W, 4).astype(int)
     b, g, r_ = a[..., 0], a[..., 1], a[..., 2]
-    bege = (r_ > 160) & (r_ < 235) & (g > 140) & (g < 215) & (b > 90) & (b < 175) & (r_ > g) & (g > b) & ((r_ - b) > 22)
+    # bege mais escuro também (148,141,121): o DaVinci escurece a timeline quando a janela perde o foco (28/10/2026)
+    bege = (r_ > 128) & (r_ < 235) & (g > 120) & (g < 215) & (b > 85) & (b < 175) & (r_ > g) & (g > b) & ((r_ - b) > 18)
     linhas = np.where(bege.sum(axis=1) > W * 0.15)[0]
     if len(linhas) == 0: return None   # cinza = trilha de legenda DESLIGADA: religar antes de rodar
     ini = linhas[0]; fim = ini
@@ -443,7 +462,8 @@ def main():
             print("seleção múltipla falhou, indo uma a uma:", e); selecionar_alguma(caps); aba("Caption")
     for i in descer:
         navegar(i, caps, fps)
-        if not customizar(Y_LETTERING): raise RuntimeError(f"legenda {i + 1} não ficou em {Y_LETTERING}")
+        # até 3 tentativas: às vezes o bloco Caption Style fecha no meio e o campo some (28/10/2026)
+        if not any(customizar(Y_LETTERING) for _ in range(3)): raise RuntimeError(f"legenda {i + 1} não ficou em {Y_LETTERING}")
         if not integridade(t, caps): raise RuntimeError(f"legendas mudaram depois da {i + 1}: pare e reanexe o SRT")
         feitos.append(i + 1); print("ok", i + 1, caps[i]["txt"], flush=True)
     r.GetProjectManager().SaveProject()

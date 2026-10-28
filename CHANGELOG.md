@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-6 (28/10/2026)
+- **Legenda por legenda funcionando em monitor sem Retina:** subir as legendas do lettering/CTA travava ou não achava os campos em monitor ultrawide. Agora a leitura da tela amplia a imagem, acha o campo Position Y mesmo quando o texto vem grudado, reconhece a trilha de legenda com a janela fora de foco e tenta de novo quando o painel fecha no meio.
 ## 2026.10.28-5 (28/10/2026)
 - **Revisão pega borda preta em take:** take de banco mais estreito ou mais largo que a tela (ex.: 4K 2160x4096) sem o zoom de preencher agora é barrado na revisão.
 - **Cor medida pelo fundo:** o teste de cor olha a parede e a estante no alto do quadro, então camisa azul ou preta não dá mais falso alarme.
