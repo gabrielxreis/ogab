@@ -46,6 +46,19 @@ NENHUMA timeline é mostrada ao usuário, validada ou exportada sem `python3 SKI
 4. **Áudio x imagem**: a A1 cobre cada clipe da V1 no mesmo lugar.
 Mostrar ao usuário só depois da revisão zerada; o que a revisão não mede (proporção do CTA, legenda em cima de motion) continua na folha de quadros do `conferir.py`.
 
+## LEIS da edição de fala e de motion (REGRA do usuário, 28/10/2026: "tem que ser lei na skill... não pode ter esses erros, gastei muito token")
+Valem para TODO vídeo com pessoa falando, antes de mostrar qualquer coisa. Errar qualquer uma é retrabalho.
+1. **Fala limpa, sempre:** nenhuma repetição ("é, é", "por metro... por metro quadrado"), nenhum falso começo (tenta falar, pausa, recomeça) e nenhum retake: fica só a última tentativa inteira. A transcrição do DaVinci ESCONDE isso (junta a fala repetida numa palavra só: "metro" de 3,27 s). Rodar `python3 SKILL_DIR/scripts/limpar_fala.py <gravação> --trechos <cortes.json>` (transcrição LITERAL com mlx-whisper + detector de retake/gaguejo/silêncio) e montar a timeline com os trechos limpos que ele devolve. Palavra com mais de 1 s na transcrição = repetição escondida: conferir.
+2. **Sem silêncio:** nenhuma pausa maior que 0,25 s entre palavras (fica 0,08 s de respiro de cada lado). Começo do vídeo já com fala.
+3. **Legenda nunca em cima de motion:** a faixa da legenda (y 1110 a 1290 em 1080x1920) fica livre em toda cena 2D/motion; motion que ocupa a tela toda leva a legenda para cima ou para baixo, nunca por cima de objeto.
+4. **Motions seguidos ficam ligados:** dois motions/takes com menos de 1,5 s de rosto entre eles viram um bloco só (o anterior estica até o seguinte). Rosto aparecendo 1 s no meio de dois motions é buraco.
+5. **Motion cobre o corte:** se um motion/take termina até 1,2 s ANTES de um corte da gravação (V1), ele estica até 0,25 s DEPOIS do corte; se começa até 0,8 s depois de um corte, começa 0,2 s antes. O pulo da imagem na pessoa fica escondido debaixo do motion (técnica essencial de edição).
+6. **Contexto visual real:** o assunto técnico aparece desenhado/mostrado (laje vergando com a régua, trinca saindo do canto da janela, água andando dentro da parede), não só palavra ou ícone. Acontecimento real citado (temporal, show, notícia) = cena real do acontecimento (YouTube/notícia, só como take, preenchendo a tela sem borda).
+7. **Marca citada = logo real** (seção abaixo): software, empresa, órgão, evento.
+8. **SFX por último e sincronizado:** depois de tudo montado, SFX em cada entrada de cena, em cada objeto que aparece (pop/click), em número rolando (tick), em X/check (hit/ding), whoosh na troca de take e riser antes da CTA, toque no Seguir. Nunca só dois arquivos repetidos.
+9. **Motion validado em movimento:** antes do render, folha com 4 quadros por cena (25/50/75/95%); nada sobreposto, cortado, fora de quadro ou parado.
+A `revisao.py` barra 1, 2, 4 e 5 (fala pela transcrição literal da gravação, vãos e cortes pela timeline).
+
 ## Referência: "faz igual esse Reel" (subcomando `referencia`, 27/10/2026)
 `/ogab referencia <link ou arquivo>`, e SOZINHO sempre que o pedido trouxer um vídeo de referência ("nesse estilo", "igual esse Reel", "nesse ritmo"), ANTES do roteiro e do plano: `python3 SKILL_DIR/scripts/referencia.py decupar "<link ou arquivo>" --saida "<pasta do vídeo>/referencia"`. Ele baixa (só para análise), corta interface de gravação de tela e mede tudo: planos com duração, média e cortes a cada 10 s, câmera MEDIDA por plano (aproxima, afasta, anda, sobe, gira ou parada, e o ritmo), luz e cores, BPM, % de cortes na batida, picos do som e flashes. Depois:
 1. **Olhar** `folha_planos.jpg` e `folha_1s.jpg` e preencher a coluna "o que acontece" do `referencia.md` (a ficha de ritmo). Para um pico, a tira em volta: `grade.py <fonte> --de <t-1> --ate <t+1> --passo 0.08`.

@@ -154,6 +154,51 @@ def bordas(t):
                 ERROS.append(f"BORDA no take {os.path.basename(fp)} (V{n}, {mpi.GetClipProperty('Resolution')}): zoom {atual:.3f}, precisa {z:.3f}")
 
 
+def fala(t):
+    """LEI 1 e 2: repetição, gaguejo, retake e silêncio no que ficou na timeline, pela transcrição LITERAL da gravação
+    (a do DaVinci esconde repetição). Pausa > 0,35 s entre palavras ou começo sem fala = ERRO."""
+    try:
+        import limpar_fala as LF
+    except Exception as e:
+        AVISOS.append(f"FALA: limpar_fala indisponível ({e})"); return
+    S, F = t.GetStartFrame(), R.fps_tl(t); its = itens(t, "video", 1)
+    if not its: return
+    arq = its[0].GetMediaPoolItem().GetClipProperty("File Path")
+    if not arq or not os.path.exists(arq): return
+    try:
+        ws = [w for sg in LF.literal(arq)["segments"] for w in sg["words"]]
+    except Exception as e:
+        AVISOS.append(f"FALA: sem transcrição literal ({e})"); return
+    seq = []
+    for x in its:
+        lo = x.GetLeftOffset() / F; hi = lo + x.GetDuration() / F; rec = (x.GetStart() - S) / F
+        for w in ws:
+            if w["start"] >= lo - 0.02 and w["end"] <= hi + 0.05:
+                seq.append({"text": w["text"], "start": rec + w["start"] - lo, "end": rec + min(w["end"], hi) - lo})
+    if not seq: return
+    if seq[0]["start"] > 0.45: ERROS.append(f"SILÊNCIO no começo: a fala começa em {seq[0]['start']:.2f} s")
+    for a, b in zip(seq, seq[1:]):
+        if b["start"] - a["end"] > 0.35:
+            ERROS.append(f"SILÊNCIO de {b['start'] - a['end']:.2f} s em {a['end']:.2f} s ('{a['text']}' | '{b['text']}')")
+    for a, b, motivo, txt in LF.detectar(seq):
+        ERROS.append(f"FALA {motivo} em {a:.2f} s: '{txt}' (tirar, fica só a última tentativa)")
+
+
+def motions_ligados(t):
+    """LEI 4 e 5: motions/takes com menos de 1,5 s de rosto entre eles ficam ligados; motion que termina até 1,2 s
+    antes de um corte da V1 tem que passar do corte (senão o pulo da imagem aparece na pessoa)."""
+    S, F = t.GetStartFrame(), R.fps_tl(t)
+    cortes = [(x.GetEnd() - S) / F for x in itens(t, "video", 1)[:-1]]
+    cima = sorted([((x.GetStart() - S) / F, (x.GetEnd() - S) / F, x.GetName()) for x in itens(t, "video", 2)])
+    for (a1, b1, n1), (a2, b2, n2) in zip(cima, cima[1:]):
+        if 0.6 < a2 - b1 < 1.5:
+            ERROS.append(f"MOTION DESLIGADO: {a2 - b1:.2f} s de rosto entre {n1} e {n2} em {b1:.2f} s (ligar os dois)")
+    for a, b, n in cima:
+        for c in cortes:
+            if 0.05 < c - b <= 1.2 and not any(a2 <= c <= b2 for a2, b2, _ in cima):
+                ERROS.append(f"CORTE EXPOSTO: {n} termina em {b:.2f} s e o corte da V1 vem em {c:.2f} s (esticar até depois do corte)")
+
+
 def audio(t):
     v = itens(t, "video", 1); a = itens(t, "audio", 1)
     if len(v) != len(a) or any(x.GetStart() != y.GetStart() or x.GetEnd() != y.GetEnd() for x, y in zip(v, a)):
@@ -169,7 +214,7 @@ if __name__ == "__main__":
     t = tl_por_nome(p, nome); p.SetCurrentTimeline(t)
     buracos(t, mp, corrigir)
     if corrigir: R.salvar(r)
-    audio(t); bordas(t); rosto(t); cor(p, t, pasta)
+    audio(t); bordas(t); fala(t); motions_ligados(t); rosto(t); cor(p, t, pasta)
     for x in AVISOS: print("  ·", x)
     for x in dict.fromkeys(ERROS): print("ERRO", x)
     print(f"revisão {nome!r}: {len(ERROS)} erro(s)")
