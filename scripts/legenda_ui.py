@@ -12,6 +12,9 @@ pela interface sozinho: clica, digita e CONFERE por OCR (Vision da Apple), numa 
 
 Requisitos: DaVinci aberto (o script maximiza a janela sozinho) na página Edit com o Inspector visível; pyobjc-framework-Vision
 (pip install pyobjc-framework-Vision); o Python precisa de permissão de Acessibilidade (já tem nesta máquina).
+Lote longo sem o usuário (madrugada): rodar com `caffeinate -dimsu` na frente e conferir que o bloqueio de tela
+não vai entrar; com a tela bloqueada o macOS não entrega captura nem clique e todas as timelines seguintes falham
+("trilha de legenda não encontrada", 28/10/2026: 20 de 26 vídeos pararam assim).
 Armadilhas (custaram caro): NUNCA Tab no campo (o foco vai p/ "Add New" e o Return cria legenda "Subtitle");
 o 1º duplo clique no campo às vezes arrasta o valor (sai 384), por isso digita 2x e confere por OCR.
 """
