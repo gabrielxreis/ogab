@@ -97,7 +97,10 @@ def rosto(t):
     fx = 540 + (face["cx"] - 540) * z + pan; fy = 960 + (face["cy"] - 960) * z - tilt
     queixo = fy + 0.6 * face["lado"] * z; certo = R.enquadrar(face)
     if queixo > R.QUEIXO_MAX + 10:
-        ERROS.append(f"ROSTO baixo: queixo em y {queixo:.0f} (máx {R.QUEIXO_MAX}), aplicar enquadrar() = zoom/pan/tilt {certo}")
+        if z >= R.ZOOM_MAX - 0.002 and certo[0] >= R.ZOOM_MAX - 0.002:
+            AVISOS.append(f"ROSTO: gravação fechada demais, queixo em y {queixo:.0f} já no zoom máximo {R.ZOOM_MAX} (legenda pode encostar no queixo)")
+        else:
+            ERROS.append(f"ROSTO baixo: queixo em y {queixo:.0f} (máx {R.QUEIXO_MAX}), aplicar enquadrar() = zoom/pan/tilt {certo}")
     if abs(fx - 540) > 70:
         ERROS.append(f"ROSTO fora do centro: x {fx:.0f} (centro 540), aplicar enquadrar() = {certo}")
     dif = {round(float(i.GetProperty("ZoomX") or 1), 3) for i in its} | set()
@@ -128,7 +131,8 @@ def cor(p, t, pasta):
         if len(nt) >= 200: rb_neutro.append(st.mean(c[0] - c[2] for c in nt))
     if not rb: AVISOS.append("COR: poucos tons claros para medir"); return
     d, v = st.mean(rb), st.mean(gb); dn = st.mean(rb_neutro) if rb_neutro else d
-    if d > 28: ERROS.append(f"COR AMARELADA: nos tons claros o vermelho está {d:.0f} acima do azul (máx 28); tirar a LUT/PowerGrade quente ou esfriar no CDL")
+    # camisa preta deixa só pele como "tom claro" e dava falso AMARELADA (28/10/2026): exige os neutros quentes também
+    if d > 28 and dn > 14: ERROS.append(f"COR AMARELADA: nos tons claros o vermelho está {d:.0f} acima do azul (máx 28); tirar a LUT/PowerGrade quente ou esfriar no CDL")
     elif dn < -18: ERROS.append(f"COR AZULADA: azul {-dn:.0f} acima do vermelho nos tons neutros")
     if v > 12: ERROS.append(f"COR ESVERDEADA: verde {v:.0f} acima nos tons claros")
     AVISOS.append(f"cor medida em {len(rb)} quadros: vermelho-azul {d:.0f} (neutros {dn:.0f}), verde {v:.0f}")

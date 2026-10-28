@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-4 (28/10/2026)
+- **Enquadramento não corta mais a cabeça:** em gravação muito fechada (rosto grande e baixo no celular), o ajuste automático dava zoom de até 1,8x para tirar o queixo da faixa da legenda. Agora o zoom para em 1,2x, sobe só o que cabe sem cortar o alto da cabeça e a revisão só avisa.
+- **Camisa preta não vira mais "amarelado":** a revisão só acusa cor amarelada quando os tons neutros (parede, branco) também estão quentes.
 ## 2026.10.28-3 (28/10/2026)
 - **Roupa azul não vira mais "cor azulada":** quem gravava de camisa jeans ou azul clara era barrado na revisão como se a imagem estivesse azulada, mesmo com a cor certa. Agora o teste de azulado olha só os tons neutros (parede, branco), e o de amarelado continua como antes.
 ## 2026.10.28-2 (28/10/2026)

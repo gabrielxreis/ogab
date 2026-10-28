@@ -849,12 +849,23 @@ def medir_rosto(arquivo, passo_s=1.0, w=1080, h=1920):
     return {"cx": st.median(b[0] + b[2] / 2 for b in bx), "cy": st.median(b[1] + b[3] / 2 for b in bx), "lado": st.median(b[2] for b in bx)}
 
 
-def enquadrar(face, w=1080, h=1920, tol_x=40):
+ZOOM_MAX = 1.2        # teto do reenquadramento: acima disso a cabeça corta (28/10/2026, Ediel 19 e 21 saíram a 1,34x e 1,77x)
+
+
+def enquadrar(face, w=1080, h=1920, tol_x=40, zmax=ZOOM_MAX):
     """(zoom, pan, tilt) com o MÍNIMO de zoom (regra do usuário): só sobe a imagem até o queixo ficar acima de
     QUEIXO_MAX e só centraliza na horizontal se o rosto estiver a mais de tol_x px do centro. Sem borda preta.
-    Sem punch-in: o mesmo valor no vídeo todo. Tilt positivo sobe a imagem."""
+    Sem punch-in: o mesmo valor no vídeo todo. Tilt positivo sobe a imagem.
+    Gravação fechada demais (rosto grande e baixo): para em zmax e sobe o que der, sem cortar a cabeça."""
     z = 1.0
     while True:
+        if z > zmax:
+            z = zmax; fx = w / 2 + (face["cx"] - w / 2) * z; fy = h / 2 + (face["cy"] - h / 2) * z
+            lim_x, lim_y = w / 2 * (z - 1), h / 2 * (z - 1)
+            pan = 0.0 if abs(w / 2 - fx) <= tol_x else max(-lim_x, min(lim_x, w / 2 - fx))
+            topo = fy - 0.75 * face["lado"] * z             # não deixar o alto da cabeça sair do quadro
+            dy = -min(lim_y, max(0.0, fy + 0.6 * face["lado"] * z - QUEIXO_MAX), max(0.0, topo - 40))
+            return round(z, 3), round(pan), round(-dy)
         fx = w / 2 + (face["cx"] - w / 2) * z; fy = h / 2 + (face["cy"] - h / 2) * z
         queixo = fy + 0.6 * face["lado"] * z
         dy = min(0.0, QUEIXO_MAX - queixo)                       # só sobe, e só o necessário
