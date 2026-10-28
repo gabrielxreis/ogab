@@ -118,11 +118,23 @@ def maximizar():
     time.sleep(0.6)
 
 
+def regioes():
+    """INSPECTOR/TIMELINE pelo tamanho da tela principal (relato 27/10/2026: num monitor ultrawide de 662 pt de altura as
+    regiões fixas, medidas num MacBook de 1728x1117 pt, caíam fora da trilha de legenda e do Inspector)."""
+    global INSPECTOR, TIMELINE
+    from AppKit import NSScreen
+    f = NSScreen.screens()[0].frame(); W, H = int(f.size.width), int(f.size.height)
+    if (W, H) == (1728, 1117): return
+    INSPECTOR = (W - 423, 50, 423, max(300, H - 110))
+    TIMELINE = (160, int(H * 0.483), W - 160, int(H * 0.40))
+
+
 def frente():
     for a in NSRunningApplication.runningApplicationsWithBundleIdentifier_(BUNDLE):
         a.activateWithOptions_(NSApplicationActivateIgnoringOtherApps)
     time.sleep(0.8)
     maximizar()
+    regioes()
     coberta()
 
 
