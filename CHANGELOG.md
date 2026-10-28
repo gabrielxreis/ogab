@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-3 (28/10/2026)
+- **Roupa azul não vira mais "cor azulada":** quem gravava de camisa jeans ou azul clara era barrado na revisão como se a imagem estivesse azulada, mesmo com a cor certa. Agora o teste de azulado olha só os tons neutros (parede, branco), e o de amarelado continua como antes.
 ## 2026.10.28-2 (28/10/2026)
 - **Revisão não trava mais com take 4K:** quando um take de banco em outro fps (4K a 25 ou 30 quadros) ficava a 1 quadro do clipe seguinte, a revisão tentava fechar o vão para sempre e o Gab parecia congelado. Agora ela fecha o vão de primeira e, se não conseguir em 3 tentativas, avisa em vez de travar.
 ## 2026.10.28-1 (28/10/2026)

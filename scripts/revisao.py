@@ -114,19 +114,24 @@ def cor(p, t, pasta):
     if not livres: AVISOS.append("COR: nenhum trecho só com a V1 para medir"); return
     pegar = [livres[0], livres[len(livres) // 2], livres[-1]]
     out = conferir.exportar(p, t, [(s, "cor") for s in pegar], os.path.join(pasta, "revisao_cor"))
-    rb, gb = [], []
+    rb, gb, rb_neutro = [], [], []
     for png, s, _ in out:
         im = Image.open(png).convert("RGB").resize((270, 480))
-        px = [c for c in (im.get_flattened_data() if hasattr(im, "get_flattened_data") else im.getdata()) if sum(c) / 3 > 140 and max(c) - min(c) < 70]
+        todos = list(im.get_flattened_data() if hasattr(im, "get_flattened_data") else im.getdata())
+        px = [c for c in todos if sum(c) / 3 > 140 and max(c) - min(c) < 70]
         if len(px) < 200: continue
         r_ = st.mean(c[0] for c in px); g_ = st.mean(c[1] for c in px); b_ = st.mean(c[2] for c in px)
         rb.append(r_ - b_); gb.append(g_ - (r_ + b_) / 2)
+        # AZULADO só nos tons quase sem cor: camisa jeans/azul clara entrava como "tom claro" e dava falso
+        # COR AZULADA com a cor certa (28/10/2026, 4 vídeos do Ediel de camisa azul)
+        nt = [c for c in todos if sum(c) / 3 > 140 and max(c) - min(c) < 40]
+        if len(nt) >= 200: rb_neutro.append(st.mean(c[0] - c[2] for c in nt))
     if not rb: AVISOS.append("COR: poucos tons claros para medir"); return
-    d, v = st.mean(rb), st.mean(gb)
+    d, v = st.mean(rb), st.mean(gb); dn = st.mean(rb_neutro) if rb_neutro else d
     if d > 28: ERROS.append(f"COR AMARELADA: nos tons claros o vermelho está {d:.0f} acima do azul (máx 28); tirar a LUT/PowerGrade quente ou esfriar no CDL")
-    elif d < -18: ERROS.append(f"COR AZULADA: azul {-d:.0f} acima do vermelho nos tons claros")
+    elif dn < -18: ERROS.append(f"COR AZULADA: azul {-dn:.0f} acima do vermelho nos tons neutros")
     if v > 12: ERROS.append(f"COR ESVERDEADA: verde {v:.0f} acima nos tons claros")
-    AVISOS.append(f"cor medida em {len(rb)} quadros: vermelho-azul {d:.0f}, verde {v:.0f}")
+    AVISOS.append(f"cor medida em {len(rb)} quadros: vermelho-azul {d:.0f} (neutros {dn:.0f}), verde {v:.0f}")
 
 
 def audio(t):
