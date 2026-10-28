@@ -98,7 +98,12 @@ def detectar(ws):
             sobra = ws[i + m]["text"] if m < vao else ""
             cortada = sobra.endswith(("...", "…", "-")) or (len(norm(sobra)) <= 3 and not sobra.endswith((",", ".", "?", "!")))
             gag = vao == 1 and m == 1 and not n[i].isdigit() and ws[j]["start"] - ws[i]["end"] < 1.0   # colada de verdade
-            if gag or (m >= 2 and (m == vao or (vao - m == 1 and cortada))):
+            # repetição DE PROPÓSITO fica: fecha frase ("ter visão de dono. Visão de dono tem o dono"), vem depois de
+            # "não" ("não é vergar, é vergar por tempo demais") ou é "ou... ou" / "nem... nem" ("ou você tem, ou você não tem")
+            fim_1a = ws[j - 1]["text"]
+            proposito = ((fim_1a.endswith((".", "?", "!")) and not fim_1a.endswith(("...", "…"))) or n[i] in ("ou", "nem", "quer", "seja")
+                         or (i > 0 and n[i - 1] in ("não", "nem")))
+            if gag or (m >= 2 and not proposito and (m == vao or (vao - m == 1 and cortada))):
                 achou = (j, "GAGUEJO" if vao == 1 else "RETAKE"); break
         if achou:
             j, motivo = achou
@@ -172,6 +177,11 @@ def limpar(arquivo, trechos=None, pausa=0.25, respiro=0.08):
             if b - cur > 0.05: refinado.append([round(cur, 3), round(b, 3)])
         limpo = refinado
     texto = " ".join(w["text"] for w in fica)
+    # palavra que atravessa o começo de um trecho ("Por" de 0,0 a 0,58 com o corte em 0,4) entra na legenda a partir
+    # do corte; sem isso ela sumia da legenda ("que o metro quadrado...")
+    for w in fica:
+        for a, b in limpo:
+            if w["start"] < a < w["end"] - 0.05: w["start"] = round(a + 0.01, 3); break
     json.dump({"segments": [{"start": fica[0]["start"] if fica else 0, "end": fica[-1]["end"] if fica else 0, "words": fica}]},
               open(arquivo + ".literal.json", "w", encoding="utf-8"), ensure_ascii=False)
     return {"trechos": limpo, "removidos": [{"ini": round(a, 2), "fim": round(b, 2), "motivo": m, "texto": t} for a, b, m, t in tira],
