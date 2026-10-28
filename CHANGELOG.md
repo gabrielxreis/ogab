@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.27-16 (27/10/2026)
+- **Revisão automática antes de mostrar:** o Gab agora roda uma revisão na timeline antes de te mostrar qualquer vídeo. Ela acha e fecha sozinha os buracos e vãos entre clipes (aquele quadro em que a imagem de baixo pisca), confere se o rosto está centralizado e acima da legenda, mede se a cor ficou amarelada, azulada ou esverdeada e se o áudio cobre toda a imagem. Com qualquer erro, o vídeo não é mostrado.
 ## 2026.10.27-15 (27/10/2026)
 - **Tirar silêncios sem perder o sincronismo:** em gravação de 30 fps numa timeline de 24 fps, a voz podia sair levemente fora da boca depois de tirar os silêncios, e às vezes o áudio ia parar na trilha A2. Agora vídeo e áudio voltam juntos na V1/A1, ligados.
 ## 2026.10.27-14 (27/10/2026)

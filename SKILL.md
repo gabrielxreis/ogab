@@ -38,6 +38,14 @@ NENHUM motion é renderizado sem antes: `python3 SKILL_DIR/scripts/prints_cenas.
 6. **Beleza:** comparar com a referência aprovada da marca/preset; se estiver mais feio que ela, não renderiza.
 Mudou a direção de arte (cor, luz, personagem, cenário novo)? Mostrar a folha ao usuário ANTES do render. Conferir só miniatura (folha de 150 px) não vale: foi assim que esses furos passaram.
 
+## Revisão da timeline antes de mostrar (REGRA do usuário, 27/10/2026: "mais uma vez o problema dos buracos... a revisão precisa existir com a skill para ela não deixar esses furos")
+NENHUMA timeline é mostrada ao usuário, validada ou exportada sem `python3 SKILL_DIR/scripts/revisao.py "<timeline>" --pasta <pasta do vídeo> --corrigir` com **0 ERRO**. Ela confere e trava:
+1. **Buraco** na V1/A1 (qualquer quadro) e **vão de até 0,6 s** entre clipes seguidos da mesma trilha de cima (b-roll, motion, CTA), onde a imagem de baixo pisca. `--corrigir` cola os vãos sozinho. Na montagem, já planejar colado: take estica até o próximo, motion seguinte começa no fim do anterior.
+2. **Rosto**: queixo acima da faixa da legenda e rosto no centro, com o zoom/pan/tilt da timeline; dá o valor de `enquadrar()` para aplicar na V1 inteira.
+3. **Cor**: mede os tons claros de 3 quadros só com a V1; amarelado (vermelho > azul + 28), azulado ou esverdeado é ERRO. A LUT/PowerGrade quente que amarelar a pele sai e entra um CDL neutro. Take de banco (Envato etc.) entra sem LUT: já vem tratado.
+4. **Áudio x imagem**: a A1 cobre cada clipe da V1 no mesmo lugar.
+Mostrar ao usuário só depois da revisão zerada; o que a revisão não mede (proporção do CTA, legenda em cima de motion) continua na folha de quadros do `conferir.py`.
+
 ## Referência: "faz igual esse Reel" (subcomando `referencia`, 27/10/2026)
 `/ogab referencia <link ou arquivo>`, e SOZINHO sempre que o pedido trouxer um vídeo de referência ("nesse estilo", "igual esse Reel", "nesse ritmo"), ANTES do roteiro e do plano: `python3 SKILL_DIR/scripts/referencia.py decupar "<link ou arquivo>" --saida "<pasta do vídeo>/referencia"`. Ele baixa (só para análise), corta interface de gravação de tela e mede tudo: planos com duração, média e cortes a cada 10 s, câmera MEDIDA por plano (aproxima, afasta, anda, sobe, gira ou parada, e o ritmo), luz e cores, BPM, % de cortes na batida, picos do som e flashes. Depois:
 1. **Olhar** `folha_planos.jpg` e `folha_1s.jpg` e preencher a coluna "o que acontece" do `referencia.md` (a ficha de ritmo). Para um pico, a tira em volta: `grade.py <fonte> --de <t-1> --ate <t+1> --passo 0.08`.
