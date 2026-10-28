@@ -1,0 +1,10 @@
+{
+ "id": "poster",
+ "nome": "POSTER (pôster editorial em movimento)",
+ "resumo": "Cada frase vira um pôster de design: fundo cinza de estúdio com vinheta OU preto chapado, um recorte em preto e branco de alto contraste no centro, uma forma...",
+ "categoria": "ideia",
+ "formato": [
+  "vertical"
+ ],
+ "gif": "exemplo.gif"
+}

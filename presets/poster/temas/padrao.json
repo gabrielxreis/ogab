@@ -1,0 +1,20 @@
+{
+ "_leia": "Tema neutro do preset Poster (cinza de estúdio, preto, vermelho de pôster). Marca do cliente: copiar para temas/<marca>.json e trocar acento (cor da marca), acento2 (chip do HUD) e os textos miúdos em micro (rótulos de pôster: nome, ano, @, site).",
+ "nome": "Padrão",
+ "claro": "#E4E0DF",
+ "borda": "#8E8888",
+ "escuro": "#000000",
+ "tinta": "#121212",
+ "branco": "#F4F4F4",
+ "acento": "#D3141C",
+ "acento2": "#C9F23A",
+ "fonte": "Inter Tight",
+ "micro": {
+  "topo": ["arquivo de", "estúdio", "vol. 02"],
+  "marca": ["EDIÇÃO", "N.º 7"],
+  "lado": ["referência visual", "pôster em movimento"],
+  "rodape": ["EST. 2026", "DESIGN & MOVIMENTO", "SÉRIE A"],
+  "chip": "DESCUBRA",
+  "numero": "2"
+ }
+}

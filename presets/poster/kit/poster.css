@@ -1,0 +1,70 @@
+@font-face { font-family: "Inter Tight"; src: url("fontes/InterTight-500.woff2") format("woff2"); font-weight: 500; font-display: block; }
+@font-face { font-family: "Inter Tight"; src: url("fontes/InterTight-800.woff2") format("woff2"); font-weight: 800; font-display: block; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: "Inter Tight", sans-serif; }
+#cenas, .cena, .cam, .fundo { position: absolute; inset: 0; }
+.cena { visibility: hidden; overflow: hidden; }
+.cam { transform-origin: 50% 50%; will-change: transform; }
+.claro .fundo { background: radial-gradient(ellipse 85% 62% at 50% 42%, var(--claro) 0%, color-mix(in srgb, var(--claro) 70%, var(--borda)) 58%, var(--borda) 115%); }
+.escuro .fundo { background: var(--escuro); }
+#grao { position: absolute; inset: 0; pointer-events: none; opacity: .09; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.4 -.2'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>"); }
+
+/* formas */
+.abs { position: absolute; }
+.disco { border-radius: 50%; background: var(--acento); }
+.orbita { position: absolute; border-radius: 50%; border: 3px dotted var(--acento); opacity: .85; }
+.ponto { position: absolute; border-radius: 50%; background: var(--acento); }
+.quadro-moldura { position: absolute; border: 2px solid var(--acento); }
+.quadro { position: absolute; background: var(--acento); }
+.ped-topo { position: absolute; background: linear-gradient(180deg, #cfcac8, #9e9997); clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%); }
+.ped-corpo { position: absolute; background: #050505; }
+.foto { position: absolute; transform-origin: 50% 100%; }
+.claro .foto img { filter: drop-shadow(0 26px 30px rgba(0,0,0,.28)); }
+.foto img { display: block; width: 100%; height: 100%; }
+
+/* texto */
+.texto { position: absolute; width: 900px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.texto.esq { align-items: flex-start; text-align: left; }
+.linha { white-space: nowrap; line-height: 1; }
+.linha.peq { font-weight: 500; font-size: 46px; letter-spacing: -.03em; margin-bottom: 4px; }
+.linha.gde { font-weight: 800; font-size: 120px; letter-spacing: -.055em; line-height: .92; }
+.texto .w { display: inline-block; white-space: pre; }
+.claro .texto { color: var(--tinta); }
+.claro .texto.branco, .escuro .texto { color: var(--branco); }
+.claro .texto.branco { text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+.gigante { position: absolute; left: 0; white-space: nowrap; font-weight: 800; font-size: 520px; letter-spacing: -.07em; line-height: .8; }
+.claro .gigante { color: var(--tinta); }
+.escuro .gigante { color: #4d4d4d; }
+
+/* microtipografia */
+.micro { position: absolute; font-weight: 500; font-size: 15px; letter-spacing: -.01em; line-height: 1.15; }
+.micro b { font-weight: 800; font-size: 30px; letter-spacing: -.03em; line-height: .95; display: block; }
+.claro .micro { color: var(--tinta); }
+.escuro .micro { color: var(--branco); }
+.num { position: absolute; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid currentColor; font: 800 17px "Inter Tight"; display: flex; align-items: center; justify-content: center; }
+.fio { position: absolute; height: 1.5px; background: currentColor; opacity: .55; }
+.fio-v { position: absolute; width: 1.5px; background: currentColor; opacity: .55; }
+.grade-o { position: absolute; border: 1.5px solid rgba(0,0,0,.22); border-radius: 260px; }
+.barras { position: absolute; display: flex; align-items: flex-end; gap: 3px; height: 54px; }
+.barras i { display: block; background: var(--tinta); height: 100%; }
+.qr { position: absolute; display: grid; grid-template-columns: repeat(7, 7px); gap: 1px; }
+.qr i { width: 7px; height: 7px; background: var(--tinta); }
+.qr i.v { background: transparent; }
+.pontos3 { position: absolute; font: 800 26px "Inter Tight"; letter-spacing: .05em; }
+.claro .pontos3 { color: var(--tinta); } .escuro .pontos3 { color: var(--branco); }
+.x { position: absolute; width: 54px; height: 54px; }
+.x::before, .x::after { content: ""; position: absolute; left: 50%; top: 0; width: 13px; height: 100%; margin-left: -6.5px; border: 2.5px solid var(--acento); border-radius: 2px; }
+.x::before { transform: rotate(45deg); } .x::after { transform: rotate(-45deg); }
+.quad-branco { position: absolute; background: #fff; }
+
+/* HUD (fundo escuro) */
+.canto { position: absolute; border-color: var(--branco); border-style: solid; border-width: 0; opacity: .9; }
+.chip { position: absolute; display: flex; align-items: center; gap: 10px; color: var(--branco); font: 800 15px "Inter Tight"; letter-spacing: .02em; }
+.chip .globo { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--branco); background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(255,255,255,.7) 5px 6px); }
+.chip .tag { background: var(--acento2); color: #000; padding: 3px 8px 2px; font-size: 13px; }
+
+/* fecho */
+.marca { position: absolute; left: 0; right: 0; text-align: center; color: var(--branco); font-size: 66px; letter-spacing: -.04em; }
+.marca.b { font-weight: 800; } .marca.l { font-weight: 500; }

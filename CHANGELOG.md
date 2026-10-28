@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-1 (28/10/2026)
+- **Novo preset Pôster:** cada frase vira um pôster editorial. Fundo cinza de estúdio ou preto, recorte em preto e branco com um disco, quadro ou pedestal vermelho atrás, rótulos miúdos de pôster, texto entrando palavra a palavra e uma palavra gigante desfocada atravessando a tela, com a câmera sempre em movimento e a marca no fecho. Bom para frase de efeito, reflexão, criatividade e portfólio. Peça com `/ogab faz um reels no preset poster sobre <tema>` ou escolha no menu.
 ## 2026.10.27-16 (27/10/2026)
 - **Revisão automática antes de mostrar:** o Gab agora roda uma revisão na timeline antes de te mostrar qualquer vídeo. Ela acha e fecha sozinha os buracos e vãos entre clipes (aquele quadro em que a imagem de baixo pisca), confere se o rosto está centralizado e acima da legenda, mede se a cor ficou amarelada, azulada ou esverdeada e se o áudio cobre toda a imagem. Com qualquer erro, o vídeo não é mostrado.
 ## 2026.10.27-15 (27/10/2026)

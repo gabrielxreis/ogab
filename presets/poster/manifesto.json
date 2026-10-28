@@ -1,0 +1,70 @@
+{
+ "preset": "poster",
+ "arquivos": {
+  "PRESET.md": "4f9b6c9be3437c3ad0c7aa3cd4ee3caf5c2557b1",
+  "exemplo.gif": "ffe402d7e12e1a2f75b4eccaaba77058d12d55ec",
+  "exemplo.mp4": "03aab51c918785d9ab4a2f357d81718ede0ae788",
+  "gerar.py": "c45728c0e29091c78d45f799fc17d17c68b4abd7",
+  "preset.json": "ff291b6f4e2e6dd944ca47ee555cf7cbdfca6f32",
+  "exemplo/plano.json": "9a03536b4a13e1f0304c9d555daa4173f2fe8f7d",
+  "exemplo/fotos/astronauta.jpg": "cd617cb22e417e50ee4353e0d4196e7a0bc25d6c",
+  "exemplo/fotos/busto.jpg": "01a8be6e60cbcc9e05405b5b4de3272402d522b6",
+  "exemplo/fotos/camera.jpg": "c0e1c4cdfdf7a5b64d082986f0797fd83f040f4a",
+  "exemplo/fotos/kouros.jpg": "62568f73d5b849f21bc4472765704ef17fc99cde",
+  "exemplo/fotos/terra.jpg": "957ddbc1ea0386716d54d393545da9e59b84f492",
+  "kit/index.html": "c9d781ec9be7bfd2698aca53a157e438788bb40c",
+  "kit/poster.css": "16466a22019569fa7330f334a2a5d731f0ad4abe",
+  "kit/poster.js": "86dab12a3eadc8bee40bc37b2ba6837cec44b9ef",
+  "kit/fontes/InterTight-500.woff2": "cfdddb209d78a29f625c3e461df9da09a69ace16",
+  "kit/fontes/InterTight-800.woff2": "1248a6f1b4491cce55726ce8415077931b28068b",
+  "kit/fontes/OFL.txt": "f616fd85da318ddf49fc8ee585e95c682479b844",
+  "temas/padrao.json": "105ed5482bc4d56b7a156c6a86303ad087a8b07d"
+ },
+ "dependencias": [
+  {
+   "ref": "/Users/gabrielreis/.claude/skills/ogab/scripts/hf_preset.py",
+   "de": "manifesto.json",
+   "tipo": "skill",
+   "caminho": "scripts/hf_preset.py"
+  },
+  {
+   "ref": "/Users/gabrielreis/.claude/skills/ogab/scripts/sujeito.py",
+   "de": "manifesto.json",
+   "tipo": "skill",
+   "caminho": "scripts/sujeito.py"
+  },
+  {
+   "ref": "numpy",
+   "de": "gerar.py",
+   "tipo": "pip",
+   "nota": "numpy"
+  },
+  {
+   "ref": "PIL",
+   "de": "gerar.py",
+   "tipo": "pip",
+   "nota": "PIL"
+  },
+  {
+   "ref": "cv2",
+   "de": "gerar.py",
+   "tipo": "pip",
+   "nota": "cv2"
+  },
+  {
+   "ref": "https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js",
+   "de": "kit/index.html",
+   "tipo": "cdn",
+   "nota": "gsap@3.14.2"
+  },
+  {
+   "ref": "plano.js",
+   "de": "kit/index.html",
+   "tipo": "faltando",
+   "caminho": "kit/plano.js"
+  }
+ ],
+ "faltando": [
+  "plano.js"
+ ]
+}

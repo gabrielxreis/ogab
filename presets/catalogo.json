@@ -1491,6 +1491,49 @@
     "marca": 2
    },
    "cenas": {}
+  },
+  {
+   "id": "poster",
+   "nome": "Pôster",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Pôster editorial em movimento: recorte P&B com disco ou quadro vermelho, microtipografia, texto palavra a palavra e palavra gigante desfocada; câmera sempre viva, claro e preto alternando.",
+   "quando": "frase de efeito, reflexão, criatividade, portfólio de criador ou estúdio, manifesto de marca, design, arte, cinema",
+   "nichos": [
+    "criativ",
+    "design",
+    "arte",
+    "cinema",
+    "filme",
+    "estudio",
+    "portfolio",
+    "fotograf",
+    "musica",
+    "editor"
+   ],
+   "sinais": [
+    "criar",
+    "criativ",
+    "referencia",
+    "inspira",
+    "ideia",
+    "absorv",
+    "talento",
+    "estudar",
+    "aprend",
+    "segredo",
+    "nao e sobre",
+    "e sobre",
+    "manifesto"
+   ],
+   "padroes": {
+    "pergunta": 1
+   },
+   "cenas": {}
   }
  ],
  "pedidos": [

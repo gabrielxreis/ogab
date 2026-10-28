@@ -1,0 +1,188 @@
+{
+ "w": 1080,
+ "h": 1920,
+ "fps": 30,
+ "cenas": [
+  {
+   "dur": 3.0,
+   "fundo": "claro",
+   "camera": [
+    "afasta",
+    "esquerda"
+   ],
+   "forma": {
+    "tipo": "disco",
+    "x": -40,
+    "y": 110,
+    "raio": 330
+   },
+   "foto": {
+    "arquivo": "fotos/busto.jpg",
+    "credito": "Gary Todd, CC0",
+    "recorte": "sujeito",
+    "altura": 820,
+    "largura": 820,
+    "x": 10,
+    "y": 300
+   },
+   "texto": {
+    "linhas": [
+     "ninguém nasce",
+     "sabendo criar"
+    ],
+    "y": -500,
+    "em": 0.15,
+    "ate": 1.5
+   },
+   "ref_plano": 1,
+   "ref_o_que": "afasta + anda p/ esquerda, disco vermelho atrás do recorte"
+  },
+  {
+   "dur": 1.5,
+   "fundo": "escuro",
+   "camera": [
+    "aproxima",
+    "gira"
+   ],
+   "ritmo": "rapida",
+   "foto": {
+    "arquivo": "fotos/terra.jpg",
+    "credito": "NASA/Apollo 17, domínio público",
+    "recorte": "escuro",
+    "altura": 1000,
+    "largura": 1000,
+    "x": -380,
+    "y": 640
+   },
+   "texto": {
+    "linhas": [
+     "o segredo é",
+     "absorver"
+    ],
+    "y": -140,
+    "em": 0.05,
+    "ate": 0.8
+   },
+   "micro": true,
+   "ref_plano": 2,
+   "ref_o_que": "aproxima + gira rápido no preto, planeta no canto"
+  },
+  {
+   "dur": 1.5,
+   "fundo": "claro",
+   "camera": [
+    "direita"
+   ],
+   "forma": {
+    "tipo": "pedestal",
+    "x": 0,
+    "y": 140,
+    "larg": 300,
+    "alt": 900
+   },
+   "foto": {
+    "arquivo": "fotos/kouros.jpg",
+    "credito": "The Met, CC0",
+    "recorte": "sujeito",
+    "altura": 400,
+    "largura": 300
+   },
+   "texto": {
+    "linhas": [
+     "tudo que",
+     "você vê"
+    ],
+    "y": -420,
+    "em": 0.05,
+    "ate": 0.8
+   },
+   "ref_plano": 3,
+   "ref_o_que": "anda p/ direita, figura pequena no pedestal"
+  },
+  {
+   "dur": 3.0,
+   "fundo": "claro",
+   "camera": [
+    "direita",
+    "gira"
+   ],
+   "grade": true,
+   "forma": {
+    "tipo": "quadro",
+    "x": 60,
+    "y": 40,
+    "larg": 420,
+    "alt": 540
+   },
+   "foto": {
+    "arquivo": "fotos/camera.jpg",
+    "credito": "National Air and Space Museum, CC0",
+    "recorte": "sujeito",
+    "altura": 520,
+    "largura": 680,
+    "x": -40,
+    "y": 170
+   },
+   "gigante": {
+    "texto": "REFERÊNCIA",
+    "y": 600,
+    "frente": true
+   },
+   "texto": {
+    "linhas": [
+     "vira",
+     "referência"
+    ],
+    "y": -540,
+    "em": 0.1,
+    "ate": 1.2
+   },
+   "ref_plano": 4,
+   "ref_o_que": "anda p/ direita + gira, quadro vermelho e palavra gigante desfocada"
+  },
+  {
+   "dur": 3.6,
+   "fundo": "escuro",
+   "camera": [
+    "aproxima"
+   ],
+   "hud": true,
+   "foto": {
+    "arquivo": "fotos/astronauta.jpg",
+    "credito": "NASA, domínio público",
+    "recorte": "sujeito",
+    "altura": 920,
+    "largura": 760,
+    "x": 170,
+    "y": 420
+   },
+   "gigante": {
+    "texto": "APLICANDO",
+    "y": 330,
+    "linhas": 2
+   },
+   "texto": {
+    "linhas": [
+     "e aplicando",
+     "nas suas ideias"
+    ],
+    "y": -430,
+    "em": 0.2,
+    "ate": 1.8
+   },
+   "ref_plano": 5,
+   "ref_o_que": "aproxima no preto, recorte de perfil com palavra gigante atrás"
+  },
+  {
+   "dur": 2.0,
+   "fundo": "escuro",
+   "fecho": "gabrielxreis",
+   "camera": [
+    "afasta"
+   ],
+   "ritmo": "rapida",
+   "ref_plano": 6,
+   "ref_o_que": "afasta rápido, marca no preto"
+  }
+ ]
+}
