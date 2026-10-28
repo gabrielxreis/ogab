@@ -122,7 +122,9 @@ def cor(p, t, pasta):
     livres = [s for s in [fim * k / 20 for k in range(1, 20)] if not any(a - .2 <= s <= b + .2 for a, b in cobertos)]
     if not livres: AVISOS.append("COR: nenhum trecho só com a V1 para medir"); return
     pegar = [livres[0], livres[len(livres) // 2], livres[-1]]
-    out = conferir.exportar(p, t, [(s, "cor") for s in pegar], os.path.join(pasta, "revisao_cor"))
+    # caminho ABSOLUTO: pasta relativa dava "Render path inaccessible" no DaVinci e travava a revisão (28/10/2026)
+    destino = os.path.abspath(os.path.join(pasta, "revisao_cor")); os.makedirs(destino, exist_ok=True)
+    out = conferir.exportar(p, t, [(s, "cor") for s in pegar], destino)
     rb, gb, rb_neutro = [], [], []
     for png, s, _ in out:
         im = Image.open(png).convert("RGB").resize((270, 480))
