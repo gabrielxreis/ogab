@@ -144,6 +144,16 @@ def estilos_prontos():
     return r
 
 
+# regras que dependem de DUAS escolhas juntas (as de uma escolha só ficam no próprio item: trava/esconde)
+SEM_PESSOA = ["audio", "voz_ia", "sem_voz"]
+COMBOS = [
+    # sem pessoa e sem motion, o b-roll é a única imagem: "Sem b-roll" deixaria o vídeo vazio
+    {"se": {"voz": SEM_PESSOA, "motions": ["sem"]}, "esconde": {"takes": ["sem"]}},
+    # sem pessoa e sem b-roll, não há take para colorir
+    {"se": {"voz": SEM_PESSOA, "takes": ["sem"]}, "trava": {"cor": "natural"}},
+]
+
+
 def grupos(formato, lettering, editor_nome="DaVinci"):
     """lettering = [(id_template, nome visível)] do editor da pessoa (lettering_do_editor)."""
     C = catalogo()
@@ -652,8 +662,10 @@ function render() {
   scrollTo(0, 0);
 }
 // árvore: trava = escolha forçada noutro passo (o passo some); esconde = opções que não existem nesse caminho
-function regra(k) { const t = {}; D.grupos.forEach(g => g.itens.forEach(i => { if (i[k] && sel[g.id].has(i.id))
-  for (const [a, v] of Object.entries(i[k])) t[a] = k === "esconde" ? (t[a] || []).concat(v) : v; })); return t; }
+function regra(k) { const t = {}, soma = r => { for (const [a, v] of Object.entries(r)) t[a] = k === "esconde" ? (t[a] || []).concat(v) : v; };
+  D.grupos.forEach(g => g.itens.forEach(i => { if (i[k] && sel[g.id].has(i.id)) soma(i[k]); }));
+  (D.combos || []).forEach(c => { if (c[k] && Object.entries(c.se).every(([gid, ids]) => sel[gid] && ids.some(id => sel[gid].has(id)))) soma(c[k]); });
+  return t; }
 const travas = () => regra("trava"), escondidos = gid => regra("esconde")[gid] || [];
 function pula(p) { const g = D.grupos[p - 1]; return g && ((["estilo", "gancho", "layout", "prova"].includes(g.id) && sel.motions && sel.motions.has("sem")) || g.id in travas()); }
 const visiveis = () => D.grupos.map((g, k) => k + 1).filter(p => !pula(p));
@@ -786,7 +798,7 @@ def main(a):
     except Exception:
         cfg = {}
     editor_nome, lettering = lettering_do_editor(arg("--editor", cfg.get("editor", "davinci")), cfg)
-    dados = {"icones": ICONES, "grupos": grupos(formato, lettering, editor_nome), "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
+    dados = {"icones": ICONES, "grupos": grupos(formato, lettering, editor_nome), "combos": COMBOS, "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
              "sugeridos": sugestoes(arg("--pedido"), arg("--roteiro"), formato, cliente, pasta)}
     html = PAGINA.replace("__DADOS__", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")).encode("utf-8")
     pronto, fechado, visto = threading.Event(), threading.Event(), {"aba": 0}
