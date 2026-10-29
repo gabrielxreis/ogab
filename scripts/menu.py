@@ -362,16 +362,16 @@ def ja_sabe(cliente):
 
 # receitas: um clique preenche os passos e leva para a revisão (o que fica de fora vai no automático)
 RECEITAS = [
-    {"id": "falado", "nome": {"pt": "Reels falado", "en": "Talking Reels"}, "anim": "cap-gab",
+    {"id": "falado", "ico": "gravacao", "nome": {"pt": "Reels falado", "en": "Talking Reels"}, "anim": "cap-gab",
      "desc": {"pt": "Pessoa gravada, motion equilibrado, legenda do Gab, b-roll misto e LUT.", "en": "Recorded person, balanced motion, Gab captions, mixed b-roll and LUT."},
      "escolhas": {"voz": ["gravacao"], "formato": ["ig_reels"], "motions": ["equilibrado"], "legenda": ["gab_usa"], "takes": ["misto"], "ritmo": ["padrao"], "cor": ["lut_gab"]}},
-    {"id": "so_motion", "nome": {"pt": "Só motion + música", "en": "Motion + music only"}, "anim": "dens d3",
+    {"id": "so_motion", "ico": "sem_voz", "nome": {"pt": "Só motion + música", "en": "Motion + music only"}, "anim": "dens d3",
      "desc": {"pt": "Sem voz e sem legenda: o vídeo todo em motion na batida, com efeitos sonoros.", "en": "No voice, no captions: all motion on the beat, with sound effects."},
      "escolhas": {"voz": ["sem_voz"], "formato": ["ig_reels"], "motions": ["inteiro"], "sfx": ["completo"], "ritmo": ["padrao"]}},
-    {"id": "narracao_ia", "nome": {"pt": "Narração por IA", "en": "AI narration"}, "anim": "sfx s2",
+    {"id": "narracao_ia", "ico": "voz_ia", "nome": {"pt": "Narração por IA", "en": "AI narration"}, "anim": "sfx s2",
      "desc": {"pt": "Roteiro na voz por IA, muito motion e b-roll misto, legenda do Gab.", "en": "Script in an AI voice, lots of motion and mixed b-roll, Gab captions."},
      "escolhas": {"voz": ["voz_ia"], "formato": ["ig_reels"], "motions": ["muitos"], "legenda": ["gab_usa"], "takes": ["misto"], "ritmo": ["padrao"]}},
-    {"id": "anuncio", "nome": {"pt": "Anúncio Meta", "en": "Meta ad"}, "anim": "hooks",
+    {"id": "anuncio", "ico": "anuncio", "nome": {"pt": "Anúncio Meta", "en": "Meta ad"}, "anim": "hooks",
      "desc": {"pt": "Reels/Stories e feed, ritmo rápido, variações de gancho e CTA com o site.", "en": "Reels/Stories and feed, fast pace, hook variations and website CTA."},
      "escolhas": {"voz": ["voz_ia"], "formato": ["ads_meta_vertical", "ads_meta_feed"], "motions": ["equilibrado"], "legenda": ["gab_usa"], "takes": ["misto"], "ritmo": ["rapido"], "extras": ["variacoes_gancho", "cta_site"]}},
 ]
@@ -551,10 +551,49 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:10px;width:32px;heig
 .go{background:var(--grad);color:var(--ink);border-radius:12px!important;min-width:170px;letter-spacing:.08em;text-transform:uppercase;animation:respira 1.6s ease-in-out infinite alternate}
 @keyframes respira{from{box-shadow:0 0 6px rgba(43,255,136,.25);transform:scale(1)}to{box-shadow:0 0 16px rgba(43,255,136,.7);transform:scale(1.015)}}
 .bk{background:rgba(255,255,255,.08);color:var(--tx);border:1px solid var(--line)!important}.pl{background:rgba(245,181,68,.12);color:var(--amb);border:1px solid rgba(245,181,68,.3)!important;border-radius:999px!important}
-.barra button[hidden]{display:none}
+.barra button[hidden]{display:none}.barra[hidden]{display:none}
 .go:disabled{animation:none;opacity:.35;cursor:not-allowed;filter:grayscale(.6)}
 .pl.ativo{background:var(--amb)!important;color:var(--ink)!important}
 .fim{position:fixed;inset:0;background:rgba(4,8,5,.92);display:none;place-items:center;z-index:20;text-align:center}.fim b{font-size:26px;font-weight:800;letter-spacing:-.03em;display:block;margin:14px 0 6px}
+/* tela inicial: título com respiro, 2 caminhos grandes, faixa do último vídeo, receitas compactas com ícone */
+.home{max-width:1120px;margin:0 auto;padding:clamp(18px,4vh,46px) 0 8px}
+.home h1{font-size:clamp(30px,4.2vw,48px);margin:10px 0 10px}.home .lead{font-size:16px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:800 11px "Inter Tight";letter-spacing:.14em;text-transform:uppercase;color:var(--g1)}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g)}
+.caminhos{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin-top:28px}
+.big{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;text-align:left;padding:22px 22px 22px 20px;border-radius:20px;
+  border:1px solid var(--line);background:var(--card);backdrop-filter:blur(14px);color:inherit;font:inherit;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.big:hover{transform:translateY(-2px);border-color:rgba(43,255,136,.5);box-shadow:0 10px 40px -12px rgba(43,255,136,.35)}
+.big b{display:block;font-weight:800;font-size:23px;letter-spacing:-.025em;margin:2px 0 5px}.big p{color:var(--mu);font-size:14px;margin:0;max-width:46ch}
+.big.pri{background:radial-gradient(120% 140% at 0% 0%,rgba(43,255,136,.16),rgba(43,255,136,.03) 55%),var(--card);border-color:rgba(43,255,136,.42);
+  box-shadow:inset 0 1px 0 rgba(156,255,201,.18),0 0 0 1px rgba(43,255,136,.08)}
+.ico{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:rgba(43,255,136,.08);border:1px solid rgba(43,255,136,.22);color:var(--g1);flex:none}
+.ico svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.big.pri .ico{background:var(--grad);border:0;color:var(--ink);box-shadow:0 0 26px rgba(43,255,136,.45)}
+.selo{display:inline-block;font:800 10px "Inter Tight";letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:var(--grad);padding:3px 8px;border-radius:999px}
+.seta{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--mu);transition:.18s}
+.seta svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.big:hover .seta,.faixa:hover .seta{color:var(--ink);background:var(--g);border-color:var(--g)}
+.faixa{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;width:100%;margin-top:12px;padding:12px 14px 12px 12px;border-radius:16px;text-align:left;
+  border:1px dashed rgba(120,255,180,.28);background:rgba(255,255,255,.02);color:inherit;font:inherit;cursor:pointer;transition:.18s}
+.faixa:hover{border-style:solid;border-color:rgba(43,255,136,.5);background:rgba(43,255,136,.05)}
+.faixa .ico{width:40px;height:40px;border-radius:12px}.faixa .ico svg{width:20px;height:20px}
+.faixa b{font-weight:800;font-size:15px}.faixa span.s{display:block;color:var(--mu);font-size:13px}
+.secao{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:34px 0 12px;border-top:1px solid rgba(120,255,180,.08);padding-top:22px}
+.secao h3{margin:0;font:800 12px "Inter Tight";letter-spacing:.13em;text-transform:uppercase;color:var(--tx)}.secao p{margin:0;color:var(--mu);font-size:13px;text-align:right}
+.recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.rec{position:relative;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);
+  background:var(--card);color:inherit;font:inherit;cursor:pointer;transition:.16s}
+.rec:hover{border-color:rgba(43,255,136,.5);background:rgba(43,255,136,.05);transform:translateY(-1px)}
+.rec .ico{width:40px;height:40px;border-radius:12px}.rec .ico svg{width:20px;height:20px}
+.rec b{display:block;font-weight:800;font-size:15px;letter-spacing:-.01em;margin:1px 0 3px;padding-right:22px}
+.rec p{margin:0;color:var(--mu);font-size:12.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rec .seu{margin-left:6px;font:800 9.5px "Inter Tight";letter-spacing:.08em;text-transform:uppercase;color:var(--g1);vertical-align:2px}
+.rec .x{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:var(--mu);font:700 14px "Inter Tight";opacity:0;transition:.15s}
+.rec:hover .x{opacity:1}.rec .x:hover{color:#fff;background:rgba(255,80,80,.65)}
+.home .sabe{margin-top:30px}
+@media (hover:none){.rec .x{opacity:1}}
+@media (max-width:760px){.caminhos{grid-template-columns:1fr}.big{grid-template-columns:auto 1fr;padding:18px}.big .seta{display:none}.secao{flex-direction:column;align-items:flex-start;gap:4px}.secao p{text-align:left}}
 @media (max-width:640px){.inicio{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.resumo b{min-width:110px}.barra .codes{display:none}}
 /* ---------- prévias em loop (opções sem GIF) ---------- */
 .an{width:100%;height:100%;position:relative;display:grid;place-items:center;font-family:"Inter Tight";overflow:hidden;background:radial-gradient(circle at 50% 30%,#13241A,#050806 70%)}
@@ -633,14 +672,14 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:10px;width:32px;heig
 const D = __DADOS__;
 const T = {
  pt:{menu:"Menu do vídeo",ola:"Como você quer montar este vídeo?",ola_p:"Escolha passo a passo o que entra no vídeo, ou deixe tudo com o Gab.",
-  auto_t:"Automático",auto_p:"O Gab escolhe tudo pelo que já sabe de você e da marca (estilo, memória da marca, pedidos anteriores) e pelo roteiro.",
+  auto_t:"Automático",eyebrow:"Novo vídeo",rapido:"Mais rápido",auto_p:"O Gab escolhe tudo pelo que já sabe de você e da marca (estilo, memória da marca, pedidos anteriores) e pelo roteiro.",
   eu_t:"Eu escolho",eu_p:"Passo a passo: voz, formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras.",
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
   ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",na:"não se aplica",ult_t:"Igual ao último vídeo",ult_p:n=>`Repete as escolhas de “${n}”. Você revisa antes de confirmar.`,rec_t:"Receitas prontas",rec_p:"Um clique preenche o menu e leva para a revisão; o que ficar de fora vai no automático.",resto:"Resto no automático",minhas_t:"Suas receitas",minhas_p:"Salvas por você para esta marca. Um clique repete o jeito.",salvar_p:"Vai repetir esse jeito em outros vídeos?",salvar_ph:"Nome da receita (ex.: Reels de dica)",salvar_b:"Salvar como receita",salvo:"Salva! Aparece no início dos próximos vídeos desta marca.",apagar:"Apagar receita",teclas:"Atalhos: 1-9 marca na ordem da tela · Enter avança · A automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
-  auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
+  auto_t:"Automatic",eyebrow:"New video",rapido:"Fastest",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: voice, format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",seu:"yours",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
@@ -700,14 +739,16 @@ function render() {
   const sabe = D.ja_sabe.length ? `<div class="sabe"><b>${T[L].sabe}</b><ul>${D.ja_sabe.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
   let h = "";
   if (passo === 0) {
-    h = `<h1>${T[L].ola}</h1><p class="lead">${T[L].ola_p}</p><div class="inicio">
-      <button class="op" data-op="auto"><div class="ic">${prev({anim:"dens d3"})}</div><b>${T[L].auto_t}</b><p>${T[L].auto_p}</p></button>
-      <button class="op" data-op="eu"><div class="ic">${prev({anim:"let-word"})}</div><b>${T[L].eu_t}</b><p>${T[L].eu_p}</p></button>
-      ${D.anterior ? `<button class="op" data-op="ultimo"><div class="ic">${prev({anim:"pace p2"})}</div><b>${T[L].ult_t}</b><p>${esc(T[L].ult_p(D.anterior.nome))}</p></button>` : ""}</div>
-      ${(D.minhas || []).length ? `<div class="rt">${T[L].minhas_t}</div><p>${T[L].minhas_p}</p><div class="receitas">${D.minhas.map((x, k) =>
-        `<button class="op" data-minha="${k}"><span class="tag">${T[L].seu}</span><span class="x" data-apaga="${esc(x.id)}" title="${T[L].apagar}">×</span><div class="ic">${prev({anim: animReceita(x.escolhas)})}</div><b>${esc(x.nome)}</b><p>${esc(resumoReceita(x.escolhas))}</p></button>`).join("")}</div>` : ""}
-      ${(D.receitas || []).length ? `<div class="rt">${T[L].rec_t}</div><p>${T[L].rec_p}</p><div class="receitas">${D.receitas.map((x, k) =>
-        `<button class="op" data-rec="${k}"><div class="ic">${prev({anim: x.anim})}</div><b>${esc(x.nome[L])}</b><p>${esc(x.desc[L])}</p></button>`).join("")}</div>` : ""}${sabe}`;
+    const seta = `<span class="seta">${svg(ICO.seta)}</span>`, ico = k => `<span class="ico">${svg(ICO[k] || ICO.receita)}</span>`;
+    h = `<div class="home"><span class="eyebrow"><i></i>${T[L].eyebrow}</span><h1>${T[L].ola}</h1><p class="lead">${T[L].ola_p}</p>
+      <div class="caminhos">
+        <button class="big pri" data-op="auto">${ico("auto")}<div><span class="selo">${T[L].rapido}</span><b>${T[L].auto_t}</b><p>${T[L].auto_p}</p></div>${seta}</button>
+        <button class="big" data-op="eu">${ico("eu")}<div><b>${T[L].eu_t}</b><p>${T[L].eu_p}</p></div>${seta}</button></div>
+      ${D.anterior ? `<button class="faixa" data-op="ultimo">${ico("ultimo")}<div><b>${T[L].ult_t}</b><span class="s">${esc(T[L].ult_p(D.anterior.nome))}</span></div>${seta}</button>` : ""}
+      ${(D.minhas || []).length ? `<div class="secao"><h3>${T[L].minhas_t}</h3><p>${T[L].minhas_p}</p></div><div class="recs">${D.minhas.map((x, k) =>
+        `<button class="rec" data-minha="${k}">${ico((x.escolhas.voz || [])[0])}<div><b>${esc(x.nome)}<span class="seu">${T[L].seu}</span></b><p>${esc(resumoReceita(x.escolhas))}</p></div><span class="x" data-apaga="${esc(x.id)}" title="${T[L].apagar}">×</span></button>`).join("")}</div>` : ""}
+      ${(D.receitas || []).length ? `<div class="secao"><h3>${T[L].rec_t}</h3><p>${T[L].rec_p}</p></div><div class="recs">${D.receitas.map((x, k) =>
+        `<button class="rec" data-rec="${k}">${ico(x.ico)}<div><b>${esc(x.nome[L])}</b><p>${esc(x.desc[L])}</p></div></button>`).join("")}</div>` : ""}${sabe}</div>`;
   } else if (passo <= N) {
     const g = D.grupos[passo - 1];
     if (g.abas && aba[g.id] !== "todos") { const e = escondidos(g.id);   // a aba aberta ficou vazia: volta para a primeira
@@ -745,6 +786,7 @@ function render() {
   }
   $("#tela").innerHTML = h;
   ajustar();
+  $(".barra").hidden = passo === 0;   // tela inicial: sem barra vazia por cima das receitas
   $("#bk").hidden = passo === 0; $("#pl").hidden = !(passo >= 1 && passo <= N); $("#ra").hidden = !(passo >= 1 && passo < vis[vis.length - 1]); $("#go").hidden = passo === 0;
   $("#go").textContent = passo > N ? (auto ? T[L].conf_auto : T[L].confirmar) : (passo === vis[vis.length - 1] ? T[L].revisar : T[L].avancar);
   $("#codes").textContent = auto ? T[L].auto_t : codigos().join("  ");
@@ -817,7 +859,7 @@ document.addEventListener("click", e => {
   const mi = e.target.closest("[data-minha]"); if (mi) return carrega(D.minhas[+mi.dataset.minha].escolhas);
   if (e.target.closest("#rsalva")) return salvaReceita();
   const rc = e.target.closest("[data-rec]"); if (rc) return carrega(D.receitas[+rc.dataset.rec].escolhas);
-  const op = e.target.closest(".op"); if (op) {
+  const op = e.target.closest("[data-op]"); if (op) {
     if (op.dataset.op === "ultimo") return carrega(D.anterior.escolhas);
     auto = op.dataset.op === "auto";
     if (!auto && sel.voz && !sel.voz.size) { const v = D.grupos.find(g => g.id === "voz").itens.find(i => D.sugeridos.includes(i.id)); if (v) { sel.voz.add(v.id); aplicaTravas(); } }   // voz sugerida já marcada
@@ -842,6 +884,18 @@ document.addEventListener("click", e => {
 $("#bk").onclick = () => ir(auto ? 0 : passo - 1);
 $("#ra").onclick = () => ir(N + 1);
 // receitas da pessoa (salvas no cliente): cartão com a cara da voz e um resumo do que foi marcado
+const ICO = {
+  auto: '<path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z"/>',
+  eu: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  ultimo: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5v4h4"/><path d="M12 8v4.2l2.8 1.8"/>',
+  gravacao: '<rect x="3" y="6.5" width="12.5" height="11" rx="2.5"/><path d="M15.5 10.5l5-3v9l-5-3"/>',
+  audio: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+  voz_ia: '<path d="M3 12h1.5M6.5 9v6M10 5.5v13M13.5 8.5v7M17 6.5v11M20.5 10.5v3"/>',
+  sem_voz: '<path d="M9 17.5V5.5l10.5-2v12"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/>',
+  anuncio: '<path d="M4 10v4h3l6 4V6L7 10z"/><path d="M16.5 9.5a3.5 3.5 0 0 1 0 5M19 7a7 7 0 0 1 0 10"/>',
+  receita: '<path d="M7 3.5h10a1 1 0 0 1 1 1V20l-6-3.5L6 20V4.5a1 1 0 0 1 1-1z"/>',
+  seta: '<path d="M5 12h14M13 6l6 6-6 6"/>'};
+const svg = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
 const animReceita = esc => ({gravacao: "cap-gab", audio: "sfx s1", voz_ia: "sfx s2", sem_voz: "dens d3"})[(esc.voz || [])[0]] || "let-word";
 const resumoReceita = esc => D.grupos.flatMap(g => (esc[g.id] || []).filter(id => id !== "sem").slice(0, 1)
   .map(id => (g.itens.find(i => i.id === id) || {nome: {}}).nome[L]).filter(Boolean)).slice(0, 5).join(" · ");
