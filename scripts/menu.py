@@ -140,7 +140,7 @@ def estilos_prontos():
         rel = os.path.relpath(pasta, SKILL).replace(os.sep, "/")
         r.setdefault(m.get("grupo", ""), []).append(it(m["id"], m["nome"]["pt"], m["nome"].get("en", m["nome"]["pt"]),
             m["desc"]["pt"], m["desc"].get("en", m["desc"]["pt"]), gif=rel + "/" + ex,
-            extra={"estilo": True, "aba": m.get("grupo", "")}))
+            extra={"estilo": True, "aba": m.get("grupo", ""), "precisa": m.get("precisa") or []}))
     return r
 
 
@@ -160,7 +160,8 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
     presets = [p for p in C["presets"] if p["id"] not in FORA_DO_MENU]
     est = [it(p["id"], p["nome"], NOME_EN.get(p["nome"], p["nome"]), p["resumo"], PRESET_EN.get(p["id"], p["resumo"]),
               gif=p.get("gif") or None, extra={"aba": p["categoria"], "cat": p["categoria"], "catn": {"pt": C["categorias"].get(p["categoria"], ""),
-              "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or [], "base": True}) for p in presets]
+              "en": CAT_EN.get(p["categoria"], "")}, "formato": p.get("formato") or [], "base": True,
+              "precisa": ["rosto"] if p["categoria"] == "apresentador" else []}) for p in presets]
     est += presets_do_usuario(C)
     EST = estilos_prontos()
     est += EST.get("batida", []) + EST.get("broll", [])   # batidas e b-roll animado: abas no passo de estilo dos motions
@@ -359,6 +360,27 @@ def ja_sabe(cliente):
     return [l for l in linhas if l][:6]
 
 
+def sugestao_voz(pedido, pasta):
+    """Qual opção do passo Voz combina com o pedido e com o que já está na pasta do vídeo (selo 'sugerido')."""
+    t = (pedido or "").lower()
+    for rx, v in ((r"sem (voz|narra)|s[oó] (motion|anima)|motion e m[uú]sica|sem fala", "sem_voz"),
+                  (r"voz (por |de |com )?ia|voz clonada|narra[cç][aã]o (por |de |com )?ia", "voz_ia"),
+                  (r"podcast|locu[cç][aã]o|s[oó] (o )?[aá]udio", "audio")):
+        if re.search(rx, t):
+            return v
+    arqs = []
+    for d in (pasta, os.path.join(pasta or "", "brutos")):
+        if d and os.path.isdir(d):
+            arqs += [f.lower() for f in os.listdir(d)]
+    if any(f.endswith((".mp4", ".mov", ".mxf", ".braw", ".m4v")) for f in arqs):
+        return "gravacao"
+    if any(f.endswith((".wav", ".mp3", ".m4a", ".aac")) for f in arqs):
+        return "audio"
+    if "roteiro.txt" in arqs:
+        return "voz_ia"
+    return None
+
+
 def sugestoes(pedido, roteiro, formato, cliente, pasta):
     """Presets que o escolher_preset.py sugere (aparecem com o selo 'sugerido')."""
     sug = set()
@@ -377,7 +399,7 @@ def sugestoes(pedido, roteiro, formato, cliente, pasta):
             sug |= {w for w in re.findall(r"[a-z][a-z-]+", r) if w in ids}
     except Exception:
         pass
-    return sorted(x for x in sug if x)
+    return sorted(x for x in sug if x) + [v for v in [sugestao_voz(pedido, pasta)] if v]
 
 
 PAGINA = r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -622,12 +644,15 @@ function render() {
       <button class="op" data-op="eu"><div class="ic">${prev({anim:"let-word"})}</div><b>${T[L].eu_t}</b><p>${T[L].eu_p}</p></button></div>${sabe}`;
   } else if (passo <= N) {
     const g = D.grupos[passo - 1];
+    if (g.abas && aba[g.id] !== "todos") { const e = escondidos(g.id);   // a aba aberta ficou vazia: volta para a primeira
+      if (!g.itens.some(i => !e.includes(i.id) && (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) aba[g.id] = g.abas[0].id; }
     h = `<div class="passo">${T[L].passo(pos, vis.length)}</div><h2><span class="k">${g.letra}</span>${esc(g.nome[L])}</h2>
       <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : (autoPasso[g.id] ? " · <b style='color:var(--amb)'>" + T[L].gab_escolhe + "</b>" : " · <b style='color:var(--mu)'>" + T[L].marque + "</b>")}</p>
-      ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "todos" || (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id)) && sel[g.id].has(i.id)).length;
+      ${g.abas ? `<div class="abas">${g.abas.filter(x => { const e = escondidos(g.id), ok = g.itens.filter(i => !e.includes(i.id));   // aba sem nada visível some
+          return x.id === "todos" || (x.id === "sugeridos" ? ok.some(i => D.sugeridos.includes(i.id)) : ok.some(i => i.aba === x.id)); }).map(x => { const c = g.itens.filter(i => (x.id === "todos" || (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id)) && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${ic(x.id)}${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
       <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : g.id === "estilo" ? "--ar:9/16" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => escondidos(g.id).includes(i.id) || (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
-      <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}${i.seu ? `<span class="tag">${T[L].seu}</span>` : ""}</div>
+      <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && (g.id === "estilo" || g.id === "voz") ? `<span class="tag">${T[L].sug}</span>` : ""}${i.seu ? `<span class="tag">${T[L].seu}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div><div class="pager" id="pager"></div>`;
   } else {
     const GR = D.grupos.filter((g, k) => !pula(k + 1) || sel[g.id].size);
@@ -666,7 +691,22 @@ function regra(k) { const t = {}, soma = r => { for (const [a, v] of Object.entr
   D.grupos.forEach(g => g.itens.forEach(i => { if (i[k] && sel[g.id].has(i.id)) soma(i[k]); }));
   (D.combos || []).forEach(c => { if (c[k] && Object.entries(c.se).every(([gid, ids]) => sel[gid] && ids.some(id => sel[gid].has(id)))) soma(c[k]); });
   return t; }
-const travas = () => regra("trava"), escondidos = gid => regra("esconde")[gid] || [];
+// sem pessoa na tela (voz que não é gravação ou vídeo inteiro em motion): somem os estilos que precisam de rosto/recorte
+const semPessoa = () => [...(sel.voz || [])].some(v => v !== "gravacao") || !!(sel.motions && sel.motions.has("inteiro"));
+// orientações dos formatos marcados: some o estilo que não existe numa delas (vídeo sai em todas)
+const orient = () => { const f = D.grupos.find(g => g.id === "formato"), o = new Set();
+  if (f) f.itens.forEach(i => { if (sel.formato.has(i.id)) o.add(i.proporcao === "16:9" ? "horizontal" : "vertical"); }); return [...o]; };
+function escondidos(gid) {
+  const g = D.grupos.find(x => x.id === gid), r = regra("esconde")[gid] || []; if (!g) return r;
+  const sp = semPessoa(), o = orient();
+  return r.concat(g.itens.filter(i => (sp && (i.precisa || []).some(p => p === "rosto" || p === "recorte"))
+    || (o.length && (i.formato || []).length && o.some(x => !i.formato.includes(x)))).map(i => i.id));
+}
+// passo que ficou só com "sem" (todo o resto escondido) some sozinho, com "sem"
+function travas() { const t = regra("trava");
+  D.grupos.forEach(g => { if (g.id in t || g.itens.length < 2 || !g.itens.some(i => i.id === "sem")) return;
+    const e = escondidos(g.id); if (g.itens.every(i => i.id === "sem" || e.includes(i.id))) t[g.id] = "sem"; });
+  return t; }
 function pula(p) { const g = D.grupos[p - 1]; return g && ((["estilo", "gancho", "layout", "prova"].includes(g.id) && sel.motions && sel.motions.has("sem")) || g.id in travas()); }
 const visiveis = () => D.grupos.map((g, k) => k + 1).filter(p => !pula(p));
 let travados = new Set();
@@ -676,7 +716,7 @@ function aplicaTravas() {
     for (const gid of travados) if (!(gid in t) && sel[gid]) sel[gid].clear();   // saiu a trava: a escolha forçada sai junto
     travados = new Set(Object.keys(t).filter(gid => sel[gid]));
     for (const [gid, v] of Object.entries(t)) if (sel[gid]) { sel[gid].clear(); sel[gid].add(v); autoPasso[gid] = false; }
-    for (const [gid, ids] of Object.entries(regra("esconde"))) if (sel[gid]) ids.forEach(id => sel[gid].delete(id));
+    D.grupos.forEach(g => escondidos(g.id).forEach(id => sel[g.id].delete(id)));
   }
 }
 // cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; se todas as opções couberem, sem rolagem;
