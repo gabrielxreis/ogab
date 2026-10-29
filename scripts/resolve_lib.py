@@ -144,12 +144,14 @@ def criar_timeline(p, mp, nome, w=None, h=None, fps=None, pasta=None, sem_menu=N
 
 def _no_pool(mp, caminho):
     """Item do Media Pool que já aponta para este arquivo (procura em todas as pastas), ou None."""
-    alvo = os.path.normcase(os.path.abspath(caminho)); pilha = [mp.GetRootFolder()]
+    import unicodedata   # NFC: o Mac grava acento em NFD ("Vídeo" do iPhone) e o DaVinci devolve em NFC; sem isso reimportava
+    norm = lambda c: unicodedata.normalize("NFC", os.path.normcase(os.path.abspath(c)))
+    alvo = norm(caminho); pilha = [mp.GetRootFolder()]
     while pilha:
         f = pilha.pop()
         for c in f.GetClipList() or []:
             fp = c.GetClipProperty("File Path") or ""
-            if fp and os.path.normcase(os.path.abspath(fp)) == alvo: return c
+            if fp and norm(fp) == alvo: return c
         pilha.extend(f.GetSubFolderList() or [])
     return None
 
@@ -408,7 +410,10 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1, lut=None):
         r.GetProjectManager().GetCurrentProject().RefreshLUTList()
     r.OpenPage("color"); res = []
     for x in t.GetItemListInTrack("video", trilha) or []:
-        arq = x.GetMediaPoolItem().GetClipProperty("File Path")
+        mpi = x.GetMediaPoolItem()
+        if not mpi:   # transição (AddTransition), título ou gerador: não tem mídia nem recebe grade (relato da comunidade)
+            continue
+        arq = mpi.GetClipProperty("File Path")
         if arq and f"{os.sep}motions{os.sep}" in arq:   # motion não recebe grade (o motion pode estar numa trilha de takes)
             res.append((x.GetName(), "motion (pulado)", True)); continue
         iph = bool(arq and os.path.exists(arq) and eh_iphone(arq))
@@ -437,8 +442,13 @@ def colocar_legendas(t, mp, srt, trocar=True, p=None):
     # O Media Pool reaproveita item pelo NOME do arquivo: SRT com mesmo nome em vídeos diferentes faz um vídeo
     # receber a legenda do outro. Sempre importar com nome único (pasta do vídeo + nome).
     pasta_video = os.path.basename(os.path.dirname(os.path.dirname(os.path.abspath(srt))))
-    unico = os.path.join(os.path.dirname(srt), f"{pasta_video.split(' - ')[0].replace(' ', '_')}__{os.path.basename(srt)}")
-    if not os.path.exists(unico): import shutil; shutil.copy(srt, unico)
+    # e o nome leva o hash do CONTEÚDO: SRT corrigido e recolocado com o mesmo nome reaproveitava o item antigo
+    # do Media Pool e a legenda continuava com o texto velho (relato da comunidade)
+    import hashlib, shutil
+    marca = hashlib.sha1(open(srt, "rb").read()).hexdigest()[:8]
+    base, ext = os.path.splitext(os.path.basename(srt))
+    unico = os.path.join(os.path.dirname(srt), f"{pasta_video.split(' - ')[0].replace(' ', '_')}__{base}_{marca}{ext}")
+    if not os.path.exists(unico): shutil.copy(srt, unico)
     it = importar(mp, unico, "LEGENDAS")
     # AppendToTimeline usa a timeline ABERTA (já aberta acima; sem p= a legenda pode cair em outro vídeo)
     # trilha de legenda DESABILITADA recusa o SRT em silêncio (render sem legenda pode deixá-la desligada)

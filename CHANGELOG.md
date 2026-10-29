@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.29-3 (29/10/2026)
+- **Correções que vieram dos relatos de vocês:** take com acento no nome ("Vídeo" do iPhone) não é mais importado duas vezes; legenda corrigida e recolocada entra com o texto novo (antes ficava a antiga); a cor não quebra mais quando a V1 tem transição; a conferência de enquadramento lê o tamanho de qualquer MP4 do DaVinci.
 ## 2026.10.29-2 (29/10/2026)
 - **DaVinci em 24 fps:** projeto novo nasce com timeline e playback em 24 fps (o padrão fica em `config.regras.fps`; troque lá se quiser outro).
 ## 2026.10.29-1 (29/10/2026)
