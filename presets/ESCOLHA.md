@@ -40,6 +40,9 @@ Em qualquer preset: um elemento novo na tela a cada ~2,5-4 s, acompanhando cada 
 ### UM estilo por vídeo (regra do usuário, 27/10/2026)
 No menu, o passo "Estilo dos motions" aceita UM estilo só (batidas visuais, b-roll animado e efeitos extras podem somar). O vídeo inteiro nasce nesse estilo: o Gab NÃO fica preso às cenas que o preset já tem; cria cenas e animações novas para cada frase, sempre no padrão do estilo escolhido (paleta, fundo, tipografia, ritmo, jeito de entrar e sair). Trecho que pediria outro preset (dado com fonte, ranking, lista) vira cena nova desenhada no estilo escolhido, não troca de preset. Cena nova que ficou boa: registrar no `PRESET.md` do estilo.
 
+### O que é estilo de motion e o que não é (regra do usuário, 29/10/2026)
+Podcast, tela dividida, destaque, lume, letreiro (palco), órbita e lente NÃO são estilo de motion: são o que acontece com a pessoa. No menu eles saem do passo E e ficam no passo certo: tela dividida e podcast são o mesmo layout (passo Q, id `tela-dividida`); destaque, lume e "cor por quem fala" são legenda (passo L); letreiro, órbita e lente ficam em "Efeitos na pessoa" (passo K, `escolhas.efeito`), somando ao estilo. No `menu_escolha.json`, `layout: ["tela-dividida"]` com duas pessoas = preset `podcast`; com uma pessoa = preset `tela-dividida`.
+
 ### Escolha do preset (OBRIGATÓRIO em todo vídeo com motion, regra do usuário 22/10/2026: "a skill tem que identificar cada tipo de conteúdo")
 O cérebro é `presets/catalogo.json` (sinais, nicho, formato, se precisa de apresentador e as cenas de cada preset); a tabela abaixo é o mesmo conteúdo para leitura.
 1. **Pedido chegou:** `python3 SKILL_DIR/scripts/escolher_preset.py pedido "<pedido do usuário>" [--formato horizontal]` diz se é um fluxo próprio (anima arte/PSD, fábrica de cortes, carrossel, só motion) ou um preset direto (logo reveal, lottie, launch, painel, gráfico, ranking, podcast...). Seguir a rota e ler o guia que ele aponta.
