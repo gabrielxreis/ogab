@@ -195,7 +195,7 @@ Uso no Gab: grupo "iPhone" com LUT de conversão no pre-clip, e o look geral no 
 | `album.ImportStills([arquivo.drx])` | |
 | `album.DeleteStills([st])` | |
 
-**ATENÇÃO: os álbuns de PowerGrade são globais** (aparecem em todos os projetos do banco). No teste, `GetGalleryPowerGradeAlbums()[0]` era o álbum "LUT DO GAB" do Gabriel, e não um álbum novo: renomear ou importar "no primeiro álbum" mexe no álbum real. Regra: sempre achar o álbum **pelo nome** e nunca mexer em álbum de PowerGrade que o Gab não criou.
+**ATENÇÃO: os álbuns de PowerGrade são globais** (aparecem em todos os projetos do banco). No teste, `GetGalleryPowerGradeAlbums()[0]` era o álbum "LUT DO GAB" do Gabriel, e não um álbum novo: renomear ou importar "no primeiro álbum" mexe no álbum real. Regra: sempre achar o álbum **pelo nome** e nunca mexer em álbum de PowerGrade que o Gab não criou. Observação: logo depois de abrir o Resolve, no "Untitled Project", `GetGalleryPowerGradeAlbums()` voltou vazio mesmo indo à página Color; num projeto salvo a lista apareceu inteira. Com a lista vazia, não concluir que não há PowerGrades.
 
 Fluxo para salvar um look e reaproveitar em outro projeto: `tl.GrabStill()` -> `album.ExportStills([st], pasta, "look", "drx")` -> no outro projeto, `it.GetNodeGraph().ApplyGradeFromDRX(pasta + "/look_1.1.1.drx", 0)`.
 
