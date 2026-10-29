@@ -32,7 +32,33 @@ def etapas(pasta):
 
 def estado(pasta):
     f = os.path.join(pasta, "status.json")
-    return json.load(open(f)) if os.path.exists(f) else {"feitas": [], "puladas": {}, "timeline": None}
+    st = json.load(open(f)) if os.path.exists(f) else {"feitas": [], "puladas": {}, "timeline": None}
+    for e, m in pulos_do_menu(pasta).items():   # o que marcou à mão vale mais que o menu
+        if e not in st["feitas"]: st["puladas"].setdefault(e, m)
+    return st
+
+
+# passo do menu marcado "sem" (ou fora do caminho) -> etapas que não existem neste vídeo
+GRUPO_ETAPAS = {"legenda": ["legenda", "legenda_validada"], "lettering": ["letterings"], "takes": ["broll"],
+                "motions": ["motions"], "musica": ["musica"], "sfx": ["sfx"]}
+
+
+def pulos_do_menu(pasta):
+    """Etapas puladas pelo menu_escolha.json (passo Voz do vídeo, 'sem ...' e 'não se aplica'), para o status e o
+    `proximo` não cobrarem voz, cortes de fala ou legenda de vídeo que não tem."""
+    try:
+        d = json.load(open(os.path.join(pasta, "menu_escolha.json"), encoding="utf-8"))
+    except Exception:
+        return {}
+    esc = d.get("escolhas") or {}; voz = (esc.get("voz") or [None])[0]; r = {}
+    if voz in ("gravacao", "audio"): r["voz"] = "fala gravada, sem voz por IA (menu)"
+    if voz == "sem_voz":
+        for e in ("voz", "cortes", "silencios", "legenda", "legenda_validada"): r[e] = "vídeo sem voz (menu)"
+    for g, ets in GRUPO_ETAPAS.items():
+        if esc.get(g) == ["sem"] or g in (d.get("nao_se_aplica") or []):
+            for e in ets: r.setdefault(e, "sem " + ROTULO[e] + " (menu)")
+    if voz and voz != "gravacao" and esc.get("takes") == ["sem"]: r["cor"] = "sem take para colorir (menu)"
+    return r
 
 
 def salvar(pasta, st): json.dump(st, open(os.path.join(pasta, "status.json"), "w"), ensure_ascii=False, indent=1)
