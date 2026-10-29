@@ -427,13 +427,15 @@ function boneco(b, c, t) {
     if (a.anda != null && t >= a.t) { const u = eio((t - a.t) / (a.dur || .9)); x += a.anda * u; if (u < 1) passo = 1; }
     if (a.cai && t >= a.t) queda = (a.cai === 'esquerda' ? -1 : 1) * 86 * DEG * eic((t - a.t) / .55);
   }
-  const s = b.escala || 1, chao = PES - (b.y || 0);
+  const s = b.escala || 1, chao = PES - (b.y || 0) + (b.sentado ? 45 : 0);
   const bob = Math.sin(2 * PI * .9 * t + b.id) * 3 + (passo ? -Math.abs(Math.sin(t * 2 * PI * 2.2)) * 12 : 0);
   const balanco = Math.sin(2 * PI * .5 * t + b.id * .7) * 1.3 * DEG;
   ctx.save();
   if (lift < -1) { ctx.beginPath(); ctx.rect(0, 0, W, chao + 10); ctx.clip(); }
-  ctx.fillStyle = `rgba(30,16,6,${.28 * (1 - clamp(-lift / 200))})`;   // sombra no chão
-  ctx.beginPath(); ctx.ellipse(CX + x, chao + 6, 70 * s, 12 * s, 0, 0, 2 * PI); ctx.fill();
+  if (!b.sentado) {
+    ctx.fillStyle = `rgba(30,16,6,${.28 * (1 - clamp(-lift / 200))})`;   // sombra no chão
+    ctx.beginPath(); ctx.ellipse(CX + x, chao + 6, 70 * s, 12 * s, 0, 0, 2 * PI); ctx.fill();
+  }
   ctx.translate(CX + x, chao - lift - bob);
   ctx.rotate(queda + (queda ? 0 : balanco));
   ctx.scale(s * (b.olha === -1 ? -1 : 1), s);
@@ -534,16 +536,158 @@ function aderecoForma(a, t) {
   } else if (a.tipo === 'pedra') {
     ctx.fillStyle = '#c4bdb0'; ctx.strokeStyle = '#4a3a2a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(0, 0, 14 * s, 10 * s, .3, 0, 2 * PI); ctx.fill(); ctx.stroke();
     ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.beginPath(); ctx.ellipse(-4 * s, -3 * s, 5 * s, 3 * s, .3, 0, 2 * PI); ctx.fill();
+  } else if (a.tipo === 'saco') {                     // saco de dinheiro (origem no chão)
+    ctx.scale(s, s);
+    ctx.fillStyle = 'rgba(30,16,6,.25)'; ctx.beginPath(); ctx.ellipse(0, 2, 62, 10, 0, 0, 2 * PI); ctx.fill();
+    ctx.fillStyle = '#c9a26a'; ctx.beginPath(); ctx.moveTo(-26, -118); ctx.quadraticCurveTo(-78, -70, -64, -22);
+    ctx.quadraticCurveTo(-58, 0, 0, 0); ctx.quadraticCurveTo(58, 0, 64, -22); ctx.quadraticCurveTo(78, -70, 26, -118); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,.14)'; ctx.beginPath(); ctx.moveTo(20, -116); ctx.quadraticCurveTo(70, -70, 60, -22); ctx.quadraticCurveTo(50, -4, 18, -2); ctx.quadraticCurveTo(46, -60, 20, -116); ctx.fill();
+    ctx.fillStyle = '#b48a52'; ctx.beginPath(); ctx.moveTo(-26, -118); ctx.lineTo(-38, -146); ctx.lineTo(0, -132); ctx.lineTo(38, -146); ctx.lineTo(26, -118); ctx.fill();
+    ctx.strokeStyle = '#6a4a2a'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(-28, -118); ctx.lineTo(28, -118); ctx.stroke();
+    ctx.fillStyle = a.cor || '#2f7a3a'; ctx.font = `700 64px "${FT}"`; ctx.textAlign = 'center'; ctx.fillText(a.texto || '$', 0, -34);
+  } else if (a.tipo === 'nota') {                     // cédula
+    ctx.scale(s, s);
+    ctx.fillStyle = '#6fae6a'; ctx.fillRect(-46, -22, 92, 44);
+    ctx.strokeStyle = '#3f7a3c'; ctx.lineWidth = 3; ctx.strokeRect(-40, -16, 80, 32);
+    ctx.fillStyle = '#3f7a3c'; ctx.beginPath(); ctx.arc(0, 0, 11, 0, 2 * PI); ctx.fill();
+    ctx.fillStyle = '#cfe8c8'; ctx.font = `700 16px "${FX}"`; ctx.textAlign = 'center'; ctx.fillText('$', 0, 6);
+  } else if (a.tipo === 'relogio') {                  // relógio grande com ponteiro girando (origem no centro)
+    const r = (a.raio || 120);
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.beginPath(); ctx.arc(8, 10, r + 16, 0, 2 * PI); ctx.fill();
+    ctx.fillStyle = T.dourado || '#D4A84A'; ctx.beginPath(); ctx.arc(0, 0, r + 16, 0, 2 * PI); ctx.fill();
+    ctx.fillStyle = '#fbf6ea'; ctx.beginPath(); ctx.arc(0, 0, r, 0, 2 * PI); ctx.fill();
+    ctx.strokeStyle = '#2b2622';
+    for (let i = 0; i < 12; i++) { const q = i * PI / 6; ctx.lineWidth = i % 3 ? 4 : 9; ctx.beginPath(); ctx.moveTo(Math.sin(q) * r * .8, -Math.cos(q) * r * .8); ctx.lineTo(Math.sin(q) * r * .93, -Math.cos(q) * r * .93); ctx.stroke(); }
+    const q1 = t * 2 * PI * .5, q2 = t * 2 * PI * .05;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.sin(q2) * r * .5, -Math.cos(q2) * r * .5); ctx.stroke();
+    ctx.strokeStyle = T.acento || '#E31E24'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.sin(q1) * r * .78, -Math.cos(q1) * r * .78); ctx.stroke();
+    ctx.lineCap = 'butt'; ctx.fillStyle = '#2b2622'; ctx.beginPath(); ctx.arc(0, 0, 12, 0, 2 * PI); ctx.fill();
+    if (a.check) {                                       // selo verde de confirmado
+      const u = eoc((t - a.t0 - a.check) / .35);
+      if (u > 0) { ctx.save(); ctx.translate(r * .78, r * .7); ctx.scale(u, u);
+        ctx.fillStyle = '#2f9a4a'; ctx.beginPath(); ctx.arc(0, 0, 50, 0, 2 * PI); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-22, 2); ctx.lineTo(-6, 18); ctx.lineTo(24, -16); ctx.stroke(); ctx.restore(); }
+    }
+  } else if (a.tipo === 'grafico' || a.tipo === 'quadro') {   // quadro no cavalete (origem no chão): candles ou texto
+    ctx.scale(s, s);
+    ctx.strokeStyle = '#6a4a2a'; ctx.lineWidth = 10;
+    ctx.beginPath(); ctx.moveTo(-110, 0); ctx.lineTo(-70, -330); ctx.moveTo(110, 0); ctx.lineTo(70, -330); ctx.moveTo(0, -20); ctx.lineTo(0, -330); ctx.stroke();
+    ctx.fillStyle = '#5a3a22'; ctx.fillRect(-178, -560, 356, 262);
+    ctx.fillStyle = a.tipo === 'quadro' ? '#2c3a32' : '#141c26'; ctx.fillRect(-164, -546, 328, 234);
+    if (a.tipo === 'quadro') {
+      const ls = String(a.texto || '').split('|');
+      ctx.fillStyle = '#f2efe6'; ctx.textAlign = 'left';
+      ls.forEach((l, i) => { const u = clamp((t - a.t0 - .3 - i * (a.passo || .5)) / .3); if (u <= 0) return;
+        ctx.globalAlpha = u; ctx.font = `700 ${i ? 34 : 40}px "${FX}"`; ctx.fillText(l, -140, -490 + i * 56); });
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 2;
+      for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(-164, -546 + i * 58); ctx.lineTo(164, -546 + i * 58); ctx.stroke(); }
+      const n = 9, sobe = a.sobe !== false, vis = clamp((t - a.t0 - .25) / (a.dur_velas || 1.6)) * n;
+      let y = sobe ? -350 : -510;
+      for (let i = 0; i < n; i++) {
+        if (i >= vis) break;
+        const r = hash(a.id, i), verde = sobe ? r > .25 : r < .25, d = (verde ? -1 : 1) * (12 + r * 20);
+        const x = -140 + i * 33, y1 = y + d;
+        ctx.strokeStyle = verde ? '#4fd37a' : '#ff4a4a'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x + 10, Math.min(y, y1) - 10); ctx.lineTo(x + 10, Math.max(y, y1) + 10); ctx.stroke();
+        ctx.fillStyle = ctx.strokeStyle; ctx.fillRect(x, Math.min(y, y1), 20, Math.abs(d) + 4);
+        y = clamp(y1, -530, -330);
+      }
+    }
+  } else if (a.tipo === 'calendario') {                // folha de calendário (pendurada)
+    ctx.scale(s, s);
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(-82, -62, 172, 190);
+    ctx.fillStyle = '#fbf6ea'; ctx.fillRect(-90, -70, 180, 190);
+    ctx.fillStyle = T.acento || '#E31E24'; ctx.fillRect(-90, -70, 180, 52);
+    const [m, d] = String(a.texto || 'SET|11').split('|');
+    ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.font = `700 34px "${FX}"`; ctx.fillText(m, 0, -32);
+    ctx.fillStyle = '#2b2622'; ctx.font = `700 ${String(d).length > 3 ? 40 : 92}px "${FT}"`; ctx.fillText(d, 0, String(d).length > 3 ? 64 : 92);
+  } else if (a.tipo === 'seta') {                     // seta grande subindo (verde) ou caindo (vermelha)
+    const sobe = a.dir !== 'baixo', u = eoc((t - a.t0) / .5);
+    ctx.translate(0, -100 * s); ctx.scale(s, s * (sobe ? 1 : -1)); ctx.translate(0, (1 - u) * 60);
+    ctx.fillStyle = a.cor || (sobe ? '#2f9a4a' : (T.acento || '#E31E24'));
+    ctx.beginPath(); ctx.moveTo(-34, 90); ctx.lineTo(-34, -20); ctx.lineTo(-80, -20); ctx.lineTo(0, -110); ctx.lineTo(80, -20); ctx.lineTo(34, -20); ctx.lineTo(34, 90); ctx.closePath(); ctx.fill();
+  } else if (a.tipo === 'mesa') {                     // mesa de trader (origem no chão; desenha na frente): telas em a.telas (x)
+    ctx.scale(s, s);
+    for (const dx of (a.telas || [0])) {
+      ctx.fillStyle = '#2b2b2b'; ctx.fillRect(dx - 8, -262, 16, 34);
+      ctx.fillStyle = '#1b1b1b'; ctx.fillRect(dx - 78, -372, 156, 112);
+      ctx.fillStyle = '#0d1520'; ctx.fillRect(dx - 70, -364, 140, 96);
+      let y = -310;
+      for (let i = 0; i < 7; i++) {
+        const r = hash(a.id + dx, i + Math.floor(t * 2)), verde = r > .3, d = (verde ? -1 : 1) * (5 + r * 12), x = dx - 62 + i * 19;
+        ctx.fillStyle = verde ? '#4fd37a' : '#ff4a4a'; ctx.fillRect(x, Math.min(y, y + d), 11, Math.abs(d) + 3);
+        y = clamp(y + d, -355, -278);
+      }
+    }
+    ctx.fillStyle = '#7a5232'; ctx.fillRect(-330, -230, 660, 30);
+    ctx.fillStyle = '#5e3e24'; ctx.fillRect(-310, -200, 620, 200);
+    ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.fillRect(-310, -200, 620, 14);
   } else if (a.tipo === 'estrela') {
     ctx.fillStyle = '#f6d36a'; ctx.beginPath();
     for (let i = 0; i < 10; i++) { const r = (i % 2 ? 18 : 42) * s, q = i * PI / 5 - PI / 2; ctx.lineTo(Math.cos(q) * r, Math.sin(q) * r); }
     ctx.fill();
   }
 }
+const NO_CHAO = new Set(['saco', 'grafico', 'quadro', 'mesa', 'trono', 'urna']);
+function puff(x, y, e, id, r0 = 70) {               // "pop": nuvem de fumaça + cédulas voando, e = 0..1
+  ctx.save();
+  ctx.globalAlpha = 1 - eic(e);
+  ctx.fillStyle = '#fbf6ea';
+  for (let i = 0; i < 8; i++) {
+    const q = i * PI / 4 + hash(id, i), d = eoc(e) * r0 * 1.2;
+    ctx.beginPath(); ctx.arc(x + Math.cos(q) * d, y + Math.sin(q) * d * .8, r0 * (.35 + .4 * (1 - e)), 0, 2 * PI); ctx.fill();
+  }
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  for (let i = 0; i < 10; i++) {                       // risquinhos do estouro
+    const q = i * PI / 5, a0 = r0 * (.5 + eoc(e) * 1.1), a1 = a0 + 26 * (1 - e);
+    ctx.beginPath(); ctx.moveTo(x + Math.cos(q) * a0, y + Math.sin(q) * a0); ctx.lineTo(x + Math.cos(q) * a1, y + Math.sin(q) * a1); ctx.stroke();
+  }
+  ctx.lineCap = 'butt';
+  for (let i = 0; i < 4; i++) {
+    const q = -PI / 2 + (hash(id, i + 20) - .5) * 2.4, d = eoc(e) * r0 * 2.2;
+    ctx.save(); ctx.translate(x + Math.cos(q) * d, y + Math.sin(q) * d + eic(e) * 90); ctx.rotate(e * 6 + i);
+    aderecoForma({ tipo: 'nota', escala: .6 }, 0); ctx.restore();
+  }
+  ctx.restore();
+}
+function chuva(a, c, t) {                             // cédulas caindo do céu, de a.em até a.ate (s na cena)
+  const fim = c.S + (a.ate ?? c.D), n = a.n || 26;
+  for (let i = 0; i < n; i++) {
+    const nasce = a.t0 + hash(a.id, i) * Math.max(.1, fim - a.t0 - .9), v = t - nasce;
+    if (v < 0 || v > 2.2) continue;
+    const x = CX + (hash(a.id, i + 50) * 2 - 1) * 470 + Math.sin(v * 3 + i) * 40, y = -80 + v * (520 + hash(a.id, i + 90) * 260);
+    if (y > PES) continue;
+    if (a.estoura_em != null && t >= c.S + a.estoura_em) { const e = (t - c.S - a.estoura_em) / .3; if (e < 1 && i % 3 === 0) puff(x, y, e, a.id + i, 28); continue; }
+    ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(v * 4 + i) * .9); ctx.scale(1, .6 + .4 * Math.abs(Math.cos(v * 5 + i)));
+    aderecoForma({ ...a, tipo: 'nota' }, t); ctx.restore();
+  }
+}
 function adereco(a, c, t) {
   if (t < a.t0 - .02) return;
+  if (a.tipo === 'chuva') return chuva(a, c, t);
   const sai = c.prox ? c.prox.S : 1e9, dt = t - a.t0;
-  let x = CX + (a.x || 0), y = 960 + (a.y || 0), ang = 0;
+  let x = CX + (a.x || 0), y = 960 + (a.y ?? (NO_CHAO.has(a.tipo) ? PES - 960 : 0)), ang = 0;
+  if (a.cai) {                                         // cai do céu, quica no chão; some_em = desce pelo alçapão
+    const u = clamp(dt / .55), d2 = Math.max(0, dt - .55);
+    let yy = lerp(-260, y, u * u) - Math.abs(Math.sin(d2 * PI * 3)) * 34 * Math.exp(-d2 * 6);
+    if (a.estoura_em != null && t >= c.S + a.estoura_em) {
+      const e = (t - c.S - a.estoura_em) / .4;
+      if (e >= 1) return;
+      const inch = e < .2 ? 1 + .35 * eoc(e / .2) : 0;      // incha e some no pop
+      if (inch) { ctx.save(); ctx.translate(x, y); ctx.scale(inch, inch); aderecoForma(a, t); ctx.restore(); }
+      puff(x, y - 70 * (a.escala || 1), clamp((e - .1) / .9), a.id, 80 * (a.escala || 1));
+      return;
+    }
+    let desce = 0;
+    if (a.some_em != null) desce += eic((t - c.S - a.some_em) / .45) * 600;
+    desce += eic((t - sai + .3) / .45) * 600;
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, y + 10); ctx.clip();
+    ctx.translate(x, yy + desce); ctx.rotate((1 - u) * (hash(a.id, 7) - .5) * 1.2); aderecoForma(a, t); ctx.restore();
+    return;
+  }
   if (a.tipo === 'pomba' && a.de && a.ate) {           // voa de um ponto a outro
     const u = eio(dt / (a.dur || 1.6));
     x = CX + lerp(a.de[0], a.ate[0], u); y = 960 + lerp(a.de[1], a.ate[1], u) + Math.sin(u * PI) * -60;
@@ -554,7 +698,7 @@ function adereco(a, c, t) {
     const topo = a.tipo === 'nuvem' ? -40 : -(a.raio || 50);
     barbante(x, 0, x + Math.sin(ang) * -topo, y + topo * Math.cos(ang));
   } else if (a.tipo !== 'balao') {                     // de chão: sobe do alçapão
-    const lift = -(1 - eoc(dt / .5)) * 560 - eic((t - sai + .3) / .45) * 600;
+    const lift = -(1 - eoc(dt / .5)) * 560 - eic((t - sai + .3) / .45) * 600 - (a.some_em != null ? eic((t - c.S - a.some_em) / .45) * 600 : 0);
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, y + 10); ctx.clip();
     ctx.translate(x, y - lift); aderecoForma(a, t); ctx.restore();
     return;
@@ -619,6 +763,7 @@ function acabamento(t) {
 }
 
 // ---------------------------------------------------------------- quadro
+const frente = a => a.frente ?? (a.tipo === 'mesa' || a.tipo === 'chuva');
 function conteudo(c, t) {
   c.aderecos.filter(a => NO_CEU.has(a.tipo) || a.pendurado).forEach(a => adereco(a, c, t));
 }
@@ -643,11 +788,13 @@ function render(t) {
   if (!trocando || t >= c.S - .1) conteudo(c, t);
   ctx.drawImage(CHAO, 0, FUNDO);
   if (ant && t < c.S + .2) {
-    ant.aderecos.filter(a => !(NO_CEU.has(a.tipo) || a.pendurado)).forEach(a => adereco(a, ant, t));
+    ant.aderecos.filter(a => !(NO_CEU.has(a.tipo) || a.pendurado) && !frente(a)).forEach(a => adereco(a, ant, t));
     ant.bonecos.forEach(b => boneco(b, ant, t));
+    ant.aderecos.filter(frente).forEach(a => adereco(a, ant, t));
   }
-  c.aderecos.filter(a => !(NO_CEU.has(a.tipo) || a.pendurado)).forEach(a => adereco(a, c, t));
+  c.aderecos.filter(a => !(NO_CEU.has(a.tipo) || a.pendurado) && !frente(a)).forEach(a => adereco(a, c, t));
   c.bonecos.forEach(b => boneco(b, c, t));
+  c.aderecos.filter(frente).forEach(a => adereco(a, c, t));
   holofote(t);
   cortinas(t);
   if (ant) ant.placas.forEach(p => placa(p, t));

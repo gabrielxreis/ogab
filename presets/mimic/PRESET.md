@@ -33,7 +33,15 @@ perfil"). Plano em `exemplo/plano.json`.
    quem está no palco (personagens prontos: `povo`, `jesus`, `discipulo`, `soldado`, `rei`, `diabo`, `menino`,
    `pessoa`, `gigante`; cada campo pode ser trocado: roupa, cabelo, barba, manto, chapéu, objeto) e o que eles FAZEM
    na palavra forte (pose, andar, cair). Adereço quando a frase tem um objeto (sol, lua, balão com palavra, trono,
-   urna, pomba voando, estrela).
+   urna, pomba voando, estrela, saco de dinheiro, chuva de notas, relógio, gráfico de candles, quadro com texto,
+   calendário, seta subindo/caindo, mesa de trader com telas). TODA fala com objeto ou ideia concreta ganha adereço
+   (pedido do Gabriel 29/10: "falta objetos no cenário que faz alusão à fala").
+   - `cai: true`: o adereço cai do céu e quica no chão; `estoura_em: <s>` estoura com pop (fumaça + notas voando),
+     `some_em: <s>` desce pelo alçapão. Perder tudo = sacos caindo e depois estourando.
+   - `chuva` (`em`, `ate`, `n`, `estoura_em`); `relogio` (`raio`, `check`: selo verde em s); `grafico` (`sobe`,
+     `dur_velas`); `quadro` (`texto` "linha|linha", `passo`); `calendario` (`texto` "MÊS|DIA"); `seta` (`dir`
+     "baixo"); `mesa` (`telas`: lista de x) com boneco `sentado: true` atrás; `frente: true` desenha na frente dos
+     bonecos (padrão da mesa e da chuva).
 3. Tempos pela fala: `"transcricao": "tr.json"` no plano e `"em": "<palavra>"` em placas, bonecos e ações.
 4. `python3 SKILL_DIR/presets/mimic/gerar.py plano.json <pasta>/motions/mimic [--tema <marca>] --render <pasta>/motions/mimic.mp4 [--gif]`
    (formato do plano na docstring do `gerar.py`). Ele RECUSA cena com mais de 4,5 s sem nada novo (`CENA_PARADA`,

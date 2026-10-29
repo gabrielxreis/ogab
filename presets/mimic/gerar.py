@@ -24,7 +24,7 @@ plano.json (x/y em px a partir do CENTRO da tela 540,960; vertical 1080x1920):
                    "objeto": "espada|lanca|tocha|funda|cajado|cetro|tridente",
                    "acoes": [{"em": 1.2, "pose": "aponta"}, {"em": 0.8, "anda": 160, "dur": 0.9},
                              {"em": 2.0, "cai": "direita"}]}],
-      "aderecos": [{"tipo": "sol|lua|nuvem|estrela|balao|trono|urna|pomba|pedra", "x": 220, "y": 200, "em": 0.3,
+      "aderecos": [{"tipo": "sol|lua|nuvem|estrela|balao|trono|urna|pomba|pedra|saco|nota|chuva|relogio|grafico|quadro|calendario|seta|mesa", "x": 220, "y": 200, "em": 0.3,
                     "raio": 80, "escala": 1, "texto": "ira", "cor": "#hex", "fio_ate": [0, 260],
                     "pendurado": true, "de": [-500, -200], "ate": [500, -300], "dur": 1.6}] } ] }
 
