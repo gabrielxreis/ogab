@@ -686,6 +686,7 @@ Menu do vídeo (`/ogab menu`): servidor local em `127.0.0.1:47321`, grava `<past
 ```
 python3 scripts/menu.py --pasta <pasta do vídeo> --cliente <empresa> [--pedido "<pedido>"] [--formato horizontal]
 ```
+Vários vídeos num menu só (cada um com as suas escolhas, ou reaproveitando as de outro): `--video <pasta 1> --video <pasta 2> ...` no lugar de `--pasta`; cada pasta recebe o seu `menu_escolha.json`.
 
 ### qc.py
     <pasta_do_video> [--cliente pasta] [--plataforma instagram|meta_ads|youtube_shorts]

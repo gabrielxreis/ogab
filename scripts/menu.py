@@ -9,6 +9,9 @@
   escolher_preset.py com o pedido/roteiro). Com --pedido/--roteiro, as sugestões já aparecem marcadas como "sugerido".
 - As prévias ficam em loop: GIF de cada preset (presets/catalogo.json) e animação própria nas opções sem GIF.
 - Ao confirmar grava <pasta>/menu_escolha.json (ou ./menu_escolha.json) e termina; rodar em segundo plano.
+- Vários vídeos de uma vez: `--video <pasta 1> --video <pasta 2> ...` (no lugar de --pasta). Cada vídeo tem as suas
+  escolhas (barra de vídeos no topo), pode copiar as de outro ("Igual ao vídeo X") ou passar as suas para os que faltam;
+  ao confirmar grava um menu_escolha.json em CADA pasta (com "lote": nomes dos vídeos).
 Identidade visual da /ogab (logo da Apresentação ogab, 22/10/2026): fundo #070B08/#16201A, verde #2BFF88,
 degradê #9CFFC9 > #14E070, Inter Tight 800 (assets/fontes/InterTight, OFL). Só 127.0.0.1.
 """
@@ -592,6 +595,15 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:10px;width:32px;heig
 .rec .x{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:var(--mu);font:700 14px "Inter Tight";opacity:0;transition:.15s}
 .rec:hover .x{opacity:1}.rec .x:hover{color:#fff;background:rgba(255,80,80,.65)}
 .home .sabe{margin-top:30px}
+/* lote: um chip por vídeo (✓ = confirmado), clique troca de vídeo */
+.lote{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.home .lote{margin:0 0 18px}
+.vchip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 13px 0 6px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--mu);font:700 13px "Inter Tight";cursor:pointer;transition:.15s;max-width:260px}
+.vchip span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vchip .n{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.07);font:800 11px "Inter Tight";color:var(--tx)}
+.vchip:hover{border-color:rgba(43,255,136,.45);color:var(--tx)}.vchip.on{color:var(--tx);border-color:rgba(43,255,136,.6);box-shadow:0 0 16px rgba(43,255,136,.22)}
+.vchip.ok .n{background:var(--grad);color:var(--ink)}
+.todos{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin:16px 0 4px;padding:14px;border-radius:14px;border:1px solid rgba(43,255,136,.35);background:rgba(43,255,136,.05)}
+.todos button{height:40px;border-radius:10px;border:0;padding:0 16px;font:800 13px "Inter Tight";cursor:pointer;background:var(--grad);color:var(--ink)}.todos p{margin:0;color:var(--mu);font-size:13px}
 @media (hover:none){.rec .x{opacity:1}}
 @media (max-width:760px){.caminhos{grid-template-columns:1fr}.big{grid-template-columns:auto 1fr;padding:18px}.big .seta{display:none}.secao{flex-direction:column;align-items:flex-start;gap:4px}.secao p{text-align:left}}
 @media (max-width:640px){.inicio{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.resumo b{min-width:110px}.barra .codes{display:none}}
@@ -672,14 +684,14 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:10px;width:32px;heig
 const D = __DADOS__;
 const T = {
  pt:{menu:"Menu do vídeo",ola:"Como você quer montar este vídeo?",ola_p:"Escolha passo a passo o que entra no vídeo, ou deixe tudo com o Gab.",
-  auto_t:"Automático",eyebrow:"Novo vídeo",rapido:"Mais rápido",auto_p:"O Gab escolhe tudo pelo que já sabe de você e da marca (estilo, memória da marca, pedidos anteriores) e pelo roteiro.",
+  auto_t:"Automático",eyebrow:"Novo vídeo",video_n:(i,n,nome)=>`Vídeo ${i} de ${n} · ${nome}`,igual_v:n=>`Igual ao vídeo “${n}”`,igual_p:"Copia as escolhas desse vídeo do lote. Você revisa antes de confirmar.",todos_t:n=>`Usar estas escolhas ${n === 1 ? "no outro vídeo" : `nos outros ${n} vídeos`}`,todos_p:"Os vídeos que ainda faltam ficam iguais a este. Clique num vídeo lá em cima para mudar só ele.",prox:"Confirmar e ir para o próximo vídeo",conf_lote:n=>`Confirmar os ${n} vídeos`,cab_lote:n=>`/ogab menu confirmado (${n} vídeos):`,auto_linha:"- Automático: o Gab escolhe tudo pelo que já sabe da marca",rapido:"Mais rápido",auto_p:"O Gab escolhe tudo pelo que já sabe de você e da marca (estilo, memória da marca, pedidos anteriores) e pelo roteiro.",
   eu_t:"Eu escolho",eu_p:"Passo a passo: voz, formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras.",
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
   ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",na:"não se aplica",ult_t:"Igual ao último vídeo",ult_p:n=>`Repete as escolhas de “${n}”. Você revisa antes de confirmar.`,rec_t:"Receitas prontas",rec_p:"Um clique preenche o menu e leva para a revisão; o que ficar de fora vai no automático.",resto:"Resto no automático",minhas_t:"Suas receitas",minhas_p:"Salvas por você para esta marca. Um clique repete o jeito.",salvar_p:"Vai repetir esse jeito em outros vídeos?",salvar_ph:"Nome da receita (ex.: Reels de dica)",salvar_b:"Salvar como receita",salvo:"Salva! Aparece no início dos próximos vídeos desta marca.",apagar:"Apagar receita",teclas:"Atalhos: 1-9 marca na ordem da tela · Enter avança · A automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
-  auto_t:"Automatic",eyebrow:"New video",rapido:"Fastest",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
+  auto_t:"Automatic",eyebrow:"New video",video_n:(i,n,nome)=>`Video ${i} of ${n} · ${nome}`,igual_v:n=>`Same as “${n}”`,igual_p:"Copies the choices from that video in the batch. You review before confirming.",todos_t:n=>`Use these choices ${n === 1 ? "on the other video" : `on the other ${n} videos`}`,todos_p:"The videos still left become the same as this one. Click a video above to change just that one.",prox:"Confirm and go to the next video",conf_lote:n=>`Confirm the ${n} videos`,cab_lote:n=>`/ogab menu confirmed (${n} videos):`,auto_linha:"- Automatic: Gab picks everything from what he knows about the brand",rapido:"Fastest",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: voice, format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",seu:"yours",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
@@ -687,9 +699,9 @@ const T = {
   ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",na:"not applicable",ult_t:"Same as last video",ult_p:n=>`Repeats the choices from “${n}”. You review before confirming.`,rec_t:"Ready-made recipes",rec_p:"One click fills the menu and takes you to the review; anything left out goes on automatic.",resto:"Rest on automatic",minhas_t:"Your recipes",minhas_p:"Saved by you for this brand. One click repeats the setup.",salvar_p:"Going to reuse this setup in other videos?",salvar_ph:"Recipe name (e.g. Tip Reels)",salvar_b:"Save as recipe",salvo:"Saved! It shows at the start of the next videos for this brand.",apagar:"Delete recipe",teclas:"Shortcuts: 1-9 tick in screen order · Enter next · A automatic",erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
-const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
+let sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
 const N = D.grupos.length; let passo = 0, auto = false; const aba = {};
-const pag = {}, autoPasso = {};   // autoPasso[g] = a pessoa apertou 'Automático neste passo'
+const pag = {}; let autoPasso = {};   // autoPasso[g] = a pessoa apertou 'Automático neste passo'
 D.grupos.forEach(g => { if (g.abas) aba[g.id] = g.abas[0].id; });   // estilos abrem em "Todos"   // 0 = início, 1..N = grupos, N+1 = resumo
 const $ = s => document.querySelector(s), esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ic = (id, cls = "pi") => D.icones && D.icones[id] ? `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${D.icones[id]}"/></svg>` : "";
@@ -740,10 +752,11 @@ function render() {
   let h = "";
   if (passo === 0) {
     const seta = `<span class="seta">${svg(ICO.seta)}</span>`, ico = k => `<span class="ico">${svg(ICO[k] || ICO.receita)}</span>`;
-    h = `<div class="home"><span class="eyebrow"><i></i>${T[L].eyebrow}</span><h1>${T[L].ola}</h1><p class="lead">${T[L].ola_p}</p>
+    h = `<div class="home">${barraLote()}<span class="eyebrow"><i></i>${LOTE ? esc(T[L].video_n(cv + 1, V.length, D.videos[cv].nome)) : T[L].eyebrow}</span><h1>${T[L].ola}</h1><p class="lead">${T[L].ola_p}</p>
       <div class="caminhos">
         <button class="big pri" data-op="auto">${ico("auto")}<div><span class="selo">${T[L].rapido}</span><b>${T[L].auto_t}</b><p>${T[L].auto_p}</p></div>${seta}</button>
         <button class="big" data-op="eu">${ico("eu")}<div><b>${T[L].eu_t}</b><p>${T[L].eu_p}</p></div>${seta}</button></div>
+      ${LOTE ? V.map((st, j) => j !== cv && st.feito ? `<button class="faixa" data-copia="${j}">${ico("ultimo")}<div><b>${esc(T[L].igual_v(D.videos[j].nome))}</b><span class="s">${T[L].igual_p}</span></div>${seta}</button>` : "").join("") : ""}
       ${D.anterior ? `<button class="faixa" data-op="ultimo">${ico("ultimo")}<div><b>${T[L].ult_t}</b><span class="s">${esc(T[L].ult_p(D.anterior.nome))}</span></div>${seta}</button>` : ""}
       ${(D.minhas || []).length ? `<div class="secao"><h3>${T[L].minhas_t}</h3><p>${T[L].minhas_p}</p></div><div class="recs">${D.minhas.map((x, k) =>
         `<button class="rec" data-minha="${k}">${ico((x.escolhas.voz || [])[0])}<div><b>${esc(x.nome)}<span class="seu">${T[L].seu}</span></b><p>${esc(resumoReceita(x.escolhas))}</p></div><span class="x" data-apaga="${esc(x.id)}" title="${T[L].apagar}">×</span></button>`).join("")}</div>` : ""}
@@ -781,14 +794,16 @@ function render() {
             <div class="esc">${its.length ? esc(its[0].nome[L]) : `<span style="color:var(--amb)">${T[L].gab_escolhe}</span>`}</div>
             ${its.length > 1 ? `<div class="mais">${its.slice(1, 4).map(i => `<span>${esc(i.nome[L])}</span>`).join("")}${its.length > 4 ? `<span>+${its.length - 4}</span>` : ""}</div>` : ""}
             <div class="ed">${T[L].editar}</div></div></button>`; }).join("")}</div>
+        ${LOTE && V.some((st, k) => k !== cv && !st.feito) ? `<div class="todos"><button data-todos="1">${T[L].todos_t(V.filter((st, k) => k !== cv && !st.feito).length)}</button><p>${T[L].todos_p}</p></div>` : ""}
         ${D.pode_salvar && man ? `<div class="salvar"><p>${T[L].salvar_p}</p><input id="rnome" maxlength="60" placeholder="${T[L].salvar_ph}"><button id="rsalva">${T[L].salvar_b}</button><span class="ok" id="rmsg"></span></div>` : ""}`;
     }
   }
-  $("#tela").innerHTML = h;
+  $("#tela").innerHTML = (passo === 0 ? "" : barraLote()) + h;
   ajustar();
   $(".barra").hidden = passo === 0;   // tela inicial: sem barra vazia por cima das receitas
   $("#bk").hidden = passo === 0; $("#pl").hidden = !(passo >= 1 && passo <= N); $("#ra").hidden = !(passo >= 1 && passo < vis[vis.length - 1]); $("#go").hidden = passo === 0;
-  $("#go").textContent = passo > N ? (auto ? T[L].conf_auto : T[L].confirmar) : (passo === vis[vis.length - 1] ? T[L].revisar : T[L].avancar);
+  const falta = LOTE ? V.filter((st, k) => k !== cv && !st.feito).length : 0;
+  $("#go").textContent = passo > N ? (falta ? T[L].prox : (LOTE ? T[L].conf_lote(V.length) : (auto ? T[L].conf_auto : T[L].confirmar))) : (passo === vis[vis.length - 1] ? T[L].revisar : T[L].avancar);
   $("#codes").textContent = auto ? T[L].auto_t : codigos().join("  ");
   const trava = passo >= 1 && passo <= N && !pronto(passo);
   $("#go").disabled = trava; $("#go").title = trava ? T[L].trava : "";
@@ -819,6 +834,24 @@ function travas() { const t = regra("trava");
 function pula(p) { const g = D.grupos[p - 1]; return g && ((["estilo", "gancho", "layout", "prova"].includes(g.id) && sel.motions && sel.motions.has("sem")) || g.id in travas()); }
 const visiveis = () => D.grupos.map((g, k) => k + 1).filter(p => !pula(p));
 let travados = new Set();
+// lote (vários vídeos): cada vídeo guarda as suas escolhas; trocar de vídeo troca o estado inteiro do menu
+const LOTE = (D.videos || []).length > 1, V = [];
+let cv = 0;
+const novoEstado = () => { const s = {}; D.grupos.forEach(g => s[g.id] = new Set()); return {sel: s, autoPasso: {}, auto: false, travados: new Set(), feito: false, passo: 0}; };
+if (LOTE) { D.videos.forEach(() => V.push(novoEstado())); V[0].sel = sel; V[0].autoPasso = autoPasso; }
+const usa = st => { sel = st.sel; autoPasso = st.autoPasso; auto = st.auto; travados = st.travados; };
+function guarda() { if (LOTE) Object.assign(V[cv], {sel, autoPasso, auto, travados, passo}); }
+function vaiPara(k) { guarda(); cv = k; usa(V[k]); passo = V[k].feito ? N + 1 : (V[k].passo || 0); render(); }
+function copiaDe(j) {   // "Igual ao vídeo X": copia tudo (inclusive o automático) e abre a revisão
+  const o = V[j]; D.grupos.forEach(g => { sel[g.id].clear(); o.sel[g.id].forEach(x => sel[g.id].add(x)); });
+  autoPasso = Object.assign({}, o.autoPasso); auto = o.auto; travados = new Set(o.travados); ir(N + 1);
+}
+function paraTodos() {   // as escolhas deste vídeo vão para os que ainda faltam
+  guarda(); V.forEach((st, k) => { if (k === cv || st.feito) return;
+    D.grupos.forEach(g => { st.sel[g.id] = new Set(sel[g.id]); });
+    Object.assign(st, {autoPasso: Object.assign({}, autoPasso), auto, travados: new Set(travados), feito: true, passo: N + 1}); });
+  V[cv].feito = true; render();
+}
 function aplicaTravas() {
   for (let volta = 0; volta < 3; volta++) {   // cascata: voz -> motions -> b-roll/cor...
     const t = travas();
@@ -855,6 +888,9 @@ function ajustar() {
 addEventListener("resize", ajustar);
 function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }
 document.addEventListener("click", e => {
+  const vc = e.target.closest("[data-video]"); if (vc) return vaiPara(+vc.dataset.video);
+  const cp = e.target.closest("[data-copia]"); if (cp) return copiaDe(+cp.dataset.copia);
+  if (e.target.closest("[data-todos]")) return paraTodos();
   const ap = e.target.closest("[data-apaga]"); if (ap) { e.stopPropagation(); return receita("/receita/apagar", {id: ap.dataset.apaga}); }
   const mi = e.target.closest("[data-minha]"); if (mi) return carrega(D.minhas[+mi.dataset.minha].escolhas);
   if (e.target.closest("#rsalva")) return salvaReceita();
@@ -862,7 +898,7 @@ document.addEventListener("click", e => {
   const op = e.target.closest("[data-op]"); if (op) {
     if (op.dataset.op === "ultimo") return carrega(D.anterior.escolhas);
     auto = op.dataset.op === "auto";
-    if (!auto && sel.voz && !sel.voz.size) { const v = D.grupos.find(g => g.id === "voz").itens.find(i => D.sugeridos.includes(i.id)); if (v) { sel.voz.add(v.id); aplicaTravas(); } }   // voz sugerida já marcada
+    if (!auto && sel.voz && !sel.voz.size) { const vs = LOTE && D.videos[cv].voz ? [D.videos[cv].voz] : D.sugeridos, v = D.grupos.find(g => g.id === "voz").itens.find(i => vs.includes(i.id)); if (v) { sel.voz.add(v.id); aplicaTravas(); } }   // voz sugerida já marcada
     return ir(auto ? N + 1 : 1); }
   const r = e.target.closest("[data-ir]"); if (r) return ir(+r.dataset.ir);
   const ab = e.target.closest("[data-aba]"); if (ab) { const gid = D.grupos[passo - 1].id; aba[gid] = ab.dataset.aba; pag[gid] = 0; return render(); }
@@ -883,6 +919,7 @@ document.addEventListener("click", e => {
 });
 $("#bk").onclick = () => ir(auto ? 0 : passo - 1);
 $("#ra").onclick = () => ir(N + 1);
+const barraLote = () => LOTE ? `<div class="lote">${D.videos.map((v, k) => `<button class="vchip${k === cv ? " on" : ""}${V[k].feito ? " ok" : ""}" data-video="${k}" title="${esc(v.nome)}"><span class="n">${V[k].feito ? "✓" : k + 1}</span><span class="t">${esc(v.nome)}</span></button>`).join("")}</div>` : "";
 // receitas da pessoa (salvas no cliente): cartão com a cara da voz e um resumo do que foi marcado
 const ICO = {
   auto: '<path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z"/>',
@@ -917,18 +954,27 @@ function carrega(esc) {
   aplicaTravas(); ir(N + 1);
 }
 $("#pl").onclick = () => { const gid = D.grupos[passo - 1].id; sel[gid].clear(); autoPasso[gid] = true; ir(passo + 1); };
+// escolhas do vídeo aberto (sel/auto atuais) no formato do menu_escolha.json, e as linhas da mensagem
+function corpoAtual() {
+  const esc_ = {}, deixou = [], fora = []; D.grupos.forEach((g, k) => { if (sel[g.id].size) esc_[g.id] = [...sel[g.id]]; else (pula(k + 1) ? fora : deixou).push(g.id); });
+  const lt = D.grupos.find(g => g.id === "lettering"); if (esc_.lettering) esc_.lettering_templates = esc_.lettering.map(id => (lt.itens.find(x => x.id === id) || {}).template).filter(Boolean);
+  return {modo: auto ? "auto" : "manual", escolhas: auto ? {} : esc_, gab_escolhe: auto ? D.grupos.map(g => g.id) : deixou, nao_se_aplica: auto ? [] : fora, codigos: auto ? [] : codigos()};
+}
+const linhasAtual = () => D.grupos.map((g, k) => {
+  const its = g.itens.filter(i => sel[g.id].has(i.id)).map(i => (g.id === "formato" ? (g.abas.find(x => x.id === i.aba) || {nome: {}}).nome[L] + " " : "") + i.nome[L] + (i.proporcao ? ` (${i.proporcao})` : ""));
+  return `- ${g.nome[L]}: ${its.length ? its.join(", ") : (pula(k + 1) ? T[L].na : T[L].auto_l)}`; }).join("\n");
 $("#go").onclick = async () => {
   if (passo >= 1 && passo <= N && !pronto(passo)) return;
   if (passo <= N) return ir(passo + 1);
-  const esc_ = {}, deixou = [], fora = []; D.grupos.forEach((g, k) => { if (sel[g.id].size) esc_[g.id] = [...sel[g.id]]; else (pula(k + 1) ? fora : deixou).push(g.id); });
-  const lt = D.grupos.find(g => g.id === "lettering"); if (esc_.lettering) esc_.lettering_templates = esc_.lettering.map(id => (lt.itens.find(x => x.id === id) || {}).template).filter(Boolean);
-  const corpo = {modo: auto ? "auto" : "manual", lingua: L, escolhas: auto ? {} : esc_, gab_escolhe: auto ? D.grupos.map(g => g.id) : deixou, nao_se_aplica: auto ? [] : fora, codigos: auto ? [] : codigos()};
+  if (LOTE) { V[cv].feito = true; guarda(); const prox = V.findIndex(st => !st.feito); if (prox >= 0) { V[prox].passo = 0; return vaiPara(prox); } }
+  let corpo, msg;
+  if (LOTE) {   // todos confirmados: um corpo por vídeo, mensagem com uma seção por vídeo
+    const itens = [], partes = [], volta = V[cv];
+    V.forEach((st, k) => { usa(st); itens.push(Object.assign({i: k}, corpoAtual())); partes.push(`### ${D.videos[k].nome}\n` + (auto ? T[L].auto_linha : linhasAtual())); });
+    usa(volta); corpo = {lote: itens, lingua: L}; msg = T[L].cab_lote(V.length) + "\n\n" + partes.join("\n\n");
+  } else { corpo = Object.assign({lingua: L}, corpoAtual()); msg = auto ? T[L].cab_auto : T[L].cab + ":\n" + linhasAtual(); }
   try {
     const r = await fetch("/escolha", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corpo)}); if (!r.ok) throw 0;
-    const arq = (await r.json()).arquivo;
-    const msg = auto ? T[L].cab_auto : [T[L].cab + ":"].concat(D.grupos.map((g, k) => {
-      const its = g.itens.filter(i => sel[g.id].has(i.id)).map(i => (g.id === "formato" ? (g.abas.find(x => x.id === i.aba) || {nome: {}}).nome[L] + " " : "") + i.nome[L] + (i.proporcao ? ` (${i.proporcao})` : ""));
-      return `- ${g.nome[L]}: ${its.length ? its.join(", ") : (pula(k + 1) ? T[L].na : T[L].auto_l)}`; })).join("\n");
     try { await navigator.clipboard.writeText(msg); } catch (e) {}
     $("#msgprev").textContent = msg; $("#kmod").textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl";
     $("#copiar").onclick = async () => { try { await navigator.clipboard.writeText(msg); } catch (e) {} $("#copiar").textContent = T[L].copiado; setTimeout(() => $("#copiar").textContent = T[L].copiar, 1500); };
@@ -991,6 +1037,9 @@ def main(a):
     def arg(k, d=None):
         return a[a.index(k) + 1] if k in a else d
     pasta = arg("--pasta"); cliente = arg("--cliente"); formato = arg("--formato", "vertical")
+    videos = [os.path.abspath(a[i + 1]) for i, x in enumerate(a) if x == "--video" and i + 1 < len(a)]   # lote: um por vídeo
+    if videos and not pasta:
+        pasta = videos[0]
     saida = os.path.abspath(os.path.join(pasta or os.getcwd(), "menu_escolha.json"))
     try:
         cfg = json.load(open(os.path.join(SKILL, "config.json"), encoding="utf-8"))
@@ -1000,7 +1049,8 @@ def main(a):
     dados = {"icones": ICONES, "grupos": grupos(formato, lettering, editor_nome), "combos": COMBOS, "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
              "sugeridos": sugestoes(arg("--pedido"), arg("--roteiro"), formato, cliente, pasta),
              "receitas": RECEITAS, "anterior": ultimo_video(pasta),
-             "minhas": receitas_salvas(arq_receitas(cliente, pasta)), "pode_salvar": bool(arq_receitas(cliente, pasta))}
+             "minhas": receitas_salvas(arq_receitas(cliente, pasta)), "pode_salvar": bool(arq_receitas(cliente, pasta)),
+             "videos": [{"nome": os.path.basename(os.path.normpath(v)), "voz": sugestao_voz(arg("--pedido"), v)} for v in videos] if len(videos) > 1 else []}
     html = PAGINA.replace("__DADOS__", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")).encode("utf-8")
     pronto, fechado, visto = threading.Event(), threading.Event(), {"aba": 0}
     VERSAO = f"{os.getpid()}-{time.time():.0f}"
@@ -1076,10 +1126,23 @@ def main(a):
                 d = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
             except Exception:
                 return self._envia(400, b"json invalido", "text/plain")
-            d["salvo_em"] = time.strftime("%Y-%m-%d %H:%M"); d["cliente"] = cliente
-            os.makedirs(os.path.dirname(saida), exist_ok=True)
-            json.dump(d, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-            self._envia(200, json.dumps({"arquivo": saida}).encode(), "application/json"); pronto.set()
+            quando = time.strftime("%Y-%m-%d %H:%M")
+            if "lote" in d and len(videos) > 1:   # um menu_escolha.json em cada pasta (o portão do editor confere por pasta)
+                nomes = [os.path.basename(os.path.normpath(v)) for v in videos]; arqs = []
+                for item in d["lote"]:
+                    k = int(item.pop("i", -1))
+                    if not 0 <= k < len(videos):
+                        continue
+                    item.update({"lingua": d.get("lingua"), "salvo_em": quando, "cliente": cliente, "lote": nomes})
+                    f = os.path.join(videos[k], "menu_escolha.json"); os.makedirs(videos[k], exist_ok=True)
+                    json.dump(item, open(f, "w", encoding="utf-8"), ensure_ascii=False, indent=1); arqs.append(f)
+                self._envia(200, json.dumps({"arquivo": arqs[0] if arqs else saida, "arquivos": arqs}).encode(), "application/json")
+            else:
+                d["salvo_em"] = quando; d["cliente"] = cliente
+                os.makedirs(os.path.dirname(saida), exist_ok=True)
+                json.dump(d, open(saida, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+                self._envia(200, json.dumps({"arquivo": saida}).encode(), "application/json")
+            pronto.set()
             if "--sem-voltar" not in a:   # traz o Claude para a frente (o Gab já é avisado porque o menu roda em segundo plano)
                 try:
                     if sys.platform == "darwin":
@@ -1106,17 +1169,20 @@ def main(a):
         raise SystemExit("menu fechado: um menu novo foi aberto no lugar")
     if not ok:
         raise SystemExit("tempo esgotado sem escolha")
-    d = json.load(open(saida, encoding="utf-8"))
-    if d["modo"] == "auto":
-        print("AUTOMÁTICO: o Gab escolhe tudo (estilo.md do cliente, memória da marca, escolher_preset.py)")
-    else:
-        for g, ids in d["escolhas"].items():
-            print(f"  {g}: {', '.join(ids)}")
-        if d["gab_escolhe"]:
-            print("  o Gab escolhe: " + ", ".join(d["gab_escolhe"]))
-        if d.get("nao_se_aplica"):
-            print("  não se aplica: " + ", ".join(d["nao_se_aplica"]))
-    print(f"salvo: {saida}")
+    for f in ([os.path.join(v, "menu_escolha.json") for v in videos] if len(videos) > 1 else [saida]):
+        d = json.load(open(f, encoding="utf-8"))
+        if len(videos) > 1:
+            print(f"== {os.path.basename(os.path.dirname(f))}")
+        if d["modo"] == "auto":
+            print("AUTOMÁTICO: o Gab escolhe tudo (estilo.md do cliente, memória da marca, escolher_preset.py)")
+        else:
+            for g, ids in d["escolhas"].items():
+                print(f"  {g}: {', '.join(ids)}")
+            if d["gab_escolhe"]:
+                print("  o Gab escolhe: " + ", ".join(d["gab_escolhe"]))
+            if d.get("nao_se_aplica"):
+                print("  não se aplica: " + ", ".join(d["nao_se_aplica"]))
+        print(f"salvo: {f}")
 
 
 if __name__ == "__main__":
