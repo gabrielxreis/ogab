@@ -32,6 +32,13 @@ P.qual()                 # "uxp (Premiere 26.x)" ou "cep (Premiere 13.1.5)"
 P.colocar(seq, arquivo, tempo, video=1)   # mesma interface nas duas pontes
 ```
 
+**Salvar a cada modificação (regra, 29/10/2026):** o Premiere fecha sozinho no meio da edição. A `ponte.py` salva o
+projeto **depois de toda função que modifica** (colocar, volume, legenda, cortar, efeito, lettering, animar, `js`/`jsx`
+cru...). Só leitura e exportação não salvam. Por isso o Gab **sempre** usa `ponte` (nunca `premiere_lib`/`premiere2019_lib`
+direto, que não salvam sozinhos). Em lote muito grande dá para desligar com `OGAB_PREMIERE_SALVAR=0`, mas aí é obrigatório
+`P.salvar()` no fim de cada bloco. Se o Premiere fechar mesmo assim: reabrir o projeto, conferir a timeline (retrato) e
+seguir do ponto em que parou, sem refazer o que já está salvo.
+
 Se der `O Premiere não conectou` / não responder na porta: o Premiere está fechado ou o painel Gab Ponte não foi aberto. Pedir ao usuário para abrir e tentar de novo.
 
 ## Etapa por etapa (o que muda em relação ao DaVinci)
