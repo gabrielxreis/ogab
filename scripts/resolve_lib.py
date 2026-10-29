@@ -124,9 +124,10 @@ def criar_timeline(p, mp, nome, w=None, h=None, fps=None, pasta=None, sem_menu=N
     # Já na criação: playback fps tem que ser igual ao da timeline (senão o áudio picota).
     if not checar_playback(p):
         p.SetSetting("timelinePlaybackFrameRate", str(fps or p.GetSetting("timelineFrameRate")))
-        if not checar_playback(p):
-            print("AJUSTAR AGORA PELA INTERFACE: File > Project Settings > Master Settings > Playback frame rate "
-                  "= fps da timeline > Save (Render Cache fica em None)")
+        if not checar_playback(p):   # só avisar deixava seguir com o áudio picotando (relato Windows, 26/10/2026)
+            raise RuntimeError("PLAYBACK_DIFERENTE: o DaVinci não aceitou o playback fps pela API. Pedir ao usuário: "
+                               "File > Project Settings > Master Settings > Playback frame rate = fps da timeline > Save "
+                               "(Render Cache fica em None); a timeline já foi criada, conferir com checar_playback(p) e seguir")
     return t
 
 
@@ -1422,7 +1423,11 @@ def _calibrar_corte(r, p, t, comp, quadro, pasta=None):
         r.OpenPage("edit"); t.SetCurrentTimecode(_tc(t, quadro)); time.sleep(5)
         fotos[nome] = os.path.join(pasta, f"corte_{nome}.png")
         if not p.ExportCurrentFrameAsStill(fotos[nome]):
-            raise RuntimeError("ExportCurrentFrameAsStill falhou (a página Edit precisa estar aberta)")
+            # 21.1 no Mac: na página Edit a exportação às vezes devolve False; na Color funciona (23/10/2026)
+            r.OpenPage("color"); t.SetCurrentTimecode(_tc(t, quadro)); time.sleep(3)
+            ok = p.ExportCurrentFrameAsStill(fotos[nome]); r.OpenPage("edit")
+            if not ok:
+                raise RuntimeError("ExportCurrentFrameAsStill falhou na Edit e na Color")
     r.OpenPage("fusion"); comp.Lock(); mo.ConnectInput("Input", mc); comp.Unlock(); r.OpenPage("edit")
     cor = Image.open(fotos["cor"]); W, H = cor.size
     caixas = _rosto._caixa_vision(fotos["cor"], W, H) if sys.platform == "darwin" else []
@@ -1475,7 +1480,7 @@ def magic_rastreado(item, nome="PintarPessoa"):
     return lo, hi, lo <= a["COMPN_RenderStart"] and hi >= a["COMPN_RenderEnd"]
 
 
-def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, metodo="magicmask", modo="Faster", corte=None, borda=0.0, desfoque=1.0):
+def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, metodo="magicmask", modo="Faster", corte=None, borda=0.0, desfoque=1.0, na_trilha=None):
     """Recorta a pessoa da V1 no trecho [ini_s, fim_s] (segundos da timeline) numa trilha NOVA "PESSOA NA FRENTE",
     logo acima de `acima_da_trilha` (padrão: no topo). Tudo entre a V1 e o recorte (motion, lettering, objeto) fica
     ATRÁS da pessoa. A V1 não é tocada: o recorte é uma cópia do trecho (só vídeo, mesmo enquadramento) com uma
@@ -1494,7 +1499,9 @@ def pessoa_na_frente(r, p, t, mp, ini_s, fim_s, acima_da_trilha=None, metodo="ma
     b = min(b, base.GetEnd())
     m = base.GetMediaPoolItem(); r_ = float(m.GetClipProperty("FPS")) / F
     src = round((base.GetLeftOffset() + a - base.GetStart()) * r_)
-    if acima_da_trilha is None:
+    if na_trilha:   # vários trechos na MESMA trilha (aula cortada em muitos pedaços: uma trilha só, não uma por pedaço)
+        trilha = na_trilha
+    elif acima_da_trilha is None:
         t.AddTrack("video"); trilha = t.GetTrackCount("video")
     else:
         t.AddTrack("video", {"index": acima_da_trilha + 1}); trilha = acima_da_trilha + 1

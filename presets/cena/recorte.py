@@ -63,7 +63,9 @@ def recortar(video, saida, de=0.0, ate=None, w=1080, qualidade="equilibrada", fp
         from fractions import Fraction
         r = fps or float(Fraction(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
                                                  "stream=r_frame_rate", "-of", "csv=p=0", video], capture_output=True, text=True).stdout.strip().strip(",").split(",")[0]))
+        # bt709 na conversão e na marcação: sem isso o ffmpeg converte em BT.601 e o DaVinci lê como 709 (rosto mais quente que o take, relato 24/10/2026)
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(r), "-i", os.path.join(tmp, "r_%05d.png"),
+                        "-vf", "scale=out_color_matrix=bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
                         "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", "-alpha_bits", "16", saida], check=True)
         return saida, len(quadros), r
     finally:

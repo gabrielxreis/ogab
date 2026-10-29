@@ -67,6 +67,13 @@ Se der `O Premiere não conectou` / não responder na porta: o Premiere está fe
 - Overwrite numa trilha que não existe dá "invalid track index"; trilhas de áudio além das existentes são criadas só em alguns casos. Nunca usar a seleção do usuário (`remover()` usa seleção própria).
 - O Premiere não grava quadro exportado na pasta temporária do sistema (`/var/folders`); a calibração usa `assets/lut/_calibracao`.
 - **Premiere 26.0 (17/10/2026):** não tem `createSubClipAction`, então `colocar(..., audio=None)` e `montar_takes` param com erro claro. Motion MOV (sem áudio) entra com `createOverwriteItemAction(item, t, trilha, -1)` direto (conferir antes com ffprobe que o MOV não tem áudio). Desde 19/10/2026 o `colocar`/`montar_takes` já faz isso sozinho (`_tem_audio` pelo ffprobe): no 26.5 o subclipe de arquivo sem áudio dá "startTime must be less than endTime". Overwrite numa V acima da última CRIA a trilha nesse caso. Recolocar um motion mais longo que o vão cobre o começo do seguinte: recolocar os seguintes em ordem.
+- **Premiere 26.0 / Windows (20/10/2026, relato de usuário):**
+  - `P.Exporter.exportSequenceFrame(seq, t, nome, pasta, w, h)` quer a pasta com barra no fim (`os.path.abspath(pasta) + os.sep`) e grava `<nome>.png` como `<nome>.png.png`; sem extensão no nome dá "File Format is not supported".
+  - Dentro de `lockedAccess`, `component.getDisplayName()` volta como promessa: achar o Motion pelos parâmetros (`Anchor Point`), não pelo nome. `item.getComponentChain()` precisa de `await` FORA do `lockedAccess`.
+  - Vídeo do YouTube em AV1 (4K) entra no Premiere só com o áudio: baixar sempre H.264 (`scripts/baixar_video.py` já prefere avc1; não chamar o yt-dlp direto com `bv*[ext=mp4]`).
+  - Nest de b-roll pela API: in/out no item do projeto -> `createSequenceFromMedia` -> `createSetSettingsAction(settings da sequência principal)` -> limpar in/out. Colocar a nest com `createOverwriteItemAction(nest, t, V, A3)` e apagar o que cair na A3 (com `-1` o áudio iria para a A1). Cortar um clipe sem razor: in/out no item do projeto e overwrite do mesmo item no trecho.
+  - Não há como aplicar preset de efeito (.prfpset) nem criar máscara pela API. Os valores de Motion de um preset estão no `Effect Presets and Custom Items.prfpset` (Documentos/Adobe/Premiere Pro/<versão>/Profile-<user>/): copiar posição, escala e âncora. Máscara: o usuário arrasta o preset nos clipes selecionados.
+  - Vídeo de iPhone vem 1920x1080 com rotação -90: a largura real no Premiere é 1080 (escala 100 = largura do quadro vertical). Foto é encaixada na largura do quadro ao entrar.
 - O painel Gab Ponte carrega mesmo na tela inicial do Premiere; plugin atualizado só carrega depois de reiniciar o Premiere.
 
 ## Premiere antigo (2018 a 25.x): ponte CEP

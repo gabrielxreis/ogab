@@ -202,6 +202,14 @@ def versao():
     return js("return uxp.host.version;", "versão")
 
 
+_VERSAO = None
+def _versao_ppro():
+    global _VERSAO
+    if _VERSAO is None:
+        _VERSAO = str(versao())
+    return _VERSAO
+
+
 def abrir_projeto(caminho=None):
     """Usa o projeto aberto (caminho=None) ou abre/cria o .prproj. Cria a árvore de bins (regra 1b) e salva."""
     if caminho:
@@ -271,7 +279,8 @@ _JS_COLOCAR = """
     }
     // Overwrite do ITEM com in point (sem subclipe) cai em tempo + in (relato 3f81261bd5, 20/10/2026: música com
     // de=40 entrou em 40 s): compensa a posição; o subclipe (soVideo) já começa no zero e não precisa.
-    const desloc = (fonte === it && c.de) ? c.de : 0;
+    // 26.0 já põe no tempo certo: compensar lá cai antes do lugar e sobrescreve o fim do clipe vizinho (24/10/2026)
+    const desloc = (fonte === it && c.de && !c.v260) ? c.de : 0;
     if (c.tempo - desloc < 0) {
       // de > tempo (ex.: 2º trecho da narração sem silêncio, de=5.36 em 5.2): a compensação daria posição negativa e o
       // clipe caía no 0 por cima do 1º (Premiere 26.2, sem subclipe). Coloca depois do fim da trilha e MOVE para o tempo.
@@ -297,6 +306,11 @@ _JS_COLOCAR = """
         const st = (await x.getStartTime()).seconds;
         if (Math.abs(st - c.tempo) < 0.05) { caiu = st; break; }
         if (Math.abs(st - c.tempo - desloc) < 0.05 || Math.abs(st - c.tempo - (c.de || 0)) < 0.05) caiu = st;
+        // Premiere 26.0 não soma o in point (24/10/2026: música com de=15,7 caiu em tempo - de): move para o tempo pedido
+        if (caiu === null && desloc && Math.abs(st - pos) < 0.05) {
+          await tx(p, "Gab: acerta posição", () => [x.createMoveAction(tt(c.tempo - st))]);
+          caiu = (await x.getStartTime()).seconds; break;
+        }
       }
     } catch (e) {}
     saida.push({ nome: it.name, pedido: c.tempo, caiu });
@@ -321,7 +335,8 @@ def colocar(seq, arquivo, tempo, video=0, audio=0, de=None, ate=None, db=None, f
     de/ate cortam a fonte (s). db/fades ajustam o volume do clipe de áudio colocado."""
     arquivo = _abs(arquivo)
     r = js(_JS_COLOCAR, "colocar", seq=seq, clipes=[dict(arquivo=arquivo, tempo=tempo, video=video, audio=audio,
-                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo))])
+                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo),
+                                                           v260=_versao_ppro().startswith("26.0"))])
     for x in (r or []):
         if isinstance(x, dict) and x.get("caiu") is not None and abs(x["caiu"] - tempo) > 0.05:
             raise RuntimeError(f"{x['nome']} entrou em {x['caiu']:.2f} s, não em {tempo:.2f} s (ponto de entrada de={de}): "
@@ -546,8 +561,8 @@ def _indice_lut(seq, lut, amostra):
     for f in os.listdir(d): os.remove(os.path.join(d, f))
     t = amostra["tempo"]
     def quadro(nome):
-        js("const p = await proj(); const s = await seqPorNome(p, args.seq); return await P.Exporter.exportSequenceFrame(s, tt(args.t), args.n, args.d + '/', 540, 960);",
-           "quadro", seq=seq, t=t, n=nome, d=d)
+        js("const p = await proj(); const s = await seqPorNome(p, args.seq); return await P.Exporter.exportSequenceFrame(s, tt(args.t), args.n, args.d, 540, 960);",
+           "quadro", seq=seq, t=t, n=nome, d=os.path.abspath(d) + os.sep)   # Windows quer a barra do sistema (relato 20/10/2026)
         f = os.path.join(d, nome)
         for _ in range(60):
             if os.path.exists(f) and os.path.getsize(f) > 0:

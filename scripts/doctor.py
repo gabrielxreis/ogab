@@ -24,7 +24,11 @@ def item(estado, grupo, texto):
 
 def roda(cmd, timeout=900, **k):
     try:
-        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, **k)
+        k.setdefault("errors", "replace")  # Windows: saida em cp850 (tasklist) quebrava o decode utf-8
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, **k)
+        r.stdout = r.stdout or ""
+        r.stderr = r.stderr or ""
+        return r
     except Exception as e:
         return subprocess.CompletedProcess(cmd, 1, "", str(e))
 
@@ -371,6 +375,33 @@ def davinci(usa):
              "o DaVinci está aberto mas não aceita o Gab: Preferences > System > General > External scripting using: Local, e reinicie o Resolve")
 
 
+def _premiere_registro():
+    """Pastas do Premiere 20xx pelo InstallLocation do desinstalador (Windows), em qualquer disco."""
+    import winreg
+    achou = set()
+    for raiz, chave in ((winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
+                        (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+                        (winreg.HKEY_CURRENT_USER, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")):
+        try:
+            k = winreg.OpenKey(raiz, chave)
+        except OSError:
+            continue
+        for i in range(winreg.QueryInfoKey(k)[0]):
+            try:
+                sub = winreg.OpenKey(k, winreg.EnumKey(k, i))
+                nome = winreg.QueryValueEx(sub, "DisplayName")[0]
+                local = winreg.QueryValueEx(sub, "InstallLocation")[0]
+            except OSError:
+                continue
+            if not str(nome).startswith("Adobe Premiere Pro 20") or not local:
+                continue
+            # o InstallLocation pode ser a pasta do app ou a pasta Adobe acima dela
+            for p in [local] + glob.glob(os.path.join(local, "Adobe Premiere Pro 20*")):
+                if os.path.exists(os.path.join(p, "Adobe Premiere Pro.exe")):
+                    achou.add(p)
+    return achou
+
+
 def premiere(usa):
     if MAC:
         apps = glob.glob("/Applications/Adobe Premiere Pro 20*/Adobe Premiere Pro 20*.app")
@@ -379,6 +410,8 @@ def premiere(usa):
               glob.glob("/Library/Application Support/Adobe/UXP/Plugins/External/*ogab.ponte*")
     else:
         apps = glob.glob(os.path.join(os.environ.get("ProgramFiles", ""), "Adobe", "Adobe Premiere Pro 20*"))
+        if not apps:  # instalado em outro disco pela Creative Cloud (ex.: D:\Adobe): o caminho está no registro
+            apps = sorted(_premiere_registro())
         luts = os.path.join(os.environ.get("APPDATA", ""), "Adobe", "Common", "LUTs")
         uxp = glob.glob(os.path.join(os.environ.get("APPDATA", ""), "Adobe", "UXP", "Plugins", "External", "*ogab.ponte*")) + \
               glob.glob(os.path.join(os.environ.get("ProgramData", ""), "Adobe", "UXP", "Plugins", "External", "*ogab.ponte*"))

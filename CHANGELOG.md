@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-12 (28/10/2026)
+- **Correções que vieram dos relatos de vocês:** recorte da pessoa sem mudar a cor do rosto; doctor no Windows não quebra mais e acha o Premiere instalado fora do C:; Premiere 26.0 coloca clipe com ponto de entrada no lugar certo (sem cortar o vizinho); DaVinci para e avisa quando o playback fica diferente do projeto (áudio picotando); pessoa na frente aceita vários trechos numa trilha só; quadro do DaVinci exporta pela página Color quando a Edit falha.
 ## 2026.10.28-11 (28/10/2026)
 - **Gab mais leve e mais organizado (gasta bem menos token):** o começo de cada pedido agora é um comando só (`inicio.py`) que mostra só o que precisa de atenção, e o mapa do Gab ficou 7 vezes menor: cada etapa tem o seu arquivo, lido só quando chega nela. Nada muda no seu jeito de pedir.
 - **Ordem das etapas unificada:** cortes > fala limpa > motions, música, takes e cor > legenda > efeitos sonoros por último > revisão > sua validação. `projeto.py proximo <pasta do vídeo>` diz a próxima etapa e o que ler.
