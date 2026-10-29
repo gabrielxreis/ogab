@@ -13,7 +13,10 @@ info() { printf "\n\033[1m%s\033[0m\n" "$1"; }
 warn() { printf "  \033[33m!\033[0m %s\n" "$1"; }
 
 if [ "$(uname)" != "Darwin" ]; then
-  echo "Esta skill foi feita para macOS (DaVinci Resolve Studio + scripting). Instalação cancelada."
+  echo "Este install.sh é o instalador do Mac. O Gab também funciona no Windows, com outro instalador."
+  echo "No Windows, abra o PowerShell (usuário normal) e cole:"
+  echo "  irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex"
+  echo "Nada foi instalado por este script."
   exit 1
 fi
 
