@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.29-5 (29/10/2026)
+- **Upscale de foto com IA, grátis e no seu computador:** `python3 scripts/upscale.py <foto ou pasta> [--escala 2|3|4] [--largura 2400]` aumenta até 4x e recria os detalhes (Real-ESRGAN, roda na placa de vídeo do Mac, Windows ou Linux). Na primeira vez ele baixa o programa sozinho (~52 MB). Bom para foto de IA que sai pequena (Gemini, ChatGPT) antes de usar em tela cheia, página ou capa.
 ## 2026.10.29-4 (29/10/2026)
 - **Efeito sonoro completo:** o Gab agora põe som em TODO movimento do motion (cada palavra que acende, foto que entra, vela que nasce, placa, boneco, objeto, estouro e logo), lendo o plano do pôster, colagem, mimic ou gráfico (`scripts/sfx_plano.py`). Antes era só o corte e um som por cena.
 ## 2026.10.29-3 (29/10/2026)
