@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.29-4 (29/10/2026)
+- **Efeito sonoro completo:** o Gab agora põe som em TODO movimento do motion (cada palavra que acende, foto que entra, vela que nasce, placa, boneco, objeto, estouro e logo), lendo o plano do pôster, colagem, mimic ou gráfico (`scripts/sfx_plano.py`). Antes era só o corte e um som por cena.
 ## 2026.10.29-3 (29/10/2026)
 - **Correções que vieram dos relatos de vocês:** take com acento no nome ("Vídeo" do iPhone) não é mais importado duas vezes; legenda corrigida e recolocada entra com o texto novo (antes ficava a antiga); a cor não quebra mais quando a V1 tem transição; a conferência de enquadramento lê o tamanho de qualquer MP4 do DaVinci.
 ## 2026.10.29-2 (29/10/2026)
