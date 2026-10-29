@@ -377,6 +377,22 @@ RECEITAS = [
 ]
 
 
+def arq_receitas(cliente, pasta):
+    """Receitas salvas pela pessoa: clientes/<cliente>/receitas_menu.json (fora do git); sem cliente, na pasta da marca."""
+    if cliente:
+        return os.path.join(SKILL, "clientes", cliente, "receitas_menu.json")
+    if pasta:
+        return os.path.join(os.path.dirname(os.path.realpath(pasta)), "receitas_menu.json")
+    return None
+
+
+def receitas_salvas(arq):
+    try:
+        return [x for x in json.load(open(arq, encoding="utf-8")) if x.get("id") and x.get("escolhas")]
+    except Exception:
+        return []
+
+
 def ultimo_video(pasta):
     """Escolhas do vídeo mais recente da mesma marca (menu_escolha.json nas pastas irmãs), para o 'Igual ao último'."""
     if not pasta:
@@ -499,8 +515,13 @@ h2 .k{color:var(--ink);background:var(--grad);border-radius:10px;width:32px;heig
 .tx{padding:11px 12px 13px}.tx b{font-weight:800;font-size:15px;letter-spacing:-.015em;display:block}.tx span{color:var(--mu);font-size:12.5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px}
 .inicio{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
 .rt{font:800 11px "Inter Tight";letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin:28px 0 2px}.rt+p{margin:0;color:var(--mu);font-size:13px}
-.receitas{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}.receitas .op{padding:12px}.receitas .op b{font-size:16px;margin:10px 0 4px}.receitas .op p{font-size:12.5px}
+.receitas{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:12px}.receitas .op{padding:12px}.receitas .op b{font-size:16px;margin:10px 0 4px}.receitas .op p{font-size:12.5px}
 .teclas{font:600 11.5px "Inter Tight";color:var(--mu);margin-top:6px}
+.receitas .op{position:relative}.op .x{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.55);color:var(--mu);font:700 14px "Inter Tight";z-index:2}.op .x:hover{color:#fff;background:rgba(255,80,80,.7)}
+.op .tag{top:8px;bottom:auto}
+.salvar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0 4px;padding:12px 14px;border:1px dashed var(--line);border-radius:12px}.salvar p{margin:0;width:100%;color:var(--mu);font-size:13px}
+.salvar input{flex:1;min-width:180px;height:38px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:inherit;padding:0 12px;font:600 13px "Inter Tight"}
+.salvar button{height:38px;border-radius:10px;border:0;padding:0 14px;font:800 13px "Inter Tight";cursor:pointer;background:linear-gradient(135deg,#9CFFC9,#14E070);color:#04130A}.salvar .ok{color:var(--g1);font:700 12.5px "Inter Tight"}
 .op{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--card);backdrop-filter:blur(14px);cursor:pointer;color:inherit;font:inherit;text-align:left;transition:.15s}
 .op:hover{border-color:rgba(43,255,136,.55);box-shadow:0 0 18px rgba(43,255,136,.3);transform:translateY(-2px)}.op b{display:block;font-weight:800;font-size:22px;letter-spacing:-.025em;margin:12px 0 6px}.op p{color:var(--mu);font-size:14px}
 .op .ic{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
@@ -617,14 +638,14 @@ const T = {
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
-  ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",na:"não se aplica",ult_t:"Igual ao último vídeo",ult_p:n=>`Repete as escolhas de “${n}”. Você revisa antes de confirmar.`,rec_t:"Receitas prontas",rec_p:"Um clique preenche o menu e leva para a revisão; o que ficar de fora vai no automático.",resto:"Resto no automático",teclas:"Atalhos: 1-9 marca na ordem da tela · Enter avança · A automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
+  ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",na:"não se aplica",ult_t:"Igual ao último vídeo",ult_p:n=>`Repete as escolhas de “${n}”. Você revisa antes de confirmar.`,rec_t:"Receitas prontas",rec_p:"Um clique preenche o menu e leva para a revisão; o que ficar de fora vai no automático.",resto:"Resto no automático",minhas_t:"Suas receitas",minhas_p:"Salvas por você para esta marca. Um clique repete o jeito.",salvar_p:"Vai repetir esse jeito em outros vídeos?",salvar_ph:"Nome da receita (ex.: Reels de dica)",salvar_b:"Salvar como receita",salvo:"Salva! Aparece no início dos próximos vídeos desta marca.",apagar:"Apagar receita",teclas:"Atalhos: 1-9 marca na ordem da tela · Enter avança · A automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
   eu_t:"I'll choose",eu_p:"Step by step: voice, format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",seu:"yours",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
   resumo_t:"Here is your video",resumo_p:"Click a card to go back and change it.",resumo_rot:"Review",suas:"yours",escolhas_suas:"your picks",no_auto:"on automatic",passos_auto:"steps on automatic",editar:"Click to change",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
-  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",na:"not applicable",ult_t:"Same as last video",ult_p:n=>`Repeats the choices from “${n}”. You review before confirming.`,rec_t:"Ready-made recipes",rec_p:"One click fills the menu and takes you to the review; anything left out goes on automatic.",resto:"Rest on automatic",teclas:"Shortcuts: 1-9 tick in screen order · Enter next · A automatic",erro:"Couldn't save. Is Gab still open?"}};
+  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",na:"not applicable",ult_t:"Same as last video",ult_p:n=>`Repeats the choices from “${n}”. You review before confirming.`,rec_t:"Ready-made recipes",rec_p:"One click fills the menu and takes you to the review; anything left out goes on automatic.",resto:"Rest on automatic",minhas_t:"Your recipes",minhas_p:"Saved by you for this brand. One click repeats the setup.",salvar_p:"Going to reuse this setup in other videos?",salvar_ph:"Recipe name (e.g. Tip Reels)",salvar_b:"Save as recipe",salvo:"Saved! It shows at the start of the next videos for this brand.",apagar:"Delete recipe",teclas:"Shortcuts: 1-9 tick in screen order · Enter next · A automatic",erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
@@ -683,6 +704,8 @@ function render() {
       <button class="op" data-op="auto"><div class="ic">${prev({anim:"dens d3"})}</div><b>${T[L].auto_t}</b><p>${T[L].auto_p}</p></button>
       <button class="op" data-op="eu"><div class="ic">${prev({anim:"let-word"})}</div><b>${T[L].eu_t}</b><p>${T[L].eu_p}</p></button>
       ${D.anterior ? `<button class="op" data-op="ultimo"><div class="ic">${prev({anim:"pace p2"})}</div><b>${T[L].ult_t}</b><p>${esc(T[L].ult_p(D.anterior.nome))}</p></button>` : ""}</div>
+      ${(D.minhas || []).length ? `<div class="rt">${T[L].minhas_t}</div><p>${T[L].minhas_p}</p><div class="receitas">${D.minhas.map((x, k) =>
+        `<button class="op" data-minha="${k}"><span class="tag">${T[L].seu}</span><span class="x" data-apaga="${esc(x.id)}" title="${T[L].apagar}">×</span><div class="ic">${prev({anim: animReceita(x.escolhas)})}</div><b>${esc(x.nome)}</b><p>${esc(resumoReceita(x.escolhas))}</p></button>`).join("")}</div>` : ""}
       ${(D.receitas || []).length ? `<div class="rt">${T[L].rec_t}</div><p>${T[L].rec_p}</p><div class="receitas">${D.receitas.map((x, k) =>
         `<button class="op" data-rec="${k}"><div class="ic">${prev({anim: x.anim})}</div><b>${esc(x.nome[L])}</b><p>${esc(x.desc[L])}</p></button>`).join("")}</div>` : ""}${sabe}`;
   } else if (passo <= N) {
@@ -716,7 +739,8 @@ function render() {
           return `<button class="rc" data-ir="${k + 1}">${mini}<div><div class="rot"><b>${g.letra}</b>${esc(g.nome[L])}</div>
             <div class="esc">${its.length ? esc(its[0].nome[L]) : `<span style="color:var(--amb)">${T[L].gab_escolhe}</span>`}</div>
             ${its.length > 1 ? `<div class="mais">${its.slice(1, 4).map(i => `<span>${esc(i.nome[L])}</span>`).join("")}${its.length > 4 ? `<span>+${its.length - 4}</span>` : ""}</div>` : ""}
-            <div class="ed">${T[L].editar}</div></div></button>`; }).join("")}</div>`;
+            <div class="ed">${T[L].editar}</div></div></button>`; }).join("")}</div>
+        ${D.pode_salvar && man ? `<div class="salvar"><p>${T[L].salvar_p}</p><input id="rnome" maxlength="60" placeholder="${T[L].salvar_ph}"><button id="rsalva">${T[L].salvar_b}</button><span class="ok" id="rmsg"></span></div>` : ""}`;
     }
   }
   $("#tela").innerHTML = h;
@@ -789,6 +813,9 @@ function ajustar() {
 addEventListener("resize", ajustar);
 function ir(p) { const dir = p >= passo ? 1 : -1; while (p >= 1 && p <= N && pula(p)) p += dir; passo = Math.max(0, Math.min(N + 1, p)); render(); }
 document.addEventListener("click", e => {
+  const ap = e.target.closest("[data-apaga]"); if (ap) { e.stopPropagation(); return receita("/receita/apagar", {id: ap.dataset.apaga}); }
+  const mi = e.target.closest("[data-minha]"); if (mi) return carrega(D.minhas[+mi.dataset.minha].escolhas);
+  if (e.target.closest("#rsalva")) return salvaReceita();
   const rc = e.target.closest("[data-rec]"); if (rc) return carrega(D.receitas[+rc.dataset.rec].escolhas);
   const op = e.target.closest(".op"); if (op) {
     if (op.dataset.op === "ultimo") return carrega(D.anterior.escolhas);
@@ -813,7 +840,21 @@ document.addEventListener("click", e => {
   const l = e.target.closest(".lang button"); if (l) { L = l.dataset.l; try { localStorage.setItem("ogab_menu_lang", L) } catch(e) {} render(); }
 });
 $("#bk").onclick = () => ir(auto ? 0 : passo - 1);
-$("#ra").onclick = () => ir(N + 1);   // o que não foi marcado fica com o Gab
+$("#ra").onclick = () => ir(N + 1);
+// receitas da pessoa (salvas no cliente): cartão com a cara da voz e um resumo do que foi marcado
+const animReceita = esc => ({gravacao: "cap-gab", audio: "sfx s1", voz_ia: "sfx s2", sem_voz: "dens d3"})[(esc.voz || [])[0]] || "let-word";
+const resumoReceita = esc => D.grupos.flatMap(g => (esc[g.id] || []).filter(id => id !== "sem").slice(0, 1)
+  .map(id => (g.itens.find(i => i.id === id) || {nome: {}}).nome[L]).filter(Boolean)).slice(0, 5).join(" · ");
+async function receita(url, corpo) {
+  try { const r = await fetch(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corpo)}); if (!r.ok) throw 0;
+        D.minhas = (await r.json()).receitas; return true; } catch (e) { alert(T[L].erro); return false; }
+  finally { if (passo === 0) render(); }
+}
+async function salvaReceita() {
+  const nome = ($("#rnome").value || "").trim(); if (!nome) return $("#rnome").focus();
+  const esc = {}; D.grupos.forEach(g => { if (sel[g.id].size) esc[g.id] = [...sel[g.id]]; });
+  if (await receita("/receita", {nome, escolhas: esc})) { $("#rmsg").textContent = T[L].salvo; $("#rnome").value = ""; }
+}   // o que não foi marcado fica com o Gab
 // receita ou último vídeo: marca tudo de uma vez (só o que existe neste menu) e abre a revisão
 function carrega(esc) {
   auto = false; D.grupos.forEach(g => { sel[g.id].clear(); autoPasso[g.id] = false; });
@@ -841,6 +882,7 @@ $("#go").onclick = async () => {
   } catch (e) { alert(T[L].erro); }
 };
 document.addEventListener("keydown", e => {
+  if (e.target.id === "rnome") { if (e.key === "Enter") salvaReceita(); return; }   // digitando o nome da receita
   if (e.metaKey || e.ctrlKey || e.altKey || $("#fim").style.display === "grid") return;
   if (passo >= 1 && passo <= N && /^[1-9]$/.test(e.key)) { const c = document.querySelectorAll(".grid .card")[+e.key - 1]; if (c) c.click(); return; }
   if (passo >= 1 && passo <= N && (e.key === "a" || e.key === "A")) return $("#pl").click();
@@ -903,7 +945,8 @@ def main(a):
     editor_nome, lettering = lettering_do_editor(arg("--editor", cfg.get("editor", "davinci")), cfg)
     dados = {"icones": ICONES, "grupos": grupos(formato, lettering, editor_nome), "combos": COMBOS, "ja_sabe": ja_sabe(cliente), "lingua": arg("--lingua"),
              "sugeridos": sugestoes(arg("--pedido"), arg("--roteiro"), formato, cliente, pasta),
-             "receitas": RECEITAS, "anterior": ultimo_video(pasta)}
+             "receitas": RECEITAS, "anterior": ultimo_video(pasta),
+             "minhas": receitas_salvas(arq_receitas(cliente, pasta)), "pode_salvar": bool(arq_receitas(cliente, pasta))}
     html = PAGINA.replace("__DADOS__", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")).encode("utf-8")
     pronto, fechado, visto = threading.Event(), threading.Event(), {"aba": 0}
     VERSAO = f"{os.getpid()}-{time.time():.0f}"
@@ -945,9 +988,34 @@ def main(a):
                 return self._arquivo(fontes, p[len("/fonte/"):])
             self._envia(404, b"nao achei", "text/plain")
 
+        def _receita(self):
+            arq = arq_receitas(cliente, pasta)
+            try:
+                d = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+            except Exception:
+                return self._envia(400, b"json invalido", "text/plain")
+            if not arq:
+                return self._envia(400, b"sem cliente nem pasta", "text/plain")
+            lista = receitas_salvas(arq)
+            if self.path == "/receita":
+                nome = str(d.get("nome") or "").strip()[:60]
+                esc = {str(k): [str(v) for v in vs][:20] for k, vs in (d.get("escolhas") or {}).items() if isinstance(vs, list)}
+                if not nome or not esc:
+                    return self._envia(400, b"nome e escolhas", "text/plain")
+                lista = [x for x in lista if x["nome"].lower() != nome.lower()]   # mesmo nome: substitui
+                lista.insert(0, {"id": re.sub(r"[^a-z0-9]+", "-", nome.lower()).strip("-") + "-" + time.strftime("%y%m%d%H%M%S"),
+                                 "nome": nome, "escolhas": esc, "quando": time.strftime("%Y-%m-%d %H:%M")})
+            else:
+                lista = [x for x in lista if x["id"] != d.get("id")]
+            os.makedirs(os.path.dirname(arq), exist_ok=True)
+            json.dump(lista, open(arq, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+            self._envia(200, json.dumps({"receitas": lista}, ensure_ascii=False).encode(), "application/json")
+
         def do_POST(self):
             if self.path == "/fechar":   # um menu novo pediu a porta: este (velho) sai sem escolha
                 self._envia(200, b"ok", "text/plain"); fechado.set(); pronto.set(); return
+            if self.path in ("/receita", "/receita/apagar"):   # receitas da pessoa: salvar ou apagar
+                return self._receita()
             if self.path != "/escolha":
                 return self._envia(404, b"", "text/plain")
             try:
