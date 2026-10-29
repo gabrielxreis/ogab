@@ -1,7 +1,7 @@
 {
-  "quando": "2026-10-28 22:41",
+  "quando": "2026-10-29 05:49",
   "arquivos": {
-    "SKILL.md": "d4d17784ab6d7630490374e64c6847fa852a921e35c9dcc06aa3d2c2b8626e4d",
+    "SKILL.md": "70471e792446c15e7295fd9333c8af2d997e150be43ea8ab126f6dd7aae17adb",
     "docs/PROCESSO.md": "85447e961693d0ef3a0995144cb375ba20e8ad302ea71a00f70b8c6aa506be1a",
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
@@ -31,13 +31,13 @@
     "docs/etapas/render.md": "52dd87bb79f2884487ef379ce020042e2fb2d6f1abb5f16493a7a02f2c13ff75",
     "docs/etapas/revisor.md": "2c1125fa3a801fbbc06b6e851092b477c49b4bc4a2284cc270eca1a9a997a5a0",
     "docs/etapas/sfx.md": "3f7fa1e1f51ae2fd1c5cfc6f5e063ece281e519d515b13733c9cea48f0dd70a3",
-    "docs/etapas/so_motion.md": "4742a0b94d2f654c148b4e853dd33f6dee7d25a04f3c4db814cd397c1f07fc3e",
+    "docs/etapas/so_motion.md": "4b76f8daf25815a412f101bcfe5badb2d6aa999c8984eeb7cc086f47f5afdc5a",
     "docs/etapas/sonorizacao.md": "f3ffff82d00ca954560f1e3a27725102113364625b35b0ed52cfb7d060325ea8",
-    "docs/etapas/subcomandos.md": "a13da1db802ceee8a29315ed50fd01c2058e6b2179cf568da091cf0fc64d5c0e",
+    "docs/etapas/subcomandos.md": "798c8a7d37804a61ac67fa14bd3b92d1b52aeb7b9dc8d70ce032f875e25d86d4",
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
-    "docs/etapas/voz.md": "8c96528a60f017dc0d97030d2de434d6318d76efe78a79c781f549a08a8a8759",
+    "docs/etapas/voz.md": "0252ca060004079d1eb69f0afd1017297b4c05686ca80ccce95fcad4ceae6f5c",
     "docs/etapas/youtube.md": "eb498825318d5a59d06243f4428fea122fd0571eafd56c1305aa88af2c16d22f"
   }
 }
