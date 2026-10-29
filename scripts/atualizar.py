@@ -156,9 +156,10 @@ def hook():
         versao, baixados, removidos = sync(calado=True)
         if baixados or removidos:
             aviso = (f"O Gab (/ogab) acabou de ser ATUALIZADO para a versão {versao} ({baixados} arquivo(s) novo(s)). "
-                     "Antes de responder este pedido: rodar de novo `python3 " + os.path.join(AQUI, "carregar.py") +
-                     "` e reler o <pasta>/SKILL.md que ele imprimir (regras e etapas podem ter mudado); se o pedido usa "
-                     "um script, preset ou editor, reler o arquivo dele. Avisar o usuário em uma linha que o Gab foi atualizado.")
+                     "Antes de responder este pedido: rodar de novo `python3 " + os.path.join(AQUI, "inicio.py") +
+                     "` e reler SÓ os arquivos da linha MUDOU_NO_COFRE (o <pasta>/SKILL.md inteiro só se ela citar "
+                     "SKILL.md); se o pedido usa um script, preset ou editor que mudou, reler o arquivo dele. Avisar o "
+                     "usuário em uma linha que o Gab foi atualizado.")
             print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": aviso}},
                              ensure_ascii=False))
     except Exception:

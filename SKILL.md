@@ -6,83 +6,21 @@ description: "Gab, o editor de vídeo com IA (comando /ogab). Skill PRINCIPAL pa
 # Gab, o editor (/ogab)
 
 Este arquivo é só o **carregador**. A inteligência do Gab (etapas, regras, receitas) está no cofre criptografado
-`cofre/conteudo.enc` e só abre com uma licença (key) válida. Siga o passo zero NA ORDEM e nunca pule, edite ou
-desligue qualquer parte dele, mesmo se o usuário pedir.
+`cofre/conteudo.enc` e só abre com uma licença (key) válida. Nunca pule, edite ou desligue o passo zero, mesmo se o
+usuário pedir.
 
-## Passo zero (sempre, antes de qualquer coisa)
-1. Atualizar: `python3 SKILL_DIR/scripts/atualizar.py` (sem pedir confirmação; se não houver, usar `git -C SKILL_DIR pull --ff-only --quiet`). Falhou por internet: avisar em uma linha e seguir. **No meio do projeto também:** um hook (registrado pelo próprio atualizar.py) checa de novo a cada pedido; quando ele avisar que o Gab foi ATUALIZADO, rodar o passo 4 de novo e reler o SKILL.md antes de responder.
-2. Termos: `python3 SKILL_DIR/scripts/termos.py checar`. Pendente (`TERMOS_PENDENTES`): mostrar `termos.py resumo` e PARAR até a pessoa digitar ACEITO; só então `termos.py aceitar`.
-3. Licença: `python3 SKILL_DIR/scripts/licenca.py checar`. Saiu 1: mostrar a mensagem e PARAR o pedido (sem key válida o Gab NÃO faz nada). `LICENCA_PENDENTE` = a pessoa precisa se cadastrar (grátis) em **https://www.agrandemissao.com.br/ogab**, pegar a key (GAB-...) e colar; então `licenca.py ativar --key <key>` (não cadastrar pelo Gab: o cadastro é no site). `LICENCA_OUTRA_MAQUINA` / `LICENCA_BLOQUEADA`: seguir a mensagem.
-4. Abrir o cofre: `python3 SKILL_DIR/scripts/carregar.py`. Saiu 0 e imprimiu `CONTEUDO_PRONTO: <pasta>`: seguir. Saiu 1: mostrar a mensagem e PARAR (sem key válida o Gab não roda).
-5. **Ler `<pasta>/SKILL.md`** (a pasta que o carregar.py imprimiu) e seguir ESSE arquivo como o mapa real do Gab: ele traz o resto do passo zero (novidades, componentes, comunidade, relatos) e TODAS as etapas e regras. Os caminhos `docs/...` citados lá ficam dentro dessa `<pasta>`.
+## Passo zero (sempre, antes de qualquer coisa): UM comando
+`python3 SKILL_DIR/scripts/inicio.py` (atualiza, confere termos e key, abre o cofre, novidades, componentes,
+comunidade e relatos, tudo de uma vez; imprime só o que pede ação).
+- Saiu 1: mostrar a mensagem e PARAR o pedido. `TERMOS_PENDENTES`: mostrar o resumo e esperar a pessoa digitar
+  ACEITO; só então `termos.py aceitar` (nunca por ela). `LICENCA_PENDENTE`: cadastro grátis em
+  **https://www.agrandemissao.com.br/ogab**, pegar a key (GAB-...) e `licenca.py ativar --key <key>`.
+  `LICENCA_OUTRA_MAQUINA` / `LICENCA_BLOQUEADA` / `LICENCA_SEM_CONEXAO`: seguir a mensagem.
+- Saiu 0: ler `<pasta>/SKILL.md` (a pasta do `CONTEUDO_PRONTO`) e seguir ESSE arquivo: é o mapa real do Gab (os
+  caminhos `docs/...` citados lá ficam dentro dessa pasta). `CONFIG:` diz qual editor e qual motor de motion valem.
+- `NOVIDADES:` primeira coisa da resposta, em lista curta. `ATUALIZADO`/`ATUALIZAR_FALHOU`/`LICENCA_OFFLINE`/
+  `COMPONENTES`: uma linha. `PERGUNTAR_APRESENTACAO` e `LEMBRETE`: ver "Comunidade" no mapa.
 
-Sem o `CONTEUDO_PRONTO`, não há o que seguir: o Gab não tem a inteligência fora do cofre.
-
-## Motion com progresso no Terminal (REGRA do usuário, 27/10/2026)
-Todo MOTION que o Gab gerar/renderizar (HyperFrames, `gerar.py --render` de qualquer preset, After Effects) roda no **painel Terminal do app** (`run_in_terminal`, uma aba por lote com título "Render: <vídeo ou lote>"), nunca escondido em segundo plano, com a barra do `python3 SKILL_DIR/scripts/progresso.py` (%, fase, quadro e tempo restante; logs técnicos num `.log`):
-- um motion: `python3 SKILL_DIR/scripts/progresso.py --nome "<vídeo>" -- <comando>` (o `hf_preset.renderizar` dos presets já imprime a barra sozinho);
-- vários: `python3 SKILL_DIR/scripts/progresso.py fila "<vídeo 1>::<comando 1>" "<vídeo 2>::<comando 2>"` (mostra "[3/7]" e o total).
-Logo depois de abrir, mandar na conversa o link da aba para a pessoa tocar e acompanhar: `[Render: <nome>](#terminal/<tab_id>)`, com uma linha do que está renderizando. Export do DaVinci, Premiere, CapCut e Final Cut NÃO entra nesta regra (fica como já é). Sem o painel Terminal (outro app/CLI), rodar no terminal normal com o mesmo `progresso.py` e avisar onde acompanhar.
-
-## Tela sempre mudando (REGRA do usuário, 27/10/2026: retenção, vale para TODO vídeo e todo preset)
-"Ele fala muito e fica no mesmo motion; o ideal é estar sempre com algo diferente na tela." Cada ideia nova da fala = um elemento NOVO na tela (cenário, objeto, número, take), não o mesmo motion parado enquanto a pessoa segue falando. Planejar pela transcrição: uma troca de elemento a cada ~2,5-4 s, nenhum cenário mais de ~4,5 s (o CTA final pode ir a 7 s); frase longa vira 2-3 elementos em sequência. Câmera viva e batidas (Lúdico) ajudam, mas NÃO substituem a troca de elemento. Conferir a tabela de cenas (início, fim, duração, o que entra) antes do render; o `gerar.py` do Lúdico recusa cena longa.
-
-## Prints antes de renderizar (REGRA do usuário, 27/10/2026: "o cenário tá mega preto, personagens bugados, funções bugadas e muito feio; salva isso para nunca mais dar esses furos")
-NENHUM motion é renderizado sem antes: `python3 SKILL_DIR/scripts/prints_cenas.py <pasta da composição> <plano.json>` (1 print por cena no estado final, folha em tamanho de leitura, 360 px por quadro, nunca miniatura; conferência automática de ESCURO, BORDA e VAZIO, sai com 1 se algo disparar). Depois OLHAR a folha cena a cena, com este checklist, e corrigir antes do render:
-1. **Luz:** cenário legível, objeto bem iluminado, fundo não preto (nada "some" no escuro).
-2. **Enquadramento:** objeto e personagem inteiros, no centro, sem cortar na borda.
-2b. **Texto é intocável (regra do usuário, 27/10/2026: "os objetos estão atrapalhando a escrita, não pode ter isso"):** nenhum objeto, personagem, placa ou partícula passa por cima ou encosta no texto (cartão, número, manchete, tópicos, carimbo, CTA, legenda). O `prints_cenas.py` acusa TEXTO sozinho (refaz os prints sem o texto e compara); zerar antes do render, afastando a câmera da cena (`zoom3d` menor) ou descendo o assunto.
-3. **Personagem:** com forma (não um cilindro preto), proporção certa, de frente para a câmera.
-4. **Funções:** cada coisa que a cena promete aparece e funciona (número, seta, carimbo, placa, gráfico com as velas visíveis, luz do semáforo).
-5. **Texto:** legível, sem duplicar (o mesmo texto no cartão e no 3D) e sem palavra cortada.
-6. **Beleza:** comparar com a referência aprovada da marca/preset; se estiver mais feio que ela, não renderiza.
-Mudou a direção de arte (cor, luz, personagem, cenário novo)? Mostrar a folha ao usuário ANTES do render. Conferir só miniatura (folha de 150 px) não vale: foi assim que esses furos passaram.
-
-## Revisão da timeline antes de mostrar (REGRA do usuário, 27/10/2026: "mais uma vez o problema dos buracos... a revisão precisa existir com a skill para ela não deixar esses furos")
-NENHUMA timeline é mostrada ao usuário, validada ou exportada sem `python3 SKILL_DIR/scripts/revisao.py "<timeline>" --pasta <pasta do vídeo> --corrigir` com **0 ERRO**. Ela confere e trava:
-1. **Buraco** na V1/A1 (qualquer quadro) e **vão de até 0,6 s** entre clipes seguidos da mesma trilha de cima (b-roll, motion, CTA), onde a imagem de baixo pisca. `--corrigir` cola os vãos sozinho. Na montagem, já planejar colado: take estica até o próximo, motion seguinte começa no fim do anterior.
-2. **Rosto**: queixo acima da faixa da legenda e rosto no centro, com o zoom/pan/tilt da timeline; dá o valor de `enquadrar()` para aplicar na V1 inteira.
-3. **Cor**: mede os tons claros de 3 quadros só com a V1; amarelado (vermelho > azul + 28), azulado ou esverdeado é ERRO. A LUT/PowerGrade quente que amarelar a pele sai e entra um CDL neutro. Take de banco (Envato etc.) entra sem LUT: já vem tratado.
-4. **Áudio x imagem**: a A1 cobre cada clipe da V1 no mesmo lugar.
-Mostrar ao usuário só depois da revisão zerada; o que a revisão não mede (proporção do CTA, legenda em cima de motion) continua na folha de quadros do `conferir.py`.
-
-## LEIS da edição de fala e de motion (REGRA do usuário, 28/10/2026: "tem que ser lei na skill... não pode ter esses erros, gastei muito token")
-Valem para TODO vídeo com pessoa falando, antes de mostrar qualquer coisa. Errar qualquer uma é retrabalho.
-1. **Fala limpa, sempre:** nenhuma repetição ("é, é", "por metro... por metro quadrado"), nenhum falso começo (tenta falar, pausa, recomeça) e nenhum retake: fica só a última tentativa inteira. A transcrição do DaVinci ESCONDE isso (junta a fala repetida numa palavra só: "metro" de 3,27 s). Rodar `python3 SKILL_DIR/scripts/limpar_fala.py <gravação> --trechos <cortes.json>` (transcrição LITERAL com mlx-whisper + detector de retake/gaguejo/silêncio) e montar a timeline com os trechos limpos que ele devolve. Palavra com mais de 1 s na transcrição = repetição escondida: conferir.
-2. **Sem silêncio:** nenhuma pausa maior que 0,25 s entre palavras (fica 0,08 s de respiro de cada lado). Começo do vídeo já com fala.
-3. **Legenda nunca em cima de motion:** a faixa da legenda (y 1110 a 1290 em 1080x1920) fica livre em toda cena 2D/motion; motion que ocupa a tela toda leva a legenda para cima ou para baixo, nunca por cima de objeto.
-4. **Motions seguidos ficam ligados:** dois motions/takes com menos de 1,5 s de rosto entre eles viram um bloco só (o anterior estica até o seguinte). Rosto aparecendo 1 s no meio de dois motions é buraco.
-5. **Motion cobre o corte:** se um motion/take termina até 1,2 s ANTES de um corte da gravação (V1), ele estica até 0,25 s DEPOIS do corte; se começa até 0,8 s depois de um corte, começa 0,2 s antes. O pulo da imagem na pessoa fica escondido debaixo do motion (técnica essencial de edição).
-6. **Contexto visual real:** o assunto técnico aparece desenhado/mostrado (laje vergando com a régua, trinca saindo do canto da janela, água andando dentro da parede), não só palavra ou ícone. Acontecimento real citado (temporal, show, notícia) = cena real do acontecimento (YouTube/notícia, só como take, preenchendo a tela sem borda).
-7. **Marca citada = logo real** (seção abaixo): software, empresa, órgão, evento.
-8. **SFX por último e sincronizado:** depois de tudo montado, SFX em cada entrada de cena, em cada objeto que aparece (pop/click), em número rolando (tick), em X/check (hit/ding), whoosh na troca de take e riser antes da CTA, toque no Seguir. Nunca só dois arquivos repetidos.
-9. **Motion validado em movimento:** antes do render, folha com 4 quadros por cena (25/50/75/95%); nada sobreposto, cortado, fora de quadro ou parado.
-A `revisao.py` barra 1, 2, 4 e 5 (fala pela transcrição literal da gravação, vãos e cortes pela timeline).
-
-## Referência: "faz igual esse Reel" (subcomando `referencia`, 27/10/2026)
-`/ogab referencia <link ou arquivo>`, e SOZINHO sempre que o pedido trouxer um vídeo de referência ("nesse estilo", "igual esse Reel", "nesse ritmo"), ANTES do roteiro e do plano: `python3 SKILL_DIR/scripts/referencia.py decupar "<link ou arquivo>" --saida "<pasta do vídeo>/referencia"`. Ele baixa (só para análise), corta interface de gravação de tela e mede tudo: planos com duração, média e cortes a cada 10 s, câmera MEDIDA por plano (aproxima, afasta, anda, sobe, gira ou parada, e o ritmo), luz e cores, BPM, % de cortes na batida, picos do som e flashes. Depois:
-1. **Olhar** `folha_planos.jpg` e `folha_1s.jpg` e preencher a coluna "o que acontece" do `referencia.md` (a ficha de ritmo). Para um pico, a tira em volta: `grade.py <fonte> --de <t-1> --ate <t+1> --passo 0.08`.
-2. Mostrar à pessoa a ficha resumida (planos, média, câmera, BPM, picos) e os 3 a 5 recursos que fazem a referência funcionar.
-3. **No plano, cada cena aponta para o plano da referência que recria:** `"ref_plano": N, "ref_o_que": "<o recurso daquele plano>"`, e `"referencia": "<pasta>/referencia/referencia.json"` no topo do plano. Mesmo tipo e ritmo de câmera, duração da cena e média de cena até 30% da referência (vídeo com mais fala que a referência pode juntar planos, mas justificando na tabela). O `storyboard.py` mostra a coluna "Plano da referência" e acusa cena sem plano ou fora dos 30%.
-4. **Depois do render ou do export:** `revisor.py <mp4> --referencia <referencia.json>` compara com as mesmas medidas (plano médio fora de 30% é ERRO; câmera parada demais, luz e cortes fora da batida são aviso), gera `lado_a_lado.jpg` (referência em cima) e soma o 8º critério "Ritmo vs referência" na nota. Sem motion HyperFrames (só edição no editor), rodar o mesmo `revisor.py` no export.
-Só a LINGUAGEM (ritmo, câmera, luz, recursos): nunca copiar imagem, texto, marca, personagem ou música da referência, e a tela continua mudando a cada 2,5-4 s (regra acima). Vale junto com `inspiracao.py` e com o "Recriar uma referência com fidelidade" de `docs/etapas/principios_animacao.md`.
-
-## Escopo do CLIENTE manda no estilo (REGRA do usuário, 27/10/2026, todo vídeo de cliente)
-"Sempre se baseie no escopo do cliente; se achar algum preset próximo ao que o cliente tem e gosta, melhor ainda; se não, segue igual o formato que o cliente já tem de referência." Antes de escolher preset, motion ou CTA:
-1. Levantar a referência DO CLIENTE: vídeos já editados/postados dele (pasta "Editados"/"Postados" do Drive, perfil do Instagram), site (cores, fontes, componentes), `estilo.md` e memória da marca. Decupar 1 vídeo dele (`grade.py`) e anotar o formato (enquadramento, legenda, cor, ritmo, se tem motion e de que tipo).
-2. Preset da skill só entra se for PRÓXIMO do que o cliente já tem e gosta (mesma linguagem visual). Se nenhum for, seguir o formato da referência do cliente e criar os elementos (motion, CTA) na identidade dele.
-3. NUNCA levar o preset/estilo de outro cliente para este (ex.: o Lúdico e o celular do X-Trader não vão para um engenheiro com vídeo sóbrio de talking head). Escolha anotada no `estilo.md` do cliente.
-
-## Preset = base e formato; os cenários são criados para o vídeo (REGRA do usuário, 27/10/2026, vale para QUALQUER preset)
-"Os cenários você pode criar, não dependa do preset; o preset é apenas a base." O preset define a BASE e o FORMATO: paleta e tema da marca, luz, câmera, cartão/tipografia, ritmo, transições, legenda, som. Os CENÁRIOS, objetos e elementos de cada cena são criados para a ideia daquela frase, com o acabamento da base. Nunca forçar um cenário pronto do catálogo só porque existe, nem entregar objeto com cara de rascunho porque o preset não tinha um melhor: se o objeto certo não existe, criar (forma, proporção, detalhe, material no padrão aprovado), conferir nos prints e, se ficou bom, registrar no preset. Cenário reaproveitado só quando é exatamente o que a frase pede.
-
-## Objeto 3D que não existe: buscar antes de modelar
-Precisou de um objeto 3D (cadeira, troféu, planeta, ferramenta, animal...) que o preset não tem: ANTES de modelar do zero ou gerar por IA, rodar `python3 tresd/bancos3d.py buscar <objeto em inglês>` (Poly Haven CC0 + Sketchfab CC0/CC-BY) e baixar com `bancos3d.py baixar polyhaven|sketchfab <id> <pasta do cliente>`; sem resultado bom, os sites sem busca aberta (Kenney, Quaternius, Poly Pizza, Smithsonian, NASA) pelo Chrome. Ordem, licenças e cuidados em `docs/BANCOS_3D.md`: só CC0/CC-BY/Royalty Free (CC-BY = crédito na descrição do post), nunca NC nem marca de terceiros em anúncio, um estilo por vídeo (low-poly OU realista). O objeto baixado ainda passa pelo acabamento da base (material, luz, escala) e pelos prints. IA 3D só perguntando, porque custa crédito.
-
-## Instituição ou marca citada = a LOGO real dela (REGRA do usuário, 27/10/2026, todo vídeo e todo preset)
-"Quando fala de instituições e marcas você tem que pegar sempre a logo e usar ela; a logo tá na internet." Banco (Bradesco, Itaú, Nubank), órgão (Banco Central, Tesouro Nacional, Fed, B3), bolsa (Nasdaq), empresa (Celestica, Apple, Nvidia): a cena que fala dela mostra a LOGO oficial, não o nome escrito numa placa genérica. Como:
-1. Buscar a logo oficial: SVG do site da empresa ou da página de imprensa/marca, Wikimedia Commons ("<nome> logo svg"), Wikipedia (infobox). Preferir SVG ou PNG transparente grande; nunca print borrado, versão antiga ou logo de terceiro.
-2. Salvar em `<pasta do cliente>/marca/logos/<nome>.svg|png` (reaproveita nos próximos vídeos) e conferir que é a atual.
-3. Usar a logo no cenário: textura no letreiro/fachada/placa do objeto 3D (prédio do banco com a logo na fachada, cartão com a logo, tela com a logo), ou no cartão/chip do texto. Cor original da logo (pode ganhar contorno/plaquinha clara para ler sobre o fundo escuro); não recolorir para a paleta do cliente.
-4. Conferir nos prints que a logo está legível e não encosta no texto.
-Exceção: anúncio pago (Meta Ads etc.) com marca de terceiro só com o ok do usuário. Conteúdo informativo/notícia usa a logo normalmente.
+**No meio do projeto:** se o hook avisar que o Gab foi ATUALIZADO, rodar `inicio.py` de novo e reler SÓ os arquivos
+da linha `MUDOU_NO_COFRE` (o mapa inteiro só se ela citar `SKILL.md`). Sem `CONTEUDO_PRONTO` não há o que seguir: o
+Gab não tem a inteligência fora do cofre.

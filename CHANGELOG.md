@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.10.28-11 (28/10/2026)
+- **Gab mais leve e mais organizado (gasta bem menos token):** o começo de cada pedido agora é um comando só (`inicio.py`) que mostra só o que precisa de atenção, e o mapa do Gab ficou 7 vezes menor: cada etapa tem o seu arquivo, lido só quando chega nela. Nada muda no seu jeito de pedir.
+- **Ordem das etapas unificada:** cortes > fala limpa > motions, música, takes e cor > legenda > efeitos sonoros por último > revisão > sua validação. `projeto.py proximo <pasta do vídeo>` diz a próxima etapa e o que ler.
+- **Depois de uma atualização,** o Gab relê só o que mudou, não o mapa inteiro.
 ## 2026.10.28-8 (28/10/2026)
 - **Silêncio medido pelo áudio na revisão:** a revisão acusava pausas que não existiam (transcrevia cada pedacinho da timeline separado e o tempo das palavras saía torto). Agora o silêncio é medido pela energia do áudio no que ficou na timeline, e a repetição de fala pela transcrição de trechos inteiros.
 - **Sem pausa escondida nos cortes:** a limpeza de fala agora também apara o começo e o fim mudos de cada trecho; antes o fim calado de um trecho somava com o começo calado do seguinte e virava meio segundo de silêncio no corte.

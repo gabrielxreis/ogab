@@ -6,8 +6,9 @@
   python3 projeto.py checklist <pasta_do_video>|<pasta_da_empresa>   (OBRIGATÓRIO antes de dizer "pronto"/entregar)
   python3 projeto.py memoria <pasta_da_empresa> ["nota"] [--tipo pedido|aprendizado|proxima|feito]
         (memória da marca: cria <pasta>/<Empresa>.md na 1ª vez e mostra; com nota, anota com a data na seção do tipo)
+  python3 projeto.py proximo <pasta_do_video>         (próxima etapa + o arquivo de docs/etapas a ler; não abre o DaVinci)
 
-Etapas (edição): cortes, silencios, letterings, motions, musica, sfx, broll, cor, legenda, legenda_validada (validação visual), abas, qc, export.
+Etapas (edição): cortes, silencios, letterings, motions, musica, broll, cor, legenda, sfx, legenda_validada (validação visual), abas, qc, export.
 cor = todos os takes da V1 com PowerGrade (nó > 1) ou LUT no nó 1 (detectado); letterings = título Fusion acima da V1 (detectado);
 motions = item na trilha MOTIONS ou nome de motion (detectado); abas = timelines abertas em abas (marcar depois de abrir_em_abas).
 Na criação (existe roteiro.txt) entram antes: roteiro, voz.
@@ -17,15 +18,15 @@ fora da pasta) é marcado com `marcar`. Estado em <pasta>/status.json. O bloco "
 import glob, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "silêncios (transcrição do DaVinci)", "legenda": "legenda", "legenda_validada": "validação visual no editor (você valida)",
+ROTULO = {"roteiro": "roteiro", "voz": "voz", "cortes": "cortes", "silencios": "fala limpa / silêncios", "legenda": "legenda", "legenda_validada": "validação visual no editor (você valida)",
           "broll": "b-roll/takes", "cor": "cor (PowerGrade)", "letterings": "letterings", "abas": "abas abertas", "motions": "motions", "musica": "música", "sfx": "efeitos sonoros", "qc": "QC final", "export": "export"}
 DEPENDE_DO_USUARIO = {"roteiro", "voz", "legenda_validada"}
 MOTION = re.compile(r"(^x\d\d-|motion|cta|lettering)", re.I)
 
 
 def etapas(pasta):
-    # ordem do usuário (23/10/2026): cortes, lettering/motions, música/SFX/takes/cor, legenda, validação visual, render
-    base = ["cortes", "silencios", "letterings", "motions", "musica", "sfx", "broll", "cor", "legenda", "legenda_validada", "abas", "qc", "export"]
+    # ordem única (28/10/2026, regras.md 1f): cortes, fala limpa, lettering/motions, música, takes, cor, legenda, SFX por último, validação, render
+    base = ["cortes", "silencios", "letterings", "motions", "musica", "broll", "cor", "legenda", "sfx", "legenda_validada", "abas", "qc", "export"]
     return (["roteiro", "voz"] if os.path.exists(os.path.join(pasta, "roteiro.txt")) else []) + base
 
 
@@ -159,8 +160,27 @@ def checklist(alvo):
     return 1 if falta_algo else 0
 
 
+LER = {"roteiro": "SKILL.md (Roteiro)", "voz": "voz.md", "cortes": "davinci.md + regras.md 1f1 (emendas.py)",
+       "silencios": "leis.md (limpar_fala.py; narração gerada: silencios.py)", "letterings": "motions.md",
+       "motions": "motions.md + motion_qc.md + presets_escolha.md", "musica": "musica.md", "broll": "takes.md",
+       "cor": "cor.md", "legenda": "legenda.md", "sfx": "sfx.md", "legenda_validada": "validacao.md (revisao.py 0 ERRO)",
+       "abas": "regras.md 1c", "qc": "render.md + revisor.md", "export": "render.md"}
+
+
+def proximo(pasta):
+    """Barato: só o status.json, sem DaVinci. Diz a etapa e o que ler, para não reler o mapa nem os docs todos."""
+    st = estado(pasta); E = etapas(pasta)
+    falta = [e for e in E if e not in st["feitas"] and e not in st["puladas"]]
+    if not falta: return "PROXIMO: entregar (rodar projeto.py checklist antes)"
+    e = falta[0]
+    return (f"PROXIMO: {ROTULO[e]}{' (esperando o ok do usuário)' if e in DEPENDE_DO_USUARIO else ''}\n"
+            f"LER: {'o mapa (SKILL.md, Roteiro)' if e == 'roteiro' else 'docs/etapas/' + LER[e]}\n"
+            "(status.json não vê a timeline: se a etapa já está nela, `projeto.py status <pasta> --timeline` marca sozinho)")
+
+
 def main():
     a = sys.argv[1:]
+    if len(a) >= 2 and a[0] == "proximo": print(proximo(a[1])); return
     if len(a) >= 2 and a[0] == "lote":
         for d in pastas_do_lote(a[1]): print(status(d)); print()
         return
