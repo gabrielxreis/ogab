@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.29-2 (29/10/2026)
+- **DaVinci em 24 fps:** projeto novo nasce com timeline e playback em 24 fps (o padrão fica em `config.regras.fps`; troque lá se quiser outro).
 ## 2026.10.29-1 (29/10/2026)
 - **Menu do vídeo com o passo Voz:** primeiro você diz de onde vem a fala (pessoa gravada, só a sua voz, voz por IA ou sem voz) e o menu mostra só os passos que existem nesse vídeo. Dá para fazer vídeo só de motion, ou motion e música, sem gerar voz nem legenda. Combinações sem imagem (sem pessoa, sem motion e sem b-roll) não aparecem mais.
 - **Menu mais esperto:** sem pessoa na tela, somem os estilos que precisam de alguém falando (apresentador, título atrás da cabeça); com formato horizontal marcado, somem os estilos que só existem em vertical; passo que fica só com "Sem" sai sozinho; e o passo Voz já vem com a sugestão pelo seu pedido e pelos arquivos da pasta.

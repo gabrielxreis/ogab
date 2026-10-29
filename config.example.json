@@ -80,7 +80,7 @@
    ]
   },
   "palavras_por_minuto": 150,
-  "fps": 30,
+  "fps": 24,
   "volume_db": {
    "narracao": 5,
    "musica": -10

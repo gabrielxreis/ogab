@@ -53,9 +53,20 @@ def conectar(abrir=True, espera=120):
     return r
 
 
-def criar_projeto(nome, w=1080, h=1920, fps=30):
+def fps_padrao():
+    """fps do usuário (config.regras.fps). Regra do usuário (29/10/2026): DaVinci SEMPRE em 24 fps."""
+    try:
+        cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"), encoding="utf-8"))
+        return int(cfg.get("regras", {}).get("fps") or 24)
+    except Exception:
+        return 24
+
+
+def criar_projeto(nome, w=1080, h=1920, fps=None):
     """Cria (ou abre) o projeto 'Assunto - Empresa'. IMPORTANTE: fps de timeline E de playback
-    são gravados ANTES de qualquer timeline; depois a API não muda o playback (áudio engasga)."""
+    são gravados ANTES de qualquer timeline; depois a API não muda o playback (áudio engasga).
+    fps padrão = config.regras.fps (24, regra do usuário de 29/10/2026)."""
+    fps = fps or fps_padrao()
     r = conectar(); pm = r.GetProjectManager()
     salvar(r)   # CreateProject troca o projeto atual e DESCARTA o que não foi salvo (armadilha da API, MCP samuelgursky)
     p = pm.CreateProject(nome)
