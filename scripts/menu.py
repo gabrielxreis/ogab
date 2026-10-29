@@ -171,7 +171,20 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
         return "let-blurup"
     let = [it("t%02d" % i, nome, nome, f"Título do {editor_nome}, editável no próprio editor.", f"{editor_nome} title, editable in the editor itself.",
               anim=anim_let(nome), extra={"template": tid}) for i, (tid, nome) in enumerate(lettering, 1)]
+    # árvore do menu: "trava" = escolha forçada noutro passo (o passo some), "esconde" = opções que não existem nesse caminho
     G = [
+        {"id": "voz", "letra": "V", "unico": True, "nome": {"pt": "Voz do vídeo", "en": "Voice"},
+         "sub": {"pt": "De onde vem a fala. Daqui o menu só mostra os passos que existem nesse tipo de vídeo.",
+                 "en": "Where the talking comes from. From here the menu only shows the steps that exist for this kind of video."}, "itens": [
+            it("gravacao", "Pessoa gravada", "Recorded person", "Alguém fala para a câmera: você manda o vídeo bruto.",
+               "Someone talks to camera: you send the raw footage.", "cap-gab", extra={"esconde": {"motions": ["inteiro"]}}),
+            it("audio", "Só a voz gravada", "Recorded voice only", "Locução ou podcast seu, sem a imagem da pessoa.",
+               "Your voice-over or podcast, without the person on screen.", "sfx s1", extra={"trava": {"layout": "sem"}}),
+            it("voz_ia", "Voz por IA", "AI voice", "Roteiro aprovado e narrado pela voz clonada ou de IA.",
+               "Approved script narrated by a cloned or AI voice.", "sfx s2", extra={"trava": {"layout": "sem"}}),
+            it("sem_voz", "Sem voz", "No voice", "Só imagem e som: motion, texto na tela, música e efeitos. Sem roteiro falado.",
+               "Picture and sound only: motion, on-screen text, music and effects. No spoken script.", "bars m4",
+               extra={"trava": {"layout": "sem", "legenda": "sem"}})]},
         {"id": "formato", "letra": "F", "unico": False, "nome": {"pt": "Formato", "en": "Format"},
          "sub": {"pt": "Escolha a plataforma e marque os formatos. Pode marcar vários: o vídeo sai em cada um.",
                  "en": "Pick the platform and tick the formats. You can tick several: the video is exported in each."},
@@ -202,10 +215,14 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
          ]},
         {"id": "motions", "letra": "M", "unico": True, "nome": {"pt": "Quantidade de motion", "en": "Amount of motion"},
          "sub": {"pt": "Motion = animação em HyperFrames. Lettering simples não entra aqui.", "en": "Motion = HyperFrames animation. Plain lettering is not counted here."}, "itens": [
+            # vídeo todo em motion (sem gravação nem imagem gerada): trava os passos que não existem nele; a voz vem do passo V
+            it("inteiro", "Vídeo inteiro em motion", "Full motion video", "Motion do começo ao fim: sem gravação de pessoa, sem b-roll, sem imagem gerada.",
+               "Motion start to finish: no footage of a person, no b-roll, no generated images.", "dens d3",
+               extra={"trava": {"takes": "sem", "lettering": "sem", "cor": "natural", "layout": "sem"}}),
             it("poucos", "Poucos", "A few", "Só nos números, dados e no CTA.", "Only numbers, data and the CTA.", "dens d1"),
             it("equilibrado", "Equilibrado", "Balanced", "Nos momentos que pedem imagem, com respiro de pessoa falando.", "Where an image helps, with talking breathers.", "dens d2"),
             it("muitos", "Muitos", "Lots", "Uma ideia, uma imagem: quase o vídeo todo.", "One idea, one image: almost the whole video.", "dens d3"),
-            it("sem", "Sem motion", "No motion", "Só a pessoa, legenda e lettering.", "Just the person, captions and lettering.", "none")]},
+            it("sem", "Sem motion", "No motion", "Sem animação: gravação ou b-roll, legenda e lettering.", "No animation: footage or b-roll, captions and lettering.", "none")]},
         # UM estilo base por vídeo (itens "base"); batidas, b-roll e efeitos somam
         {"id": "estilo", "letra": "E", "unico": False, "max": 4, "nome": {"pt": "Estilo dos motions (presets)", "en": "Motion style (presets)"},
          "abas": [{"id": "todos", "nome": {"pt": "Todos", "en": "All"}}, {"id": "sugeridos", "nome": {"pt": "Sugeridos", "en": "Suggested"}}] + [x for x in (
@@ -250,7 +267,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("ia", "Gerado por IA", "AI generated", "Imagem aprovada antes, depois vira vídeo (ilimitado).", "Image approved first, then animated (unlimited plan).", "takes t2"),
             it("misto", "Misto", "Mixed", "Banco no que existe de verdade, IA no conceitual.", "Stock for real things, AI for concepts.", "takes t3"),
             it("real", "Material real", "Real footage", "Vídeo público e acervo (fatos, pessoas, lugares reais).", "Public video and archives (real facts, people, places).", "takes t4"),
-            it("sem", "Sem b-roll", "No b-roll", "Só a gravação.", "Only the recording.", "none")]},
+            it("sem", "Sem b-roll", "No b-roll", "Só a gravação ou os motions.", "Only the recording or the motion.", "none")]},
         {"id": "musica", "letra": "A", "unico": True, "nome": {"pt": "Música", "en": "Music"},
          "sub": {"pt": "Escolha pelo sentimento que o vídeo deve passar (a música vem do seu Artlist ou Envato). Na dúvida, deixe no automático: o Gab escolhe pelo assunto.",
                  "en": "Pick the feeling the video should carry (the track comes from your Artlist or Envato). Not sure? Leave it on automatic: Gab picks by topic."}, "itens": [
@@ -262,7 +279,7 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("corporativa", "Confiança, empresa", "Trust, corporate", "Boa para: serviço, institucional, apresentação da marca.", "Good for: services, corporate, brand intro.", "bars m5", extra={"som": "corporativa"}),
             it("calma", "Calma, reflexão", "Calm, reflective", "Boa para: explicação, tutorial, fé e reflexão.", "Good for: explainer, tutorial, faith and reflection.", "bars m6", extra={"som": "calma"}),
             it("delicada", "Delicada, afetiva", "Gentle, heartfelt", "Boa para: família, casamento, homenagem.", "Good for: family, wedding, tribute.", "bars m8", extra={"som": "delicada"}),
-            it("sem", "Sem música", "No music", "Só a voz e os efeitos.", "Voice and effects only.", "none")]},
+            it("sem", "Sem música", "No music", "Sem trilha: só a voz e os efeitos (ou silêncio).", "No track: just voice and effects (or silence).", "none")]},
         {"id": "sfx", "letra": "S", "unico": True, "nome": {"pt": "Efeitos sonoros", "en": "Sound effects"},
          "sub": {"pt": "Som do que aparece na tela (gaveta, papel, avião), nunca mais alto que a voz.", "en": "The sound of what's on screen (drawer, paper, plane), never louder than the voice."}, "itens": [
             it("completo", "Desenho de som completo", "Full sound design", "Foley do que o motion mostra + ambiente.", "Foley for what the motion shows + ambience.", "sfx s1"),
@@ -284,6 +301,10 @@ def grupos(formato, lettering, editor_nome="DaVinci"):
             it("capa", "Capa + legenda do post", "Cover + post caption", "Capa PNG e texto do post prontos.", "PNG cover and post text ready.", "cover"),
             it("logo_abertura", "Logo na abertura", "Logo opener", "Abertura de marca de 5-8 s.", "5-8 s brand opener.", "logo"),
             it("cta_site", "CTA com o site", "CTA with website", "Chamada final com o site da marca.", "Final call with the brand website.", "cta"),
+            # cena `instagram` do Lúdico (presets/ludico/PRESET.md), renderizada à parte e colada no fim de qualquer preset
+            it("cta_instagram", "CTA de seguir no Instagram", "Instagram follow CTA",
+               "Celular 3D com o perfil real: foto, bio, seguidores e capas dos últimos posts; o dedo toca em Seguir.",
+               "3D phone with the real profile: photo, bio, followers and latest post covers; a finger taps Follow.", "cta"),
             it("lottie", "Animações Lottie (site/app)", "Lottie animations (web/app)", "Carregando, sucesso, curtir e botão em .json leve, na marca.",
                "Loading, success, like and button as light .json, on brand.", "logo", gif="presets/lottie/exemplo.gif"),
          ]},
@@ -520,18 +541,18 @@ const D = __DADOS__;
 const T = {
  pt:{menu:"Menu do vídeo",ola:"Como você quer montar este vídeo?",ola_p:"Escolha passo a passo o que entra no vídeo, ou deixe tudo com o Gab.",
   auto_t:"Automático",auto_p:"O Gab escolhe tudo pelo que já sabe de você e da marca (estilo, memória da marca, pedidos anteriores) e pelo roteiro.",
-  eu_t:"Eu escolho",eu_p:"Passo a passo: formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras.",
+  eu_t:"Eu escolho",eu_p:"Passo a passo: voz, formato, estilo, legenda, lettering, motion, b-roll, música, efeitos, ritmo, cor e extras.",
   sabe:"O que o Gab já sabe dessa marca",gab_escolhe:"automático",sug:"sugerido",passo:(i,n)=>`Passo ${i} de ${n}`,
   voltar:"Voltar",pular:"Automático neste passo",avancar:"Avançar",revisar:"Revisar",confirmar:"Confirmar",conf_auto:"Confirmar: automático",
   resumo_t:"Seu vídeo vai ficar assim",resumo_p:"Clique num cartão para voltar e mudar.",resumo_rot:"Revisão",suas:"suas",escolhas_suas:"escolhas suas",no_auto:"no automático",passos_auto:"passos no automático",editar:"Clique para mudar",auto_resumo:"O Gab vai escolher tudo pelo que já sabe de você e da marca.",
-  ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",erro:"Não consegui salvar. O Gab ainda está aberto?"},
+  ouvir:"Ouvir o clima",seu:"seu",trava:"Marque uma opção ou aperte Automático neste passo",marque:"marque uma opção ou use o automático",max:n=>`até ${n}`,fim_t:"Pronto! Agora falta um passo",fim_p:"Se o Claude já mostrou as suas escolhas, não precisa colar.",cole_rot:"Cole no Claude",cole_1:"Volte para a janela do Claude",cole_2:"Cole a mensagem e aperte Enter",copiar:"Copiar a mensagem de novo",copiado:"Copiado!",cab:"/ogab menu confirmado",cab_auto:"/ogab menu confirmado: automático (o Gab escolhe tudo pelo que já sabe de você e da marca).",auto_l:"Automático",na:"não se aplica",erro:"Não consegui salvar. O Gab ainda está aberto?"},
  en:{menu:"Video menu",ola:"How do you want to build this video?",ola_p:"Pick step by step what goes in, or leave it all to Gab.",
   auto_t:"Automatic",auto_p:"Gab picks everything from what he already knows about you and the brand (style, brand memory, past requests) and the script.",
-  eu_t:"I'll choose",eu_p:"Step by step: format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
+  eu_t:"I'll choose",eu_p:"Step by step: voice, format, style, captions, lettering, motion, b-roll, music, effects, pace, colour and extras.",
   sabe:"What Gab already knows about this brand",gab_escolhe:"automatic",sug:"suggested",seu:"yours",passo:(i,n)=>`Step ${i} of ${n}`,
   voltar:"Back",pular:"Automatic for this step",avancar:"Next",revisar:"Review",confirmar:"Confirm",conf_auto:"Confirm: automatic",
   resumo_t:"Here is your video",resumo_p:"Click a card to go back and change it.",resumo_rot:"Review",suas:"yours",escolhas_suas:"your picks",no_auto:"on automatic",passos_auto:"steps on automatic",editar:"Click to change",auto_resumo:"Gab will pick everything from what he knows about you and the brand.",
-  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",erro:"Couldn't save. Is Gab still open?"}};
+  ouvir:"Hear the mood",trava:"Tick an option or press Automatic for this step",marque:"tick an option or use automatic",max:n=>`up to ${n}`,fim_t:"Done! One more step",fim_p:"If Claude already shows your choices, no need to paste.",cole_rot:"Paste into Claude",cole_1:"Go back to the Claude window",cole_2:"Paste the message and press Enter",copiar:"Copy the message again",copiado:"Copied!",cab:"/ogab menu confirmed",cab_auto:"/ogab menu confirmed: automatic (Gab picks everything from what he knows about you and the brand).",auto_l:"Automatic",na:"not applicable",erro:"Couldn't save. Is Gab still open?"}};
 let L = D.lingua || ((navigator.language||"pt").toLowerCase().startsWith("pt") ? "pt" : "en");
 try { L = localStorage.getItem("ogab_menu_lang") || L } catch(e) {}
 const sel = {}; D.grupos.forEach(g => sel[g.id] = new Set());
@@ -581,7 +602,8 @@ function render() {
   document.documentElement.lang = L === "pt" ? "pt-BR" : "en";
   document.querySelectorAll("[data-t]").forEach(e => { const v = T[L][e.dataset.t]; if (typeof v === "string") e.innerHTML = v; });
   document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === L));
-  $("#prog").innerHTML = passo === 0 || auto ? "" : Array.from({length: N + 1}, (_, k) => `<i class="${k < passo ? "on" : ""}"></i>`).join("");
+  const vis = visiveis(), pos = passo > N ? vis.length + 1 : vis.indexOf(passo) + 1;   // passos que existem neste caminho
+  $("#prog").innerHTML = passo === 0 || auto ? "" : Array.from({length: vis.length + 1}, (_, k) => `<i class="${k < pos ? "on" : ""}"></i>`).join("");
   const sabe = D.ja_sabe.length ? `<div class="sabe"><b>${T[L].sabe}</b><ul>${D.ja_sabe.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
   let h = "";
   if (passo === 0) {
@@ -590,15 +612,16 @@ function render() {
       <button class="op" data-op="eu"><div class="ic">${prev({anim:"let-word"})}</div><b>${T[L].eu_t}</b><p>${T[L].eu_p}</p></button></div>${sabe}`;
   } else if (passo <= N) {
     const g = D.grupos[passo - 1];
-    h = `<div class="passo">${T[L].passo(passo, N)}</div><h2><span class="k">${g.letra}</span>${esc(g.nome[L])}</h2>
+    h = `<div class="passo">${T[L].passo(pos, vis.length)}</div><h2><span class="k">${g.letra}</span>${esc(g.nome[L])}</h2>
       <p class="sub">${esc(g.sub[L])}${g.max ? " · " + T[L].max(g.max) : ""}${sel[g.id].size ? "" : (autoPasso[g.id] ? " · <b style='color:var(--amb)'>" + T[L].gab_escolhe + "</b>" : " · <b style='color:var(--mu)'>" + T[L].marque + "</b>")}</p>
       ${g.abas ? `<div class="abas">${g.abas.filter(x => x.id !== "sugeridos" || D.sugeridos.length).map(x => { const c = g.itens.filter(i => (x.id === "todos" || (x.id === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === x.id)) && sel[g.id].has(i.id)).length;
         return `<button data-aba="${x.id}" aria-pressed="${aba[g.id] === x.id}">${ic(x.id)}${esc(x.nome[L])}${c ? `<span class="n">${c}</span>` : ""}</button>`; }).join("")}</div>` : ""}
-      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : g.id === "estilo" ? "--ar:9/16" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
+      <div class="grid" style="${g.id === "lettering" ? "--ar:4/3" : g.id === "estilo" ? "--ar:9/16" : (["formato", "musica", "sfx", "ritmo", "cor"].includes(g.id) ? "--ar:1/1" : "")}">${g.itens.map((i, n) => escondidos(g.id).includes(i.id) || (g.abas && !(aba[g.id] === "todos" || (aba[g.id] === "sugeridos" ? D.sugeridos.includes(i.id) : i.aba === aba[g.id]))) ? "" : `<button class="card" data-g="${g.id}" data-i="${esc(i.id)}" aria-pressed="${sel[g.id].has(i.id)}" title="${esc(i.desc[L])}">
       <div class="vis">${prev(i)}${g.id === "formato" ? ic(i.aba, "pcard") : ""}<span class="code">${g.letra}${n + 1}</span><span class="chk">${CHK}</span>${D.sugeridos.includes(i.id) && g.id === "estilo" ? `<span class="tag">${T[L].sug}</span>` : ""}${i.seu ? `<span class="tag">${T[L].seu}</span>` : ""}</div>
       <div class="tx"><b>${esc(i.nome[L])}</b><span>${esc(i.desc[L])}</span></div></button>`).join("")}</div><div class="pager" id="pager"></div>`;
   } else {
-    const man = D.grupos.filter(g => sel[g.id].size).length, tot = D.grupos.length, pct = auto ? 0 : man / tot;
+    const GR = D.grupos.filter((g, k) => !pula(k + 1) || sel[g.id].size);
+    const man = GR.filter(g => sel[g.id].size).length, tot = GR.length, pct = auto ? 0 : man / tot;
     const C = 2 * Math.PI * 46, anel = `<div class="anel"><svg viewBox="0 0 104 104"><circle cx="52" cy="52" r="46" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="9"/>
       <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ga)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}" style="filter:drop-shadow(0 0 6px rgba(43,255,136,.6));transition:stroke-dashoffset .8s"/>
       <defs><linearGradient id="ga"><stop offset="0" stop-color="#9CFFC9"/><stop offset="1" stop-color="#14E070"/></linearGradient></defs></svg>
@@ -610,7 +633,7 @@ function render() {
     } else {
       h = `<div class="passo">${T[L].resumo_rot}</div><div class="rev">${anel}<div><h2>${T[L].resumo_t}</h2><p class="sub" style="margin:4px 0 0">${T[L].resumo_p}</p>
         <div class="pills"><span class="pill g"><i></i>${man} ${T[L].escolhas_suas}</span><span class="pill a"><i></i>${tot - man} ${T[L].no_auto}</span></div></div></div>
-        <div class="rgrid">${D.grupos.map((g, k) => { const its = g.itens.filter(i => sel[g.id].has(i.id));
+        <div class="rgrid">${GR.map(g => { const k = D.grupos.indexOf(g), its = g.itens.filter(i => sel[g.id].has(i.id));
           const mini = its.length ? `<div class="mini">${prev(its[0])}</div>` : `<div class="mini auto"><span>AUTO</span></div>`;
           return `<button class="rc" data-ir="${k + 1}">${mini}<div><div class="rot"><b>${g.letra}</b>${esc(g.nome[L])}</div>
             <div class="esc">${its.length ? esc(its[0].nome[L]) : `<span style="color:var(--amb)">${T[L].gab_escolhe}</span>`}</div>
@@ -621,14 +644,29 @@ function render() {
   $("#tela").innerHTML = h;
   ajustar();
   $("#bk").hidden = passo === 0; $("#pl").hidden = !(passo >= 1 && passo <= N); $("#go").hidden = passo === 0;
-  $("#go").textContent = passo > N ? (auto ? T[L].conf_auto : T[L].confirmar) : (passo === N ? T[L].revisar : T[L].avancar);
+  $("#go").textContent = passo > N ? (auto ? T[L].conf_auto : T[L].confirmar) : (passo === vis[vis.length - 1] ? T[L].revisar : T[L].avancar);
   $("#codes").textContent = auto ? T[L].auto_t : codigos().join("  ");
   const trava = passo >= 1 && passo <= N && !pronto(passo);
   $("#go").disabled = trava; $("#go").title = trava ? T[L].trava : "";
   $("#pl").classList.toggle("ativo", passo >= 1 && passo <= N && !!autoPasso[D.grupos[passo - 1].id]);
   scrollTo(0, 0);
 }
-function pula(p) { const g = D.grupos[p - 1]; return g && ["estilo", "gancho", "layout", "prova"].includes(g.id) && sel.motions && sel.motions.has("sem"); }
+// árvore: trava = escolha forçada noutro passo (o passo some); esconde = opções que não existem nesse caminho
+function regra(k) { const t = {}; D.grupos.forEach(g => g.itens.forEach(i => { if (i[k] && sel[g.id].has(i.id))
+  for (const [a, v] of Object.entries(i[k])) t[a] = k === "esconde" ? (t[a] || []).concat(v) : v; })); return t; }
+const travas = () => regra("trava"), escondidos = gid => regra("esconde")[gid] || [];
+function pula(p) { const g = D.grupos[p - 1]; return g && ((["estilo", "gancho", "layout", "prova"].includes(g.id) && sel.motions && sel.motions.has("sem")) || g.id in travas()); }
+const visiveis = () => D.grupos.map((g, k) => k + 1).filter(p => !pula(p));
+let travados = new Set();
+function aplicaTravas() {
+  for (let volta = 0; volta < 3; volta++) {   // cascata: voz -> motions -> b-roll/cor...
+    const t = travas();
+    for (const gid of travados) if (!(gid in t) && sel[gid]) sel[gid].clear();   // saiu a trava: a escolha forçada sai junto
+    travados = new Set(Object.keys(t).filter(gid => sel[gid]));
+    for (const [gid, v] of Object.entries(t)) if (sel[gid]) { sel[gid].clear(); sel[gid].add(v); autoPasso[gid] = false; }
+    for (const [gid, ids] of Object.entries(regra("esconde"))) if (sel[gid]) ids.forEach(id => sel[gid].delete(id));
+  }
+}
 // cabe tudo na tela, sem letra miúda: cartão entre 160 e 300 px; se todas as opções couberem, sem rolagem;
 // se não couberem, cartões de ~220 px e a grade rola para baixo (pedido do usuário: rolar em vez de páginas).
 function ajustar() {
@@ -667,7 +705,7 @@ document.addEventListener("click", e => {
       if (g.unico || id === "sem") s.clear(); else s.delete("sem");
       if ((g.itens.find(x => x.id === id) || {}).base) g.itens.forEach(x => { if (x.base) s.delete(x.id); });   // estilo: um só, o novo troca o anterior
       if (g.max && s.size >= g.max) return; s.add(id); }
-    autoPasso[g.id] = false;
+    autoPasso[g.id] = false; aplicaTravas();   // ex.: vídeo inteiro em motion trava b-roll, lettering e cor
     const gr = $(".grid"), y = gr ? gr.scrollTop : 0; render(); if ($(".grid")) $(".grid").scrollTop = y; return;
   }
   const l = e.target.closest(".lang button"); if (l) { L = l.dataset.l; try { localStorage.setItem("ogab_menu_lang", L) } catch(e) {} render(); }
@@ -677,15 +715,15 @@ $("#pl").onclick = () => { const gid = D.grupos[passo - 1].id; sel[gid].clear();
 $("#go").onclick = async () => {
   if (passo >= 1 && passo <= N && !pronto(passo)) return;
   if (passo <= N) return ir(passo + 1);
-  const esc_ = {}, deixou = []; D.grupos.forEach(g => { if (sel[g.id].size) esc_[g.id] = [...sel[g.id]]; else deixou.push(g.id); });
+  const esc_ = {}, deixou = [], fora = []; D.grupos.forEach((g, k) => { if (sel[g.id].size) esc_[g.id] = [...sel[g.id]]; else (pula(k + 1) ? fora : deixou).push(g.id); });
   const lt = D.grupos.find(g => g.id === "lettering"); if (esc_.lettering) esc_.lettering_templates = esc_.lettering.map(id => (lt.itens.find(x => x.id === id) || {}).template).filter(Boolean);
-  const corpo = {modo: auto ? "auto" : "manual", lingua: L, escolhas: auto ? {} : esc_, gab_escolhe: auto ? D.grupos.map(g => g.id) : deixou, codigos: auto ? [] : codigos()};
+  const corpo = {modo: auto ? "auto" : "manual", lingua: L, escolhas: auto ? {} : esc_, gab_escolhe: auto ? D.grupos.map(g => g.id) : deixou, nao_se_aplica: auto ? [] : fora, codigos: auto ? [] : codigos()};
   try {
     const r = await fetch("/escolha", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(corpo)}); if (!r.ok) throw 0;
     const arq = (await r.json()).arquivo;
-    const msg = auto ? T[L].cab_auto : [T[L].cab + ":"].concat(D.grupos.map(g => {
+    const msg = auto ? T[L].cab_auto : [T[L].cab + ":"].concat(D.grupos.map((g, k) => {
       const its = g.itens.filter(i => sel[g.id].has(i.id)).map(i => (g.id === "formato" ? (g.abas.find(x => x.id === i.aba) || {nome: {}}).nome[L] + " " : "") + i.nome[L] + (i.proporcao ? ` (${i.proporcao})` : ""));
-      return `- ${g.nome[L]}: ${its.length ? its.join(", ") : T[L].auto_l}`; })).join("\n");
+      return `- ${g.nome[L]}: ${its.length ? its.join(", ") : (pula(k + 1) ? T[L].na : T[L].auto_l)}`; })).join("\n");
     try { await navigator.clipboard.writeText(msg); } catch (e) {}
     $("#msgprev").textContent = msg; $("#kmod").textContent = /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘" : "Ctrl";
     $("#copiar").onclick = async () => { try { await navigator.clipboard.writeText(msg); } catch (e) {} $("#copiar").textContent = T[L].copiado; setTimeout(() => $("#copiar").textContent = T[L].copiar, 1500); };
@@ -838,6 +876,8 @@ def main(a):
             print(f"  {g}: {', '.join(ids)}")
         if d["gab_escolhe"]:
             print("  o Gab escolhe: " + ", ".join(d["gab_escolhe"]))
+        if d.get("nao_se_aplica"):
+            print("  não se aplica: " + ", ".join(d["nao_se_aplica"]))
     print(f"salvo: {saida}")
 
 
