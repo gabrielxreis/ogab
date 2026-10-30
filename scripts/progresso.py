@@ -69,9 +69,15 @@ def _linha_total(pct_item):
         return None
     tot = min(100.0, (e["atual"] - 1 + pct_item / 100) / e["total"] * 100)
     n = 25; cheio = int(tot / 100 * n)
+    # tempo que falta pela MÉDIA das etapas já prontas (Gabriel, 30/10/2026: "36 min para terminar, é isso mesmo?"):
+    # projetar os 2% iniciais (que incluem a partida do npx/navegador) para a fila inteira dava 10x o tempo real.
+    # Antes da 1ª etapa acabar, só estima quando a atual já passou de 30%.
     resta = ""
-    if tot > 2:
-        gasto = time.time() - e["t0"]; resta = f" · falta ~{_fmt_s(gasto * (100 - tot) / tot)}"
+    gasto = time.time() - e["t0"]; feitas = e["atual"] - 1; faltam = e["total"] - feitas - pct_item / 100
+    if feitas >= 1:
+        resta = f" · falta ~{_fmt_s(gasto / (feitas + pct_item / 100) * faltam)}"
+    elif pct_item >= 30:
+        resta = f" · falta ~{_fmt_s(gasto / (pct_item / 100) * faltam)}"
     return (f"    {_C['verde']}{'█' * cheio}{_C['cinza']}{'░' * (n - cheio)}{_C['fim']} {tot:3.0f}%  "
             f"{_C['neg']}TOTAL{_C['fim']} · {e['atual']} de {e['total']}{resta}")
 

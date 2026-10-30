@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.30-9 (30/10/2026)
+- **Tempo restante do render certo:** a barra TOTAL agora calcula o que falta pela média dos motions já prontos. Antes, no começo da fila, ela mostrava um tempo umas 10 vezes maior que o real ("36 min" para algo de 5 min).
 ## 2026.10.30-8 (30/10/2026)
 - **Painel ao vivo da produção:** quando o Gab faz voz, música, takes e motions ao mesmo tempo, abre sozinho uma aba no painel Terminal com tudo acontecendo: barra do total, um cartão por vídeo com cada parte em selo colorido (✓ pronta, girando com o tempo, ⚠ travada, ✗ falhou) e o que precisa de atenção, atualizando a cada 2 segundos. O link da aba vem na conversa. Sem o painel aberto o Gab nem começa (`paralelo.py painel <pasta>`).
 - **Painel de render mais bonito:** a aba do Terminal abre limpa com o nome do vídeo numa caixa, cada motion vira uma etapa com a barra colorida embaixo (azul rodando, ✓ verde pronto, ✗ vermelho se falhar) e o fim lista só os arquivos prontos. Cada etapa mostra quantas faltam ("2 de 4") e uma segunda barra mostra o progresso TOTAL e o tempo que falta para acabar tudo. Sumiram os caminhos compridos e as linhas soltas de log.
