@@ -31,8 +31,9 @@
   if (P.olho) { const o = mk("div", "olho", palco, { fontSize: px(26), marginBottom: px(30) }); o.textContent = P.olho; aparece(o, .1); }
   if (P.titulo) titulo(palco, P.titulo, P.tam || (VERT ? 104 : 84));
   if (P.sub) { const s = mk("div", "sub", palco, { fontSize: px(34), marginTop: px(24) }); s.textContent = P.sub; aparece(s, .7); }
-  const cw = (VERT ? 920 : 1300) * U, ch = (VERT ? 980 : 540) * U;
-  const caixa = mk("div", "grafico", palco, { width: cw + "px", height: ch + "px", marginTop: px(VERT ? 90 : 50) });
+  // vertical: título + gráfico + fonte cabem na zona segura do Reels (y 360-1560, centro.py ALTURA_MAX 1200), relato 30/10/2026
+  const cw = (VERT ? 920 : 1300) * U, ch = (VERT ? 650 : 540) * U;
+  const caixa = mk("div", "grafico", palco, { width: cw + "px", height: ch + "px", marginTop: px(VERT ? 50 : 50) });
   const svg = sv("svg", { width: cw, height: ch, viewBox: `0 0 ${cw} ${ch}` }, caixa);
   const T0 = 1.0;   // o gráfico começa depois do título assentar
 
@@ -113,7 +114,10 @@
     },
   };
   (tipos[P.tipo] || tipos.barras)();
-  const f = mk("div", "fonte", document.getElementById("root"), { fontSize: px(27), bottom: px(VERT ? 150 : 60) }); f.textContent = P.fonte;
+  // vertical: a fonte vem logo abaixo do gráfico (no rodapé ficava em y~1750, fora da zona segura e sob os botões do Reels)
+  const f = VERT ? mk("div", "fonte", palco, { fontSize: px(27), position: "static", marginTop: px(40) })
+                 : mk("div", "fonte", document.getElementById("root"), { fontSize: px(27), bottom: px(60) });
+  f.textContent = P.fonte;
   aparece(f, T0 + .8);
   tl.fromTo("#cam", { scale: 1 }, { scale: 1.03, duration: dur, ease: "none" }, 0)
     .fromTo("#palco", { opacity: 0 }, { opacity: 1, duration: .5 }, 0);

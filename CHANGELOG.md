@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.30-3 (30/10/2026)
+- **Gráfico e marco dentro da área segura do Reels:** no vertical, a fonte do dado (e a frase de apoio do marco) não fica mais no rodapé, embaixo dos botões do Instagram; o bloco inteiro fica centrado e a fonte vem logo abaixo do gráfico ou do número. No horizontal nada mudou.
+- **Windows:** render de motion pelo painel de progresso acha o `npx` sozinho.
 ## 2026.10.30-2 (30/10/2026)
 - **Gab mais rápido, fazendo várias coisas ao mesmo tempo:** depois que você aprova o roteiro e a voz, a narração, a música, os takes, o vídeo por IA e os motions (em 2 ou 3 blocos) são feitos juntos em vez de um de cada vez. Com travas para não dar problema: nada começa sem o que precisa, nada gasta crédito duas vezes, um só usa o navegador por vez, ninguém mexe no seu editor além do Gab, e a montagem só começa com tudo pronto e conferido (`scripts/paralelo.py`).
 - **Correções que vieram dos relatos de vocês:** a conferência de centro do motion não quebra mais com o HyperFrames novo; no Windows, a conferência de centro e o render de motion acham o `npx` sozinhos; a folha de quadros da validação sai com a legenda gravada; a fábrica de cortes confere direto a transcrição do DaVinci; e o texto do estilo cinético fica dentro da área segura do Reels.

@@ -52,6 +52,8 @@ def rodar(cmd, nome="render", log=None, shell=False):
     t0 = time.time(); pct, fase, extra = 0.0, "começando", ""
     barra(nome, 0, fase)
     with open(log, "w", encoding="utf-8") as lg:
+        if not shell and isinstance(cmd, list) and cmd and str(cmd[0]).lower() in ("npx", "npm"):
+            cmd = [shutil.which(str(cmd[0])) or cmd[0]] + list(cmd[1:])   # Windows: npx é npx.cmd e o Popen sem shell não acha (o sitecustomize só cobre subprocess.run)
         pr = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
         buf = b""
         while True:
