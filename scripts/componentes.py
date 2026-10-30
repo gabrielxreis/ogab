@@ -27,6 +27,8 @@ FFMPEG_MIN = 7  # -/filter_complex <arquivo> existe desde o 7.0
 PACOTES = {"ffmpeg": ("ffmpeg", "Gyan.FFmpeg"), "yt-dlp": ("yt-dlp", "yt-dlp.yt-dlp"),
            "node": ("node", "OpenJS.NodeJS.LTS"), "git": ("git", "Git.Git")}
 PIP = ["pillow", "numpy", "opencv-python", "requests", "python-dotenv", "fonttools", "psd-tools", "pymupdf"]
+# teto de versão: o OpenCV 5.0 tirou o CascadeClassifier (detecção de rosto do Gab), então fica no 4.x
+TETO = {"opencv-python": "opencv-python<5"}
 
 REMOVIDAS = {  # opção (como aparece no código) -> troca
     "-vsync": "-fps_mode",
@@ -134,7 +136,7 @@ def problemas(rede=True):
 
 
 def pip_instalar(nomes):
-    base = [sys.executable, "-m", "pip", "install", "--user", "--quiet", "-U", *nomes]
+    base = [sys.executable, "-m", "pip", "install", "--user", "--quiet", "-U", *[TETO.get(n.lower(), n) for n in nomes]]
     if roda(base).returncode == 0:
         return True
     return roda(base + ["--break-system-packages"]).returncode == 0  # Python do Homebrew

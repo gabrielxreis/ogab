@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.30-6 (30/10/2026)
+- **O Gab agora trabalha junto com o Rick e o Jhon:** carrossel, capa, thumbnail, post e criativo em imagem vão para o Rick (/orick, o designer, que pergunta onde você quer gerar: Photoshop, ChatGPT, Gemini ou outra IA); resultado de campanha e anúncio passam pelo Jhon (/ojhon). Vídeo continua com o Gab.
+- **Correções que vieram dos relatos de vocês:** a prévia do CapCut não mostra mais quadro preto entre fotos curtas; o OpenCV fica na versão 4 (a 5.0 tirou a detecção de rosto) na instalação e no doctor; colocar música não quebra mais no DaVinci 21.0; e no Premiere para Windows a calibração de LUT acha o arquivo .cube.
 ## 2026.10.30-4 (30/10/2026)
 - **Premiere:** take de b-roll com corte (de/até) entra no trecho certo; antes entrava do começo do arquivo e ia até o fim dele, por cima do take seguinte.
 ## 2026.10.30-3 (30/10/2026)

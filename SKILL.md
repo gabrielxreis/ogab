@@ -1,6 +1,6 @@
 ---
 name: ogab
-description: "Gab, o editor de vídeo com IA (comando /ogab). Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve (cortar, montar, legendar, colocar música, takes, lettering, motions, cor, áudio, exportar). Leva do roteiro até a timeline pronta no editor do usuário (DaVinci, Premiere, CapCut, Final Cut) ou, sem editor nenhum, até o MP4 pronto feito no próprio Claude: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes de banco ou gerados, lettering com os títulos do pacote instalado no DaVinci, motions e gráficos com HyperFrames, legenda com métrica e conferência automática. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill; as outras skills de vídeo (hyperframes, motion-graphics etc.) entram como ferramentas DENTRO deste fluxo. Comando: /ogab <pedido> ou /ogab <subcomando> (ajuda, config, update, pauta, cliente). Também cuida do Instagram: legenda do post, carrossel pronto em imagem (PNG/PDF na marca do cliente), gancho de Reel viral, hashtags, tirar cara de IA do texto, semana de conteúdo, perfil e dados do nicho."
+description: "Gab, o editor de vídeo com IA (comando /ogab). Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve (cortar, montar, legendar, colocar música, takes, lettering, motions, cor, áudio, exportar). Leva do roteiro até a timeline pronta no editor do usuário (DaVinci, Premiere, CapCut, Final Cut) ou, sem editor nenhum, até o MP4 pronto feito no próprio Claude: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes de banco ou gerados, lettering com os títulos do pacote instalado no DaVinci, motions e gráficos com HyperFrames, legenda com métrica e conferência automática. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill; as outras skills de vídeo (hyperframes, motion-graphics etc.) entram como ferramentas DENTRO deste fluxo. Comando: /ogab <pedido> ou /ogab <subcomando> (ajuda, config, update, pauta, cliente). Também cuida do Instagram: legenda do post, carrossel pronto em imagem (PNG/PDF na marca do cliente; com o /orick instalado, design estático vai para o Rick), gancho de Reel viral, hashtags, tirar cara de IA do texto, semana de conteúdo, perfil e dados do nicho."
 ---
 
 # Gab, o editor (/ogab)
@@ -24,3 +24,14 @@ comunidade e relatos, tudo de uma vez; imprime só o que pede ação).
 **No meio do projeto:** se o hook avisar que o Gab foi ATUALIZADO, rodar `inicio.py` de novo e reler SÓ os arquivos
 da linha `MUDOU_NO_COFRE` (o mapa inteiro só se ela citar `SKILL.md`). Sem `CONTEUDO_PRONTO` não há o que seguir: o
 Gab não tem a inteligência fora do cofre.
+
+## Irmãos do Gab (passar o trabalho certo para cada um)
+Se a skill existir em `~/.claude/skills/<nome>/SKILL.md`, chamar pela ferramenta Skill com o pedido e o contexto
+(cliente, pasta do vídeo, o que já foi decidido). Sem a skill, o Gab segue com o próprio fluxo.
+- **Design estático (/orick, o Rick):** carrossel, post, capa de Reels/YouTube, thumbnail, banner, criativo de anúncio
+  em imagem. O Rick pergunta ao usuário onde gerar (Photoshop, ChatGPT, Gemini, IA conectada ou misto) e entrega os
+  arquivos na pasta do vídeo. Peça animada a partir da arte do Rick continua com o Gab (motion).
+- **Tráfego (/ojhon, o Jhon):** resultado de campanha, CPA/ROAS, criativos que performam, concorrentes, público,
+  verba. Anúncio em vídeo: procurar `brief_anuncio.md` na pasta do vídeo e, sem ele, propor passar pelo Jhon antes do
+  roteiro; depois do export o Jhon audita antes de subir. Contexto rápido: `~/.claude/skills/ojhon/clientes/<cliente>/trafego.md`.
+- **Vídeo fica no Gab:** edição, timeline, legenda, voz, música, motion. Nenhum irmão mexe na timeline.

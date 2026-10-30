@@ -249,7 +249,10 @@ def colocar_musica(t, mp, wav_bruto, inicio_faixa=0.0, dur=None, db=-10, fade_in
     x = res[0]
     F = fps_tl(t); fades = {"FadeIn": int(round(fade_in * F)), "FadeOut": int(round(fade_out * F))}
     # DaVinci 21.1: volume e fade do PRÓPRIO clipe pela API (o usuário arrasta as alças depois). Conferir lendo de volta.
-    x.SetProperties({"AudioVolume": float(db)}) if hasattr(x, "SetProperties") else x.SetProperty("AudioVolume", db)
+    # hasattr() é sempre True nos objetos do DaVinci (devolve None para método inexistente): testar o retorno
+    fn = getattr(x, "SetProperties", None)
+    if not callable(fn) or not fn({"AudioVolume": float(db)}):
+        x.SetProperty("AudioVolume", float(db))
     set_fades(x, fades)
     lido, vol = get_fades(x) or {}, x.GetProperty("AudioVolume")
     if any(abs(float(lido.get(k, -1)) - v) > 0.5 for k, v in fades.items()) or vol is None or abs(float(vol) - db) > 0.1:

@@ -111,6 +111,7 @@ def ferramentas():
 
 def pip_instalar(pacote):
     """pip --user no Python que roda a skill (no Mac com Python do Homebrew precisa de --break-system-packages)."""
+    pacote = {"opencv-python": "opencv-python<5"}.get(pacote, pacote)   # OpenCV 5.0 tirou o CascadeClassifier
     base = [sys.executable, "-m", "pip", "install", "--user", "--quiet", pacote]
     return roda(base).returncode == 0 or roda(base + ["--break-system-packages"]).returncode == 0
 
@@ -156,9 +157,9 @@ def python():
             m_ = __import__(mod)
             if mod == "cv2" and not hasattr(m_, "CascadeClassifier"):   # relato 16/10/2026: dois OpenCV instalados juntos
                 ok = CORRIGIR and roda([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless",
-                                        "opencv-contrib-python"]).returncode == 0 and pip_instalar("opencv-python")
+                                        "opencv-contrib-python"]).returncode == 0 and pip_instalar("opencv-python<5")  # 5.0 tirou o CascadeClassifier
                 item("⟳" if ok else "!", "python", "opencv-python reinstalado (detecção de rosto)" if ok else
-                     f"OpenCV sem detecção de rosto: {sys.executable} -m pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python && {sys.executable} -m pip install --user opencv-python")
+                     f"OpenCV sem detecção de rosto: {sys.executable} -m pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python && {sys.executable} -m pip install --user \"opencv-python<5\"")
                 continue
             item("✓", "python", f"{pac} ({uso})")
         except Exception:

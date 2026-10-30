@@ -20,7 +20,8 @@ import numpy as np
 from PIL import Image
 
 AQUI = Path(__file__).resolve().parent
-OYOSHI = Path.home() / ".claude/skills/oyoshi/scripts"
+ORICK = next((p for p in (Path.home() / ".claude/skills/orick/scripts", Path.home() / ".claude/skills/oyoshi/scripts") if p.exists()),
+             Path.home() / ".claude/skills/orick/scripts")
 
 # ---------------------------------------------------------------- utilidades
 
@@ -237,9 +238,9 @@ def _tem_photoshop():
 
 
 def _ps_arquivo(caminho, timeout=1800):
-    """Roda um .jsx no Photoshop (usa a ponte da /oyoshi se existir; senão, a mesma chamada por AppleScript)."""
-    if (OYOSHI / "ps_lib.py").exists():
-        sys.path.insert(0, str(OYOSHI))
+    """Roda um .jsx no Photoshop (usa a ponte da /orick se existir; senão, a mesma chamada por AppleScript)."""
+    if (ORICK / "ps_lib.py").exists():
+        sys.path.insert(0, str(ORICK))
         import ps_lib
         return ps_lib.arquivo(caminho, timeout=timeout)
     c = os.path.abspath(caminho).replace("'", "\\'")

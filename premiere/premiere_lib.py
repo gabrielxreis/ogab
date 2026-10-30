@@ -589,7 +589,8 @@ def _indice_lut(seq, lut, amostra):
     por(0)
     base = quadro("base.png")
     import subprocess
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", os.path.join(d, "base.png"), "-vf", f"lut3d=file='{cubo}'", os.path.join(d, "ref.png")], check=True)
+    cubo_ff = cubo.replace("\\", "/").replace(":", "\\:")   # filtro do ffmpeg: "C:\..." quebra no Windows (relato 27/10/2026)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", os.path.join(d, "base.png"), "-vf", f"lut3d=file='{cubo_ff}'", os.path.join(d, "ref.png")], check=True)
     ref = Image.open(os.path.join(d, "ref.png")).convert("RGB")
     dif = lambda im: sum(ImageStat.Stat(ImageChops.difference(im, ref)).mean) / 3
     melhor, ant, rep = (dif(base), 0), None, 0

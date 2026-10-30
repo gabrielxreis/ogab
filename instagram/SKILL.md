@@ -13,7 +13,7 @@ description: "Parte de Instagram do /ogab (não é comando separado; o /ogab lê
 - **Mídia vem do /ogab:** vídeo pronto em `<pasta do vídeo>/videos/`; a legenda do post vai para `videos/legenda_post.txt` (mesmo arquivo da etapa capa_e_legenda_post do /ogab).
 - **Chaves (Publora, Apify, Pixfaro) ficam em `instagram/.env`**, fora do git (copiar de `.env.example`). Sem chave, tudo funciona em modo rascunho (Tier 0).
 - **Como usar cada parte:** escolher o sub-skill pela lista abaixo e ler `skills/<nome>/SKILL.md` inteiro antes (os caminhos `../../references/` dentro deles apontam para `instagram/references/`). Código da `lib` roda de dentro desta pasta: `cd SKILL_DIR && python3 -c "from lib import ..."`.
-- **Carrossel em imagem:** depois de planejar com `skills/ig-carousel-planner`, gerar os slides PNG/PDF na marca do cliente seguindo `carrossel/CARROSSEL.md` (`carrossel/carrossel.py novo` > `MARCA` e `SLIDES` > `exportar`).
+- **Carrossel em imagem:** com o Rick instalado (`~/.claude/skills/orick/SKILL.md`), o carrossel e qualquer capa ou post estático vão para o `/orick` (ele pergunta onde gerar e tem o método de carrossel); aqui fica o plano do texto e a legenda. Sem o Rick: depois de planejar com `skills/ig-carousel-planner`, gerar os slides PNG/PDF na marca do cliente seguindo `carrossel/CARROSSEL.md` (`carrossel/carrossel.py novo` > `MARCA` e `SLIDES` > `exportar`).
 - **Publicar é ação externa:** mostrar o texto final e a mídia e só publicar/agendar com um "pode postar" explícito do usuário.
 
 A bundle of 9 focused skills for Instagram content ops in 2026. Each skill is

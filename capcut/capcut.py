@@ -426,16 +426,22 @@ def previa(nome, saida, ate=None, escala=1.0, lufs=-14.0):
             if a >= dur:
                 continue
             sd = min(sd, dur - a)
+            # início e fim em quadros absolutos: com 3 casas (0,267 x quadro em 0,2667) o corte de foto curta
+            # caía 1 quadro antes do clipe seguinte ligar e a prévia mostrava preto (relato 30/10/2026)
+            fa, fb = round(a * fps), round((a + sd) * fps)
+            if fb <= fa:
+                continue
+            a, sd = fa / fps, (fb - fa) / fps
             m = mats.get(s["material_id"], {})
-            en = f"between(t\\,{a:.3f}\\,{a + sd:.3f})"
+            en = f"between(t\\,{(fa - .5) / fps:.5f}\\,{(fb - .5) / fps:.5f})"
             n += 1
             if t["type"] == "text":
                 if m.get("type") != "text":
                     avisos.append("modelo de texto da loja fora da prévia"); continue
                 png = os.path.join(tmp, f"t{n}.png")
                 _txt_png(m, s, W, H, png)
-                i = entrada(["-loop", "1", "-framerate", str(fps), "-t", f"{sd:.3f}", "-i", png])
-                filtros.append(f"[{i}:v]setpts=PTS-STARTPTS+{a:.3f}/TB[o{n}]")
+                i = entrada(["-loop", "1", "-framerate", str(fps), "-t", f"{sd + 1 / fps:.5f}", "-i", png])
+                filtros.append(f"[{i}:v]setpts=PTS-STARTPTS+{a:.5f}/TB[o{n}]")
                 filtros.append(f"[{atual}][o{n}]overlay=0:0:enable='{en}':eof_action=pass[b{n}]")
                 atual = f"b{n}"
                 continue
@@ -444,7 +450,7 @@ def previa(nome, saida, ate=None, escala=1.0, lufs=-14.0):
             de = (s.get("source_timerange") or {}).get("start", 0) / US
             foto = m.get("type") == "photo"
             i = entrada((["-loop", "1", "-framerate", str(fps)] if foto else ["-ss", f"{de:.3f}"])
-                        + ["-t", f"{sd * s.get('speed', 1):.3f}", "-i", m["path"]])
+                        + ["-t", f"{(sd + 1 / fps) * s.get('speed', 1):.5f}", "-i", m["path"]])
             w, h = m.get("width") or W, m.get("height") or H
             clip = s.get("clip") or {}
             esc = (clip.get("scale") or {}).get("x", 1.0)
@@ -454,7 +460,7 @@ def previa(nome, saida, ate=None, escala=1.0, lufs=-14.0):
             ox = int(W / 2 + tr.get("x", 0) * W / 2 - ow / 2)
             oy = int(H / 2 - tr.get("y", 0) * H / 2 - oh / 2)
             vel = s.get("speed", 1) or 1
-            cad = f"[{i}:v]setpts=(PTS-STARTPTS)/{vel}+{a:.3f}/TB,fps={fps}"
+            cad = f"[{i}:v]setpts=(PTS-STARTPTS)/{vel}+{a:.5f}/TB,fps={fps}"
             canvas = next((mats[r] for r in s.get("extra_material_refs", []) if mats.get(r, {}).get("type", "").startswith("canvas_")), None)
             if t is principal and canvas and canvas["type"] == "canvas_blur":
                 filtros.append(f"{cad},split[f{n}][v{n}]")
