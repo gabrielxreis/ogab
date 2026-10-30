@@ -68,6 +68,7 @@ Se der `O Premiere não conectou` / não responder na porta: o Premiere está fe
 
 ## Armadilhas da API (aprendidas no teste de 12/10/2026, Premiere 26.5.2)
 
+- **In/out vai no item que entra na timeline (30/10/2026, relato de usuário):** take sem áudio entra pelo subclipe só de vídeo; o de/até posto no arquivo original era ignorado e o take entrava do 0 s até o fim do arquivo. Agora o in/out é marcado e limpo no subclipe. Clipe nunca aberto no monitor devolve out point -400000: o subclipe usa a duração do ffprobe.
 - Projeto: `Project.isProject()` diz true para qualquer caminho `.prproj`, mesmo inexistente; por isso `abrir_projeto` confere o arquivo no Python.
 - `createOverwriteItemAction` recusa o `ClipProjectItem` ("Invalid parameter"): passar o item cru do projeto. `-1` na trilha de áudio NÃO tira o áudio do take (vai para a A1 e apaga a narração): usar subclipe só de vídeo.
 - Componentes e parâmetros de efeito só valem dentro de `project.lockedAccess(...)` e sem `await` no meio (senão "script object is no longer valid"). A seleção de `TrackItemSelection.createEmptySelection` só vale dentro do callback.

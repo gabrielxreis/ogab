@@ -119,13 +119,15 @@ const remover = (p, ed, itens, tipo) => { let ok = false; p.lockedAccess(() => {
   for (const x of itens) sel.addItem(x, true);
   ok = p.executeTransaction((c) => c.addAction(ed.createRemoveItemsAction(sel, false, tipo === undefined ? P.Constants.MediaType.ANY : tipo)), "Gab: remover"); }); }); return ok; };
 // Subclipe só de vídeo do take (criado uma vez, no mesmo bin): o overwrite dele não leva áudio.
-async function soVideo(p, it) {
+async function soVideo(p, it, dur) {
   const nome = it.name + " (video)";
   const pai = it.getParentBin ? it.getParentBin() : await p.getRootItem();
   for (const x of await pai.getItems()) if (x.name === nome) return x;
   const c = clip(it);
   if (typeof c.createSubClipAction !== "function") throw new Error("este Premiere não tem createSubClipAction (26.0): atualize para 26.5+. MOV de motion sem áudio pode ir com createOverwriteItemAction(item, t, trilha, -1) direto");
-  const fim = await c.getOutPoint(P.Constants.MediaType.VIDEO);
+  let fim = await c.getOutPoint(P.Constants.MediaType.VIDEO);
+  // clipe nunca aberto no monitor devolve -400000 (sem out point): usa a duração do arquivo (ffprobe), relato 25/10/2026
+  if (!(fim.seconds > 0) && dur) fim = tt(dur);
   await tx(p, "Gab: subclipe só vídeo", () => [c.createSubClipAction(nome, P.TickTime.TIME_ZERO, fim, false, { takeVideo: true, takeAudio: false })]);
   for (const x of await pai.getItems()) if (x.name === nome) return x;
   for (const x of await itens(await p.getRootItem())) if (x.name === nome) return x;
@@ -264,18 +266,20 @@ _JS_COLOCAR = """
   const saida = [];
   for (const c of args.clipes) {
     const [it] = await importar(p, [c.arquivo], c.bin);
-    if (c.de !== null || c.ate !== null) {
-      const a = c.de !== null ? tt(c.de) : P.TickTime.TIME_ZERO;
-      const b = c.ate !== null ? tt(c.ate) : await clip(it).getOutPoint(P.Constants.MediaType.ANY);
-      await tx(p, "Gab: in/out", () => [clip(it).createSetInOutPointsAction(a, b)]);
-    }
     const v = c.video === null ? -1 : c.video, au = c.audio === null ? -1 : c.audio;
     let fonte = it;
     // com -1 o Premiere põe o áudio do take na A1 mesmo assim, por isso o subclipe só de vídeo. Arquivo SEM áudio
     // (motion MOV ProRes 4444) entra direto: o subclipe dele falha no 26.5 ("startTime must be less than endTime").
     if (c.audio === null && c.video !== null && c.tem_audio !== false) {
-      try { fonte = await soVideo(p, it); }
+      try { fonte = await soVideo(p, it, c.dur); }
       catch (e) { if (c.tem_audio === null && /startTime must be less than endTime/i.test(String(e))) fonte = it; else throw e; }  // sem ffprobe: mesmo sintoma = sem áudio
+    }
+    // in/out no item que vai para a timeline (o subclipe, se for ele): posto no arquivo original, o subclipe ignorava
+    // o de/ate e entrava do 0 s (relato 25/10/2026)
+    if (c.de !== null || c.ate !== null) {
+      const a = c.de !== null ? tt(c.de) : P.TickTime.TIME_ZERO;
+      const b = c.ate !== null ? tt(c.ate) : await clip(fonte).getOutPoint(P.Constants.MediaType.ANY);
+      await tx(p, "Gab: in/out", () => [clip(fonte).createSetInOutPointsAction(a, b)]);
     }
     // Overwrite do ITEM com in point (sem subclipe) cai em tempo + in (relato 3f81261bd5, 20/10/2026: música com
     // de=40 entrou em 40 s): compensa a posição; o subclipe (soVideo) já começa no zero e não precisa.
@@ -292,13 +296,13 @@ _JS_COLOCAR = """
       if (!novo) throw new Error("não achou o clipe colocado depois do fim da trilha");
       const st = (await novo.getStartTime()).seconds;
       await tx(p, "Gab: mover " + it.name, () => [novo.createMoveAction(tt(c.tempo - st))]);
-      if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
+      if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(fonte).createClearInOutPointsAction()]);
       saida.push({ nome: it.name, pedido: c.tempo, caiu: (await novo.getStartTime()).seconds });
       continue;
     }
     const pos = c.tempo - desloc;
     await tx(p, "Gab: colocar " + it.name, () => [ed.createOverwriteItemAction(fonte, tt(pos), v, au)]);
-    if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(it).createClearInOutPointsAction()]);
+    if (c.de !== null || c.ate !== null) await tx(p, "Gab: limpa in/out", () => [clip(fonte).createClearInOutPointsAction()]);
     let caiu = null;   // confere onde o clipe entrou (trilha de áudio, ou de vídeo se não tem áudio)
     try {
       const tr = au >= 0 ? await s.getAudioTrack(au) : await s.getVideoTrack(v);
@@ -330,12 +334,22 @@ def _tem_audio(arquivo):
         return None
 
 
+def _duracao(arquivo):
+    """Duração do arquivo em s pelo ffprobe (None se não deu)."""
+    try:
+        r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", arquivo],
+                           capture_output=True, text=True, timeout=30)
+        return float(r.stdout.strip())
+    except Exception:
+        return None
+
+
 def colocar(seq, arquivo, tempo, video=0, audio=0, de=None, ate=None, db=None, fade_in=0, fade_out=0):
     """Overwrite do arquivo em `tempo` (s). video/audio = índice da trilha (0 = V1/A1) ou None para não usar.
     de/ate cortam a fonte (s). db/fades ajustam o volume do clipe de áudio colocado."""
     arquivo = _abs(arquivo)
     r = js(_JS_COLOCAR, "colocar", seq=seq, clipes=[dict(arquivo=arquivo, tempo=tempo, video=video, audio=audio,
-                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo),
+                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo), dur=_duracao(arquivo),
                                                            v260=_versao_ppro().startswith("26.0"))])
     for x in (r or []):
         if isinstance(x, dict) and x.get("caiu") is not None and abs(x["caiu"] - tempo) > 0.05:
@@ -442,7 +456,7 @@ def montar_takes(seq, takes, fim=None, trilha=1, com_audio=False):
         t1 = takes[i + 1][1] if i + 1 < len(takes) else fim
         arq = _abs(arq)
         clipes.append(dict(arquivo=arq, tempo=t0, video=trilha, audio=(trilha if com_audio else None),
-                           de=0.0, ate=(None if t1 is None else t1 - t0), bin=_bin_de(arq), tem_audio=_tem_audio(arq)))
+                           de=0.0, ate=(None if t1 is None else t1 - t0), bin=_bin_de(arq), tem_audio=_tem_audio(arq), dur=_duracao(arq)))
     return js(_JS_COLOCAR, "montar takes", seq=seq, clipes=clipes)
 
 

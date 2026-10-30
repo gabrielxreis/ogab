@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.30-4 (30/10/2026)
+- **Premiere:** take de b-roll com corte (de/até) entra no trecho certo; antes entrava do começo do arquivo e ia até o fim dele, por cima do take seguinte.
 ## 2026.10.30-3 (30/10/2026)
 - **Gráfico e marco dentro da área segura do Reels:** no vertical, a fonte do dado (e a frase de apoio do marco) não fica mais no rodapé, embaixo dos botões do Instagram; o bloco inteiro fica centrado e a fonte vem logo abaixo do gráfico ou do número. No horizontal nada mudou.
 - **Windows:** render de motion pelo painel de progresso acha o `npx` sozinho.
