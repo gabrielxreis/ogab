@@ -452,6 +452,11 @@ def colocar_legendas(t, mp, srt, trocar=True, p=None):
     base, ext = os.path.splitext(os.path.basename(srt))
     unico = os.path.join(os.path.dirname(srt), f"{pasta_video.split(' - ')[0].replace(' ', '_')}__{base}_{marca}{ext}")
     if not os.path.exists(unico): shutil.copy(srt, unico)
+    # SRT em HD externo (exFAT, /Volumes) entra no Media Pool com duração 0 e o append falha calado: importar de uma
+    # cópia local (trecho de usuário, relato de 30/10/2026)
+    if os.path.abspath(unico).startswith("/Volumes/"):
+        import tempfile
+        local = os.path.join(tempfile.gettempdir(), os.path.basename(unico)); shutil.copy(unico, local); unico = local
     it = importar(mp, unico, "LEGENDAS")
     # AppendToTimeline usa a timeline ABERTA (já aberta acima; sem p= a legenda pode cair em outro vídeo)
     # trilha de legenda DESABILITADA recusa o SRT em silêncio (render sem legenda pode deixá-la desligada)
@@ -702,7 +707,9 @@ def takes_sem_cor(t):
             m = x.GetMediaPoolItem(); fp = (m.GetClipProperty("File Path") if m else "") or ""
             if m is None:   # título do Fusion (lettering) não é take e não recebe grade (relato 15/10/2026)
                 continue
-            if not x.GetClipEnabled() or "/motions/" in fp or fp.lower().endswith(".mov"):
+            # pasta de motions com versão (motions_v2...) e trilha MOTION* também são motion (relato 30/10/2026)
+            if (not x.GetClipEnabled() or "/motions" in fp.replace("\\", "/") or fp.lower().endswith(".mov")
+                    or (t.GetTrackName("video", k) or "").upper().startswith("MOTION")):
                 continue
             g = x.GetNodeGraph()
             if g and g.GetNumNodes() <= 1 and not g.GetLUT(1) and not take_pb(x):

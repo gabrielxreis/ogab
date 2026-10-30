@@ -84,7 +84,10 @@ def pip_velhos():
         d = json.loads(r.stdout or "[]")
     except ValueError:
         return []
-    return [(p["name"], p["version"], p["latest_version"]) for p in d if p["name"].lower() in PIP]
+    def acima_do_teto(p):   # OpenCV 5 aparecia como "desatualizado" toda semana, mas o teto é <5 (relato 30/10/2026)
+        teto = TETO.get(p["name"].lower(), "")
+        return "<" in teto and int(p["latest_version"].split(".")[0]) >= int(teto.split("<")[1].split(".")[0])
+    return [(p["name"], p["version"], p["latest_version"]) for p in d if p["name"].lower() in PIP and not acima_do_teto(p)]
 
 
 def hf_novo():

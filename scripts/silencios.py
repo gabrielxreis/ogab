@@ -36,6 +36,9 @@ def tc_quadros(tc, fps):
 
 
 def palavras(item, fps):
+    # DaVinci 21.0 não tem GetTranscription; nos objetos do Resolve o método inexistente vem None (relato 30/10/2026)
+    if not callable(getattr(item, "GetTranscription", None)) or not callable(getattr(item, "TranscribeAudio", None)):
+        return None
     tr = item.GetTranscription()
     if not tr or not tr.get("segments"):
         import time   # o resultado chega segundos depois do TranscribeAudio (relato 16/10/2026)

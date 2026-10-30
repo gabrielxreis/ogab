@@ -12,7 +12,7 @@ avisa o Claude para reabrir o cofre e reler o SKILL.md antes de responder.
 
 Enquanto o GitHub ainda existir e o servidor não tiver release, cai no `git pull` como antes.
 """
-import base64, hashlib, json, os, subprocess, sys, tempfile, time
+import base64, hashlib, json, os, shutil, subprocess, sys, tempfile, time
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(AQUI)
@@ -20,6 +20,7 @@ sys.path.insert(0, AQUI)
 import licenca  # noqa: E402
 
 CACHE = os.path.join(os.path.expanduser("~"), ".claude", "ogab_release_local.json")
+ESCRITOS = os.path.join(os.path.expanduser("~"), ".claude", "ogab_release_escritos.json")   # sha de tudo que o update gravou
 ESTADO_HOOK = os.path.join(os.path.expanduser("~"), ".claude", "ogab_hook_atualizar.json")
 INTERVALO = 60   # s entre duas checagens pelo hook
 
@@ -54,6 +55,11 @@ def _escrever(path, dados):
     tmp = full + ".parcial"
     with open(tmp, "wb") as f:
         f.write(dados)
+    # mantém o modo (install.sh 755): o os.replace sozinho deixava 644 e o git passava a ver o arquivo como editado
+    if os.path.exists(full):
+        shutil.copymode(full, tmp)
+    elif path.endswith((".sh", ".command")):
+        os.chmod(tmp, 0o755)
     os.replace(tmp, full)
 
 
@@ -63,11 +69,46 @@ def _git_pull():
 
 
 def _editados_local():
-    """Arquivos mudados e ainda não commitados no clone do dono: o update não pode sobrescrever trabalho em andamento."""
+    """Arquivos diferentes do HEAD do git local (candidatos a edição do usuário; ver _nosso)."""
     if not os.path.isdir(os.path.join(SKILL, ".git")):
         return set()
     r = subprocess.run(["git", "-C", SKILL, "status", "--porcelain", "--untracked-files=no"], capture_output=True, text=True)
     return {l[3:].strip().strip('"') for l in r.stdout.splitlines() if l.strip()}
+
+
+def _escritos():
+    try:
+        return json.load(open(ESCRITOS, encoding="utf-8")).get(SKILL, {})
+    except Exception:
+        return {}
+
+
+def _salvar_escritos(esc):
+    try:
+        todo = json.load(open(ESCRITOS, encoding="utf-8"))
+    except Exception:
+        todo = {}
+    todo[SKILL] = {p: v[-20:] for p, v in esc.items()}
+    os.makedirs(os.path.dirname(ESCRITOS), exist_ok=True)
+    json.dump(todo, open(ESCRITOS, "w", encoding="utf-8"))
+
+
+def _no_historico(path):
+    """O conteúdo atual do arquivo é alguma versão nossa que já passou pelo git (commit de qualquer data)."""
+    full = os.path.join(SKILL, path)
+    blob = subprocess.run(["git", "-C", SKILL, "hash-object", full], capture_output=True, text=True).stdout.strip()
+    if not blob:
+        return False
+    r = subprocess.run(["git", "-C", SKILL, "rev-list", "--objects", "--all", "--", path], capture_output=True, text=True)
+    return any(l.split(" ", 1)[0] == blob for l in r.stdout.splitlines())
+
+
+def _nosso(path, antigos, escritos):
+    """Arquivo diferente do HEAD local mas que é nosso: o update mesmo gravou (o sync pelo servidor não move o HEAD do
+    git) ou é uma versão do histórico. Antes, esses ficavam congelados para sempre (relatos de 30/10/2026: quadros.mjs,
+    silencios.py, relatar.py, install.sh parados em versões de duas semanas atrás)."""
+    sha = _sha(os.path.join(SKILL, path))
+    return sha is None or sha == antigos.get(path) or sha in escritos.get(path, []) or _no_historico(path)
 
 
 def _e_dono():
@@ -97,19 +138,31 @@ def sync(calado=False):
         _git_pull()   # servidor sem release ainda
         return None, 0, 0
     antigos = _cache()
+    escritos = _escritos()
     baixados = 0
     editados = _editados_local()
     for path, sha in arquivos.items():
-        if path in editados:
+        atual = _sha(os.path.join(SKILL, path))
+        if atual == sha:
             continue
-        if _sha(os.path.join(SKILL, path)) != sha:
-            r = licenca._post("/v1/release/baixar", {"key": d["key"], "maquina": licenca.maquina(), "path": path})
-            if r and r.get("b64") is not None:
-                try:
-                    _escrever(path, base64.b64decode(r["b64"]))
-                    baixados += 1
-                except Exception:
-                    pass
+        if path in editados and not _nosso(path, antigos, escritos):
+            continue   # edição do próprio usuário: não sobrescrever
+        r = licenca._post("/v1/release/baixar", {"key": d["key"], "maquina": licenca.maquina(), "path": path})
+        if r and r.get("b64") is not None:
+            try:
+                _escrever(path, base64.b64decode(r["b64"]))
+                escritos.setdefault(path, []).append(_sha(os.path.join(SKILL, path)))
+                baixados += 1
+            except Exception:
+                pass
+    _salvar_escritos(escritos)
+    for path in arquivos:   # conserta quem já perdeu o +x (install.sh 644 de updates antigos)
+        full = os.path.join(SKILL, path)
+        if path.endswith((".sh", ".command")) and os.path.isfile(full) and not os.access(full, os.X_OK):
+            try:
+                os.chmod(full, 0o755)
+            except Exception:
+                pass
     # apaga o que saiu do release (estava no último sync e não está mais), sem tocar no que é do usuário
     removidos = 0
     for path in antigos:

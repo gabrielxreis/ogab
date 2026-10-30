@@ -32,7 +32,7 @@ def etapas(pasta):
 
 def estado(pasta):
     f = os.path.join(pasta, "status.json")
-    st = json.load(open(f)) if os.path.exists(f) else {"feitas": [], "puladas": {}, "timeline": None}
+    st = json.load(open(f, encoding="utf-8")) if os.path.exists(f) else {"feitas": [], "puladas": {}, "timeline": None}
     for e, m in pulos_do_menu(pasta).items():   # o que marcou à mão vale mais que o menu
         if e not in st["feitas"]: st["puladas"].setdefault(e, m)
     return st
@@ -61,7 +61,7 @@ def pulos_do_menu(pasta):
     return r
 
 
-def salvar(pasta, st): json.dump(st, open(os.path.join(pasta, "status.json"), "w"), ensure_ascii=False, indent=1)
+def salvar(pasta, st): json.dump(st, open(os.path.join(pasta, "status.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
 def detectar(nome_tl):
@@ -119,12 +119,12 @@ def atualizar_md(pasta, E, feitas, puladas, tl):
     md = os.path.join(pasta, "PROJETO.md")
     bloco = "## Status (gerado por projeto.py)\n" + (f"Timeline: {tl}\n" if tl else "") + "".join(
         f"- [{'x' if e in feitas else ('-' if e in puladas else ' ')}] {ROTULO[e]}" + (f" (pulado: {puladas[e]})" if e in puladas else "") + "\n" for e in E)
-    txt = open(md).read() if os.path.exists(md) else f"# {os.path.basename(os.path.normpath(pasta))}\n\n"
+    txt = open(md, encoding="utf-8").read() if os.path.exists(md) else f"# {os.path.basename(os.path.normpath(pasta))}\n\n"
     if "## Status (gerado por projeto.py)" in txt:
         txt = re.sub(r"## Status \(gerado por projeto\.py\)\n(?:.*\n)*?(?=\n## |\Z)", bloco, txt, count=1)
     else:
         txt = txt.rstrip("\n") + "\n\n" + bloco
-    open(md, "w").write(txt)
+    open(md, "w", encoding="utf-8").write(txt)
 
 
 CONFERIR = [  # o que a API não vê: conferir de olho (prévia/screenshot) antes de entregar
@@ -151,18 +151,18 @@ def memoria(pasta, nota=None, tipo="aprendizado"):
     pasta = os.path.abspath(os.path.expanduser(pasta)); os.makedirs(pasta, exist_ok=True)
     nome = os.path.basename(pasta.rstrip("/")); arq = os.path.join(pasta, nome + ".md")
     if not os.path.exists(arq):
-        open(arq, "w").write(f"# {nome}: memória da marca\n\nLida no começo de todo vídeo desta marca. Regra que virou fixa "
+        open(arq, "w", encoding="utf-8").write(f"# {nome}: memória da marca\n\nLida no começo de todo vídeo desta marca. Regra que virou fixa "
                              "sobe para o estilo.md do cliente.\n\n" + "".join(f"## {v}\n\n" for v in SECOES.values()))
     if nota:
         if tipo not in SECOES: sys.exit(f"tipo inválido: {tipo} (use {', '.join(SECOES)})")
-        linhas = open(arq).read().split("\n"); cab = "## " + SECOES[tipo]
+        linhas = open(arq, encoding="utf-8").read().split("\n"); cab = "## " + SECOES[tipo]
         if cab not in linhas: linhas += [cab, ""]
         i = linhas.index(cab) + 1
         while i < len(linhas) and not linhas[i].startswith("## "): i += 1
         while i > 0 and linhas[i - 1] == "": i -= 1
         linhas.insert(i, f"- {datetime.date.today():%d/%m/%Y}: {nota}")
         linhas = [y for k, x in enumerate(linhas) for y in ([""] if x.startswith("## ") and k and linhas[k - 1] != "" else []) + [x]]
-        open(arq, "w").write("\n".join(linhas).rstrip() + "\n")
+        open(arq, "w", encoding="utf-8").write("\n".join(linhas).rstrip() + "\n")
     return arq
 
 
@@ -214,7 +214,7 @@ def main():
     if len(a) >= 2 and a[0] == "memoria":
         tipo = a[a.index("--tipo") + 1] if "--tipo" in a else "aprendizado"
         nota = next((x for i, x in enumerate(a[2:], 2) if not x.startswith("--") and a[i - 1] != "--tipo"), None)
-        arq = memoria(a[1], nota, tipo); print(open(arq).read()); return
+        arq = memoria(a[1], nota, tipo); print(open(arq, encoding="utf-8").read()); return
     if len(a) < 2 or a[0] not in ("status", "marcar"): print(__doc__); sys.exit(2)
     pasta = a[1]; st = estado(pasta)
     if a[0] == "marcar":

@@ -6,11 +6,11 @@
 - Com sugestao.json (de escolher_preset.py sugerir ... --saida): mostra o vídeo trecho a trecho com o preset que o Gab
   sugeriu; a pessoa clica num trecho e depois na miniatura para trocar (ou troca a linguagem do vídeo inteiro).
 - Sem sugestão: galeria para escolher o preset do vídeo (um ou mais).
-Ao clicar em "Confirmar", a escolha é gravada em --saida (padrão: ao lado da sugestão, ou ./escolha_presets.json),
+Ao clicar em "Confirmar", a escolha é gravada em --saida (padrão: ao lado da sugestão, ou na pasta temporária; antes caía na raiz da skill),
 a página avisa que pode voltar ao Gab e o script termina (rodar em segundo plano: o Gab é avisado quando acabar).
 Só serve arquivos de presets/ e só em 127.0.0.1.
 """
-import json, os, socket, sys, threading, time, webbrowser
+import json, os, socket, sys, tempfile, threading, time, webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote
 
@@ -152,7 +152,7 @@ def main(a):
     sug_arq = a[0] if a and not a[0].startswith("--") else None
     sug = json.load(open(sug_arq, encoding="utf-8")) if sug_arq else None
     formato = arg("--formato", (sug or {}).get("formato", "vertical"))
-    saida = os.path.abspath(arg("--saida", os.path.join(os.path.dirname(os.path.abspath(sug_arq)) if sug_arq else os.getcwd(), "escolha_presets.json")))
+    saida = os.path.abspath(arg("--saida", os.path.join(os.path.dirname(os.path.abspath(sug_arq)) if sug_arq else tempfile.gettempdir(), "escolha_presets.json")))
     C = catalogo()
     dados = {"presets": C["presets"], "categorias": C["categorias"], "formato": formato, "sugestao": sug}
     html = PAGINA.replace("__DADOS__", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")).encode("utf-8")

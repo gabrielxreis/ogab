@@ -37,6 +37,17 @@ def busca(termos, n=8):
     print(JS.replace("%N%", str(n)))
 
 
+def _ssl():
+    """Python do python.org no Mac vem sem certificados (CERTIFICATE_VERIFY_FAILED): usa os do certifi se houver
+    (trecho de usuário, relato de 30/10/2026)."""
+    import ssl
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
 def slug(s):
     s = re.sub(r"\s+by\s+.*$", "", s, flags=re.I)
     return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")[:40] or "sfx"
@@ -58,7 +69,7 @@ def baixar(lista_json, pasta, so=None, nomes=None):
         destino = os.path.join(pasta, nome + ".wav")
         tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False).name
         req = urllib.request.Request(it["mp3"], headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=60) as r, open(tmp, "wb") as f:
+        with urllib.request.urlopen(req, timeout=60, context=_ssl()) as r, open(tmp, "wb") as f:
             f.write(r.read())
         # 48 kHz estéreo e -16 LUFS como a biblioteca do Artlist: mede e aplica um ganho fixo (o loudnorm dinâmico
         # erra em som curto), sem passar de -1 dBTP de pico

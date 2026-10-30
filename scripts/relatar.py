@@ -712,6 +712,7 @@ MIN_LINHAS_INVENCAO = 6   # menos que isso é ajuste, não invenção
 # pasta de temporário (scripts gerados na hora, com conteúdo de cliente) nunca é invenção (relato de 27/10/2026)
 TEMP_INVENCAO = re.compile(r"(^|/)(_?tmp|_?temp|_?cache)(/|$)|\.parcial$", re.I)
 RELEASE_LOCAL = os.path.expanduser("~/.claude/ogab_release_local.json")
+RELEASE_ESCRITOS = os.path.expanduser("~/.claude/ogab_release_escritos.json")
 
 
 def _git(*args):
@@ -729,14 +730,22 @@ def _do_release():
 
 
 def _oficial(rel, release):
-    """O arquivo está igual ao do release oficial (não foi o usuário que mudou)."""
-    sha = release.get(rel)
-    if not sha:
-        return False
+    """O arquivo é nosso (não foi o usuário que mudou): igual ao release atual, a algo que o update já gravou
+    (atualizar.py guarda em ogab_release_escritos.json) ou a uma versão do histórico do git. Antes só o release atual
+    contava, e arquivo congelado numa versão velha ia para a fila como "invenção" (relatos de 30/10/2026)."""
     try:
-        return hashlib.sha256(open(os.path.join(SKILL, rel), "rb").read()).hexdigest() == sha
+        sha = hashlib.sha256(open(os.path.join(SKILL, rel), "rb").read()).hexdigest()
     except Exception:
         return False
+    if sha == release.get(rel):
+        return True
+    try:
+        if sha in json.load(open(RELEASE_ESCRITOS, encoding="utf-8")).get(SKILL, {}).get(rel, []):
+            return True
+    except Exception:
+        pass
+    blob = _git("hash-object", os.path.join(SKILL, rel)).strip()
+    return bool(blob) and any(l.split(" ", 1)[0] == blob for l in _git("rev-list", "--objects", "--all", "--", rel).splitlines())
 
 
 def _blocos_invencao():

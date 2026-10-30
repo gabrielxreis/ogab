@@ -70,20 +70,20 @@ def main():
     agora = tirar(t)
     gab = os.path.join(d, f"{base}_gab.json")
     if modo in ("antes", "vigiar") and "--retomar" not in a and os.path.exists(gab):
-        mexeu = comparar(json.load(open(gab)), agora, [])
+        mexeu = comparar(json.load(open(gab, encoding="utf-8")), agora, [])
         if mexeu:
             print("USUARIO_MEXEU: a timeline mudou desde a última mexida do Gab. REGRA DE EMERGÊNCIA: PARAR TUDO no editor "
                   "e esperar o usuário avisar que pode voltar (depois: retrato.py antes ... --retomar).")
             [print("  " + x) for x in mexeu[:12]]; sys.exit(3)
     if modo == "vigiar": print("OK: ninguém mexeu desde a última mexida do Gab"); return
     if modo == "antes":
-        arq = os.path.join(d, f"{base}_{time.strftime('%Y%m%d_%H%M%S')}.json"); json.dump(agora, open(arq, "w"), ensure_ascii=False, indent=1)
-        if "--retomar" in a: json.dump(agora, open(gab, "w"), ensure_ascii=False, indent=1)
+        arq = os.path.join(d, f"{base}_{time.strftime('%Y%m%d_%H%M%S')}.json"); json.dump(agora, open(arq, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        if "--retomar" in a: json.dump(agora, open(gab, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         n = sum(len(v["itens"]) for v in agora["trilhas"].values()); print(f"retrato salvo ({n} itens): {arq}"); return
     ant = sorted(glob.glob(os.path.join(d, f"{base}_*.json")))
     if not ant: sys.exit("sem retrato 'antes' desta timeline")
-    difs = comparar(json.load(open(ant[-1])), agora, alvos)
-    json.dump(agora, open(gab, "w"), ensure_ascii=False, indent=1)   # como o Gab deixou a timeline
+    difs = comparar(json.load(open(ant[-1], encoding="utf-8")), agora, alvos)
+    json.dump(agora, open(gab, "w", encoding="utf-8"), ensure_ascii=False, indent=1)   # como o Gab deixou a timeline
     if not difs: print(f"OK: nada fora do alvo mudou (comparado com {os.path.basename(ant[-1])})"); return
     print("ATENÇÃO, mudou fora do alvo:"); [print("  " + x) for x in difs]; sys.exit(1)
 
