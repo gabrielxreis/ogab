@@ -71,7 +71,8 @@ def exportar(p, t, tempos, pasta):
         for i, (s, _) in enumerate(tempos):
             q = S + max(0, round(s * F))
             p.SetRenderSettings({"SelectAllFrames": False, "MarkIn": q, "MarkOut": q, "TargetDir": pasta, "CustomName": f"q_{i:03d}",
-                                 "FormatWidth": w, "FormatHeight": h, "ExportVideo": True, "ExportAudio": False})
+                                 "FormatWidth": w, "FormatHeight": h, "ExportVideo": True, "ExportAudio": False,
+                                 "ExportSubtitle": True, "SubtitleFormat": "BurnIn"})   # legenda gravada: a folha confere a legenda também
             jid = p.AddRenderJob()
             if jid:
                 jobs.append(jid)

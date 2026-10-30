@@ -9,7 +9,7 @@
   root.style.setProperty("--brilho", P.brilho || "rgba(232,32,42,.55)");
   let s = P.semente || 7; const R = () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const tl = gsap.timeline({ paused: true });
-  const AREA = W - 140;
+  const AREA = P.area || (W - 260);   // folga dentro da zona segura do Reels (x 70-1010): o zoom de entrada e o brilho passam da caixa medida
 
   const mk = (tag, cls, pai, css) => { const e = document.createElement(tag); if (cls) e.className = cls; if (css) Object.assign(e.style, css); if (pai) pai.appendChild(e); return e; };
   function fit(el, maxW, maxPx) { el.style.fontSize = "200px"; el.style.display = "inline-block"; const w = el.getBoundingClientRect().width || 1; el.style.display = ""; const f = Math.min(maxPx, 200 * maxW / w); el.style.fontSize = f + "px"; return f; }

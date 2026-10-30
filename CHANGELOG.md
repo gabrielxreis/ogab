@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.30-2 (30/10/2026)
+- **Gab mais rápido, fazendo várias coisas ao mesmo tempo:** depois que você aprova o roteiro e a voz, a narração, a música, os takes, o vídeo por IA e os motions (em 2 ou 3 blocos) são feitos juntos em vez de um de cada vez. Com travas para não dar problema: nada começa sem o que precisa, nada gasta crédito duas vezes, um só usa o navegador por vez, ninguém mexe no seu editor além do Gab, e a montagem só começa com tudo pronto e conferido (`scripts/paralelo.py`).
+- **Correções que vieram dos relatos de vocês:** a conferência de centro do motion não quebra mais com o HyperFrames novo; no Windows, a conferência de centro e o render de motion acham o `npx` sozinhos; a folha de quadros da validação sai com a legenda gravada; a fábrica de cortes confere direto a transcrição do DaVinci; e o texto do estilo cinético fica dentro da área segura do Reels.
 ## 2026.10.29-5 (29/10/2026)
 - **Upscale de foto com IA, grátis e no seu computador:** `python3 scripts/upscale.py <foto ou pasta> [--escala 2|3|4] [--largura 2400]` aumenta até 4x e recria os detalhes (Real-ESRGAN, roda na placa de vídeo do Mac, Windows ou Linux). Na primeira vez ele baixa o programa sozinho (~52 MB). Bom para foto de IA que sai pequena (Gemini, ChatGPT) antes de usar em tela cheia, página ou capa.
 ## 2026.10.29-4 (29/10/2026)

@@ -41,7 +41,7 @@ def montar(kit, plano, pasta, dur):
 def renderizar(pasta, saida, gif=False, trabalhadores=2):
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import progresso   # barra com % no Terminal (regra do usuário, 27/10/2026); logs técnicos em <saida>.log
-    progresso.hf(["npx", "--yes", HYPERFRAMES, "render", pasta, "--format", "mp4", "-q", "high", "-w", str(trabalhadores), "-o", saida],
+    progresso.hf([shutil.which("npx") or "npx", "--yes", HYPERFRAMES, "render", pasta, "--format", "mp4", "-q", "high", "-w", str(trabalhadores), "-o", saida],
                  os.path.splitext(os.path.basename(saida))[0], os.path.splitext(saida)[0] + ".log")
     print("render", saida)
     if gif:   # prévia leve para README e chat: 15 fps, paleta própria

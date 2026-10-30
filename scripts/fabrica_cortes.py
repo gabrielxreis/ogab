@@ -86,7 +86,10 @@ def conferir(trans, cortes_json, mn=20, mx=75, pausa=.8):
         if c["media"] < 7.5: prob.append(f"média {c['media']} abaixo de 7,5")
         usados.append((a, b))
         # trechos do corte com as pausas encurtadas (cortes.plano numa transcrição só com as palavras do corte)
-        d = json.load(open(trans)); seg = {"segments": [{"words": [w for s in d["segments"] for w in s.get("words", [])
+        d = json.load(open(trans)); fps = float(d.get("fps", 30))
+        for s in d["segments"]:   # motor davinci grava timecode HH:MM:SS:FF; daqui para baixo tudo em segundos
+            for w in s.get("words", []): w["start"], w["end"] = C._seg(w["start"], fps), C._seg(w["end"], fps)
+        seg = {"segments": [{"words": [w for s in d["segments"] for w in s.get("words", [])
                                                                      if a - .01 <= float(w["start"]) and float(w["end"]) <= b + .01]}]}
         tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False); json.dump(seg, tmp); tmp.close()
         plano = os.path.join(pasta, f"{k:02d}.json")

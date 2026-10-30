@@ -25,7 +25,7 @@ ALTURA_MAX = 1200   # 4:5 do feed (1350) menos margem: y de 360 a 1560
 LARGURA_MAX = 900   # 90 px de margem em cada lado
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from componentes import hf  # noqa: E402
-HF = ["npx", "--yes", hf()]  # versão fixada em versoes.json
+HF = [shutil.which("npx") or "npx", "--yes", hf()]  # Windows: npx.cmd  # versão fixada em versoes.json
 
 
 def _snap(pasta, tempos):
@@ -34,7 +34,7 @@ def _snap(pasta, tempos):
     html = (dst / "index.html").read_text()
     html = html.replace("</style>", "#bg, canvas { display: none !important; } html, body { background: transparent !important; }\n</style>", 1)
     (dst / "index.html").write_text(html)
-    subprocess.run(HF + ["snapshot", str(dst), "--at", ",".join(str(t) for t in tempos)],
+    subprocess.run(HF + ["snapshot", str(dst), "-o", str(dst / "snapshots"), "--no-end", "--describe", "false", "--at", ",".join(str(t) for t in tempos)],
                    capture_output=True, text=True, cwd=str(tmp))
     pngs = sorted((dst / "snapshots").glob("*.png"))
     if not pngs: raise SystemExit(f"sem snapshots de {pasta}")
@@ -68,7 +68,7 @@ def comeca_do_preto(pasta, comparar=0.6):
     from PIL import Image
     pasta = Path(pasta).resolve(); tmp = Path(tempfile.mkdtemp(prefix="preto_")); dst = tmp / pasta.name
     shutil.copytree(pasta, dst, ignore=shutil.ignore_patterns("snapshots"))
-    subprocess.run(HF + ["snapshot", str(dst), "--at", f"0,{comparar}"], capture_output=True, text=True, cwd=str(tmp))
+    subprocess.run(HF + ["snapshot", str(dst), "-o", str(dst / "snapshots"), "--no-end", "--describe", "false", "--at", f"0,{comparar}"], capture_output=True, text=True, cwd=str(tmp))
     pngs = sorted((dst / "snapshots").glob("*.png"), key=lambda p: float(re.search(r"at-([\d.]+)s", p.name).group(1)))
     # mediana = o fundo; texto grande e claro entrando (permitido) não puxa a medida (falso alarme no launch verde, 22/10/2026)
     b = [float(np.median(np.asarray(Image.open(p).convert("L")))) for p in pngs[:2]]

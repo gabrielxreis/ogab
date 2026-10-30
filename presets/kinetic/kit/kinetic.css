@@ -13,7 +13,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 .carvao .pontos { background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); background-size: 135px 135px; opacity: 1; }
 .vermelho .pontos { background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 2px, transparent 2px 7px); opacity: 1; }
 .bokeh { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255,70,70,.95), rgba(232,32,42,0) 70%); }
-.palco { position: absolute; left: 70px; right: 70px; top: var(--cy); transform: translateY(-50%); }
+.palco { position: absolute; left: 120px; right: 120px; top: var(--cy); transform: translateY(-50%); }
 .L { position: relative; display: block; white-space: nowrap; font-family: "Archivo", sans-serif; font-weight: 900; font-stretch: 125%;
   font-variation-settings: "wdth" 125; text-transform: uppercase; line-height: .92; letter-spacing: -.005em; text-align: center; }
 .esq .L { text-align: left; }
