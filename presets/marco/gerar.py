@@ -22,7 +22,7 @@ def gerar(plano, pasta):
     if not str(plano.get("numero", "")).strip():
         raise SystemExit('Falta "numero" (o texto exato do marco, ex.: "10 mil").')
     montar(os.path.join(AQUI, "kit"), plano, pasta, plano["dur"])
-    print("ok", pasta, plano["numero"], plano["dur"], "s")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", plano["numero"], plano["dur"], "s")
     return pasta
 
 

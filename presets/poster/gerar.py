@@ -17,7 +17,8 @@ plano.json (x/y em px a partir do CENTRO da tela 540,960; texto dentro da caixa 
       "ritmo": "media" | "rapida" | "lenta",
       "foto": {"arquivo": "fotos/x.jpg", "credito": "NASA, domínio público",
                "recorte": "sujeito" | "escuro" | "nenhum", "altura": 900, "largura": 900, "x": 0, "y": 120,
-               "rot": 0, "frente": false},          # recorte escuro = objeto sobre fundo preto (planeta, produto)
+               "rot": 0, "frente": false, "cor": false},   # recorte escuro = objeto sobre fundo preto (planeta, produto);
+                                            # cor = logo de marca em PNG: mantém cores e transparência (sem P&B)
       "forma": {"tipo": "disco" | "quadro" | "pedestal", "x": -60, "y": 40, "raio": 330,
                 "larg": 420, "alt": 520, "orbita": true},
       "texto": {"linhas": ["ninguém nasce", "sabendo criar"], "x": 0, "y": -300, "em": 0.15, "ate": 1.6,
@@ -25,8 +26,13 @@ plano.json (x/y em px a partir do CENTRO da tela 540,960; texto dentro da caixa 
       "gigante": {"texto": "CRIAR", "y": 560, "linhas": 1, "frente": true},
       "micro": true,                                # rótulos miúdos, código de barras, grade (padrão true)
       "hud": false,                                 # cantos finos e chip de rótulo (bom no fundo escuro)
+      "celular": {"em": 1.4, "larg": 600, "x": 0, "y": 170,   # CTA de seguir: celular 3D com o perfil, o dedo toca em Seguir no "em"
+                  "perfil": {"user", "nome", "posts", "seguidores", "seguindo", "bio": [linhas], "link", "destaques": [...],
+                             "foto": "perfil.jpg", "capas": ["capa1.jpg", ...]}},
       "ref_plano": 1, "ref_o_que": "afasta + anda p/ esquerda" },
     { "dur": 2.0, "fundo": "escuro", "fecho": "nome da marca" } ] }
+  "tempos": [s, s, ...] no texto = segundo (desde o começo da cena) em que CADA palavra é dita: ela acende junto com a voz
+  (montar pela transcrição; regra do usuário 28/10/2026: "o timing de entrada dos textos com a voz não bate").
   em/ate: segundos desde o começo da cena (ou palavra da fala com "transcricao"): as palavras entram uma a uma
   entre em e ate. Cena com "fecho": só a marca no preto (entra pesada e assenta leve, câmera afastando).
 Do tema (temas/padrao.json): claro, borda, escuro, tinta, acento, acento2, fontes e os rótulos miúdos (micro).
@@ -95,8 +101,15 @@ def recortar(f, base, pasta):
         raise SystemExit("Foto não encontrada: " + orig)
     modo = f.get("recorte", "sujeito")
     alt, larg = f.get("altura", 900), f.get("largura", 900)
-    nome = "foto_" + _hash(orig, os.path.getmtime(orig), modo, alt, larg) + ".png"
+    cor = bool(f.get("cor"))   # logo de marca: cores originais e a transparência do PNG (sem P&B)
+    nome = "foto_" + _hash(orig, os.path.getmtime(orig), modo, alt, larg, cor) + ".png"
     destino = os.path.join(pasta, "assets", nome)
+    if cor and not os.path.exists(destino):
+        img = Image.open(orig).convert("RGBA")
+        img = img.crop(img.getbbox() or (0, 0, img.width, img.height))
+        s = min(alt / img.height, larg / img.width, 1.6)
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        img.resize((max(8, int(img.width * s)), max(8, int(img.height * s))), Image.LANCZOS).save(destino, optimize=True)
     if not os.path.exists(destino):
         img = Image.open(orig).convert("RGB")
         m = mascara(orig, img, modo)
@@ -168,6 +181,18 @@ def gerar(plano, pasta, base, tema):
         f = c.get("foto")
         if f:
             f["src"], f["w"], f["h"] = recortar(f, base, pasta)
+        cel = (c.get("celular") or {}).get("perfil")
+        if cel:   # celular do Instagram: foto e capas vão para assets/ (o render só enxerga a pasta)
+            def leva(arq):
+                o = arq if os.path.isabs(arq) else os.path.join(base, arq)
+                if not os.path.exists(o):
+                    raise SystemExit("Foto do perfil não encontrada: " + o)
+                d = "perfil_" + _hash(o, os.path.getmtime(o)) + os.path.splitext(o)[1].lower()
+                shutil.copy(o, os.path.join(pasta, "assets", d))
+                return "assets/" + d
+            if cel.get("foto"):
+                cel["foto"] = leva(cel["foto"])
+            cel["capas"] = [leva(x) for x in cel.get("capas", [])]
         S += c["dur"]
     dur = round(S, 3)
     plano["tema"] = tema
@@ -185,7 +210,7 @@ def gerar(plano, pasta, base, tema):
     open(os.path.join(pasta, "index.html"), "w", encoding="utf-8").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}},
               open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, f"{len(plano['cenas'])} cenas, {dur} s, tema {tema.get('nome')}")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", f"{len(plano['cenas'])} cenas, {dur} s, tema {tema.get('nome')}")
     return pasta
 
 

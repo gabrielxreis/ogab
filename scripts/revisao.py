@@ -162,6 +162,34 @@ def bordas(t):
                 ERROS.append(f"BORDA no take {os.path.basename(fp)} (V{n}, {mpi.GetClipProperty('Resolution')}): zoom {atual:.3f}, precisa {z:.3f}")
 
 
+def v1_sem_som(t):
+    """Vídeo inteiro em motion / narração por IA: a V1 é o motion (sem áudio) e a fala mora na A1.
+    Também quando a V1 são takes de IA (Seedance) com som próprio, mas só a imagem entrou: a A1 é uma narração que não
+    vem de nenhum arquivo da V1 (30/10/2026, teaser da Black: o som do take virava 'retake' e 'silêncio' falsos)."""
+    its = itens(t, "video", 1)
+    if not its or not its[0].GetMediaPoolItem(): return False
+    def _arq(x): return (x.GetMediaPoolItem().GetClipProperty("File Path") or "") if x.GetMediaPoolItem() else ""
+    a1 = {_arq(x) for x in itens(t, "audio", 1)} - {""}
+    if a1 and not (a1 & {_arq(x) for x in its}): return True
+    arq = its[0].GetMediaPoolItem().GetClipProperty("File Path") or ""
+    if not os.path.exists(arq): return False
+    import subprocess
+    o = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", arq],
+                       capture_output=True, text=True).stdout.strip()
+    return not o
+
+
+def v1_tem_take(t):
+    """Algum clipe da V1 é gravação/take com som próprio (o rosto ainda se confere, mesmo com a fala na A1)."""
+    import subprocess
+    for x in itens(t, "video", 1):
+        arq = (x.GetMediaPoolItem().GetClipProperty("File Path") or "") if x.GetMediaPoolItem() else ""
+        if arq and os.path.exists(arq) and subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries",
+                                                           "stream=index", "-of", "csv=p=0", arq], capture_output=True, text=True).stdout.strip():
+            return True
+    return False
+
+
 def fala(t):
     """LEI 1 e 2. SILÊNCIO pela energia do áudio da gravação, no que ficou na timeline (pausa sem voz > 0,35 s, ou
     começo sem fala > 0,45 s). REPETIÇÃO/RETAKE/GAGUEJO pela transcrição literal de trechos grandes (palavra que
@@ -169,8 +197,8 @@ def fala(t):
     try:
         import limpar_fala as LF
     except Exception as e:
-        AVISOS.append(f"FALA: limpar_fala indisponível ({e})"); return
-    S, F = t.GetStartFrame(), R.fps_tl(t); its = itens(t, "video", 1)
+        ERROS.append(f"FALA: limpar_fala indisponível ({e}), checagem de fala não rodou"); return
+    S, F = t.GetStartFrame(), R.fps_tl(t); its = itens(t, "audio", 1) if v1_sem_som(t) else itens(t, "video", 1)
     if not its: return
     arq = its[0].GetMediaPoolItem().GetClipProperty("File Path")
     if not arq or not os.path.exists(arq): return
@@ -194,25 +222,51 @@ def fala(t):
                 k = j
             else:
                 k += 1
-    # trechos grandes da gravação (cortes próximos juntos) para a transcrição literal
-    grandes = []
-    for lo, hi, rec in sorted(pedacos):
-        if grandes and lo - grandes[-1][1] < 1.5: grandes[-1][1] = max(grandes[-1][1], hi)
-        else: grandes.append([lo, hi])
-    try:
-        ws = LF.literal_trechos(arq, grandes)
-    except Exception as e:
-        AVISOS.append(f"FALA: sem transcrição literal ({e})"); return
-    seq = []
-    for w in ws:
-        m = (w["start"] + w["end"]) / 2
-        for lo, hi, rec in pedacos:
-            if lo - 0.03 <= m <= hi + 0.03:
-                seq.append({"text": w["text"], "start": rec + max(w["start"], lo) - lo, "end": rec + min(w["end"], hi) - lo}); break
-    seq.sort(key=lambda w: w["start"])
+    # REPETIÇÃO pela transcrição do ÁUDIO COMO FICOU na timeline (pedaços da V1 emendados, só para análise; nada
+    # disso vai para a timeline). Transcrever a gravação e distribuir as palavras nos cortes perdia palavra curta na
+    # emenda e dava gaguejo falso ("como for. Se for" virava "for for", 28/10/2026).
+    import tempfile, subprocess, hashlib, json as _json
+    chave = hashlib.md5(repr([(round(lo, 3), round(hi, 3)) for lo, hi, _ in pedacos]).encode()).hexdigest()[:12]
+    cache = arq + f".revisao_{chave}.json"
+    if os.path.exists(cache):
+        seq = _json.load(open(cache, encoding="utf-8"))
+    else:
+        try:
+            import mlx_whisper
+            with tempfile.TemporaryDirectory() as tmp:
+                partes = []
+                for k, (lo, hi, rec) in enumerate(pedacos):
+                    o = os.path.join(tmp, f"{k:04d}.wav")
+                    subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", f"{lo:.3f}", "-to", f"{hi:.3f}", "-i", arq,
+                                    "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", o], check=True)
+                    partes.append(o)
+                lst = os.path.join(tmp, "l.txt"); open(lst, "w").write("".join(f"file '{x}'\n" for x in partes))
+                junto = os.path.join(tmp, "junto.wav")
+                subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", junto], check=True)
+                r = mlx_whisper.transcribe(junto, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language="pt",
+                                           word_timestamps=True, condition_on_previous_text=False)
+            seq = [{"text": w["word"].strip(), "start": w["start"], "end": w["end"]} for sg in r["segments"] for w in sg.get("words", [])]
+            _json.dump(seq, open(cache, "w", encoding="utf-8"), ensure_ascii=False)
+        except Exception as e:
+            ERROS.append(f"FALA: transcrição do áudio da timeline falhou ({e})"); return
+    fins = [rec + hi - lo for lo, hi, rec in pedacos]
     for a, b, motivo, txt in LF.detectar(seq):
+        # "técnico..." colado num corte: a pausa que fez o whisper pôr reticências já foi cortada (15 CARGA DE VENTO)
+        if motivo == "HESITAÇÃO" and any(a <= f <= b + 0.4 for f in fins): continue
         if motivo != "HESITAÇÃO" or b - a > 0.15:
             ERROS.append(f"FALA {motivo} em {a:.2f} s: '{txt}' (tirar, fica só a última tentativa)")
+
+
+def fim_do_video(t):
+    """Nada depois do fim da fala (V1): legenda, música ou SFX sobrando viram quadros pretos no fim do export; e só
+    uma CTA por timeline (28/10/2026: clipe de outro vídeo caiu nesta timeline quando a ativa foi trocada no meio)."""
+    S, F = t.GetStartFrame(), R.fps_tl(t)
+    v1 = itens(t, "video", 1)
+    if not v1: return
+    fv1 = (v1[-1].GetEnd() - S) / F; ftl = (t.GetEndFrame() - S) / F
+    if ftl - fv1 > 0.1: ERROS.append(f"SOBRA DEPOIS DO FIM: a timeline vai até {ftl:.2f} s e a fala acaba em {fv1:.2f} s")
+    ctas = [x for n in range(2, t.GetTrackCount("video") + 1) for x in itens(t, "video", n) if "CTA" in x.GetName().upper()]
+    if len(ctas) > 1: ERROS.append(f"{len(ctas)} CTAs na timeline (clipe de outro vídeo?)")
 
 
 def motions_ligados(t):
@@ -232,6 +286,11 @@ def motions_ligados(t):
 
 def audio(t):
     v = itens(t, "video", 1); a = itens(t, "audio", 1)
+    if v1_sem_som(t):   # motion na V1, narração em trechos na A1: confere só se a fala está dentro da imagem
+        if a and v and (a[0].GetStart() < v[0].GetStart() or a[-1].GetEnd() > v[-1].GetEnd()):
+            ERROS.append("ÁUDIO x IMAGEM: a narração da A1 passa do começo ou do fim do motion da V1")
+        AVISOS.append(f"V1 é motion sem som: fala conferida na A1 ({len(a)} trechos)")
+        return
     if len(v) != len(a) or any(x.GetStart() != y.GetStart() or x.GetEnd() != y.GetEnd() for x, y in zip(v, a)):
         ERROS.append(f"ÁUDIO x IMAGEM: V1 tem {len(v)} clipes e A1 {len(a)} (ou fora de posição); a fala pode estar fora do lugar ou faltando")
 
@@ -245,7 +304,10 @@ if __name__ == "__main__":
     t = tl_por_nome(p, nome); p.SetCurrentTimeline(t)
     buracos(t, mp, corrigir)
     if corrigir: R.salvar(r)
-    audio(t); bordas(t); fala(t); motions_ligados(t); rosto(t); cor(p, t, pasta)
+    audio(t); fim_do_video(t); bordas(t); fala(t); motions_ligados(t)
+    if v1_sem_som(t) and not v1_tem_take(t): AVISOS.append("vídeo inteiro em motion: rosto/legenda não se aplica (rosto é foto do pôster)")
+    else: rosto(t)
+    cor(p, t, pasta)
     for x in AVISOS: print("  ·", x)
     for x in dict.fromkeys(ERROS): print("ERRO", x)
     print(f"revisão {nome!r}: {len(ERROS)} erro(s)")

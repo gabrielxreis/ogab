@@ -51,6 +51,20 @@ tudo que você vê / vira referência / e aplicando nas suas ideias / gabrielxre
 7. Conferir: `scripts/revisor.py <mp4> [--referencia <referencia.json>]`. O primeiro quadro do `snapshot` às vezes
    sai preto: conferir no MP4.
 
+## Objetos animados (velas) e imagem que faz sentido
+O assunto do pôster tem que DIZER a frase (regra do usuário, 28/10/2026: "tem coisas sem sentido e pode ter objetos
+animados como candles"). Mercado se mexendo, volatilidade, alta/queda = `"velas": {"n": 12, "modo": "volatil|sobe|cai",
+"em", "ate", "larg", "alt", "y"}`: candles nascendo um a um (alta cheia na cor da marca, queda vazada) com a linha do preço
+desenhando junto. Foto que recorta mal (prédio com árvore, rua) entra inteira (`"recorte": "nenhum"`) dentro de um `quadro`,
+nunca com buracos e restos na borda.
+
+## CTA de seguir no Instagram (celular 3D no Pôster)
+Com "CTA de seguir no Instagram" marcado no menu (`cta_instagram`), o CTA é uma cena do PRÓPRIO Pôster, nunca o cenário roxo
+do Lúdico (regra do usuário, 28/10/2026: "tem que ser igual o preset que eu escolhi"): `"celular": {"em", "larg", "y",
+"perfil": {...}}` com o mesmo `perfil` do Lúdico (user, nome, posts, seguidores, seguindo, bio, link, destaques, foto, capas
+reais em `<cliente>/marca/instagram/`). Fundo claro com disco + órbita da cor da marca atrás, perfil em P&B, botão Seguir na cor
+da marca, o dedo entra, toca no `em` e vira "Seguindo"; texto em cima "segue / @usuario". Cena de ~4,5 s antes do fecho.
+
 ## Tema (cor da marca)
 `temas/padrao.json`: `claro`/`borda` (cinza do centro e da vinheta), `escuro`, `tinta` (texto no claro), `branco`
 (texto no escuro), `acento` (disco, quadro, órbita, X: a cor da marca entra aqui), `acento2` (chip do HUD) e

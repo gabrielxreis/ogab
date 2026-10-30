@@ -2,9 +2,12 @@
 ## 2026.10.30-7 (30/10/2026)
 - **Atualização que não trava mais:** em algumas instalações, arquivos que a atualização tinha baixado uma vez ficavam parados para sempre naquela versão (e o install.sh perdia a permissão de rodar). Agora o Gab reconhece o que ele mesmo gravou, volta a atualizar esses arquivos e conserta a permissão; o que você mudou à mão continua protegido. Os relatos também param de mandar esses arquivos antigos como se fossem invenção sua.
 - **Pequenas correções que vieram de vocês:** efeitos sonoros baixam no Mac com o Python do python.org (certificado SSL); a busca de silêncios não quebra no DaVinci 21.0; acentos certos no Windows ao salvar o andamento do projeto e o retrato da timeline; legenda de projeto em HD externo entra com a duração certa; pastas `motions_v2`, `motions_v3` e trilhas MOTION não são cobradas como take sem cor; o OpenCV 5 não aparece mais como "desatualizado" toda semana; e a escolha de presets sem sugestão não cai mais na pasta da skill.
+- **Painel ao vivo da produção:** quando o Gab faz voz, música, takes e motions ao mesmo tempo, abre sozinho uma aba no painel Terminal com tudo acontecendo: barra do total, um cartão por vídeo com cada parte em selo colorido (✓ pronta, girando com o tempo, ⚠ travada, ✗ falhou) e o que precisa de atenção, atualizando a cada 2 segundos. O link da aba vem na conversa. Sem o painel aberto o Gab nem começa (`paralelo.py painel <pasta>`).
 ## 2026.10.30-6 (30/10/2026)
 - **O Gab agora trabalha junto com o Rick e o Jhon:** carrossel, capa, thumbnail, post e criativo em imagem vão para o Rick (/orick, o designer, que pergunta onde você quer gerar: Photoshop, ChatGPT, Gemini ou outra IA); resultado de campanha e anúncio passam pelo Jhon (/ojhon). Vídeo continua com o Gab.
 - **Correções que vieram dos relatos de vocês:** a prévia do CapCut não mostra mais quadro preto entre fotos curtas; o OpenCV fica na versão 4 (a 5.0 tirou a detecção de rosto) na instalação e no doctor; colocar música não quebra mais no DaVinci 21.0; e no Premiere para Windows a calibração de LUT acha o arquivo .cube.
+## 2026.10.30-5 (30/10/2026)
+- **Painel de render mais bonito:** a aba do Terminal abre limpa com o nome do vídeo numa caixa, cada motion vira uma etapa com a barra colorida embaixo (azul rodando, ✓ verde pronto, ✗ vermelho se falhar) e o fim lista só os arquivos prontos. Cada etapa mostra quantas faltam ("2 de 4") e uma segunda barra mostra o progresso TOTAL e o tempo que falta para acabar tudo. Sumiram os caminhos compridos e as linhas soltas de log.
 ## 2026.10.30-4 (30/10/2026)
 - **Premiere:** take de b-roll com corte (de/até) entra no trecho certo; antes entrava do começo do arquivo e ia até o fim dele, por cima do take seguinte.
 ## 2026.10.30-3 (30/10/2026)
@@ -13,6 +16,8 @@
 ## 2026.10.30-2 (30/10/2026)
 - **Gab mais rápido, fazendo várias coisas ao mesmo tempo:** depois que você aprova o roteiro e a voz, a narração, a música, os takes, o vídeo por IA e os motions (em 2 ou 3 blocos) são feitos juntos em vez de um de cada vez. Com travas para não dar problema: nada começa sem o que precisa, nada gasta crédito duas vezes, um só usa o navegador por vez, ninguém mexe no seu editor além do Gab, e a montagem só começa com tudo pronto e conferido (`scripts/paralelo.py`).
 - **Correções que vieram dos relatos de vocês:** a conferência de centro do motion não quebra mais com o HyperFrames novo; no Windows, a conferência de centro e o render de motion acham o `npx` sozinhos; a folha de quadros da validação sai com a legenda gravada; a fábrica de cortes confere direto a transcrição do DaVinci; e o texto do estilo cinético fica dentro da área segura do Reels.
+## 2026.10.30-1 (30/10/2026)
+- **Render de motion sempre com o link da barra:** todo motion que o Gab renderiza (qualquer preset, morph, 3D) abre no painel Terminal com a barra de progresso em tempo real, e o link da aba vem na conversa para você tocar e acompanhar. Render escondido em segundo plano agora é recusado pelo próprio Gab, inclusive quando ele trabalha com ajudantes em paralelo. Sem o painel Terminal (outro app), use `OGAB_SEM_PAINEL=1` e acompanhe pelo terminal normal.
 ## 2026.10.29-5 (29/10/2026)
 - **Upscale de foto com IA, grátis e no seu computador:** `python3 scripts/upscale.py <foto ou pasta> [--escala 2|3|4] [--largura 2400]` aumenta até 4x e recria os detalhes (Real-ESRGAN, roda na placa de vídeo do Mac, Windows ou Linux). Na primeira vez ele baixa o programa sozinho (~52 MB). Bom para foto de IA que sai pequena (Gemini, ChatGPT) antes de usar em tela cheia, página ou capa.
 ## 2026.10.29-4 (29/10/2026)
@@ -35,6 +40,12 @@
 - **Gab mais leve e mais organizado (gasta bem menos token):** o começo de cada pedido agora é um comando só (`inicio.py`) que mostra só o que precisa de atenção, e o mapa do Gab ficou 7 vezes menor: cada etapa tem o seu arquivo, lido só quando chega nela. Nada muda no seu jeito de pedir.
 - **Ordem das etapas unificada:** cortes > fala limpa > motions, música, takes e cor > legenda > efeitos sonoros por último > revisão > sua validação. `projeto.py proximo <pasta do vídeo>` diz a próxima etapa e o que ler.
 - **Depois de uma atualização,** o Gab relê só o que mudou, não o mapa inteiro.
+## 2026.10.28-10 (28/10/2026)
+- **CTA de seguir no Instagram no menu:** a aba Extras ganhou o celular 3D com o perfil real (foto, bio, seguidores, capas dos últimos posts) e o dedo tocando em Seguir. Vale com qualquer preset: marque no menu e ele entra no fim do vídeo.
+## 2026.10.28-9 (28/10/2026)
+- **Revisão de fala pelo áudio de verdade:** a checagem de repetição agora transcreve o áudio exatamente como ficou na timeline, sem falso gaguejo nas emendas ("como for. Se for").
+- **Nada sobra no fim do vídeo:** legenda, música e efeito sonoro param junto com a fala, e a revisão barra sobra depois do fim e CTA repetida.
+- **Render só do que precisa e mais rápido:** ao refazer os tempos de um vídeo, cena que só encurtou um pouco reaproveita o render antigo; e a fila de render roda em várias frentes ao mesmo tempo, usando o processador todo.
 ## 2026.10.28-8 (28/10/2026)
 - **Silêncio medido pelo áudio na revisão:** a revisão acusava pausas que não existiam (transcrevia cada pedacinho da timeline separado e o tempo das palavras saía torto). Agora o silêncio é medido pela energia do áudio no que ficou na timeline, e a repetição de fala pela transcrição de trechos inteiros.
 - **Sem pausa escondida nos cortes:** a limpeza de fala agora também apara o começo e o fim mudos de cada trecho; antes o fim calado de um trecho somava com o começo calado do seguinte e virava meio segundo de silêncio no corte.

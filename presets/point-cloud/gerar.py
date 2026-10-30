@@ -21,6 +21,14 @@ import json, math, os, random, shutil, subprocess, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
+
 AQUI = os.path.dirname(os.path.abspath(__file__)); RAIZ = os.path.dirname(os.path.dirname(AQUI))
 FONTES = os.path.join(RAIZ, "assets", "fontes")
 
@@ -122,7 +130,7 @@ def gerar(plano, pasta):
         .replace("%FPS%", str(plano.get("fps", 30))).replace("%FUNDO%", dados["fundo"]).replace("%COR%", dados["cor"]).replace("%DESTAQUE%", dados["destaque"])
     open(os.path.join(pasta, "index.html"), "w").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}}, open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, f"{len(cenas)} cenas, {n} pontos, {dur} s"); return pasta, dur
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", f"{len(cenas)} cenas, {n} pontos, {dur} s"); return pasta, dur
 
 
 if __name__ == "__main__":
@@ -132,5 +140,5 @@ if __name__ == "__main__":
     pasta, dur = gerar(plano, os.path.abspath(a[1]))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], check=True)
-        print("render", saida)
+        _barra().hf(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__))))
+        print("    →", os.path.basename(saida))

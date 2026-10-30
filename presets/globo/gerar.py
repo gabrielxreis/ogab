@@ -153,7 +153,7 @@ def gerar(plano, pasta, base="."):
         num = n.get("texto") or (f'{n["valor"]}{n.get("sufixo", "")}' if "valor" in n else "")
         c["texto"] = " · ".join(x for x in (c.get("secao"), cid.get(c.get("foco"), {}).get("nome"), num, c.get("rotulo"), c.get("pergunta")) if x)
     montar(os.path.join(AQUI, "kit"), plano, pasta, plano["dur"])
-    print("ok", pasta, len(cenas), "cenas", plano["dur"], "s", len(pal), "palavras", "legenda" if plano["legenda"] else "sem legenda")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", len(cenas), "cenas", plano["dur"], "s", len(pal), "palavras", "legenda" if plano["legenda"] else "sem legenda")
     return pasta
 
 

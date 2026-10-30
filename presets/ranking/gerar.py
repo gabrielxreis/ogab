@@ -17,6 +17,14 @@ import json, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
 from hf_preset import montar, renderizar, args_render, traz, HYPERFRAMES
 
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -44,7 +52,7 @@ def gerar(plano, pasta, base="."):
             x["imagem"] = traz(x["imagem"], base, pasta)
     plano["itens"] = itens
     montar(os.path.join(AQUI, "kit"), plano, pasta, plano["dur"])
-    print("ok", pasta, plano["forma"], len(itens), "itens", plano["dur"], "s")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", plano["forma"], len(itens), "itens", plano["dur"], "s")
     return pasta
 
 
@@ -56,6 +64,6 @@ if __name__ == "__main__":
     saida, gif = args_render(a)
     if saida and saida.endswith(".mov"):   # fundo transparente: ProRes 4444 com alfa
         import subprocess
-        subprocess.run(["npx", "--yes", HYPERFRAMES, "render", pasta, "--format", "mov", "-o", saida], check=True)
+        _barra().hf(["npx", "--yes", HYPERFRAMES, "render", pasta, "--format", "mov", "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__))))
     elif saida:
         renderizar(pasta, saida, gif)

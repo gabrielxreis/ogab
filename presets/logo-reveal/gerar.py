@@ -70,7 +70,7 @@ def gerar(plano, pasta, base):
     elif plano["estilo"] == "pontos":
         print("aviso: estilo pontos precisa de logo PNG; usando luz"); plano["estilo"] = "luz"
     montar(os.path.join(AQUI, "kit"), plano, pasta, plano["dur"])
-    print("ok", pasta, plano["estilo"], plano["dur"], "s")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", plano["estilo"], plano["dur"], "s")
     return pasta
 
 

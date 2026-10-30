@@ -43,7 +43,7 @@ def renderizar(pasta, saida, gif=False, trabalhadores=2):
     import progresso   # barra com % no Terminal (regra do usuário, 27/10/2026); logs técnicos em <saida>.log
     progresso.hf([shutil.which("npx") or "npx", "--yes", HYPERFRAMES, "render", pasta, "--format", "mp4", "-q", "high", "-w", str(trabalhadores), "-o", saida],
                  os.path.splitext(os.path.basename(saida))[0], os.path.splitext(saida)[0] + ".log")
-    print("render", saida)
+    print("    →", os.path.basename(saida))
     if gif:   # prévia leve para README e chat: 15 fps, paleta própria
         g = os.path.splitext(saida)[0] + ".gif"
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", saida, "-vf",

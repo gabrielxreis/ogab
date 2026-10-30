@@ -12,6 +12,14 @@ Campo comum: dur (s), zoom (padrão 1.06), fala (texto da tela; na "frase" vira 
 Ícones: os nomes em kit/icones.json (Material Symbols, Apache 2.0); para outro ícone, ver kit/MaterialSymbolsRounded.codepoints.
 """
 import json, os, shutil, subprocess, sys
+
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
 AQUI = os.path.dirname(os.path.abspath(__file__)); RAIZ = os.path.dirname(os.path.dirname(AQUI)); FON = os.path.join(RAIZ, "assets", "fontes")
 
 
@@ -30,7 +38,7 @@ def gerar(plano, pasta):
     for a, b in (("%W%", plano["w"]), ("%H%", plano["h"]), ("%FPS%", plano["fps"]), ("%DUR%", dur), ("%EST%", plano["estilo"])): html = html.replace(a, str(b))
     open(os.path.join(pasta, "index.html"), "w").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}}, open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, plano["estilo"], len(plano["cenas"]), "cenas", dur, "s"); return pasta
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", plano["estilo"], len(plano["cenas"]), "cenas", dur, "s"); return pasta
 
 
 if __name__ == "__main__":
@@ -39,4 +47,4 @@ if __name__ == "__main__":
     pasta = gerar(json.load(open(a[0])), os.path.abspath(a[1]))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], check=True); print("render", saida)
+        _barra().hf(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__)))); print("    →", os.path.basename(saida))

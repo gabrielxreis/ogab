@@ -18,6 +18,14 @@ largura/altura (fração da tela que a figura ocupa, padrão .62/.36), estilo ("
 """
 import json, os, re, shutil, subprocess, sys, urllib.request
 
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
 
 # Formas prontas, coordenadas locais (a figura é escalada para caber). "destaque" recebe a cor da cena.
@@ -79,7 +87,7 @@ def gerar(plano, pasta):
     open(os.path.join(pasta, "index.html"), "w").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}},
               open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, f"{len(cenas)} cenas, {dur} s")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", f"{len(cenas)} cenas, {dur} s")
     return pasta, dur
 
 
@@ -90,5 +98,5 @@ if __name__ == "__main__":
     pasta, dur = gerar(json.load(open(a[0])), os.path.abspath(a[1]))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], check=True)
-        print("render", saida)
+        _barra().hf(["npx", "--yes", "hyperframes", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__))))
+        print("    →", os.path.basename(saida))

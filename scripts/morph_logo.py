@@ -94,6 +94,7 @@ if __name__ == "__main__":
     plano = json.load(open(a[0])); arq = gerar(plano, a[1]); print(arq)
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1]); fmt = "mov" if saida.endswith(".mov") else "mp4"
-        subprocess.run(["npx", "--yes", hf(), "render", os.path.join("motions", plano.get("id", "morph-logo")),
-                        "--format", fmt, "-o", saida], cwd=a[1], check=True)
+        import progresso   # LEI do usuário (30/10/2026): render de motion sempre com a barra e o link para acompanhar
+        progresso.hf(["npx", "--yes", hf(), "render", os.path.abspath(os.path.join(a[1], "motions", plano.get("id", "morph-logo"))),
+                      "--format", fmt, "-o", saida], "morph-logo")
         print(saida)

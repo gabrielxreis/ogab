@@ -12,6 +12,7 @@ mesmo navegador ou no editor, e cada uma escrevendo só na sua pasta. Estado em 
   python3 paralelo.py recurso <pasta> pegar|soltar navegador|editor --quem <agente>
   python3 paralelo.py status <pasta>
   python3 paralelo.py juntar <pasta>                     (OBRIGATÓRIO antes de montar no editor: sai 0 = PODE_MONTAR)
+  python3 paralelo.py painel <pasta do lote|vídeo> [...]  (painel ao vivo no Terminal; OBRIGATÓRIO aberto para `iniciar`)
 
 Frentes: voz, musica, takes, video_ia, imagens, motion:<n> (um bloco de cenas por agente), legenda, sfx.
 Sai 1 com o motivo quando a frente não pode (dependência faltando, já rodou, pasta ou recurso de outra frente).
@@ -139,6 +140,14 @@ def cmd_pode(pasta):
 
 def cmd_iniciar(pasta, nome, quem, refazer):
     if tipo(nome) not in FRENTES: raise SystemExit(f"frente desconhecida: {nome} (use {', '.join(FRENTES)})")
+    # painel ao vivo obrigatório (regra do usuário, 30/10/2026: "faltou o terminal com o progresso das coisas, não pode
+    # deixar de ter"); OGAB_SEM_PAINEL=1 só onde não existe painel Terminal (outro app/CLI)
+    import painel_paralelo
+    if not painel_paralelo.vivo(pasta) and os.environ.get("OGAB_SEM_PAINEL") != "1":
+        raise SystemExit("PAINEL_FECHADO: abra antes o painel ao vivo no painel Terminal (run_in_terminal, aba "
+                         "\"Progresso: <lote>\"): python3 SKILL_DIR/scripts/paralelo.py painel <pasta do lote ou do vídeo>, "
+                         "mande o link [Progresso: <lote>](#terminal/<tab_id>) na conversa e tente de novo. "
+                         "Sem painel Terminal (outro app): OGAB_SEM_PAINEL=1 e dizer onde acompanhar.")
     if tipo(nome) == "motion" and ":" not in nome: raise SystemExit("motion precisa do bloco: motion:1, motion:2...")
     with estado(pasta) as st:
         atual = st["frentes"].get(nome)
@@ -278,6 +287,8 @@ def main(a):
         v = [a[i + 1] for i, x in enumerate(a[:-1]) if x == n]
         return v if varios else (v[0] if v else None)
     c, pasta = a[0], a[1]
+    if c == "painel":
+        import painel_paralelo; return painel_paralelo.main(a[1:])
     if c == "liberar": cmd_liberar(pasta, a[2])
     elif c == "pode": cmd_pode(pasta)
     elif c == "iniciar": cmd_iniciar(pasta, a[2], opt("--quem"), opt("--refazer"))

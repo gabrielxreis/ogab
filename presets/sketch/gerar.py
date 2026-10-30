@@ -34,6 +34,14 @@ from fontTools.ttLib import TTFont
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import desenhos  # noqa: E402
 
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
+
 AQUI = os.path.dirname(os.path.abspath(__file__)); RAIZ = os.path.dirname(os.path.dirname(AQUI))
 FONTE = os.path.join(RAIZ, "assets", "fontes", "PatrickHand", "PatrickHand-Regular.ttf")
 NOMES = {"laranja": "#f0884a", "azul": "#4aa3f0", "verde": "#3fcf6a", "roxo": "#a07cf0", "rosa": "#f05a7e",
@@ -368,7 +376,7 @@ def gerar(plano, pasta):
     open(os.path.join(pasta, "index.html"), "w").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}},
               open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, len(pr["cenas"]), "cenas", pr["dur"], "s"); return pasta
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", len(pr["cenas"]), "cenas", pr["dur"], "s"); return pasta
 
 
 def centrar(plano_json, pasta):
@@ -391,5 +399,5 @@ if __name__ == "__main__":
     pasta = gerar(json.load(open(a[0])), os.path.abspath(a[1]))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", "hyperframes@0.8.151", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], check=True)
-        print("render", saida)
+        _barra().hf(["npx", "--yes", "hyperframes@0.8.151", "render", pasta, "--format", "mp4", "-q", "delivery", "--workers", "1", "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__))))
+        print("    →", os.path.basename(saida))

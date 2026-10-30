@@ -27,6 +27,14 @@ Tipos:
 import json, os, re, shutil, struct, subprocess, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
 from componentes import hf  # versão do HyperFrames fixada em versoes.json  # noqa: E402
+
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
 AQUI = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -107,7 +115,7 @@ def gerar(plano, pasta, base):
     if videos: html = html.replace('<div id="luz">', "\n".join(videos) + '\n<div id="luz">', 1)
     open(os.path.join(pasta, "index.html"), "w").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}}, open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, len(plano["cenas"]), "cenas", dur, "s"); return pasta
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", len(plano["cenas"]), "cenas", dur, "s"); return pasta
 
 
 if __name__ == "__main__":
@@ -117,7 +125,7 @@ if __name__ == "__main__":
     pasta = gerar(json.load(open(arq)), os.path.abspath(a[1]), os.path.dirname(arq))
     if "--render" in a:
         saida = os.path.abspath(a[a.index("--render") + 1])
-        subprocess.run(["npx", "--yes", hf(), "render", pasta, "--format", "mp4", "-q", "high", "-w", "2", "-o", saida], check=True); print("render", saida)
+        _barra().hf(["npx", "--yes", hf(), "render", pasta, "--format", "mp4", "-q", "high", "-w", "2", "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__)))); print("    →", os.path.basename(saida))
         if "--gif" in a:   # prévia leve (README, mandar no chat): 15 fps, paleta própria
             gif = os.path.splitext(saida)[0] + ".gif"
             subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", saida, "-vf",

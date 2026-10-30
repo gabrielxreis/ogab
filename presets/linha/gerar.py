@@ -387,7 +387,7 @@ def gerar(plano, pasta, tema):
     os.makedirs(os.path.join(pasta, "fonts"), exist_ok=True)
     import shutil
     shutil.copy(FONTE_SERIFA, os.path.join(pasta, "fonts", "EBGaramond-var.ttf"))
-    print("ok", pasta, len(pr["tracos"]), "traços", pr["dur"], "s")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", len(pr["tracos"]), "traços", pr["dur"], "s")
     return pasta
 
 

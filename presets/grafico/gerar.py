@@ -28,7 +28,7 @@ def gerar(plano, pasta):
     if len(d) < 2 or any("valor" not in x or "rotulo" not in x for x in d):
         raise SystemExit('"dados" precisa de pelo menos 2 itens com "rotulo" e "valor".')
     montar(os.path.join(AQUI, "kit"), plano, pasta, plano["dur"])
-    print("ok", pasta, plano["tipo"], len(d), "itens", plano["dur"], "s")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", plano["tipo"], len(d), "itens", plano["dur"], "s")
     return pasta
 
 

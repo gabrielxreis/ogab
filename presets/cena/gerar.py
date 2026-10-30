@@ -29,6 +29,14 @@ palavras.json: [{"w": "Olá", "ini": 0.0, "fim": 0.3}, ...] (transcrição com t
 """
 import glob, json, os, re, shutil, subprocess, sys, unicodedata
 
+
+def _barra():
+    """Render com a barra do progresso.py (LEI do usuário, 30/10/2026: todo render de motion com link para acompanhar)."""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "scripts"))
+    import progresso
+    return progresso
+
 AQUI = os.path.dirname(os.path.abspath(__file__)); PRESETS = os.path.dirname(AQUI); RAIZ = os.path.dirname(PRESETS)
 FONTES = [("Poppins", f) for f in ("Poppins-Bold.ttf", "Poppins-ExtraBold.ttf", "Poppins-Black.ttf")] + \
          [("PlayfairDisplay", f) for f in ("PlayfairDisplay-Italic.ttf", "PlayfairDisplay-SemiBoldItalic.ttf")] + \
@@ -233,7 +241,7 @@ def fps_txt(fps):
 
 
 def render(proj, saida, fps):
-    subprocess.run(["npx", "--yes", "hyperframes", "render", proj, "--format", "mov", "--fps", fps_txt(fps), "-o", saida], check=True)
+    _barra().hf(["npx", "--yes", "hyperframes", "render", proj, "--format", "mov", "--fps", fps_txt(fps), "-o", saida], os.path.basename(os.path.dirname(os.path.abspath(__file__))))
 
 
 # ------------------------------------------------------------ LENTE

@@ -97,7 +97,9 @@ def detectar(ws):
             # temporal, foi o projeto"): sobra palavra inteira diferente. Gaguejo = palavra repetida colada.
             sobra = ws[i + m]["text"] if m < vao else ""
             cortada = sobra.endswith(("...", "…", "-")) or (len(norm(sobra)) <= 3 and not sobra.endswith((",", ".", "?", "!")))
-            gag = vao == 1 and m == 1 and not n[i].isdigit() and ws[j]["start"] - ws[i]["end"] < 1.0   # colada de verdade
+            # palavra que fecha frase ("como for. Se for", "os talentos. Os talentos") não é gaguejo (28/10/2026)
+            fecha = ws[i]["text"].endswith((".", "?", "!")) and not ws[i]["text"].endswith(("...", "…"))
+            gag = vao == 1 and m == 1 and not n[i].isdigit() and not fecha and ws[j]["start"] - ws[i]["end"] < 1.0   # colada de verdade
             # repetição DE PROPÓSITO fica: fecha frase ("ter visão de dono. Visão de dono tem o dono"), vem depois de
             # "não" ("não é vergar, é vergar por tempo demais") ou é "ou... ou" / "nem... nem" ("ou você tem, ou você não tem")
             fim_1a = ws[j - 1]["text"]
@@ -117,6 +119,16 @@ def detectar(ws):
             fim = ws[k + 1]["start"] if k + 1 < len(ws) else w["end"]
             tira.append((w["start"], fim, "HESITAÇÃO", w["text"]))
     return sorted(tira)
+
+
+def perdidas(words, trechos):
+    """Palavras da transcrição limpa que o corte engoliu (menos da metade do começo delas ficou em algum trecho)."""
+    r = []
+    for w in words:
+        a, b = w["start"], w["start"] + min(w["end"] - w["start"], 0.25)
+        dentro = sum(max(0, min(b, y) - max(a, x)) for x, y in trechos)
+        if dentro < 0.5 * (b - a): r.append(w)
+    return r
 
 
 def limpar(arquivo, trechos=None, pausa=0.25, respiro=0.08):

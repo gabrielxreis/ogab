@@ -335,7 +335,7 @@ def gerar(plano, pasta, base, tema):
     open(os.path.join(pasta, "index.html"), "w", encoding="utf-8").write(html)
     json.dump({"paths": {"blocks": "compositions", "components": "compositions/components", "assets": "assets"}},
               open(os.path.join(pasta, "hyperframes.json"), "w"))
-    print("ok", pasta, f"{len(plano['cenas'])} cenas, {dur} s, tema {tema.get('nome')}")
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", f"{len(plano['cenas'])} cenas, {dur} s, tema {tema.get('nome')}")
     return pasta
 
 

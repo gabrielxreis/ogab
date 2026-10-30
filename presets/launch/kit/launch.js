@@ -155,7 +155,7 @@
       const url = c.url || M.dominio || "";
       if (url) { const u = linhaSuave(el, url, VERT ? 44 : 38, "url-cta"); u.style.marginTop = px(44); aparece(u, t + .8); }
       if (c.botao) { const b = mk("div", "botao", el, { fontSize: px(VERT ? 36 : 30), marginTop: px(44) }); b.textContent = c.botao; aparece(b, t + 1.05); }
-      if (c.aviso) { const a = linhaSuave(el, c.aviso, 26, "aviso"); a.style.position = "absolute"; a.style.bottom = px(VERT ? 150 : 70); aparece(a, t + 1.3); }
+      if (c.aviso) { const a = linhaSuave(el, c.aviso, 26, "aviso"); Object.assign(a.style, { position: "absolute", left: px(60), right: px(60), textAlign: "center" }); a.style.bottom = px(VERT ? 150 : 70); aparece(a, t + 1.3); }   // largura fixa: na letra editorial vazava pela esquerda
     },
   };
   // Editor (DaVinci simulado): janela escura com visor, régua, cursor e trilhas; cada passo do plano faz um clipe entrar

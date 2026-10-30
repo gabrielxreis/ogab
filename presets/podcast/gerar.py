@@ -314,7 +314,7 @@ def gerar(plano, pasta, base="."):
     ix = os.path.join(pasta, "index.html")
     html = open(ix, encoding="utf-8").read().replace("<!--MIDIAS-->", midias_html(fal, plano)).replace("<!--FONTE-->", fonte_css(plano, pasta))
     open(ix, "w", encoding="utf-8").write(html)
-    print("ok", pasta, f'{len(plano["_grupos"])} legendas, {len(plano["_turnos"])} turnos, {plano["dur"]} s')
+    print("  ▸", os.path.basename(os.path.normpath(pasta)) + " ·", f'{len(plano["_grupos"])} legendas, {len(plano["_turnos"])} turnos, {plano["dur"]} s')
     for g in plano["_grupos"]:
         print(f'  {g["ini"]:5.2f}-{g["fim"]:5.2f}  [{fal[g["falante"]]["nome"]}] ' + " ".join(x["texto"] for x in g["palavras"]))
     return pasta
