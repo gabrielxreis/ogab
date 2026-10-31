@@ -152,6 +152,10 @@ def python():
     clap = [m for m in ("torch", "transformers") if _iu.find_spec(m) is None]
     item("✓" if not clap else "·", "python", "torch + transformers (conferência de SFX: sfx_conferir.py, sonorizar.py conferir)" if not clap
          else f"{' e '.join(clap)} faltando: sem a conferência automática de SFX (~2 GB; com espaço: {sys.executable} -m pip install --user torch transformers)")
+    # Open-Unmix (separar faixas): instala sozinho no 1º uso de separar.py, aqui só informa
+    unmix = _iu.find_spec("openunmix") is not None
+    item("✓" if unmix else "·", "python", "openunmix (separar faixas da música: separar.py)" if unmix
+         else "openunmix faltando: instala sozinho no 1º uso de separar.py (ou: separar.py --instalar)")
     for mod, pac, uso, obrig in pacotes:
         try:
             m_ = __import__(mod)
