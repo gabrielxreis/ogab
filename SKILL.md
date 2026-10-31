@@ -25,6 +25,15 @@ comunidade e relatos, tudo de uma vez; imprime só o que pede ação).
 da linha `MUDOU_NO_COFRE` (o mapa inteiro só se ela citar `SKILL.md`). Sem `CONTEUDO_PRONTO` não há o que seguir: o
 Gab não tem a inteligência fora do cofre.
 
+## Codex como ajudante (se `codex_ponte.py checar` disser CODEX_OK)
+O Gab também roda no Codex (carregador em `codex/SKILL.md`). Daqui do Claude, passar para o Codex o que ele faz melhor:
+- **Imagem sem crédito:** `python3 SKILL_DIR/scripts/codex_ponte.py imagem "<prompt>" <pasta>/imagens/<nome_novo>.png
+  [--transparente] [--ref <img>]` (image_gen da conta ChatGPT). Oferecer ANTES de Higgsfield/Magnific pagos em
+  objeto recortado, fundo, textura e variação de capa; rosto de pessoa real continua no gerador que a regra do cliente manda.
+- **Tarefa de código pesada ou segunda opinião:** `codex_ponte.py tarefa "<pedido>" --pasta <dir>` e
+  `codex_ponte.py revisar <repo>` (motion HyperFrames longo, preset novo, revisão antes de renderizar).
+Render de motion e montagem no editor continuam aqui; o Codex devolve arquivos, o Gab confere antes de usar.
+
 ## Irmãos do Gab (passar o trabalho certo para cada um)
 Se a skill existir em `~/.claude/skills/<nome>/SKILL.md`, chamar pela ferramenta Skill com o pedido e o contexto
 (cliente, pasta do vídeo, o que já foi decidido). Sem a skill, o Gab segue com o próprio fluxo.

@@ -239,9 +239,22 @@ def garantir_hook():
         pass   # settings.json inválido: o doctor avisa; a atualização do passo zero segue valendo
 
 
+def espelhar_codex():
+    """Mantém a cópia do carregador no Codex igual à do repo (o Codex ignora SKILL.md por link simbólico)."""
+    try:
+        codex = os.environ.get("CODEX_HOME") or os.path.join(os.path.expanduser("~"), ".codex")
+        destino = os.path.join(codex, "skills", "ogab", "SKILL.md")
+        fonte = os.path.join(SKILL, "codex", "SKILL.md")
+        if os.path.isdir(os.path.dirname(destino)) and os.path.isfile(fonte) and _sha(destino) != _sha(fonte):
+            shutil.copyfile(fonte, destino)
+    except Exception:
+        pass   # sem Codex instalado ou sem permissão: o Claude segue igual
+
+
 if __name__ == "__main__":
     if sys.argv[1:2] == ["hook"]:
         sys.exit(hook())
     sync()
     garantir_hook()
+    espelhar_codex()
     sys.exit(0)

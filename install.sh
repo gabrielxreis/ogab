@@ -108,6 +108,11 @@ else
   ok "config.json mantido"
 fi
 
+# Com o Codex na máquina, o Gab também aparece lá (mesma pasta, carregador próprio em codex/).
+if command -v codex >/dev/null 2>&1 || [ -d "$HOME/.codex" ]; then
+  bash "$DEST/codex/instalar.sh" >/dev/null 2>&1 && ok "também disponível no Codex (\$ogab)"
+fi
+
 # Daqui em diante: painel ao vivo em Python (perguntas, o que baixa, MB/s, o que já tem e o que falta).
 info "Instalando o resto (painel ao vivo; log em ~/.claude/ogab-instalacao.log)"
 if tem_tty; then exec python3 "$DEST/scripts/instalador.py" < /dev/tty
