@@ -1,8 +1,8 @@
 {
-  "quando": "2026-10-30 23:44",
+  "quando": "2026-10-30 23:47",
   "arquivos": {
     "SKILL.md": "e51ad480b51095df5b2e447e00620c07de79c3fb6a36346429b8f54846ca0704",
-    "docs/PROCESSO.md": "da0e00cbb3d7179f6fd5d967621645c3bdef51c2602341126cd1d5afafd85bc6",
+    "docs/PROCESSO.md": "717fa72acb99509624c3f0c5c79f107be940bf7b71e25a91ab0c549a7b800348",
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
     "docs/etapas/cliente.md": "39951c123444c16d9303497a7c94f012d2420c8023c7bfa0318c6255bfc45975",
@@ -28,7 +28,7 @@
     "docs/etapas/presets_escolha.md": "71149846f7abba7fc4164269efd1c17fc80f851135865f9f23114b0705bc40e7",
     "docs/etapas/principios_animacao.md": "94430dc5a7ba6583af50bd5b99bd83048da317b1cb12b18477d713786042a33b",
     "docs/etapas/referencia.md": "347b375b36d9215a1aad17a3aff9e6e36bdd98da1f787304f1253c02400d6f5b",
-    "docs/etapas/regras.md": "b52fca3681a2ba1aa0d5c7f6a04de2fb6303cc3a53c5932b99f75b9ed3fe62c5",
+    "docs/etapas/regras.md": "21298d67c51c53d81013885568fe6deaf89ef892b6494d557bd60e893b41ec93",
     "docs/etapas/render.md": "52dd87bb79f2884487ef379ce020042e2fb2d6f1abb5f16493a7a02f2c13ff75",
     "docs/etapas/revisor.md": "2c1125fa3a801fbbc06b6e851092b477c49b4bc4a2284cc270eca1a9a997a5a0",
     "docs/etapas/sfx.md": "3f7fa1e1f51ae2fd1c5cfc6f5e063ece281e519d515b13733c9cea48f0dd70a3",
@@ -38,7 +38,7 @@
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
-    "docs/etapas/voz.md": "da4e3adce2567b18eff82c1bc8f0748146f08fd92017f5bf11e8e6e9786ee4b6",
+    "docs/etapas/voz.md": "cf1676057f98c177bc7093fd21512c1632c91c1f79421e27cd5d4eb98b2172b3",
     "docs/etapas/youtube.md": "eb498825318d5a59d06243f4428fea122fd0571eafd56c1305aa88af2c16d22f"
   }
 }

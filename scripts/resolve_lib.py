@@ -160,7 +160,21 @@ def importar(mp, caminho, bin_nome, permitir_render=False):
     if _gerado_pelo_gab(caminho): proibido_render(f"mídia renderizada pelo Gab: {os.path.basename(caminho)}", permitir_render)
     if bin_nome.upper() in ("BROLLS", "BROLL", "FOOTAGES", "TAKES"): checar_take_original(caminho, permitir_render)
     ja = _no_pool(mp, caminho)   # ImportMedia sempre cria item novo: reimportar duplicava o clipe (relato 16/10/2026)
-    if ja: return ja
+    if ja:
+        # 30/10/2026: narracao.wav sobrescrito com voz nova, o DaVinci seguiu com a voz VELHA (mesmo caminho) e 3 vídeos
+        # saíram exportados com a narração antiga. Arquivo mudou desde a importação = erro; salvar a versão com nome novo.
+        try:
+            out = subprocess.run(["ffprobe", "-v", "0", "-show_entries", "format=duration", "-of", "csv=p=0", caminho],
+                                 capture_output=True, text=True).stdout.strip()
+            h, m_, s_, f_ = map(int, (ja.GetClipProperty("Duration") or "0:0:0:0").split(":"))
+            fps = float(ja.GetClipProperty("FPS") or 24)
+            no_pool = h * 3600 + m_ * 60 + s_ + f_ / fps
+            if out and abs(float(out) - no_pool) > 0.1:
+                raise RuntimeError(f"{os.path.basename(caminho)} mudou no disco ({float(out):.2f}s) mas o DaVinci tem a versão "
+                                   f"antiga ({no_pool:.2f}s) com o mesmo caminho: salvar a versão nova com OUTRO nome (_v2...)")
+        except ValueError:
+            pass
+        return ja
     _bin(mp, bin_nome)
     itens = mp.ImportMedia([caminho])
     if not itens: raise RuntimeError(f"não importou {caminho}")
