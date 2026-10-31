@@ -18,6 +18,8 @@ Regra do dono (13/10/2026): ANTES de qualquer commit na skill, ler a fila inteir
 (presets/). Para cada erro: reproduzir, corrigir no repo, linha em docs/PROCESSO.md e no CHANGELOG, commit+push,
 `resolver` e `presets_vps.py apagar` daquele item. Preset bom: `biblioteca_motions.py salvar` ("autor": "comunidade");
 preset fraco ou repetido: só apagar da fila.
+Itens com nome RICK_ são do /orick (Rick, mesma fila): tratar no repo do Rick com `orick/scripts/relatos_rick.py`
+(fila | puxar | resolver | apagar), não aqui.
 """
 import json, os, sys, time
 

@@ -432,7 +432,7 @@ def desempacotar(texto, destino):
     """(dono) Remonta a pasta do preset a partir das colunas diff (todas as partes, em qualquer ordem, coladas num texto).
     Binários em base64 voltam a ser arquivos; o manifesto vai para manifesto_envio.json (conferir com conferir_pacote)."""
     import base64
-    pecas = re.split(r"^=== PACOTE (?:HYPERFRAMES|INVENCAO) ogab v1 parte (\d+)/\d+ ===\n", texto, flags=re.M)
+    pecas = re.split(r"^=== PACOTE (?:HYPERFRAMES|INVENCAO|RICK) ogab v1 parte (\d+)/\d+ ===\n", texto, flags=re.M)
     corpo = "".join(p for _, p in sorted(((int(pecas[i]), pecas[i + 1]) for i in range(1, len(pecas) - 1, 2))))
     corpo = re.sub(r"\n?--- continua ---\n", "", corpo)
     corpo = corpo.split("--- fora do pacote ---")[0]
