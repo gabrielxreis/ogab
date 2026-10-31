@@ -26,7 +26,8 @@ GUIA = """Chave grátis do Freesound (uns 2 minutos, só uma vez):
      e-mail que eles mandam.
   2. Já logado, abrir https://freesound.org/apiv2/apply
   3. Preencher o formulário: Name = ogab, Description = efeitos sonoros CC0 para edição de vídeo,
-     marcar que aceita os termos e clicar em "Request new access credentials".
+     URL = https://github.com/gabrielxreis/ogab (ou o site/Instagram da pessoa), Callback URL = deixar vazio
+     (só serve para login OAuth, o Gab não usa), marcar que aceita os termos e clicar em "Request new access credentials".
   4. Na tabela que aparece embaixo, copiar o valor da coluna "Client secret/Api key" (o comprido; NÃO o Client id).
   5. Colar a chave no chat para o Gab salvar, ou rodar: python3 sfx_freesound.py chave <CHAVE>
 Sem a chave tudo funciona igual, só a busca demora 30-60 s."""
