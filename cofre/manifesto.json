@@ -1,5 +1,5 @@
 {
-  "quando": "2026-10-30 16:32",
+  "quando": "2026-10-30 23:44",
   "arquivos": {
     "SKILL.md": "e51ad480b51095df5b2e447e00620c07de79c3fb6a36346429b8f54846ca0704",
     "docs/PROCESSO.md": "da0e00cbb3d7179f6fd5d967621645c3bdef51c2602341126cd1d5afafd85bc6",
@@ -38,7 +38,7 @@
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
-    "docs/etapas/voz.md": "0252ca060004079d1eb69f0afd1017297b4c05686ca80ccce95fcad4ceae6f5c",
+    "docs/etapas/voz.md": "da4e3adce2567b18eff82c1bc8f0748146f08fd92017f5bf11e8e6e9786ee4b6",
     "docs/etapas/youtube.md": "eb498825318d5a59d06243f4428fea122fd0571eafd56c1305aa88af2c16d22f"
   }
 }

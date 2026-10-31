@@ -1,0 +1,12 @@
+{
+  "_leia": "Armadilhas de pronúncia do eleven_v4 em português, valem para TODO cliente (texto_voz.py aplica antes de gerar). grafia = como está no roteiro; fala = como escrever no texto da voz. Palavra nova que sair errada entra aqui na hora (não só no pronuncia.json do cliente).",
+  "termos": [
+    { "grafia": "professor", "fala": "professôr", "nota": "saiu 'proféssior' com sotaque de inglês (30/10/2026)" },
+    { "grafia": "professora", "fala": "professôra", "nota": "mesmo caso de professor" },
+    { "grafia": "gestor", "fala": "gestôr", "nota": "saiu 'guestor' / 'Gaster' (30/10/2026)" },
+    { "grafia": "coordenador", "fala": "coordenadôr", "nota": "palavras em -or no começo da frase puxam o inglês" },
+    { "grafia": "diretor", "fala": "diretôr", "nota": "mesma família (-or)" },
+    { "grafia": "mentor", "fala": "mentôr", "nota": "mesma família (-or)" },
+    { "grafia": "inscrição", "fala": "inscrissão", "nota": "saiu 'Inscreção' (30/10/2026)" }
+  ]
+}
