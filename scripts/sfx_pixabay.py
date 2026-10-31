@@ -53,6 +53,22 @@ def slug(s):
     return re.sub(r"[^a-z0-9]+", "_", s.lower()).strip("_")[:40] or "sfx"
 
 
+def baixar_wav(url, destino):
+    """Baixa o MP3 e grava WAV 48 kHz estéreo a -16 LUFS como a biblioteca do Artlist: mede e aplica um ganho fixo (o
+    loudnorm dinâmico erra em som curto), sem passar de -1 dBTP de pico. Usado também pelo sfx_freesound.py."""
+    tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False).name
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=60, context=_ssl()) as r, open(tmp, "wb") as f:
+        f.write(r.read())
+    m = subprocess.run(["ffmpeg", "-hide_banner", "-i", tmp, "-af", "loudnorm=print_format=json", "-f", "null", "-"],
+                       capture_output=True, text=True).stderr
+    med = json.loads(m[m.rindex("{"):m.rindex("}") + 1])
+    ganho = min(-16 - float(med["input_i"]), -1 - float(med["input_tp"]))
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", tmp, "-af", f"volume={ganho:.2f}dB",
+                    "-ar", "48000", "-ac", "2", destino], check=True)
+    os.remove(tmp)
+
+
 def baixar(lista_json, pasta, so=None, nomes=None):
     lista = json.load(open(lista_json))
     if isinstance(lista, str):   # o javascript_tool devolve a string JSON
@@ -67,19 +83,7 @@ def baixar(lista_json, pasta, so=None, nomes=None):
             print(f"pulado (sem link do CDN): {it.get('titulo')}"); continue
         nome = nomes[k] if k < len(nomes) else slug(it.get("titulo", ""))
         destino = os.path.join(pasta, nome + ".wav")
-        tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False).name
-        req = urllib.request.Request(it["mp3"], headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=60, context=_ssl()) as r, open(tmp, "wb") as f:
-            f.write(r.read())
-        # 48 kHz estéreo e -16 LUFS como a biblioteca do Artlist: mede e aplica um ganho fixo (o loudnorm dinâmico
-        # erra em som curto), sem passar de -1 dBTP de pico
-        m = subprocess.run(["ffmpeg", "-hide_banner", "-i", tmp, "-af", "loudnorm=print_format=json", "-f", "null", "-"],
-                           capture_output=True, text=True).stderr
-        med = json.loads(m[m.rindex("{"):m.rindex("}") + 1])
-        ganho = min(-16 - float(med["input_i"]), -1 - float(med["input_tp"]))
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", tmp, "-af", f"volume={ganho:.2f}dB",
-                        "-ar", "48000", "-ac", "2", destino], check=True)
-        os.remove(tmp)
+        baixar_wav(it["mp3"], destino)
         with open(os.path.join(pasta, "CREDITOS.txt"), "a", encoding="utf-8") as f:
             f.write(f"{nome}.wav  <-  {it.get('titulo')} | {it.get('pagina')} | {LICENCA}\n")
         feitos.append(destino); print("ok:", destino)
