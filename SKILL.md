@@ -29,9 +29,13 @@ Gab não tem a inteligência fora do cofre.
 Se a skill existir em `~/.claude/skills/<nome>/SKILL.md`, chamar pela ferramenta Skill com o pedido e o contexto
 (cliente, pasta do vídeo, o que já foi decidido). Sem a skill, o Gab segue com o próprio fluxo.
 - **Design estático (/orick, o Rick):** carrossel, post, capa de Reels/YouTube, thumbnail, banner, criativo de anúncio
-  em imagem. O Rick pergunta ao usuário onde gerar (Photoshop, ChatGPT, Gemini, IA conectada ou misto) e entrega os
+  em imagem. O Rick pergunta ao usuário onde gerar (Photoshop, Canva, ChatGPT, Gemini, IA conectada ou misto) e entrega os
   arquivos na pasta do vídeo. Peça animada a partir da arte do Rick continua com o Gab (motion).
 - **Tráfego (/ojhon, o Jhon):** resultado de campanha, CPA/ROAS, criativos que performam, concorrentes, público,
   verba. Anúncio em vídeo: procurar `brief_anuncio.md` na pasta do vídeo e, sem ele, propor passar pelo Jhon antes do
   roteiro; depois do export o Jhon audita antes de subir. Contexto rápido: `~/.claude/skills/ojhon/clientes/<cliente>/trafego.md`.
 - **Vídeo fica no Gab:** edição, timeline, legenda, voz, música, motion. Nenhum irmão mexe na timeline.
+- **O que o Gab lê dos irmãos:** cores, fontes e logo da marca no `<pasta_saida>/<Marca>/design/design-<marca>.md` do
+  Rick (vale para motion, lettering e capa); ganchos que ganharam ou perderam teste na seção "Criativos" do `trafego.md`
+  do Jhon, antes de roteiro de anúncio. Os três usam o mesmo nome de cliente (`clientes/<cliente>/`);
+  `<Marca>` = a pasta dentro da `pasta_saida` cujo nome, sem espaço, acento e hífen, começa com o nome do cliente (Bora Imigrar = `boraimigrar`, Calverstone Advisors = `calverstone`, X-Trader = `xtrader`).
