@@ -1,5 +1,5 @@
 {
-  "quando": "2026-10-31 02:30",
+  "quando": "2026-10-31 08:15",
   "arquivos": {
     "SKILL.md": "e51ad480b51095df5b2e447e00620c07de79c3fb6a36346429b8f54846ca0704",
     "docs/PROCESSO.md": "717fa72acb99509624c3f0c5c79f107be940bf7b71e25a91ab0c549a7b800348",
@@ -31,9 +31,9 @@
     "docs/etapas/regras.md": "21298d67c51c53d81013885568fe6deaf89ef892b6494d557bd60e893b41ec93",
     "docs/etapas/render.md": "52dd87bb79f2884487ef379ce020042e2fb2d6f1abb5f16493a7a02f2c13ff75",
     "docs/etapas/revisor.md": "2c1125fa3a801fbbc06b6e851092b477c49b4bc4a2284cc270eca1a9a997a5a0",
-    "docs/etapas/sfx.md": "3f7fa1e1f51ae2fd1c5cfc6f5e063ece281e519d515b13733c9cea48f0dd70a3",
+    "docs/etapas/sfx.md": "dec5e2891adfa1825a707c5bca362d84dc88162d1833ce05e7907d312b428ddb",
     "docs/etapas/so_motion.md": "4b76f8daf25815a412f101bcfe5badb2d6aa999c8984eeb7cc086f47f5afdc5a",
-    "docs/etapas/sonorizacao.md": "f3ffff82d00ca954560f1e3a27725102113364625b35b0ed52cfb7d060325ea8",
+    "docs/etapas/sonorizacao.md": "10b39c9ccb25fb6a581cdd6d3d429815f34b5b72d6a77aa5cf95cc4cb272368d",
     "docs/etapas/subcomandos.md": "1149b83ebb1339024a806c9ded1e3542679344d7eb57eee513a3910b11266796",
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
