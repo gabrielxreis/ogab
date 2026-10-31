@@ -166,9 +166,17 @@ def importar(mp, caminho, bin_nome, permitir_render=False):
         try:
             out = subprocess.run(["ffprobe", "-v", "0", "-show_entries", "format=duration", "-of", "csv=p=0", caminho],
                                  capture_output=True, text=True).stdout.strip()
-            h, m_, s_, f_ = map(int, (ja.GetClipProperty("Duration") or "0:0:0:0").split(":"))
+            # 31/10/2026: o timecode conta quadros na taxa NOMINAL (24 num clipe 23.976) e dava "mudou no disco" falso
+            # (678.68 vs 678.00); "Frames" / FPS é a duração real. Sem Frames (áudio), o timecode; ";" = drop frame.
             fps = float(ja.GetClipProperty("FPS") or 24)
-            no_pool = h * 3600 + m_ * 60 + s_ + f_ / fps
+            quadros = str(ja.GetClipProperty("Frames") or "").strip()
+            if quadros.isdigit() and int(quadros) > 0:
+                no_pool = int(quadros) / fps
+            else:
+                tc = ja.GetClipProperty("Duration") or "0:0:0:0"
+                h, m_, s_, f_ = map(int, tc.replace(";", ":").split(":"))
+                no_pool = (h * 3600 + m_ * 60 + s_ + f_ / fps if ";" in tc
+                           else ((h * 60 + m_) * 60 + s_) * round(fps) / fps + f_ / fps)
             if out and abs(float(out) - no_pool) > 0.1:
                 raise RuntimeError(f"{os.path.basename(caminho)} mudou no disco ({float(out):.2f}s) mas o DaVinci tem a versão "
                                    f"antiga ({no_pool:.2f}s) com o mesmo caminho: salvar a versão nova com OUTRO nome (_v2...)")

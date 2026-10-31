@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.10.31-3 (31/10/2026)
+- **Revisão certa com várias gravações do gravador:** quando o áudio da A1 vem de mais de um arquivo (o gravador divide a gravação em partes), a revisão confere cada trecho no arquivo dele. Antes ela lia tudo do primeiro arquivo e acusava dezenas de SILÊNCIO e FALA que não existiam.
+- **Câmera em 23,976 num projeto 24:** reimportar um clipe que já estava no Media Pool não dá mais o erro falso "mudou no disco" (a conta da duração usava 24 quadros por segundo). Clipes 59,94 em drop frame também passam a ser conferidos.
 ## 2026.10.31-2 (31/10/2026)
 - **Voz em pt-BR mais certa:** antes de gerar a voz, o texto passa por uma correção de pronúncia (professôr, gestôr...) e você ouve antes de montar.
 - **Versão nova de mídia = nome novo:** o Gab nunca reaproveita o nome de um arquivo trocado, em nenhum editor, e a importação para se o arquivo mudou com o mesmo nome (o editor guardava a versão velha).

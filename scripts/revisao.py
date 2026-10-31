@@ -200,16 +200,23 @@ def fala(t):
         ERROS.append(f"FALA: limpar_fala indisponível ({e}), checagem de fala não rodou"); return
     S, F = t.GetStartFrame(), R.fps_tl(t); its = itens(t, "audio", 1) if v1_sem_som(t) else itens(t, "video", 1)
     if not its: return
-    arq = its[0].GetMediaPoolItem().GetClipProperty("File Path")
-    if not arq or not os.path.exists(arq): return
-    pedacos = [(x.GetLeftOffset() / F, x.GetLeftOffset() / F + x.GetDuration() / F, (x.GetStart() - S) / F) for x in its]
-    env = LF._envelope(arq)
-    if env:
-        db, passo = env
-        topo = sorted(db)[int(len(db) * 0.6):]; ref = topo[len(topo) // 2] if topo else -20
+    # Cada pedaço com o arquivo DELE: A1 com várias gravações do gravador (0098, 0099, 0100) lia tudo do primeiro
+    # arquivo e dava ~117 SILÊNCIO/FALA falsos nos trechos dos outros (31/10/2026).
+    pedacos = []
+    for x in its:
+        mpi = x.GetMediaPoolItem(); arq = mpi.GetClipProperty("File Path") if mpi else ""
+        if not arq or not os.path.exists(arq): return
+        pedacos.append((arq, x.GetLeftOffset() / F, x.GetLeftOffset() / F + x.GetDuration() / F, (x.GetStart() - S) / F))
+    envs = {a: LF._envelope(a) for a in dict.fromkeys(a for a, *_ in pedacos)}
+    if all(envs.values()):
+        refs = {}
+        for a, (db, _) in envs.items():
+            topo = sorted(db)[int(len(db) * 0.6):]; refs[a] = topo[len(topo) // 2] if topo else -20
+        passo = envs[pedacos[0][0]][1]
         voz = []
-        for lo, hi, rec in pedacos:
-            voz += [db[k] > ref - 16 for k in range(int(lo / passo), min(len(db), int(hi / passo)))]
+        for a, lo, hi, rec in pedacos:
+            db, ps = envs[a]
+            voz += [db[k] > refs[a] - 16 for k in range(int(lo / ps), min(len(db), int(hi / ps)))]
         k0 = next((k for k, v in enumerate(voz) if v), 0)
         if k0 * passo > 0.45: ERROS.append(f"SILÊNCIO no começo: a voz começa em {k0 * passo:.2f} s")
         k = k0
@@ -226,8 +233,8 @@ def fala(t):
     # disso vai para a timeline). Transcrever a gravação e distribuir as palavras nos cortes perdia palavra curta na
     # emenda e dava gaguejo falso ("como for. Se for" virava "for for", 28/10/2026).
     import tempfile, subprocess, hashlib, json as _json
-    chave = hashlib.md5(repr([(round(lo, 3), round(hi, 3)) for lo, hi, _ in pedacos]).encode()).hexdigest()[:12]
-    cache = arq + f".revisao_{chave}.json"
+    chave = hashlib.md5(repr([(a, round(lo, 3), round(hi, 3)) for a, lo, hi, _ in pedacos]).encode()).hexdigest()[:12]
+    cache = pedacos[0][0] + f".revisao_{chave}.json"
     if os.path.exists(cache):
         seq = _json.load(open(cache, encoding="utf-8"))
     else:
@@ -235,7 +242,7 @@ def fala(t):
             import mlx_whisper
             with tempfile.TemporaryDirectory() as tmp:
                 partes = []
-                for k, (lo, hi, rec) in enumerate(pedacos):
+                for k, (arq, lo, hi, rec) in enumerate(pedacos):
                     o = os.path.join(tmp, f"{k:04d}.wav")
                     subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", f"{lo:.3f}", "-to", f"{hi:.3f}", "-i", arq,
                                     "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", o], check=True)
@@ -249,7 +256,7 @@ def fala(t):
             _json.dump(seq, open(cache, "w", encoding="utf-8"), ensure_ascii=False)
         except Exception as e:
             ERROS.append(f"FALA: transcrição do áudio da timeline falhou ({e})"); return
-    fins = [rec + hi - lo for lo, hi, rec in pedacos]
+    fins = [rec + hi - lo for _, lo, hi, rec in pedacos]
     for a, b, motivo, txt in LF.detectar(seq):
         # "técnico..." colado num corte: a pausa que fez o whisper pôr reticências já foi cortada (15 CARGA DE VENTO)
         if motivo == "HESITAÇÃO" and any(a <= f <= b + 0.4 for f in fins): continue
