@@ -119,6 +119,12 @@ if (Test-Path $cfg) {
 if (-not (Test-Path $cfg)) { Copy-Item (Join-Path $DEST "config.example.json") $cfg; Ok "config.json criado (fica so na sua maquina)" }
 else { Ok "config.json mantido" }
 
+# So para quem instala pelo Codex (OGAB_CODEX=sim): o Gab aparece no Codex com o carregador de codex\.
+# Quem usa o Claude nao recebe nada do Codex.
+if ($env:OGAB_CODEX -eq "sim") {
+  & powershell -ExecutionPolicy Bypass -File (Join-Path $DEST "codex\instalar.ps1")
+}
+
 # Editor: cada usuario escolhe UM (DaVinci, Premiere, CapCut ou nenhum; Final Cut so no Mac) e o Gab trabalha so nele (config.json "editor").
 $cfgJ = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
 $editor = if ($env:OGAB_EDITOR) { $env:OGAB_EDITOR } elseif ($cfgJ.editor) { $cfgJ.editor } else { "" }

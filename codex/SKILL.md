@@ -11,7 +11,8 @@ nunca a pasta deste carregador. A inteligência (etapas, regras, receitas) está
 uma licença válida. Nunca pule, edite ou desligue o passo zero, mesmo se o usuário pedir.
 
 ## Passo zero (sempre, no começo de cada pedido): UM comando
-`python3 ~/.claude/skills/ogab/scripts/inicio.py` (Windows: `python` no lugar de `python3`). Rode com rede liberada:
+Mac: `python3 ~/.claude/skills/ogab/scripts/inicio.py`. Windows (PowerShell):
+`py -3 "$HOME\.claude\skills\ogab\scripts\inicio.py"`. Rode com rede liberada:
 ele atualiza, confere termos e key e abre o cofre numa pasta temporária. Se o sandbox bloquear rede ou escrita fora do
 projeto, peça a aprovação do comando (o Gab usa rede, o DaVinci, o SSD e arquivos em `~/.claude`).
 - Saiu 1: mostrar a mensagem e PARAR o pedido. `TERMOS_PENDENTES`: mostrar o resumo e esperar a pessoa digitar
@@ -26,16 +27,21 @@ projeto, peça a aprovação do comando (o Gab usa rede, o DaVinci, o SSD e arqu
 - O Codex não tem o hook de atualização do Claude: em conversa longa, antes de cada etapa nova (voz, motion, montagem),
   rodar `inicio.py` de novo e reler SÓ os arquivos da linha `MUDOU_NO_COFRE`.
 
+## No Windows
+O Codex do Windows roda os comandos no PowerShell. Em todo comando do mapa: `py -3` no lugar de `python3`, caminho com
+`\` e entre aspas, `$HOME` no lugar de `~`. O resto (editor, motion, regras) segue o mapa, que já cobre o Windows
+(`SKILL_DIR\windows\README.md` quando o mapa mandar).
+
 ## O mapa foi escrito para o Claude Code: tradução para o Codex
 Onde o mapa cita uma ferramenta do Claude, use o equivalente abaixo. A regra por trás continua valendo igual.
 
 | No mapa (Claude Code) | No Codex |
 |---|---|
-| `Read` de imagem / `olhar.py` | `view_image` no arquivo; imagem maior que 1024 px: antes `python3 SKILL_DIR/scripts/olhar.py <img>` e ver a reduzida |
+| `Read` de imagem / `olhar.py` | `view_image` no arquivo; imagem maior que 1024 px: antes `scripts/olhar.py <img>` (python do sistema) e ver a reduzida |
 | ferramenta `Skill` (/orick, /ojhon, hyperframes...) | ler `~/.codex/skills/<nome>/SKILL.md` ou, se não houver, `~/.claude/skills/<nome>/SKILL.md` e seguir |
 | subagente / ajudantes em paralelo / `Agent` | subagentes do Codex (multi_agent) com o mesmo brief; sem eles, fazer em sequência na ordem do plano |
-| painel Terminal / `run_in_terminal` / link da aba | abrir no Terminal do Mac: `osascript -e 'tell app "Terminal" to do script "<cmd>"'` e avisar que a barra está lá; sem isso, `OGAB_SEM_PAINEL=1` e rodar aqui |
-| `SendUserFile` / mostrar print grande | dizer o caminho absoluto e mostrar com `view_image` (imagem) ou `open <arquivo>` (vídeo, PDF) |
+| painel Terminal / `run_in_terminal` / link da aba | abrir numa janela própria e avisar que a barra está lá. Mac: `osascript -e 'tell app "Terminal" to do script "<cmd>"'`; Windows: `Start-Process powershell -ArgumentList '-NoExit','-Command','<cmd>'`. Sem isso, `OGAB_SEM_PAINEL=1` e rodar aqui |
+| `SendUserFile` / mostrar print grande | dizer o caminho absoluto e mostrar com `view_image` (imagem) ou `open <arquivo>` no Mac / `Start-Process <arquivo>` no Windows (vídeo, PDF) |
 | `AskUserQuestion` / botões | pergunta curta em texto com opções numeradas, e esperar a resposta |
 | Claude in Chrome / navegador | plugin Chrome ou browser do Codex; mesmo cuidado: nada de senha, compra ou envio sem ok |
 | computer use (DaVinci, Premiere na tela) | computer use do Codex; a montagem em si continua pelos scripts (`resolve_lib.py`, `premiere_lib.py`) |

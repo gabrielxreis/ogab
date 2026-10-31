@@ -161,6 +161,10 @@ Get-Content $env:TEMP\ogab-install.log -Wait
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh | OGAB_CODEX=sim bash
 ```
+No **Windows**, com o Codex, no PowerShell (usuário normal):
+```powershell
+$env:OGAB_CODEX = 'sim'; irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1 | iex
+```
 Quem instalou assim recebe as atualizações do Gab também no Codex.
 
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
