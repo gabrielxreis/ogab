@@ -108,9 +108,11 @@ else
   ok "config.json mantido"
 fi
 
-# Com o Codex na máquina, o Gab também aparece lá (mesma pasta, carregador próprio em codex/).
-if command -v codex >/dev/null 2>&1 || [ -d "$HOME/.codex" ]; then
-  bash "$DEST/codex/instalar.sh" >/dev/null 2>&1 && ok "também disponível no Codex (\$ogab)"
+# Só para quem instala pelo Codex (OGAB_CODEX=sim): o Gab aparece no Codex com o carregador de codex/.
+# Quem usa o Claude não recebe nada do Codex.
+if [ "${OGAB_CODEX:-}" = "sim" ]; then
+  bash "$DEST/codex/instalar.sh" >/dev/null 2>&1 && ok "instalado no Codex (chame com \$ogab)" \
+    || warn "não consegui colocar o Gab no Codex; rode: bash $DEST/codex/instalar.sh"
 fi
 
 # Daqui em diante: painel ao vivo em Python (perguntas, o que baixa, MB/s, o que já tem e o que falta).

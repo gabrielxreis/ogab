@@ -157,6 +157,12 @@ irm https://raw.githubusercontent.com/gabrielxreis/ogab/main/windows/install.ps1
 Get-Content $env:TEMP\ogab-install.log -Wait
 ```
 
+**Usando o Codex (Mac) em vez do Claude:** cole no Terminal e depois chame o Gab no Codex com `$ogab`:
+```bash
+curl -fsSL https://raw.githubusercontent.com/gabrielxreis/ogab/main/install.sh | OGAB_CODEX=sim bash
+```
+Quem instalou assim recebe as atualizações do Gab também no Codex.
+
 O instalador faz **duas perguntas**, que só escolhem qual app o Gab usa (tudo é instalado mesmo assim):
 1. **Editor:** DaVinci Resolve, Adobe Premiere Pro, CapCut (Mac e Windows, beta) ou Final Cut Pro (Mac, beta). No Windows: DaVinci, Premiere ou CapCut.
 2. **Motions:** automáticos (HyperFrames) ou no After Effects (camadas editáveis).

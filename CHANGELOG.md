@@ -1,7 +1,5 @@
 # Novidades do Gab (/ogab)
 ## 2026.10.31-2 (31/10/2026)
-- **O Gab agora roda no Codex:** com o Codex instalado, o Gab aparece lá sozinho (chame com `$ogab`). É a mesma instalação, a mesma key e as mesmas regras; cada atualização chega nos dois. Se você instalou antes, rode `bash ~/.claude/skills/ogab/codex/instalar.sh` uma vez.
-- **Imagem sem gastar crédito pelo Codex:** no Claude, o Gab pode pedir ao Codex objetos recortados (PNG transparente), fundos, texturas e variações de capa pela sua conta do ChatGPT, antes de usar um gerador pago. Também passa para o Codex código de motion pesado e uma revisão de olho fresco antes de renderizar.
 - **Voz em pt-BR mais certa:** antes de gerar a voz, o texto passa por uma correção de pronúncia (professôr, gestôr...) e você ouve antes de montar.
 - **Versão nova de mídia = nome novo:** o Gab nunca reaproveita o nome de um arquivo trocado, em nenhum editor, e a importação para se o arquivo mudou com o mesmo nome (o editor guardava a versão velha).
 - **Gab lê o Rick e o Jhon:** cores, fontes e logo da marca vêm do design do Rick; ganchos que venceram teste vêm do Jhon antes do roteiro de anúncio.

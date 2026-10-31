@@ -1,13 +1,13 @@
 """Ponte Claude Code -> Codex: o Gab (rodando no Claude) passa para o Codex o que o Codex faz melhor.
 Usa o `codex exec` da máquina, logado na conta ChatGPT da pessoa (sem crédito de Higgsfield/Magnific).
 
-  python3 codex_ponte.py checar
+  python3 ponte.py checar
       sai 0 e imprime CODEX_OK se o comando codex existe e está logado; senão sai 1 com o motivo
-  python3 codex_ponte.py imagem "<prompt>" <saida.png> [--ref img.png ...] [--transparente]
+  python3 ponte.py imagem "<prompt>" <saida.png> [--ref img.png ...] [--transparente]
       gera UMA imagem com o image_gen nativo do Codex e grava em <saida.png> (nome novo: nunca sobrescreve)
-  python3 codex_ponte.py tarefa "<pedido>" [--pasta <dir>] [--ref img.png ...]
+  python3 ponte.py tarefa "<pedido>" [--pasta <dir>] [--ref img.png ...]
       tarefa livre (código de motion, conserto de script, segunda opinião); imprime a resposta final do Codex
-  python3 codex_ponte.py revisar <pasta_do_repo>
+  python3 ponte.py revisar <pasta_do_repo>
       `codex review` das mudanças da pasta (olho fresco antes de renderizar ou commitar)
 """
 import os, shutil, subprocess, sys, tempfile, time
