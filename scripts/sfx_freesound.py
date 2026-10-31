@@ -2,9 +2,9 @@
 anúncio de cliente, sem crédito obrigatório). Segunda fonte grátis, para quando o Pixabay não tem o som.
 
 Dois caminhos, o script escolhe sozinho:
-- Com a chave grátis do Freesound (rápido, ~1 s): criar conta em freesound.org, pegar a chave em
-  https://freesound.org/apiv2/apply e salvar com `python3 sfx_freesound.py chave <CHAVE>` (fica em
-  ~/.config/ogab/freesound.json, fora da skill e do git). Ou a variável FREESOUND_TOKEN.
+- Com a chave grátis do Freesound (rápido, ~1 s): `python3 sfx_freesound.py chave` mostra o passo a passo para a
+  pessoa pegar a chave; `python3 sfx_freesound.py chave <CHAVE>` salva e testa (fica em ~/.config/ogab/freesound.json,
+  fora da skill e do git). Ou a variável FREESOUND_TOKEN.
 - Sem chave: busca pelo Openverse (api.openverse.org, que espelha o Freesound CC0). Funciona, mas leva 30-60 s por
   busca e às vezes cai: oferecer a chave à pessoa se for usar muito.
 
@@ -16,11 +16,20 @@ Dois caminhos, o script escolhe sozinho:
 Baixa a prévia em alta do Freesound (MP3 ~128 kbps; o original exige login OAuth). Termos em inglês, pelo OBJETO +
 ação ("drawer close wood", "paper slide"). Acervo da comunidade: ouvir/medir e conferir com sfx_conferir.py antes de usar.
 """
-import json, os, sys, urllib.parse, urllib.request
+import json, os, sys, urllib.error, urllib.parse, urllib.request
 from sfx_pixabay import UA, _ssl, baixar_wav, slug
 
 CFG = os.path.expanduser("~/.config/ogab/freesound.json")
 LICENCA = "CC0 1.0 (domínio público, uso comercial livre, sem crédito obrigatório)"
+GUIA = """Chave grátis do Freesound (uns 2 minutos, só uma vez):
+  1. Abrir https://freesound.org, clicar em "Join" (no alto da página), criar a conta grátis e confirmar pelo
+     e-mail que eles mandam.
+  2. Já logado, abrir https://freesound.org/apiv2/apply
+  3. Preencher o formulário: Name = ogab, Description = efeitos sonoros CC0 para edição de vídeo,
+     marcar que aceita os termos e clicar em "Request new access credentials".
+  4. Na tabela que aparece embaixo, copiar o valor da coluna "Client secret/Api key" (o comprido; NÃO o Client id).
+  5. Colar a chave no chat para o Gab salvar, ou rodar: python3 sfx_freesound.py chave <CHAVE>
+Sem a chave tudo funciona igual, só a busca demora 30-60 s."""
 
 
 def chave():
@@ -72,7 +81,8 @@ def busca(termos, n=8, maximo=6):
     token = chave()
     if token:
         return busca_freesound(termos, n, maximo, token)
-    print("sem chave do Freesound: buscando pelo Openverse (30-60 s)...", file=sys.stderr)
+    print("sem chave do Freesound: buscando pelo Openverse (30-60 s). Para ficar rápido: sfx_freesound.py chave",
+          file=sys.stderr)
     return busca_openverse(termos, n, maximo)
 
 
@@ -102,11 +112,18 @@ if __name__ == "__main__":
         print(json.dumps(busca(a[1], int(op("--n") or 8), float(op("--max") or 6)), ensure_ascii=False, indent=1))
     elif len(a) >= 3 and a[0] == "baixar":
         baixar(a[1], a[2], op("--so"), op("--nomes"))
+    elif a == ["chave"]:
+        print(GUIA)
     elif len(a) == 2 and a[0] == "chave":
+        try:
+            busca_freesound("whoosh", 1, 6, a[1].strip())
+        except urllib.error.HTTPError as e:
+            raise SystemExit(f"o Freesound recusou a chave (HTTP {e.code}): conferir se copiou o \"Client secret/Api key\" "
+                             "inteiro, não o Client id.\n\n" + GUIA)
         os.makedirs(os.path.dirname(CFG), exist_ok=True)
         fd = os.open(CFG, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
         with os.fdopen(fd, "w") as f:
-            json.dump({"token": a[1]}, f)
-        print("chave salva em", CFG)
+            json.dump({"token": a[1].strip()}, f)
+        print("chave testada e salva em", CFG)
     else:
         raise SystemExit(__doc__)
