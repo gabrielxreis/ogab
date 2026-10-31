@@ -748,6 +748,23 @@ def _oficial(rel, release):
     return bool(blob) and any(l.split(" ", 1)[0] == blob for l in _git("rev-list", "--objects", "--all", "--", rel).splitlines())
 
 
+def _stash_oficial(ref, rel, release):
+    """A versão do arquivo guardada no stash do doctor é nossa (release, update ou histórico)? O doctor guarda o que o
+    atualizador antigo congelou: sem isto, conteúdo oficial ia para a fila como invenção (relatos de 30/10/2026)."""
+    blob = (_git("rev-parse", f"{ref}:{rel}") or _git("rev-parse", f"{ref}^3:{rel}")).strip()
+    if not blob:
+        return True   # apagado no stash: nada do usuário para mandar
+    if any(l.split(" ", 1)[0] == blob for l in _git("rev-list", "--objects", "--branches", "--tags", "--remotes", "--", rel).splitlines()):
+        return True   # (--all incluiria o próprio stash)
+    dados = subprocess.run(["git", "-C", SKILL, "cat-file", "-p", blob], capture_output=True).stdout
+    sha = hashlib.sha256(dados).hexdigest()
+    try:
+        escritos = json.load(open(RELEASE_ESCRITOS, encoding="utf-8")).get(SKILL, {}).get(rel, [])
+    except Exception:
+        escritos = []
+    return sha == release.get(rel) or sha in escritos
+
+
 def _blocos_invencao():
     """[(rótulo, texto)] do que este usuário mudou ou criou na skill (fora presets, que vão pelo varrer de motions)."""
     blocos, release = [], _do_release()
@@ -771,7 +788,16 @@ def _blocos_invencao():
     for linha in _git("stash", "list").splitlines():   # o doctor guarda as mudanças locais antes do update
         ref = linha.split(":", 1)[0]
         if "doctor" in linha:
-            sd = _git("stash", "show", "-p", "--include-untracked", ref, "--", ".", *fora) or _git("stash", "show", "-p", ref)
+            nomes_st = (_git("stash", "show", "--name-only", "--include-untracked", ref) or _git("stash", "show", "--name-only", ref)).split()
+            seus = [r for r in nomes_st if not r.startswith(FORA_INVENCAO) and not TEMP_INVENCAO.search(r)
+                    and not _stash_oficial(ref, r, release)]
+            if not seus:
+                continue
+            sd = _git("diff", f"{ref}^1", ref, "--", *seus)   # `git stash show` não aceita filtro de arquivo
+            for r in seus:   # não rastreados ficam no 3º pai do stash
+                novo = _git("show", f"{ref}^3:{r}") if f"b/{r}" not in sd else ""
+                if novo:
+                    sd += f"\n--- arquivo novo: {r} ---\n{novo}"
             if sd.strip():
                 blocos.append((f"guardado pelo doctor antes do update ({ref})", sd))
     return blocos

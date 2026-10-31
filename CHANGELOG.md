@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.10.30-10 (30/10/2026)
+- **Relatos sem repetir o que já é do Gab:** o que o doctor guardou antes de um update só vai para o Gabriel quando é mudança sua de verdade. Antes ia o stash inteiro, inclusive versões antigas dos próprios arquivos da skill, e isso aparecia como "invenção" sua.
 ## 2026.10.30-9 (30/10/2026)
 - **Tempo restante do render certo:** a barra TOTAL agora calcula o que falta pela média dos motions já prontos. Antes, no começo da fila, ela mostrava um tempo umas 10 vezes maior que o real ("36 min" para algo de 5 min).
 ## 2026.10.30-8 (30/10/2026)
