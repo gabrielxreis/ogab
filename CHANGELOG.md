@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.01-2 (01/11/2026)
+- **Prévia do Apple Design no menu:** a miniatura agora é vertical como as outras. Antes aparecia cortada no meio.
 ## 2026.11.01-1 (01/11/2026)
 - **Novo preset Apple Design:** uma folha de desenho técnico no estilo das plantas da Apple se desenha sozinha (close na câmera, vista de trás com medidas, vista explodida com as camadas subindo) e no fim vira o produto pronto, na cor da sua marca, com o título do lançamento. Sai na vertical e na horizontal e funciona bem como GIF de lançamento.
 - **SFX no volume certo no DaVinci 21.0:** quando o DaVinci não aceita o volume do clipe pela API, o Gab grava o volume numa cópia de cada som e coloca a cópia na timeline. Antes os efeitos entravam no volume cheio, altos demais. Veio do relato de um de vocês.
