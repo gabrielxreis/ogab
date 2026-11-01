@@ -1339,9 +1339,22 @@ SFX_DMAX = {"riser_hollow": 2.1, "hud_loading": 0.8, "whoosh_info": 1.1, "ui_sel
             "air_swoosh": 1.9, "logo_impact": 6.0, "click": 0.4, "sparkle": 3.0, "pop": 0.3, "typing": 2.7, "stardust": 2.0}
 
 
+def sfx_com_ganho(arq, db):
+    """Cópia do som com o ganho gravado no arquivo (<nome>_g-9.wav, na mesma pasta). Para o DaVinci 21.0, em que
+    TimelineItem.SetProperty("AudioVolume") devolve False e o clipe ficaria a 0 dB (SFX alto demais sem ninguém ver).
+    Veio do relato de um usuário (01/11/2026)."""
+    base, _ = os.path.splitext(arq)
+    out = f"{base}_g{int(round(db))}.wav"
+    if not os.path.exists(out):
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", arq, "-af", f"volume={db}dB", "-ar", "48000", out], check=True)
+    return out
+
+
 def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
     """Coloca o desenho de som de `pasta_sfx/plano_sfx.txt` (linhas 'T.TTs Ax nome -NNdB[ D.Ds]: o que acompanha'), cada som
-    na primeira trilha livre (A3..A6), cortado em SFX_DMAX, volume e fade no clipe. Apaga o que havia nessas trilhas."""
+    na primeira trilha livre (A3..A6), cortado em SFX_DMAX, volume e fade no clipe. Apaga o que havia nessas trilhas.
+    Se a API não aceita o volume do clipe (DaVinci 21.0), o ganho vai gravado numa cópia do arquivo (sfx_com_ganho) e o
+    clipe é trocado por ela, neste e nos próximos sons."""
     pagina_edit()   # DeleteClips só funciona na página Edit
     import re as _re
     ev = [(m[2], float(m[1]), int(m[3]), float(m[4]) if m[4] else None) for m in (_re.match(r"\s*([\d.]+)s A\d (\S+) (-?\d+)dB(?: ([\d.]+)s)?", l)
@@ -1354,18 +1367,24 @@ def colocar_plano_sfx(t, mp, pasta_sfx, fim_s, trilhas=(3, 4, 5, 6)):
         if its: t.DeleteClips(its)
         if not [x for x in (t.GetItemListInTrack("audio", k) or [])]:
             t.SetTrackName("audio", k, "SFX" if k == trilhas[0] else f"SFX {k - trilhas[0] + 1}")
-    S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0; avisou = False
+    S, F = t.GetStartFrame(), fps_tl(t); fim = {k: -1 for k in trilhas}; ok = 0; no_arquivo = False
     for nome, ini, db, dmax in sorted(ev, key=lambda e: e[1]):
-        it = importar(mp, os.path.join(pasta_sfx, nome + ".wav"), "SFX"); fc = float(it.GetClipProperty("FPS") or F)
+        arq = os.path.join(pasta_sfx, nome + ".wav")
+        it = importar(mp, sfx_com_ganho(arq, db) if no_arquivo else arq, "SFX"); fc = float(it.GetClipProperty("FPS") or F)
         dur = min(dmax or SFX_DMAX.get(nome, 2.0), fim_s - ini); rf = S + round(ini * F)   # 'NN dB D.Ds' na linha = duração própria
         livres = [k for k in trilhas if fim[k] < rf and not [y for y in (t.GetItemListInTrack("audio", k) or []) if y.GetStart() < rf + round(dur * F) and y.GetEnd() > rf]]
         if not livres: print("SFX sem trilha livre:", nome, ini); continue
         k = livres[0]
-        x = mp.AppendToTimeline([{"mediaPoolItem": it, "mediaType": 2, "trackIndex": k, "recordFrame": rf, "startFrame": 0, "endFrame": round(dur * fc)}])
+        pedido = {"mediaType": 2, "trackIndex": k, "recordFrame": rf, "startFrame": 0, "endFrame": round(dur * fc)}
+        x = mp.AppendToTimeline([dict(pedido, mediaPoolItem=it)])
         if not x: print("SFX falhou:", nome, ini); continue
-        if not x[0].SetProperty("AudioVolume", db) and not avisou:   # DaVinci 21.0 não aceita volume pela API (relato 15/10/2026)
-            print("AVISO: o DaVinci não aceitou o volume do clipe pela API (< 21.1): SFX entraram no volume do arquivo;"
-                  " atualizar para 21.1+ ou gravar o ganho numa cópia (ffmpeg volume=NNdB)"); avisou = True
+        if not no_arquivo and not x[0].SetProperty("AudioVolume", db):   # DaVinci 21.0 não aceita volume pela API (relato 15/10/2026)
+            no_arquivo = True   # troca este e os próximos pela cópia com o ganho no arquivo
+            print("AVISO: a API não aceita o volume do clipe (DaVinci < 21.1); gravando o ganho de cada SFX no arquivo (_gNN.wav)")
+            t.DeleteClips([x[0]])
+            it = importar(mp, sfx_com_ganho(arq, db), "SFX")
+            x = mp.AppendToTimeline([dict(pedido, mediaPoolItem=it)])
+            if not x: print("SFX falhou:", nome, ini); continue
         set_fades(x[0], {"FadeOut": min(8, round(dur * F / 4))}); fim[k] = x[0].GetEnd(); ok += 1
     return ok, len(ev)
 

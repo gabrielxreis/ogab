@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.11.01-1 (01/11/2026)
+- **Novo preset Apple Design:** uma folha de desenho técnico no estilo das plantas da Apple se desenha sozinha (close na câmera, vista de trás com medidas, vista explodida com as camadas subindo) e no fim vira o produto pronto, na cor da sua marca, com o título do lançamento. Sai na vertical e na horizontal e funciona bem como GIF de lançamento.
+- **SFX no volume certo no DaVinci 21.0:** quando o DaVinci não aceita o volume do clipe pela API, o Gab grava o volume numa cópia de cada som e coloca a cópia na timeline. Antes os efeitos entravam no volume cheio, altos demais. Veio do relato de um de vocês.
 ## 2026.10.31-3 (31/10/2026)
 - **Revisão certa com várias gravações do gravador:** quando o áudio da A1 vem de mais de um arquivo (o gravador divide a gravação em partes), a revisão confere cada trecho no arquivo dele. Antes ela lia tudo do primeiro arquivo e acusava dezenas de SILÊNCIO e FALA que não existiam.
 - **Câmera em 23,976 num projeto 24:** reimportar um clipe que já estava no Media Pool não dá mais o erro falso "mudou no disco" (a conta da duração usava 24 quadros por segundo). Clipes 59,94 em drop frame também passam a ser conferidos.

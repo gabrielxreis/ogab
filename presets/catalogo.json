@@ -178,6 +178,42 @@
    }
   },
   {
+   "id": "apple-design",
+   "nome": "Apple Design",
+   "categoria": "produto",
+   "papel": "linguagem",
+   "formato": [
+    "vertical",
+    "horizontal"
+   ],
+   "apresentador": "sem",
+   "resumo": "Folha de desenho técnico estilo Apple que se desenha sozinha (cotas, vista explodida) e vira o produto acabado com o título do lançamento.",
+   "quando": "lançamento de produto físico (celular, gadget, aparelho), 'estilo Apple', desenho técnico, por dentro do produto, GIF de lançamento",
+   "nichos": [
+    "tecnolog",
+    "gadget",
+    "celular",
+    "iphone",
+    "eletronic",
+    "hardware",
+    "aparelho",
+    "design"
+   ],
+   "sinais": [
+    "apple",
+    "iphone",
+    "desenho tecnico",
+    "explodid",
+    "por dentro",
+    "medida",
+    "milimetr",
+    "engenharia",
+    "lanc"
+   ],
+   "padroes": {},
+   "cenas": {}
+  },
+  {
    "id": "vitrine",
    "nome": "Vitrine",
    "categoria": "produto",

@@ -1,0 +1,43 @@
+/* Preset APPLE DESIGN: folha de desenho técnico (estilo desenho dimensional da Apple) que vira o produto. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #fbfbfd; }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden;
+  --papel: #fbfbfd; --tinta: #111114; --cinza: #86868b; --cor: #C4A34F;
+  background: var(--papel); color: var(--tinta); font-family: "Inter Tight", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+#root.tema-noite { --papel: #0b0b0d; --tinta: #ececf1; --cinza: #8e8e93; }
+#cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#palco { position: absolute; inset: 0; pointer-events: none; }
+#grao { position: absolute; inset: 0; opacity: .035; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+/* desenho: --u desfaz a escala (câmera e grupo) para o traço ficar com a mesma espessura na tela */
+svg.dw { position: absolute; left: 0; top: 0; overflow: visible; --u: 1; }
+.dw text { font-family: "Inter Tight", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; fill: var(--tinta);
+  paint-order: stroke; stroke: var(--papel); stroke-linejoin: round; }
+.dw text.dts { fill: var(--cinza); letter-spacing: .08em; }
+.dw text.vt { font-weight: 600; letter-spacing: .14em; }
+.dw text.tc { text-transform: none; }
+.dw .obj { fill: var(--papel); stroke: var(--tinta); stroke-width: calc(1.8px * var(--u)); stroke-linejoin: round; }
+.dw .fino { fill: none; stroke: var(--tinta); stroke-width: calc(.9px * var(--u)); }
+.dw .chapa { fill: color-mix(in srgb, var(--tinta) 7%, var(--papel)); stroke: var(--tinta); stroke-width: calc(1px * var(--u)); }
+.dw .hach { stroke: var(--tinta); stroke-width: calc(1.1px * var(--u)); }
+.dw .tracejado { fill: none; stroke: var(--cinza); stroke-width: calc(1px * var(--u)); stroke-dasharray: calc(5px * var(--u)) calc(3.5px * var(--u)); }
+.dw .detalhe { fill: none; stroke: var(--cor); stroke-width: calc(1.2px * var(--u)); stroke-dasharray: calc(14px * var(--u)) calc(3px * var(--u)) calc(3px * var(--u)) calc(3px * var(--u)); }
+.dw .eixo { fill: none; stroke: var(--cinza); stroke-width: calc(.8px * var(--u)); stroke-dasharray: calc(18px * var(--u)) calc(4px * var(--u)) calc(2px * var(--u)) calc(4px * var(--u)); }
+.dw .cota, .dw .lider { fill: none; stroke: var(--tinta); stroke-width: calc(.8px * var(--u)); }
+.dw .ext { fill: none; stroke: var(--tinta); stroke-width: calc(.55px * var(--u)); }
+.dw .ponto, .dw .seta { fill: var(--tinta); stroke: none; }
+.dw .borda { fill: none; stroke: var(--tinta); stroke-width: calc(1.3px * var(--u)); }
+.dw .caixa { fill: none; stroke: var(--tinta); stroke-width: calc(.8px * var(--u)); }
+.dw .mg .obj, .dw .mg .chapa { fill-opacity: var(--fo, 1); }
+
+/* fecho: título que sobe da máscara */
+#texto { position: absolute; display: flex; flex-direction: column; align-items: center; text-align: center; transform: translate(-50%, -50%); }
+.olho { font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: var(--cor); }
+.titulo { font-weight: 700; letter-spacing: -.045em; line-height: .98; color: var(--tinta); }
+.linha { display: block; overflow: hidden; padding: .08em 0 .16em; margin-bottom: -.22em; }
+.linha:last-child { margin-bottom: 0; }
+.linha > span { display: inline-block; }
+.p.cor { color: var(--cor); }
+.sub { font-weight: 450; color: var(--cinza); line-height: 1.3; }
+.rodape { font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--tinta); opacity: .75; }
