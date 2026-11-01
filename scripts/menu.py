@@ -47,6 +47,7 @@ PRESET_EN = {
     "colagem": "Old photos cut out with scissors in halftone, glued on kraft or newsprint, torn-paper labels and stop-motion at 12 fps.",
     "mimic": "Paper puppet theatre: blue velvet curtains, each line on a paper sign that drops on strings and swings, puppets rising from the trapdoor and painted backdrops lowering like stage flats.",
     "launch": "Premium Apple-style launch film: black, one idea per scene, real product screens in 3D glass.",
+    "apple-design": "Apple-style technical drawing that draws itself (dimensions, exploded view) and turns into the finished product with the launch title.",
     "vitrine": "Clean luxury interface: every line becomes a piece of UI (converter, profile, card, window, pill).",
     "kinetic": "Aggressive kinetic type: giant words swapping on the beat of the voice, red box, glitch, whip.",
     "vector-motion": "Each line becomes a simple black and white visual metaphor, the hero glowing against the rest.",
