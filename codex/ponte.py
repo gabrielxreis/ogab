@@ -38,9 +38,10 @@ def _exec(prompt, pasta, refs=(), timeout=900):
     cmd = [_codex(), "exec", "--skip-git-repo-check", "-s", "workspace-write", "-C", pasta, "-o", ultima]
     for ref in refs:
         cmd += ["-i", os.path.abspath(ref)]
-    cmd.append(prompt)
+    # o -i aceita vários arquivos seguidos: sem o "--" o Codex lê o pedido como mais uma imagem e sai 1
+    cmd += ["--", prompt]
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL)
         cod = r.returncode
     except subprocess.TimeoutExpired:
         cod = 124

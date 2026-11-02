@@ -32,8 +32,16 @@ def tl_por_nome(p, nome):
     raise SystemExit(f"timeline {nome!r} não existe")
 
 
+def _transicao(x):
+    try:
+        return x.GetType() == "transition"
+    except Exception:   # DaVinci sem GetType no item
+        return False
+
+
 def itens(t, k, n):
-    return sorted(t.GetItemListInTrack(k, n) or [], key=lambda x: x.GetStart())
+    # transições (AddTransition, 21.1) também vêm na lista, sem mídia nem offset, e quebravam a revisão (relato da comunidade)
+    return sorted([x for x in (t.GetItemListInTrack(k, n) or []) if not _transicao(x)], key=lambda x: x.GetStart())
 
 
 def buracos(t, mp, corrigir):

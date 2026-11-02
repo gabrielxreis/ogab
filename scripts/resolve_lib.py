@@ -1398,6 +1398,14 @@ def _comp_do_clipe(item):
     return comp
 
 
+def _quadro_atual(comp):
+    """Quadro em que o AddModifier grava a chave automática (o tempo atual da comp, em geral o 0)."""
+    try:
+        return comp.GetAttrs().get("COMPN_CurrentTime", 0) or 0
+    except Exception:
+        return 0
+
+
 def _quadro_comp(comp, t_arquivo, fps_arquivo):
     """Quadro da composição do Fusion de um clipe: conta na taxa do ARQUIVO, a partir do início da mídia
     (COMPN_GlobalStart é negativo = quadros antes do ponto de entrada)."""
@@ -1423,6 +1431,7 @@ def texto_rastreado(item, trilha, texto, deslocamento=(0.0, -0.10), tamanho=0.06
     origem = mo.Input.GetConnectedOutput() or mi.Output
     mg.Background = origem; mg.Foreground = txt.Output; mo.Input = mg.Output
     txt.AddModifier("Center", "XYPath")
+    q0 = _quadro_atual(comp)   # o AddModifier já gravou uma chave aqui com o valor padrão (relato da comunidade)
     W, H, fps = tr["w"], tr["h"], tr["fps"]
     meia = min(0.45, len(texto) * tamanho * 0.29)          # meia largura aproximada do texto (fração do quadro)
     n = 0
@@ -1431,10 +1440,12 @@ def texto_rastreado(item, trilha, texto, deslocamento=(0.0, -0.10), tamanho=0.06
         cy = 1 - y / H - deslocamento[1] * (e if seguir_escala else 1)
         cx = min(max(cx, margem + meia), 1 - margem - meia)
         cy = min(max(cy, margem), 1 - margem)
+        if n == 0: txt.SetInput("Center", {1: cx, 2: cy}, q0)   # a chave automática passa a ter a 1ª posição
         txt.SetInput("Center", {1: cx, 2: cy}, _quadro_comp(comp, t, fps)); n += 1
     if seguir_escala:
         txt.AddModifier("Size", "BezierSpline")
-        for t, x, y, e in tr["pontos"]:
+        for k, (t, x, y, e) in enumerate(tr["pontos"]):
+            if k == 0: txt.SetInput("Size", tamanho * e, q0)
             txt.SetInput("Size", tamanho * e, _quadro_comp(comp, t, fps))
     return n
 
@@ -1459,6 +1470,14 @@ def animar_clipe(item, chaves, fps_arquivo=None, nome="AnimGab"):
     if "zoom" in usados: tf.AddModifier("Size", "BezierSpline")
     if "giro" in usados: tf.AddModifier("Angle", "BezierSpline")
     if "x" in usados or "y" in usados: tf.AddModifier("Center", "XYPath")
+    # o AddModifier grava uma chave automática no tempo atual da comp (quadro 0) com o valor PADRÃO: sem isto a
+    # animação começava no meio (zoom/posição errados antes da 1ª chave). Grava ali o 1º valor de cada parâmetro.
+    q0 = _quadro_atual(comp); vistos = set()
+    for _, c in sorted(chaves, key=lambda kv: kv[0]):
+        if "zoom" in c and "zoom" not in vistos: tf.SetInput("Size", c["zoom"], q0); vistos.add("zoom")
+        if "giro" in c and "giro" not in vistos: tf.SetInput("Angle", c["giro"], q0); vistos.add("giro")
+        if ("x" in c or "y" in c) and "xy" not in vistos:
+            tf.SetInput("Center", {1: c.get("x", 0.5), 2: c.get("y", 0.5)}, q0); vistos.add("xy")
     for t, c in chaves:
         f = _quadro_comp(comp, t, fps)
         if "zoom" in c: tf.SetInput("Size", c["zoom"], f)

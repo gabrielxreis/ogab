@@ -1,4 +1,8 @@
 # Novidades do Gab (/ogab)
+## 2026.11.02-1 (02/11/2026)
+- **Imagem pelo Codex com referência volta a funcionar:** no Codex 0.162 a imagem de referência engolia o pedido e toda geração com `--ref` falhava na hora ("codex saiu 1"). Agora a ponte separa o pedido das imagens e roda sem esperar o teclado.
+- **Revisão não quebra mais com transição na timeline:** transições (dissolve etc.) entravam na conferência como se fossem clipes e a revisão parava com erro. Agora ficam de fora.
+- **Animação no Fusion começa do jeito certo:** zoom, posição e texto que acompanha o rosto não aparecem mais "no meio do caminho" antes da primeira chave (o DaVinci criava uma chave sozinho no quadro 0 com o valor padrão).
 ## 2026.11.01-2 (01/11/2026)
 - **Prévia do Apple Design no menu:** a miniatura agora é vertical como as outras. Antes aparecia cortada no meio.
 ## 2026.11.01-1 (01/11/2026)
