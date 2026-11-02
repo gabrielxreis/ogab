@@ -1,7 +1,7 @@
 {
-  "quando": "2026-11-02 08:53",
+  "quando": "2026-11-02 09:54",
   "arquivos": {
-    "SKILL.md": "852cebe96bffe8dc8b710662d7675eb2c6ac802f25628442c8b95341042b0ca4",
+    "SKILL.md": "9280493313a37cb7c771677e60c61c4a5bfaa681f434d0f55af0900470fbeebd",
     "docs/PROCESSO.md": "717fa72acb99509624c3f0c5c79f107be940bf7b71e25a91ab0c549a7b800348",
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
@@ -11,6 +11,7 @@
     "docs/etapas/davinci_api.md": "aa7106613c4f629c34f436a259d2c090984a612a67f87e4421a50f77a81e9234",
     "docs/etapas/dono.md": "ffe18317e12cd401c12cbc7a15639becabd7c96d9c09a8c1dfe9330dc0a3ee6f",
     "docs/etapas/economia.md": "f13c1902ce0dcce536f8c3723792d54e2cc0e42d564834a6c771b115d2e73e84",
+    "docs/etapas/editor_mrbeast.md": "5b464f1d6e1de627bf5b88513784e8b8582ad60fbee4422e14d2353b059da22c",
     "docs/etapas/editores.md": "3b5b278f61e91199fde6dab8e7f5f8ec8d47ecaaaef49a14ffbc85594f000449",
     "docs/etapas/extras.md": "d6a6c8bc66ba8479d402238b81423f45c707302e10a8ee93a00f76c582f66817",
     "docs/etapas/fx.md": "f4f2d0a8ca0fb904d38bb7fcdb51d8677abbb79c2daeb38ff852cf780d03f55f",
@@ -40,6 +41,6 @@
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
     "docs/etapas/viral.md": "77c5fa401d695124b389461dd7d206e8143c8b5faa17251771703d17dccc0ca8",
     "docs/etapas/voz.md": "cf1676057f98c177bc7093fd21512c1632c91c1f79421e27cd5d4eb98b2172b3",
-    "docs/etapas/youtube.md": "eb498825318d5a59d06243f4428fea122fd0571eafd56c1305aa88af2c16d22f"
+    "docs/etapas/youtube.md": "252fcf6875f9f4945ec4595064f0d3ef91804ed0c237a23c3ad8b99ef01cf71a"
   }
 }

@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.02-3 (02/11/2026)
+- **Gab edita vídeo longo como o editor-chefe do MrBeast:** história antes de ritmo (nada de corte picotado sem motivo), uma visão do vídeo inteiro antes de montar, ordem de montagem refeita depois da gravação e mostrada a você, decupagem que não joga fora o melhor momento, piadas internas do canal guardadas no estilo do cliente e metas de retenção (70% aos 30 s; ~40% no fim do vídeo longo; 20-30% em podcast).
 ## 2026.11.02-2 (02/11/2026)
 - **Gab sabe o que viraliza em perfil de empresa:** na pauta, no roteiro orgânico e nos cortes de vídeo longo ele agora usa trend em vez de só vitrine, funcionários como rostos da marca, comentários como fonte de pauta, TikTok primeiro, assunto em alta passando na frente do calendário e pelo menos 10 cortes curtos por vídeo longo.
 ## 2026.11.02-1 (02/11/2026)
