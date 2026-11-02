@@ -1057,6 +1057,16 @@ def main(a):
     if videos and not pasta:
         pasta = videos[0]
     saida = os.path.abspath(os.path.join(pasta or os.getcwd(), "menu_escolha.json"))
+    # trabalho de outra skill que tem menu próprio (Pixel Lab AI): este menu não abre lá, a escolha já está feita
+    for p_ in (videos or [pasta or os.getcwd()]):
+        f_ = os.path.join(os.path.abspath(p_), "menu_escolha.json")
+        try:
+            origem = json.load(open(f_, encoding="utf-8")).get("origem")
+        except Exception:
+            origem = None
+        if origem and origem != "ogab":
+            print(f"MENU_DE_OUTRA_SKILL: {f_} veio do menu da {origem}. Não abrir este menu: seguir esse menu_escolha.json.")
+            return 0
     try:
         cfg = json.load(open(os.path.join(SKILL, "config.json"), encoding="utf-8"))
     except Exception:
