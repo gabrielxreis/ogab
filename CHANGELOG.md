@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.02-2 (02/11/2026)
+- **Gab sabe o que viraliza em perfil de empresa:** na pauta, no roteiro orgânico e nos cortes de vídeo longo ele agora usa trend em vez de só vitrine, funcionários como rostos da marca, comentários como fonte de pauta, TikTok primeiro, assunto em alta passando na frente do calendário e pelo menos 10 cortes curtos por vídeo longo.
 ## 2026.11.02-1 (02/11/2026)
 - **Imagem pelo Codex com referência volta a funcionar:** no Codex 0.162 a imagem de referência engolia o pedido e toda geração com `--ref` falhava na hora ("codex saiu 1"). Agora a ponte separa o pedido das imagens e roda sem esperar o teclado.
 - **Revisão não quebra mais com transição na timeline:** transições (dissolve etc.) entravam na conferência como se fossem clipes e a revisão parava com erro. Agora ficam de fora.
