@@ -1,7 +1,7 @@
 {
-  "quando": "2026-10-31 08:15",
+  "quando": "2026-11-02 08:53",
   "arquivos": {
-    "SKILL.md": "e51ad480b51095df5b2e447e00620c07de79c3fb6a36346429b8f54846ca0704",
+    "SKILL.md": "852cebe96bffe8dc8b710662d7675eb2c6ac802f25628442c8b95341042b0ca4",
     "docs/PROCESSO.md": "717fa72acb99509624c3f0c5c79f107be940bf7b71e25a91ab0c549a7b800348",
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
@@ -38,6 +38,7 @@
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
+    "docs/etapas/viral.md": "77c5fa401d695124b389461dd7d206e8143c8b5faa17251771703d17dccc0ca8",
     "docs/etapas/voz.md": "cf1676057f98c177bc7093fd21512c1632c91c1f79421e27cd5d4eb98b2172b3",
     "docs/etapas/youtube.md": "eb498825318d5a59d06243f4428fea122fd0571eafd56c1305aa88af2c16d22f"
   }
