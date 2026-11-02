@@ -20,6 +20,36 @@ import json, os, re, subprocess, sys, tempfile, unicodedata
 
 PROMPT = ("Então, é, é... o o pedreiro, ele, ele vai, vai fazer a a obra, né? Hum, quanto, quanto custa, "
           "por metro, por metro quadrado.")
+# Idioma da fala (02/11/2026: sermão em inglês da Pixel Lab AI era transcrito como português e a revisão dava
+# gaguejo falso "que", "você", "com ele"). Ordem: OGAB_IDIOMA > "lingua" do menu_escolha.json da pasta > config > pt.
+PROMPTS = {"pt": PROMPT,
+           "en": "So, um, uh... the the builder, he, he is going to, going to do the the work, right? Um, how much, "
+                 "how much does it cost, per square, per square foot."}
+
+
+def idioma(pasta=None):
+    if os.environ.get("OGAB_IDIOMA"): return os.environ["OGAB_IDIOMA"]
+    d = os.path.abspath(os.path.expanduser(pasta)) if pasta else None
+    for _ in range(3 if d else 0):
+        f = os.path.join(d, "menu_escolha.json")
+        if os.path.isfile(f):
+            try:
+                v = json.load(open(f, encoding="utf-8")).get("lingua")
+                if v: return v
+            except Exception: pass
+        d = os.path.dirname(d)
+    try:
+        cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"), encoding="utf-8"))
+        return (cfg.get("regras") or {}).get("idioma") or "pt"
+    except Exception:
+        return "pt"
+
+
+IDIOMA = idioma()
+
+
+def _sufixo():
+    return "" if IDIOMA == "pt" else f".{IDIOMA}"
 
 
 def norm(s):
@@ -28,14 +58,14 @@ def norm(s):
 
 
 def literal(arquivo):
-    cache = arquivo + ".literal.json"
+    cache = arquivo + _sufixo() + ".literal.json"
     if os.path.exists(cache):
         return json.load(open(cache, encoding="utf-8"))
     import mlx_whisper
     wav = os.path.join(tempfile.mkdtemp(), "a.wav")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", arquivo, "-ac", "1", "-ar", "16000", wav], check=True)
-    r = mlx_whisper.transcribe(wav, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language="pt",
-                               word_timestamps=True, condition_on_previous_text=False, initial_prompt=PROMPT)
+    r = mlx_whisper.transcribe(wav, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language=IDIOMA,
+                               word_timestamps=True, condition_on_previous_text=False, initial_prompt=PROMPTS.get(IDIOMA))
     out = {"segments": [{"start": s["start"], "end": s["end"],
                          "words": [{"text": w["word"].strip(), "start": round(w["start"], 3), "end": round(w["end"], 3)}
                                    for w in s.get("words", []) if w["word"].strip()]} for s in r["segments"]]}
@@ -47,7 +77,7 @@ def literal_trechos(arquivo, trechos, folga=0.4):
     """Transcrição literal TRECHO A TRECHO (28/10/2026: a do arquivo inteiro desalinha os tempos no começo, depois de
     silêncio: "Por que que na parede..." caía 5 s antes da fala real e o corte comia frase). Cache por trecho."""
     import mlx_whisper
-    cache = arquivo + ".trechos.json"
+    cache = arquivo + _sufixo() + ".trechos.json"
     c = json.load(open(cache, encoding="utf-8")) if os.path.exists(cache) else {}
     out = []
     for a, b in trechos:
@@ -55,8 +85,8 @@ def literal_trechos(arquivo, trechos, folga=0.4):
         if k not in c:
             wav = os.path.join(tempfile.mkdtemp(), "t.wav")
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{x:.3f}", "-to", f"{y:.3f}", "-i", arquivo, "-ac", "1", "-ar", "16000", wav], check=True)
-            r = mlx_whisper.transcribe(wav, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language="pt",
-                                       word_timestamps=True, condition_on_previous_text=False, initial_prompt=PROMPT)
+            r = mlx_whisper.transcribe(wav, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language=IDIOMA,
+                                       word_timestamps=True, condition_on_previous_text=False, initial_prompt=PROMPTS.get(IDIOMA))
             c[k] = [{"text": w["word"].strip(), "start": round(x + w["start"], 3), "end": round(x + w["end"], 3)}
                     for sg in r["segments"] for w in sg.get("words", []) if w["word"].strip()]
             json.dump(c, open(cache, "w", encoding="utf-8"), ensure_ascii=False)
@@ -103,8 +133,8 @@ def detectar(ws):
             # repetição DE PROPÓSITO fica: fecha frase ("ter visão de dono. Visão de dono tem o dono"), vem depois de
             # "não" ("não é vergar, é vergar por tempo demais") ou é "ou... ou" / "nem... nem" ("ou você tem, ou você não tem")
             fim_1a = ws[j - 1]["text"]
-            proposito = ((fim_1a.endswith((".", "?", "!")) and not fim_1a.endswith(("...", "…"))) or n[i] in ("ou", "nem", "quer", "seja")
-                         or (i > 0 and n[i - 1] in ("não", "nem")))
+            proposito = ((fim_1a.endswith((".", "?", "!")) and not fim_1a.endswith(("...", "…"))) or n[i] in ("ou", "nem", "quer", "seja", "or", "nor", "either", "neither")
+                         or (i > 0 and n[i - 1] in ("não", "nem", "not", "no")))
             if gag or (m >= 2 and not proposito and (m == vao or (vao - m == 1 and cortada))):
                 achou = (j, "GAGUEJO" if vao == 1 else "RETAKE"); break
         if achou:
@@ -114,8 +144,14 @@ def detectar(ws):
         else:
             i += 1
     # palavra abandonada ("Já... já... Por que"): o whisper marca com reticências; sai, e a pausa junto
+    # 02/11/2026 (sermão em inglês): "you think that you're... not a bad person" perdia o "you're" e a frase mudava de
+    # sentido. Reticência também é só pausa: sai apenas muleta ("é...", "um...") ou palavra que o falante repete logo depois.
+    muleta = {"e", "é", "hum", "hã", "ah", "eh", "ahn", "né", "um", "uh", "uhm", "erm", "hmm", "like"}
     for k, w in enumerate(ws):
-        if w["text"].endswith(("...", "…")) and not any(a <= w["start"] < b for a, b, *_ in tira):
+        prox = norm(ws[k + 1]["text"]) if k + 1 < len(ws) else ""
+        nw = norm(w["text"])
+        abandonada = nw in muleta or (prox and nw and (prox.startswith(nw) or nw.startswith(prox)))
+        if w["text"].endswith(("...", "…")) and abandonada and not any(a <= w["start"] < b for a, b, *_ in tira):
             fim = ws[k + 1]["start"] if k + 1 < len(ws) else w["end"]
             tira.append((w["start"], fim, "HESITAÇÃO", w["text"]))
     return sorted(tira)

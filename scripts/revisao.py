@@ -242,7 +242,7 @@ def fala(t):
     # emenda e dava gaguejo falso ("como for. Se for" virava "for for", 28/10/2026).
     import tempfile, subprocess, hashlib, json as _json
     chave = hashlib.md5(repr([(a, round(lo, 3), round(hi, 3)) for a, lo, hi, _ in pedacos]).encode()).hexdigest()[:12]
-    cache = pedacos[0][0] + f".revisao_{chave}.json"
+    cache = pedacos[0][0] + f".revisao_{chave}{LF._sufixo()}.json"
     if os.path.exists(cache):
         seq = _json.load(open(cache, encoding="utf-8"))
     else:
@@ -258,7 +258,7 @@ def fala(t):
                 lst = os.path.join(tmp, "l.txt"); open(lst, "w").write("".join(f"file '{x}'\n" for x in partes))
                 junto = os.path.join(tmp, "junto.wav")
                 subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", junto], check=True)
-                r = mlx_whisper.transcribe(junto, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language="pt",
+                r = mlx_whisper.transcribe(junto, path_or_hf_repo="mlx-community/whisper-large-v3-turbo", language=LF.IDIOMA, initial_prompt=LF.PROMPTS.get(LF.IDIOMA),
                                            word_timestamps=True, condition_on_previous_text=False)
             seq = [{"text": w["word"].strip(), "start": w["start"], "end": w["end"]} for sg in r["segments"] for w in sg.get("words", [])]
             _json.dump(seq, open(cache, "w", encoding="utf-8"), ensure_ascii=False)
@@ -315,6 +315,9 @@ if __name__ == "__main__":
     if not a: raise SystemExit(__doc__)
     nome = a[0]; corrigir = "--corrigir" in a
     pasta = a[a.index("--pasta") + 1] if "--pasta" in a else os.path.join(os.path.expanduser("~"), "Desktop", "revisao_" + nome)
+    try:
+        import limpar_fala as _LF; _LF.IDIOMA = _LF.idioma(pasta if "--pasta" in a else None)
+    except Exception: pass
     r = R.conectar(abrir=False); p = r.GetProjectManager().GetCurrentProject(); mp = p.GetMediaPool()
     t = tl_por_nome(p, nome); p.SetCurrentTimeline(t)
     buracos(t, mp, corrigir)

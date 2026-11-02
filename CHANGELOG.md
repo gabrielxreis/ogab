@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.11.02-4 (02/11/2026)
+- **Fala limpa e revisão em inglês:** vídeo em inglês era transcrito como português e a revisão acusava gaguejo falso. Agora o idioma vem do menu do vídeo (ou de `regras.idioma` no config; padrão português).
+- **A limpeza de fala não come mais palavra:** uma palavra seguida de pausa ("you're... not a bad person") era apagada e a frase mudava de sentido. Agora só sai muleta ("é...", "um...") ou palavra que a pessoa repete logo depois.
 ## 2026.11.02-3 (02/11/2026)
 - **Gab edita vídeo longo como o editor-chefe do MrBeast:** história antes de ritmo (nada de corte picotado sem motivo), uma visão do vídeo inteiro antes de montar, ordem de montagem refeita depois da gravação e mostrada a você, decupagem que não joga fora o melhor momento, piadas internas do canal guardadas no estilo do cliente e metas de retenção (70% aos 30 s; ~40% no fim do vídeo longo; 20-30% em podcast).
 ## 2026.11.02-2 (02/11/2026)
