@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.11.02-5 (02/11/2026)
+- **6 presets novos da família Reels:** Curva (linha que se desenha e número subindo até o valor final), Degraus (minimalista preto e branco), Rota 3D (cidade de maquete com rota até o pino e cartão de minutos), Vista explodida 3D (objeto que se abre em camadas com rótulos), Bonecos de palito (explicativo de 30 a 45 s) e "E se?" 3D (explicativo no estilo Zack D. Films). Tudo em 24 qps e português, com prévia no menu. Adaptados das animation skills de Artem Novitckii (licença MIT).
+- **Legenda pela interface acha o Inspector de novo:** o carregamento do preset de legenda parava com "cabeçalho do Inspector (Subtitle) não encontrado" mesmo com o Inspector aberto (a leitura da tela troca "l" por "i"). Veio do relato de um de vocês.
 ## 2026.11.02-4 (02/11/2026)
 - **Fala limpa e revisão em inglês:** vídeo em inglês era transcrito como português e a revisão acusava gaguejo falso. Agora o idioma vem do menu do vídeo (ou de `regras.idioma` no config; padrão português).
 - **A limpeza de fala não come mais palavra:** uma palavra seguida de pausa ("you're... not a bad person") era apagada e a frase mudava de sentido. Agora só sai muleta ("é...", "um...") ou palavra que a pessoa repete logo depois.

@@ -1,0 +1,3 @@
+{"destination": "Academia Leme", "minutes": 9, "distance": 2.8, "unit": "km",
+ "places": ["Copacabana", "Parque Garota", "Mercado Leme", "Praça Cazuza", "Canal"],
+ "accent": "#2f7cf6", "seed": 7, "hold": 0.6, "out": "exemplo.mp4"}

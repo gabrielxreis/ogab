@@ -1,0 +1,3 @@
+{"label": "Seguidores", "values": [1.2, 2.1, 3.4, 5, 9, 24, 51, 78, 100],
+ "labels": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set"],
+ "final": 100000, "dark": true, "hold": 0.8, "out": "exemplo.mp4"}

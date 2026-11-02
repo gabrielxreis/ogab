@@ -370,7 +370,7 @@ def carregar_preset(nome_preset="GAB USA", arquivo=None):
     """Inspector > Track > menu ⋯ > <preset> > Load Preset. Se o preset não existir, Import Preset... do arquivo.
     Confere pela fonte mostrada no Inspector (Poppins) no fim."""
     aba("Track")
-    cab = [o for o in ocr(INSPECTOR) if "subtitle" in _norm(o[0])]
+    cab = [o for o in ocr(INSPECTOR) if _norm("subtitle") in _norm(o[0])]
     if not cab: raise RuntimeError("cabeçalho do Inspector (Subtitle) não encontrado")
     y = cab[0][2]; x = INSPECTOR[0] + INSPECTOR[2] - 18
     clicar(x, y); time.sleep(0.6)

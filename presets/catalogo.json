@@ -1570,6 +1570,213 @@
     "pergunta": 1
    },
    "cenas": {}
+  },
+  {
+   "id": "curva",
+   "nome": "Curva",
+   "categoria": "dados",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Uma linha lisa que se desenha sozinha enquanto um número grande sobe junto com a ponta e assenta no valor final; fundo preto ou branco, minimalista.",
+   "quando": "crescimento de seguidores, faturamento, alunos, resultado de 0 a N meses, número que subiu",
+   "nichos": [
+    "criador",
+    "marketing",
+    "negocio",
+    "trader",
+    "infoproduto"
+   ],
+   "sinais": [
+    "de 0 a",
+    "de zero a",
+    "cresc",
+    "subiu",
+    "em 6 meses",
+    "em um ano",
+    "seguidores",
+    "faturamento",
+    "alunos",
+    "mil para",
+    "numero subindo",
+    "contador",
+    "curva"
+   ],
+   "padroes": {
+    "numero": 2
+   },
+   "cenas": {}
+  },
+  {
+   "id": "degraus",
+   "nome": "Degraus",
+   "categoria": "ideia",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Arte preto e branco: um ponto sobe degrau por degrau e, quando chega ao topo, a segunda linha da frase aparece.",
+   "quando": "frase curta de constância, progresso, disciplina, motivação, um passo de cada vez",
+   "nichos": [
+    "motivac",
+    "desenvolvimento",
+    "fitness",
+    "trader",
+    "fe"
+   ],
+   "sinais": [
+    "passo",
+    "constan",
+    "um dia de cada vez",
+    "degrau",
+    "disciplina",
+    "progresso",
+    "olhar para tras",
+    "pouco a pouco",
+    "consistencia"
+   ],
+   "padroes": {},
+   "cenas": {}
+  },
+  {
+   "id": "rota",
+   "nome": "Rota 3D",
+   "categoria": "dados",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Cidade 3D de maquete com a rota se desenhando até o pino, ponto andando e cartão de chegada (minutos e distância).",
+   "quando": "trajeto, endereço, como chegar, distância, delivery, loja, academia, evento, 'fica a X minutos'",
+   "nichos": [
+    "local",
+    "restaurante",
+    "academia",
+    "imobili",
+    "evento",
+    "delivery",
+    "loja"
+   ],
+   "sinais": [
+    "minutos de",
+    "fica a",
+    "como chegar",
+    "endereco",
+    "rota",
+    "caminho ate",
+    "km",
+    "perto de",
+    "trajeto",
+    "mapa"
+   ],
+   "padroes": {},
+   "cenas": {}
+  },
+  {
+   "id": "explodida",
+   "nome": "Vista explodida 3D",
+   "categoria": "produto",
+   "papel": "trecho",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "tanto_faz",
+   "resumo": "Objeto 3D em camadas (celular por padrão) que se abre no ar com 6 rótulos numerados, cada camada com nome e detalhe.",
+   "quando": "o que tem dentro, peça por peça, anatomia de um produto, especificações, review de aparelho",
+   "nichos": [
+    "tecnologia",
+    "celular",
+    "gadget",
+    "produto",
+    "review"
+   ],
+   "sinais": [
+    "por dentro",
+    "peca por peca",
+    "camada",
+    "componente",
+    "especifica",
+    "o que tem dentro",
+    "desmont",
+    "vista explodida",
+    "explodid"
+   ],
+   "padroes": {},
+   "cenas": {}
+  },
+  {
+   "id": "palito",
+   "nome": "Bonecos de palito",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Explicativo 30-45 s em desenho animado colorido: bonecos de palito com cabeça branca grande e rosto expressivo, câmera sempre andando, transições em chicote e legenda de 1-2 palavras.",
+   "quando": "curiosidade, 'e se...?', por que tal coisa é assim, história explicada, explicativo em volume",
+   "nichos": [
+    "curiosidade",
+    "historia",
+    "ciencia",
+    "educacao",
+    "explicativo"
+   ],
+   "sinais": [
+    "e se",
+    "por que",
+    "voce sabia",
+    "na verdade",
+    "curiosidade",
+    "o motivo",
+    "explica",
+    "palito",
+    "bonec",
+    "stickman",
+    "desenho animado"
+   ],
+   "padroes": {
+    "pergunta": 2
+   },
+   "cenas": {}
+  },
+  {
+   "id": "e-se",
+   "nome": "E se? 3D",
+   "categoria": "ideia",
+   "papel": "linguagem",
+   "formato": [
+    "vertical"
+   ],
+   "apresentador": "sem",
+   "resumo": "Explicativo 3D de desenho estilo 'what if' (Zack D. Films): pessoas e objetos 3D feitos em código, céu azul de estúdio, câmera lenta no impacto, onda vermelha de força e cortes rápidos.",
+   "quando": "'e se...', 'conseguiria X parar Y?', teste de força ou impacto, comparação física, curiosidade com ação",
+   "nichos": [
+    "curiosidade",
+    "ciencia",
+    "historia",
+    "explicativo"
+   ],
+   "sinais": [
+    "e se",
+    "conseguiria",
+    "aguentaria",
+    "impacto",
+    "resistiria",
+    "o que aconteceria",
+    "seria possivel",
+    "what if",
+    "zack",
+    "3d de desenho"
+   ],
+   "padroes": {
+    "pergunta": 2
+   },
+   "cenas": {}
   }
  ],
  "pedidos": [
@@ -1760,6 +1967,7 @@
  "fora_do_seletor": [
   "cena",
   "bancada",
-  "efeitos"
+  "efeitos",
+  "_reels"
  ]
 }

@@ -33,3 +33,12 @@ presets/whiteboard/exemplo/exemplo.mp4
 # temas de marca de cliente do preset ludico: só nesta máquina
 presets/ludico/temas/xtrader.json
 presets/linha/exemplo.mp4
+
+# kit das animações de reels (Novitckii, MIT): dependências locais
+presets/_reels/kit/node_modules/
+presets/_reels/kit/.venv/
+presets/_reels/kit/models/
+presets/*/exemplo/.work/
+presets/*/exemplo/*.sheet.jpg
+presets/e-se/engine/node_modules
+presets/palito/exemplo/
