@@ -13,9 +13,10 @@ usuário pedir.
 `python3 SKILL_DIR/scripts/inicio.py` (atualiza, confere termos e key, abre o cofre, novidades, componentes,
 comunidade e relatos, tudo de uma vez; imprime só o que pede ação).
 - Saiu 1: mostrar a mensagem e PARAR o pedido. `TERMOS_PENDENTES`: mostrar o resumo e esperar a pessoa digitar
-  ACEITO; só então `termos.py aceitar` (nunca por ela). `LICENCA_PENDENTE`: cadastro grátis em
-  **https://ogab.io**, pegar a key (GAB-...) e `licenca.py ativar --key <key>`.
-  `LICENCA_OUTRA_MAQUINA` / `LICENCA_BLOQUEADA` / `LICENCA_SEM_CONEXAO`: seguir a mensagem.
+  ACEITO; só então `termos.py aceitar` (nunca por ela). `LICENCA_PENDENTE`: assinar e entrar em
+  **https://ogab.io** com o email da compra, pegar a key (GAB-...) e `licenca.py ativar --key <key>`.
+  `LICENCA_SEM_PLANO` (assinatura inativa) / `LICENCA_OUTRA_MAQUINA` / `LICENCA_BLOQUEADA` / `LICENCA_SEM_CONEXAO`:
+  seguir a mensagem.
 - Saiu 0: ler `<pasta>/SKILL.md` (a pasta do `CONTEUDO_PRONTO`) e seguir ESSE arquivo: é o mapa real do Gab (os
   caminhos `docs/...` citados lá ficam dentro dessa pasta). `CONFIG:` diz qual editor e qual motor de motion valem.
 - `NOVIDADES:` primeira coisa da resposta, em lista curta. `ATUALIZADO`/`ATUALIZAR_FALHOU`/`LICENCA_OFFLINE`/

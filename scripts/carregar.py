@@ -74,6 +74,8 @@ def abrir():
     elif st == "outra_maquina":
         print("LICENCA_OUTRA_MAQUINA: esta key está ativa em outro computador (1 por key). No computador antigo: "
               "`licenca.py liberar`; ou cadastrar outro email aqui com `licenca.py registrar --email <email>`.")
+    elif st == "sem_plano":
+        print(licenca.SEM_PLANO)
     else:
         print("LICENCA_INVALIDA: " + r.get("msg", st) + ". " + licenca.PENDENTE.split(": ", 1)[1])
     return 1

@@ -15,7 +15,7 @@ Guardado em ~/.claude/ogab_licenca.json (fora da pasta da skill, sobrevive a upd
 import hashlib, json, os, platform, subprocess, sys, time, urllib.error, urllib.request
 
 URL = os.environ.get("OGAB_LICENCA_URL", "https://licencas.gabrielxreis.com").rstrip("/")
-SITE = os.environ.get("OGAB_SITE", "https://ogab.io")   # cadastro da key (grátis)
+SITE = os.environ.get("OGAB_SITE", "https://ogab.io")   # assinatura e key
 ARQ = os.path.join(os.path.expanduser("~"), ".claude", "ogab_licenca.json")
 OFFLINE_DIAS = 3
 TIMEOUT = 6
@@ -86,9 +86,12 @@ def _sistema():
     return f"{platform.system()} {platform.release()} {platform.machine()}"
 
 
-PENDENTE = ("LICENCA_PENDENTE: o Gab só roda com uma key (grátis). MOSTRAR à pessoa o site e PARAR: "
-            f"cadastre-se em {SITE}, pegue sua key (GAB-...) e cole aqui; então "
+PENDENTE = ("LICENCA_PENDENTE: o Gab só roda com uma key e assinatura ativa. MOSTRAR à pessoa o site e PARAR: "
+            f"assine e entre em {SITE} com o email da compra, pegue sua key (GAB-...) e cole aqui; então "
             "`licenca.py ativar --key <key>`. Enquanto não houver key válida, NÃO fazer nada do pedido.")
+SEM_PLANO = ("LICENCA_SEM_PLANO: a assinatura do Gab desta key não está ativa. MOSTRAR à pessoa e PARAR: "
+             f"assine (ou renove) em {SITE} com o mesmo email da key; assim que o pagamento aprovar o Gab volta "
+             "sozinho. Enquanto isso, NÃO fazer nada do pedido.")
 
 
 def checar():
@@ -118,7 +121,9 @@ def checar():
               "Instagram. O Gab não roda.")
     elif st == "outra_maquina":
         print("LICENCA_OUTRA_MAQUINA: esta key está ativa em outro computador (1 por key). No computador antigo rode "
-              f"`licenca.py liberar`; ou cadastre outra key (grátis) em {SITE} e ative com `licenca.py ativar --key <key>`.")
+              f"`licenca.py liberar`; ou pegue a key da sua conta em {SITE} e ative com `licenca.py ativar --key <key>`.")
+    elif st == "sem_plano":
+        print(SEM_PLANO)
     elif st == "invalida":
         print("LICENCA_INVALIDA: a key salva não existe mais. " + PENDENTE.split(": ", 1)[1])
     else:
