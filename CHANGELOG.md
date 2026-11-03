@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-2 (03/11/2026)
+- **Cortes, legenda e fala limpa em vídeo em inglês:** a legenda do DaVinci sai no idioma do vídeo, o corte de pregação não come mais a última palavra da frase, a fala limpa pega pausa longa mesmo com ronco grave na sala e a legenda importada por caminho relativo não entra mais com duração zero.
 ## 2026.11.03-1 (03/11/2026)
 - **O Gab agora também é seu mentor de negócios (`/ogab negocio`):** ajuda a faturar mais e tocar a empresa. Faz um diagnóstico rápido do negócio, monta um plano de 90 dias com no máximo 3 prioridades e acompanha seus números toda semana (faturamento, recebido, margem, caixa, funil, dívida) num painel com alertas: caixa curto, margem baixa, cliente concentrado, dívida alta, cobrança atrasada. Responde dúvidas de preço, vendas, contratação, sócio e gestão com base no estudo de 436 vídeos do canal G4 Business. Anúncio pago continua com o Jhon.
 ## 2026.11.02-5 (02/11/2026)

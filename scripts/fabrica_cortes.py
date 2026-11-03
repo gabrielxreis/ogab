@@ -6,7 +6,8 @@ material bruto, corte no DaVinci, transcrição do DaVinci.
         -> a transcrição em frases numeradas com o tempo (S1, S2...). É o que o Gab lê para escolher os cortes.
   python3 fabrica_cortes.py conferir <transcricao.json> <cortes.json> [--min 20 --max 75] [--pausa 0.8]
         (use o MESMO --pausa do comando frases, senão os S1, S2... apontam para outras frases)
-        -> confere cada corte escolhido e escreve o plano de trechos (pausas encurtadas) em cortes/NN.json.
+        -> confere cada corte escolhido e escreve o plano do corte inteiro em cortes/NN.json (as pausas saem
+           depois no limpar_fala.py, pelo áudio: nunca pelo tempo das palavras, que come a última palavra da frase).
   python3 fabrica_cortes.py montar <cortes.json> "<clipe do Media Pool>" [--vertical] [--reframe] [--fps-fonte 30]
         -> uma timeline por corte ("CORTE 01 - <título>"), na ordem da nota. --vertical: 1080x1920 com o clipe
            preenchendo; --reframe: Smart Reframe do DaVinci (segue a pessoa). Original intocado.
@@ -107,6 +108,12 @@ def conferir(trans, cortes_json, mn=20, mx=75, pausa=.8):
             if inis:   # começa depois do fim da palavra anterior
                 ant = [e for s, e in todas if s < min(inis) - .001]
                 if ant: tr[0] = round(max(tr[0], min(max(ant), min(inis))), 3)
+        # 02/11/2026 (sermão em inglês, transcrição da legenda do YouTube): encurtar pausa pelo tempo das PALAVRAS
+        # cortava a última palavra de cada frase que a transcrição não marcou ("moral formation", "they loved Jesus.",
+        # "egregiously wrong."): a frase do pregador mudava. O plano agora é o corte INTEIRO, do começo da 1ª palavra
+        # até o começo da palavra seguinte ao corte; as pausas saem no limpar_fala.py, pelo ÁUDIO (lei 1).
+        if pj.get("trechos"):
+            pj["trechos"] = [[pj["trechos"][0][0], pj["trechos"][-1][1]]]
         pj["total"] = round(sum(y - x for x, y in pj.get("trechos", [])), 2)
         json.dump(pj, open(plano, "w"), indent=1)
         c.update({"n": k, "ini": round(a, 2), "fim": round(b, 2), "plano": plano, "problemas": prob})

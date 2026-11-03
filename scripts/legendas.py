@@ -20,7 +20,10 @@ import json, os, re, sys
 
 FRACAS = {'a', 'o', 'as', 'os', 'um', 'uma', 'de', 'da', 'do', 'das', 'dos', 'e', 'em', 'na', 'no', 'nas', 'nos', 'que',
           'com', 'por', 'para', 'pra', 'se', 'é', 'ao', 'à', 'mas', 'ou', 'seu', 'sua', 'te', 'não', 'mais', 'nem', 'todo',
-          'toda', 'pode', 'vai', 'só', 'quem', 'muito', 'the', 'of', 'to', 'and'}
+          'toda', 'pode', 'vai', 'só', 'quem', 'muito', 'the', 'of', 'to', 'and',
+          # inglês (02/11/2026, legenda de sermão em inglês da Pixel Lab AI)
+          'an', 'in', 'on', 'at', 'for', 'with', 'from', 'by', 'that', 'but', 'or', 'if', 'is', 'are', 'was', 'his', 'her',
+          'my', 'your', 'our', 'their', 'its', 'than', 'about', 'into', 'who', 'which'}
 
 
 def t_seg(v, fps):

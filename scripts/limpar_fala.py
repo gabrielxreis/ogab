@@ -96,13 +96,29 @@ def literal_trechos(arquivo, trechos, folga=0.4):
 
 
 def _envelope(arquivo, passo=0.02):
-    """nível (dB) a cada 20 ms do áudio da gravação, ou None"""
+    """nível (dB) da VOZ a cada 20 ms do áudio da gravação, ou None.
+    Só a banda da voz (250-7000 Hz): na banda inteira o ronco grave da sala (< 150 Hz) contava como voz e pausas de
+    até 3 s passavam pelo corte e pela revisão (Minha História, 01/11/2026: "às vezes eu dou umas pausas enormes, você
+    nunca corta isso"). Fala baixinha com harmônico (periodicidade >= 0,6, janela de 40 ms) sobe para o nível da fala:
+    sem isso "eu fazia, caramba, aqui" dito baixo virava pausa. Respiro e ruído não têm harmônico e seguem baixos."""
     try:
         import numpy as np
-        raw = subprocess.run(["ffmpeg", "-v", "error", "-i", arquivo, "-ac", "1", "-ar", "16000", "-f", "s16le", "-"], capture_output=True).stdout
+        raw = subprocess.run(["ffmpeg", "-v", "error", "-i", arquivo, "-af", "highpass=f=250,lowpass=f=7000", "-ac", "1",
+                              "-ar", "16000", "-f", "s16le", "-"], capture_output=True).stdout
         a = np.frombuffer(raw, np.int16).astype(float) / 32768; h = int(16000 * passo); n = len(a) // h
         rms = np.sqrt((a[:n * h].reshape(n, h) ** 2).mean(axis=1) + 1e-12)
-        return list(20 * np.log10(rms)), passo
+        db = 20 * np.log10(rms)
+        per = np.zeros(n); N = 2 * h; jan = np.hanning(N)
+        for k0 in range(0, n - 1, 4096):
+            k1 = min(n - 1, k0 + 4096)
+            fr = np.lib.stride_tricks.as_strided(a[k0 * h:], (k1 - k0, N), (a.strides[0] * h, a.strides[0])) * jan
+            fr = fr - fr.mean(axis=1, keepdims=True)
+            ac = np.fft.irfft(np.abs(np.fft.rfft(fr, 2 * N)) ** 2)[:, :N]
+            per[k0:k1] = ac[:, 40:200].max(axis=1) / (ac[:, 0] + 1e-12)
+        topo = np.sort(db)[int(n * 0.6):]; ref = float(np.median(topo)) if len(topo) else -20.0
+        sonora = (per >= 0.6) & (db >= ref - 38)
+        db[sonora] = np.maximum(db[sonora], ref)
+        return list(db), passo
     except Exception:
         return None
 
@@ -229,6 +245,30 @@ def limpar(arquivo, trechos=None, pausa=0.25, respiro=0.08):
                 else:
                     k += 1
             if b - cur > 0.05: refinado.append([round(cur, 3), round(b, 3)])
+        # 02/11/2026 (sermão em inglês): palavra que o whisper perdeu ou pôs no tempo errado ("moral formation",
+        # "they loved Jesus.", "egregiously wrong") caía fora dos blocos e era cortada como pausa, com voz no áudio: a
+        # frase do pregador mudava. Regra: trecho COM VOZ no áudio nunca sai (só retake/gaguejo detectado sai);
+        # o que sai é só o silêncio de verdade.
+        volta = []
+        for ta, tb in trechos:
+            k, k1 = int(ta / passo), min(len(voz), int(tb / passo))
+            while k < k1:
+                if voz[k]:
+                    j = k
+                    while j < k1 and voz[j]: j += 1
+                    x, y = k * passo, j * passo
+                    if y - x >= 0.12 and not any(a - 0.02 <= x and y <= b + 0.02 for a, b in refinado) \
+                            and not any(rx < y and ry > x for rx, ry, *_ in tira):
+                        volta.append([round(max(ta, x - 0.04), 3), round(min(tb, y + 0.08), 3)])
+                    k = j
+                else:
+                    k += 1
+        if volta:
+            junto = []
+            for a, b in sorted(refinado + volta):
+                if junto and a <= junto[-1][1] + 0.02: junto[-1][1] = max(junto[-1][1], b)
+                else: junto.append([a, b])
+            refinado = junto
         limpo = refinado
     texto = " ".join(w["text"] for w in fica)
     # palavra que atravessa o começo de um trecho ("Por" de 0,0 a 0,58 com o corte em 0,4) entra na legenda a partir

@@ -456,6 +456,7 @@ def aplicar_grade(r, t, drx, drx_iphone=None, trilha=1, lut=None):
 
 def colocar_legendas(t, mp, srt, trocar=True, p=None):
     """Importa o SRT na trilha de legenda. Se a trilha já existe, troca só os itens (mantém o preset de estilo)."""
+    srt = os.path.abspath(os.path.expanduser(srt))   # caminho relativo entrava no Media Pool com duração 0 e a legenda "caía depois do fim" (02/11/2026)
     # DeleteClips/AppendToTimeline só valem na timeline ATUAL: abrir `t` antes de tudo
     pagina_edit()   # DeleteClips só funciona na página Edit
     if p: p.SetCurrentTimeline(t); import time; time.sleep(0.5)

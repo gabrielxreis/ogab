@@ -14,13 +14,23 @@ sys.path.insert(0, AQUI)
 import resolve_lib as R
 
 
-def gerar(r, t, espera=120):
+def _lingua_davinci(r, pasta):
+    """Idioma do Create Subtitles from Audio (02/11/2026: vídeo em inglês saía transcrito como português)."""
+    try:
+        import limpar_fala as LF; lg = LF.idioma(pasta)
+    except Exception:
+        lg = "pt"
+    nomes = {"pt": "PORTUGUESE", "en": "ENGLISH", "es": "SPANISH", "fr": "FRENCH", "it": "ITALIAN", "de": "GERMAN"}
+    return getattr(r, "AUTO_CAPTION_" + nomes.get(lg, "PORTUGUESE"), r.AUTO_CAPTION_PORTUGUESE)
+
+
+def gerar(r, t, espera=120, pasta=None):
     """Roda o Create Subtitles from Audio e ESPERA as legendas aparecerem (15/10/2026: com o DaVinci recém-aberto fora da
     página Edit o comando devolve True e a trilha fica com 0 itens; ler logo depois quebrava com IndexError)."""
     r.OpenPage("edit"); time.sleep(1)
     old = t.GetItemListInTrack("subtitle", 1) or []
     if old: t.DeleteClips(old)
-    cfg = {r.SUBTITLE_LANGUAGE: r.AUTO_CAPTION_PORTUGUESE, r.SUBTITLE_CAPTION_PRESET: r.AUTO_CAPTION_SUBTITLE_DEFAULT,
+    cfg = {r.SUBTITLE_LANGUAGE: _lingua_davinci(r, pasta), r.SUBTITLE_CAPTION_PRESET: r.AUTO_CAPTION_SUBTITLE_DEFAULT,
            r.SUBTITLE_CHARS_PER_LINE: 25, r.SUBTITLE_LINE_BREAK: r.AUTO_CAPTION_LINE_SINGLE, r.SUBTITLE_GAP: 0}
     if not t.CreateSubtitlesFromAudio(cfg):
         raise SystemExit("Create Subtitles from Audio falhou")
@@ -55,7 +65,7 @@ def main():
     r = R.conectar(); p = r.GetProjectManager().GetCurrentProject(); mp = p.GetMediaPool()
     t = next(p.GetTimelineByIndex(i) for i in range(1, p.GetTimelineCount() + 1) if p.GetTimelineByIndex(i).GetName() == nome)
     p.SetCurrentTimeline(t); time.sleep(0.5)
-    if "--gerar" in a: gerar(r, t)
+    if "--gerar" in a: gerar(r, t, pasta=pasta)
     ws = palavras_da_timeline(t)
     if not ws:
         raise SystemExit("a trilha de legenda 1 está vazia: rode com --gerar (ou crie as legendas) antes")
