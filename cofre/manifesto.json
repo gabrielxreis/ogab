@@ -1,7 +1,7 @@
 {
-  "quando": "2026-11-03 17:12",
+  "quando": "2026-11-03 17:17",
   "arquivos": {
-    "SKILL.md": "78aacd7d1307d2dd946b72e494fb98cbb6fcfb24615304786432fe8063072d22",
+    "SKILL.md": "648d10265ddfcfdbe4a1c389db8771c6c8130541451b01992bf18e9ac7acc74e",
     "docs/PROCESSO.md": "717fa72acb99509624c3f0c5c79f107be940bf7b71e25a91ab0c549a7b800348",
     "docs/design/canva.md": "1b61f7319c460c8519b1a15536d704170d443310ed581d0d34fd602c8f48d18f",
     "docs/design/canva_api.md": "8b96b389f211b20514961bef4efed303fa407b1ea87f0a02f3003418c168b074",
@@ -26,6 +26,7 @@
     "docs/etapas/editores.md": "3b5b278f61e91199fde6dab8e7f5f8ec8d47ecaaaef49a14ffbc85594f000449",
     "docs/etapas/extras.md": "d6a6c8bc66ba8479d402238b81423f45c707302e10a8ee93a00f76c582f66817",
     "docs/etapas/fx.md": "f4f2d0a8ca0fb904d38bb7fcdb51d8677abbb79c2daeb38ff852cf780d03f55f",
+    "docs/etapas/instagram_painel.md": "ce2f52b7fba72a4de1b5a9d881c172c1c8ead27becd44559fb8fee00ddd25afd",
     "docs/etapas/landingpage.md": "5a08da57defab4db993fb266ed40d94c5a69708f8b6aa01e1374de0e0d54f8f7",
     "docs/etapas/legenda.md": "b03380154ff9d95d1312903be5ce7e862ddf8e5689eac4e5381f05526435ee46",
     "docs/etapas/leis.md": "f157c27e3ca1bf98c38447591fcc9c44392c7226bd749f0bbdb135593ebf223e",
@@ -49,7 +50,7 @@
     "docs/etapas/sfx.md": "dec5e2891adfa1825a707c5bca362d84dc88162d1833ce05e7907d312b428ddb",
     "docs/etapas/so_motion.md": "4b76f8daf25815a412f101bcfe5badb2d6aa999c8984eeb7cc086f47f5afdc5a",
     "docs/etapas/sonorizacao.md": "10b39c9ccb25fb6a581cdd6d3d429815f34b5b72d6a77aa5cf95cc4cb272368d",
-    "docs/etapas/subcomandos.md": "0f688ed3ad8b4e5016111ce768136c3251918fc045b51a6c9f7f011284a5c801",
+    "docs/etapas/subcomandos.md": "c3e9874e420841778a645e756f3dbd0f63bdbc8fbe5a343ca1e8dec8f26ce38f",
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/trafego.md": "8ebe784fd48f24b34335a5eaca426258eb31c96a559b2605662108d6ae5a3618",
