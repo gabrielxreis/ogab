@@ -15,7 +15,7 @@ Guardado em ~/.claude/ogab_licenca.json (fora da pasta da skill, sobrevive a upd
 import hashlib, json, os, platform, subprocess, sys, time, urllib.error, urllib.request
 
 URL = os.environ.get("OGAB_LICENCA_URL", "https://licencas.gabrielxreis.com").rstrip("/")
-SITE = os.environ.get("OGAB_SITE", "https://www.agrandemissao.com.br/ogab")   # cadastro da key (grátis)
+SITE = os.environ.get("OGAB_SITE", "https://ogab.io")   # cadastro da key (grátis)
 ARQ = os.path.join(os.path.expanduser("~"), ".claude", "ogab_licenca.json")
 OFFLINE_DIAS = 3
 TIMEOUT = 6

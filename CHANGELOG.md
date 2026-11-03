@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-9 (03/11/2026)
+- **O Gab tem endereço próprio: [ogab.io](https://ogab.io).** Cadastro, login, sua key e o painel da conta agora ficam lá (ogab.io/cadastro, ogab.io/login). O endereço antigo agrandemissao.com.br/ogab continua funcionando e leva você para o novo.
 ## 2026.11.03-8 (03/11/2026)
 - **Menu do vídeo com cara nova:** o menu de escolhas agora tem a mesma identidade do Gab que o painel de tráfego: fundo preto com feixes de luz, cartões de vidro, fonte Poppins e botões em pílula branca (cor só nos avisos). Para abrir a qualquer hora, peça "abre o menu do Gab" ou use `/ogab menu`: ele abre direto, sem perguntar nada antes.
 ## 2026.11.03-7 (03/11/2026)
