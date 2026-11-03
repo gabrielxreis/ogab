@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-4 (03/11/2026)
+- **O Gab agora faz landing page e página de vendas (`/ogab lp`):** escreve a página inteira na ordem que vende (primeira dobra com promessa forte e prazo ou chamada para o vídeo, depois problema, solução e produto, com oferta, garantia e perguntas frequentes), passa a copy por 5 leitores desconfiados antes de te mostrar, espera o seu "aprovado" e monta a página pronta em HTML com a sua marca, conferida no celular e no computador. Também audita a página que você já tem e aponta onde ela perde venda. A VSL da primeira dobra ele mesmo edita; o Jhon confere o anúncio e o pixel antes de subir.
 ## 2026.11.03-3 (03/11/2026)
 - **O Gab mentor agora também cuida do seu dinheiro pessoal:** orçamento, dívidas, reserva de emergência, separar conta da empresa e da pessoa, pró-labore, aposentadoria e como funcionam renda fixa, Tesouro, ações, fundos imobiliários, cripto e investimento no exterior. Aprendeu com os 1.070 vídeos do canal Primo Rico (2016 a 2026), além da base do G4 para a empresa. Ele explica e orienta a ordem certa, mostra a data de cada opinião do canal e não indica ativo específico: para montar carteira, ele te diz o que perguntar a um planejador certificado.
 ## 2026.11.03-2 (03/11/2026)
