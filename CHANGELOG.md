@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-13 (03/11/2026)
+- **Gab em equipe: várias áreas ao mesmo tempo.** Peça um calendário de conteúdo, uma campanha ou "cuida de tudo do cliente este mês" (ou use `/ogab equipe`) e o Gab vira o gerente: monta o plano e o calendário para você aprovar e abre uma sessão para cada área (design, vídeo, tráfego, comercial para o orçamento, gestão para cronograma e custos). Cada sessão aparece no menu lateral do app, e você pode conversar direto com ela ou pedir ajustes na conversa principal, que o Gab manda para a área certa. Um painel no Terminal mostra o andamento de cada área e de cada peça do calendário. Nada sai para o cliente sem o seu ok.
+- **O dossiê e o Instagram do cliente mandam.** Antes de qualquer peça ou lote de cliente, o Gab abre o dossiê e os últimos posts reais dele e faz uma peça de prova ao lado deles antes de produzir o resto.
 ## 2026.11.03-12 (03/11/2026)
 - **Painel de tráfego ensina a conectar o Facebook Ads.** Se o Gab ainda não leu nenhuma campanha da sua conta, o painel mostra no topo o passo a passo: no Claude, Configurações > Conectores > Adicionar conector personalizado com `https://mcp.facebook.com/ads`, entrar com o Facebook, autorizar e marcar a conta de anúncios do ativo (a do negócio). Depois é só pedir `/ogab trafego painel <cliente>`. O Gab também avisa isso na conversa.
 ## 2026.11.03-11 (03/11/2026)
