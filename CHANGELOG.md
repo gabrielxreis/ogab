@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-5 (03/11/2026)
+- **O Gab monta a sua marca pelo método G4 Business (`/ogab marca`):** para criar ou refazer marca, posicionamento e frases, ele segue sempre o método do G4: a quem a marca serve (e quem decide a compra), posicionamento que amplia o mercado, Primal Branding (história, crenças, ícones, rituais, inimigos, palavras sagradas), os seis gatilhos de marca, cores na regra 60-30-10, tom de voz, manifesto, tagline, bio do Instagram, títulos, CTAs, respostas às objeções e um plano de ação. Tudo num documento da marca que passa a guiar roteiros, legendas, carrosséis e landing pages. Sem promessa de guru e sem prova social inventada.
 ## 2026.11.03-4 (03/11/2026)
 - **O Gab agora faz landing page e página de vendas (`/ogab lp`):** escreve a página inteira na ordem que vende (primeira dobra com promessa forte e prazo ou chamada para o vídeo, depois problema, solução e produto, com oferta, garantia e perguntas frequentes), passa a copy por 5 leitores desconfiados antes de te mostrar, espera o seu "aprovado" e monta a página pronta em HTML com a sua marca, conferida no celular e no computador. Também audita a página que você já tem e aponta onde ela perde venda. A VSL da primeira dobra ele mesmo edita; o Jhon confere o anúncio e o pixel antes de subir.
 ## 2026.11.03-3 (03/11/2026)
