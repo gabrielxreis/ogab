@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-1 (03/11/2026)
+- **O Gab agora também é seu mentor de negócios (`/ogab negocio`):** ajuda a faturar mais e tocar a empresa. Faz um diagnóstico rápido do negócio, monta um plano de 90 dias com no máximo 3 prioridades e acompanha seus números toda semana (faturamento, recebido, margem, caixa, funil, dívida) num painel com alertas: caixa curto, margem baixa, cliente concentrado, dívida alta, cobrança atrasada. Responde dúvidas de preço, vendas, contratação, sócio e gestão com base no estudo de 436 vídeos do canal G4 Business. Anúncio pago continua com o Jhon.
 ## 2026.11.02-5 (02/11/2026)
 - **6 presets novos da família Reels:** Curva (linha que se desenha e número subindo até o valor final), Degraus (minimalista preto e branco), Rota 3D (cidade de maquete com rota até o pino e cartão de minutos), Vista explodida 3D (objeto que se abre em camadas com rótulos), Bonecos de palito (explicativo de 30 a 45 s) e "E se?" 3D (explicativo no estilo Zack D. Films). Tudo em 24 qps e português, com prévia no menu. Adaptados das animation skills de Artem Novitckii (licença MIT).
 - **Legenda pela interface acha o Inspector de novo:** o carregamento do preset de legenda parava com "cabeçalho do Inspector (Subtitle) não encontrado" mesmo com o Inspector aberto (a leitura da tela troca "l" por "i"). Veio do relato de um de vocês.
