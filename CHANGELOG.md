@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-8 (03/11/2026)
+- **Menu do vídeo com cara nova:** o menu de escolhas agora tem a mesma identidade do Gab que o painel de tráfego: fundo preto com feixes de luz, cartões de vidro, fonte Poppins e botões em pílula branca (cor só nos avisos). Para abrir a qualquer hora, peça "abre o menu do Gab" ou use `/ogab menu`: ele abre direto, sem perguntar nada antes.
 ## 2026.11.03-7 (03/11/2026)
 - **O Rick virou parte do Gab: agora é só `/ogab` (o /orick foi desativado).** Post, carrossel, story, capa de Reels, miniatura do YouTube, banner, anúncio em imagem, mockup, recorte de foto e a arte animada saem do próprio Gab. Peça normalmente ou use `/ogab design`. Continua igual: antes de montar ele pergunta onde gerar, a IA de imagem é o padrão, gasto de crédito só com o seu ok e fonte que falta ele procura e baixa. Quem tinha o /orick: presets próprios em `~/.claude/skills/orick/presets/` vão para `~/.claude/skills/ogab/design/presets/`; depois a pasta antiga pode ser apagada.
 ## 2026.11.03-6 (03/11/2026)
