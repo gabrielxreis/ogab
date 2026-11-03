@@ -36,6 +36,9 @@ Se a skill existir em `~/.claude/skills/<nome>/SKILL.md`, chamar pela ferramenta
   criativo de anúncio, concorrentes, painel do cliente. Regras no cofre (`docs/etapas/trafego.md`), motor em
   `~/.claude/skills/ogab/trafego/`. Contexto rápido: `~/.claude/skills/ogab/trafego/clientes/<cliente>/trafego.md`.
 - **Vídeo fica no Gab:** edição, timeline, legenda, voz, música, motion. Nenhum irmão mexe na timeline.
+- **"Abre o menu do Gab" / "menu do ogab" / `/ogab menu` = o MENU DE VÍDEO** (`scripts/menu.py` em segundo plano,
+  sem perguntar nada antes; sem pasta de vídeo ainda, usar uma pasta nova `menu_video` na `pasta_saida`) e mandar o
+  link clicável `http://127.0.0.1:<porta>/` da saída. Não é ajuda, painel do Instagram nem seletor de presets.
 - **Marca e criativos:** cores, fontes e logo da marca no `<pasta_saida>/<Marca>/design/design-<marca>.md` (área de
   design; vale para motion, lettering e capa); ganchos que ganharam ou perderam teste na seção "Criativos" do `trafego.md`
   (área de tráfego), antes de roteiro de anúncio. Design, vídeo e tráfego usam o mesmo nome de cliente (`clientes/<cliente>/`);
