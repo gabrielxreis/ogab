@@ -296,6 +296,12 @@ tbody tr:hover{background:var(--hover)}
 .lc-leitura{margin-left:auto;font-size:11px;color:var(--fg-2);max-width:45%}
 .lc .lc-baixar{position:static}
 .det summary{cursor:pointer;font-size:12px;color:var(--fg-2)}
+.meta-guia{display:grid;gap:14px;padding:22px;margin-bottom:18px;border-radius:16px;border:1px solid rgba(24,119,242,.45);background:linear-gradient(135deg,rgba(24,119,242,.14),rgba(24,119,242,.03))}
+.meta-guia h3{margin:0;font-size:17px;color:var(--fg,#f5f5f5)}
+.meta-guia p{margin:0;font-size:13px;line-height:1.55;color:var(--fg-2)}
+.meta-guia ol{margin:0;padding-left:20px;display:grid;gap:8px;font-size:13px;line-height:1.5;color:var(--fg-2)}
+.meta-guia ol b{color:var(--fg,#f5f5f5)}
+.meta-guia .linha{display:flex;flex-wrap:wrap;gap:8px}
 .vazio{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:20px;border-radius:16px;border:1px dashed var(--line);font-size:12px;color:var(--fg-2)}
 .btn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:12px}
 .btn:hover{background:var(--glass-3)}
@@ -955,6 +961,13 @@ const DIC = {
   'Está indo bem': 'Doing well', 'Pede atenção': 'Needs attention', 'Não está valendo': 'Not worth it', 'mais barato': 'cheaper', 'média': 'average', 'mais caro': 'pricier',
   'Única campanha com esse resultado': 'Only campaign with this result', 'Investiu': 'Spent', 'e trouxe': 'and brought',
   'Nenhuma campanha com esse filtro.': 'No campaign with this filter.', 'Nenhum teste de criativo ainda.': 'No creative tests yet.', 'Sem campanhas nesta leitura.': 'No campaigns in this read.',
+  'Conecte o Facebook Ads para ver as suas campanhas aqui': 'Connect Facebook Ads to see your campaigns here',
+  'O Gab lê os anúncios pelo conector oficial do Meta no Claude. Enquanto ele não estiver ligado na conta de anúncios, o painel fica sem campanhas.': 'O Gab reads your ads through the official Meta connector in Claude. Until it is linked to the ad account, the panel has no campaigns.',
+  'No Claude, abra ': 'In Claude, open ', 'Configurações > Conectores': 'Settings > Connectors', ' e clique em Adicionar conector personalizado.': ' and click Add custom connector.',
+  'Cole o endereço ': 'Paste the address ', ' e salve.': ' and save.',
+  'Clique em Conectar, entre com o Facebook e autorize. Na lista de contas, marque ': 'Click Connect, sign in with Facebook and authorize. In the account list, check ',
+  'a conta de anúncios do ativo': 'the ad account of the asset', ' (a do negócio que você quer ver).': ' (the business you want to see).',
+  'Volte aqui e peça ao Gab a leitura: ': 'Come back and ask O Gab for the read: ', 'Copiar o endereço do conector': 'Copy the connector address',
   'Sem série por mês nesta leitura.': 'No monthly series in this read.', 'Mapa precisa de internet na primeira abertura.': 'The map needs internet the first time it opens.',
   'O Gab atualizou o painel': 'O Gab updated the dashboard', 'Ver em tela grande': 'See full screen', 'Ano': 'Year',
   'Visita ao perfil': 'Profile visit', 'Compra no site': 'Website purchase', 'Alcance (por mil)': 'Reach (per thousand)', 'Interação': 'Interaction', 'Engajamento': 'Engagement',
@@ -1761,6 +1774,9 @@ function render() {
   $('#manchete').textContent = d.manchete || '';
   $('#manchete-box').hidden = !d.manchete;
 
+  // sem a conta de anúncios lida: ensina a ligar o conector do Meta no Claude
+  metaGuia(d);
+
   // canais
   const pl = $('#plataformas'); pl.replaceChildren();
   const cor = {'Meta Ads': '#1877F2', 'Google Ads': '#34A853', 'TikTok Ads': '#333', 'YouTube': '#FF0000', 'LinkedIn': '#0A66C2'};
@@ -2164,6 +2180,31 @@ function desenharConcorrentes() {
   }
   if (d.concorrentes_fonte) wrap.append(el('p', 'map-note', d.concorrentes_fonte));
   co.append(wrap);
+}
+
+const CONECTOR_META = 'https://mcp.facebook.com/ads';
+function metaGuia(d) {
+  document.getElementById('meta-guia')?.remove();
+  if ((d.campanhas || []).length) return;
+  const g = el('div', 'meta-guia'); g.id = 'meta-guia';
+  g.append(el('h3', null, 'Conecte o Facebook Ads para ver as suas campanhas aqui'));
+  g.append(el('p', null, 'O Gab lê os anúncios pelo conector oficial do Meta no Claude. Enquanto ele não estiver ligado na conta de anúncios, o painel fica sem campanhas.'));
+  const ol = el('ol');
+  const passos = [
+    ['No Claude, abra ', 'Configurações > Conectores', ' e clique em Adicionar conector personalizado.'],
+    ['Cole o endereço ', CONECTOR_META, ' e salve.'],
+    ['Clique em Conectar, entre com o Facebook e autorize. Na lista de contas, marque ', 'a conta de anúncios do ativo', ' (a do negócio que você quer ver).'],
+    ['Volte aqui e peça ao Gab a leitura: ', '/ogab trafego painel ' + atual, '.'],
+  ];
+  passos.forEach(([a, b, c]) => { const li = el('li'); li.append(document.createTextNode(a), el('b', null, b), document.createTextNode(c)); ol.append(li); });
+  g.append(ol);
+  const linha = el('div', 'linha');
+  const bc = el('button', 'btn'); bc.append(el('code', null, 'Copiar o endereço do conector'));
+  bc.addEventListener('click', () => copiar(CONECTOR_META, () => { bc.lastChild.textContent = 'copiado: cole no Claude'; setTimeout(() => (bc.lastChild.textContent = 'Copiar o endereço do conector'), 1800); }));
+  const bp = el('button', 'btn'); bp.append(el('code', null, '/ogab trafego painel ' + atual));
+  bp.addEventListener('click', () => copiar('/ogab trafego painel ' + atual, () => { bp.lastChild.textContent = 'copiado: cole no Claude'; setTimeout(() => (bp.lastChild.textContent = '/ogab trafego painel ' + atual), 1800); }));
+  linha.append(bc, bp); g.append(linha);
+  document.querySelector('section[data-sec="geral"]').prepend(g);
 }
 
 function vazio(txt, cmd) {

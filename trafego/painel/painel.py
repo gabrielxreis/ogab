@@ -77,6 +77,9 @@ def marcar_miniaturas(nome, d):
     return faltam
 
 
+# conector oficial do Meta para o Claude ler a conta de anúncios (sem ele o painel fica sem campanhas)
+CONECTOR_META = "https://mcp.facebook.com/ads"
+
 def carregar():
     dados, erros = {}, []
     if not os.path.isdir(CLIENTES):
@@ -98,6 +101,10 @@ def carregar():
             erros.append(f"{nome}: falta {', '.join(falta)}")
         if (d.get("concorrentes") or d.get("concorrentes_principais")) and not d.get("concorrentes_principais"):
             erros.append(f"CAMPEOES_FALTANDO: {nome} tem concorrentes sem concorrentes_principais/campeoes (puxar pela Biblioteca agora)")
+        if not d.get("campanhas"):
+            erros.append(f"SEM_META_ADS: {nome}: sem campanhas lidas. Oriente: no Claude, Configurações > Conectores > "
+                         f"Adicionar conector personalizado com {CONECTOR_META}; entrar com o Facebook, autorizar e escolher "
+                         f"a conta de anúncios do ativo (a do negócio do cliente); depois /ogab trafego painel {nome}")
         if sem_mini:
             erros.append(f"FALTAM_MINIATURAS: {nome}: {len(sem_mini)} ({', '.join(sem_mini)}) -> painel/miniaturas.py --cliente {nome} --faltam")
         dados[nome] = d
