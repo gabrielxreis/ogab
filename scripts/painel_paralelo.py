@@ -70,7 +70,7 @@ def barra(pct, n, cor):
 
 
 def selo(nome, v, giro):
-    e = v["estado"]; rot = NOME.get(nome.split(":")[0], nome) + (f" {nome.split(':')[1]}" if ":" in nome else "")
+    e = v["estado"]; rot = NOME.get(nome.split(":")[0], nome.split(":")[0].replace("_", " ")) + (f" {nome.split(':')[1]}" if ":" in nome else "")
     if e == "concluida": return f"{C['verde']}✓ {rot}{C['fim']}"
     if e == "rodando":
         m = _min(v["inicio"])
@@ -118,7 +118,7 @@ def desenhar(pastas, lote, quadro):
                 atencao.append(f"{os.path.basename(p)}: {k} desatualizada ({v.get('erro', '')[:50]})")
         for r, d in st.get("recursos", {}).items():
             rodando.append(f"{os.path.basename(p)} · {r} com {d.get('quem')}")
-        cartoes.append((os.path.basename(p), pct, selos, port))
+        cartoes.append((os.path.basename(p), pct, selos, port, st.get("area", "video")))
 
     pct_tot = feitas / total * 100 if total else 0
     agora = time.strftime("%H:%M:%S")
@@ -137,7 +137,8 @@ def desenhar(pastas, lote, quadro):
     linhas.append(f"  {C['neg']}TOTAL{C['fim']}  {barra(pct_tot, n, cor)}  {C['neg']}{pct_tot:3.0f}%{C['fim']}"
                   f"  {C['cinza']}{feitas} de {total} prontas{C['fim']}")
     # cartões
-    for nome, pct, selos, port in cartoes:
+    import paralelo
+    for nome, pct, selos, port, ar in cartoes:
         linhas.append("")
         cor = C["verde"] if pct >= 100 and selos else C["azul"]
         lab = f"  {C['neg']}{nome}{C['fim']} "
@@ -153,7 +154,8 @@ def desenhar(pastas, lote, quadro):
                 linhas.append(atual); atual, larg = "    ", 4
             atual += s + "   "; larg += _vis(s) + 3
         linhas.append(atual)
-        g = "  ".join(f"{g} {'✓' if port.get(g) else '·'}" for g in ("roteiro", "voz_escolhida", "plano"))
+        gs = ("roteiro", "voz_escolhida", "plano") if ar == "video" else paralelo.AREAS[ar]["portoes"]
+        g = "  ".join(f"{g} {'✓' if port.get(g) else '·'}" for g in gs)
         linhas.append(f"    {C['cinza']}{C['fraco']}portões: {g.replace('voz_escolhida', 'voz')}{C['fim']}")
     # rodando / atenção
     linhas.append("")
@@ -167,7 +169,7 @@ def desenhar(pastas, lote, quadro):
             linhas.append(f"    {C['amar']}{a}{C['fim']}")
     if total and feitas == total:
         linhas.append("")
-        linhas.append(f"  {C['verde']}{C['neg']}✓ Tudo pronto: o Gab pode juntar e montar no editor{C['fim']}")
+        linhas.append(f"  {C['verde']}{C['neg']}✓ Tudo pronto: o Gab pode juntar{' e montar no editor' if all(c[4] == 'video' for c in cartoes) else ''}{C['fim']}")
     linhas.append("")
     linhas.append(f"  {C['cinza']}{C['fraco']}atualiza a cada 2 s · Ctrl-C fecha (e trava frentes novas){C['fim']}")
     return linhas
