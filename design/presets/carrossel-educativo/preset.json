@@ -1,0 +1,37 @@
+{
+  "nome": "carrossel-educativo",
+  "descricao": "Carrossel educativo de 7 páginas: foto cinematográfica com metáfora do dia a dia, título condensado em duas cores, exemplo concreto, blocos glitch e rodapé fixo",
+  "aprendido_de": "carrossel educativo de mercado financeiro aprovado de primeira pelo cliente, 28/10/2026",
+  "metodo": "docs/carrossel.md",
+  "formatos": {"feed": [1080, 1350], "quadrado": [1080, 1080], "story": [1080, 1920]},
+  "sequencia": [
+    {"pagina": 1, "papel": "capa", "pessoa_da_marca": true, "itens": ["frase-gancho em 2 cores", "3 chips com os temas (o do meio na cor quente)"]},
+    {"pagina": 2, "papel": "metafora geral", "pessoa_da_marca": false},
+    {"pagina": 3, "papel": "conceito 1", "pessoa_da_marca": false, "itens": ["metáfora em foto", "corpo com destaque frio", "caixa Exemplo:"]},
+    {"pagina": 4, "papel": "conceito 2", "pessoa_da_marca": false, "itens": ["metáfora em foto", "barra vertical com analogia em caixa alta"]},
+    {"pagina": 5, "papel": "conceito 3", "pessoa_da_marca": false, "itens": ["metáfora em foto", "gráfico sobre a foto"]},
+    {"pagina": 6, "papel": "fixacao", "pessoa_da_marca": true, "itens": ["GUARDE ISSO!", "lista com ícone 3D por item", "frase final com pincelada embaixo"]},
+    {"pagina": 7, "papel": "conversao", "pessoa_da_marca": true, "itens": ["frase de fechamento", "logo do produto", "barra CTA", "Acesse o link da bio", "pílula com o link"]}
+  ],
+  "grade": {
+    "rotulo": {"x": 150, "y": 95, "texto": "PÁGINA N — TEMA", "caixa_alta": true, "tracking": 200, "opacidade": 40, "traco": [80, 4]},
+    "foto": {"ocupa": "página inteira", "assunto": "direita", "vinheta": "preto diagonal da esquerda, 0-75%"},
+    "glitch": {"esquerda_topo": [0, 30, 65, 360], "direita_baixo": [990, 860, 1080, 1280], "contorno_branco": 1, "grao": true},
+    "rodape": {"y": 1250, "itens": ["logo", "seta →", "divisor", "#assinatura ou @"]},
+    "margem_esquerda": 64
+  },
+  "tipografia": {
+    "titulo": {"alternativas": ["BebasNeue-Regular", "Anton-Regular", "Druk Condensed Heavy"], "caixa_alta": true, "entrelinha": 0.85, "ponto_final": true},
+    "corpo": {"alternativas": ["Montserrat-Regular", "Montserrat-SemiBold"], "tamanho_px": [34, 38]},
+    "analogia": {"alternativas": ["Montserrat-Medium"], "caixa_alta": true}
+  },
+  "cores_papel": {
+    "quente": "palavra-chave, marca, traços, bordas (gradiente vertical claro > escuro)",
+    "fria": "solução, alta, destaque do corpo",
+    "vermelho": "erro, queda, perigo",
+    "fundo": "preto azulado, nunca preto chapado (foto escurecida embaixo)"
+  },
+  "paleta_exemplo": {"fundo": "#0A0F14", "quente_topo": "#FDA102", "quente_base": "#E04203", "marca": "#F45F05", "fria": "#10B6DC", "vermelho": "#FB0908", "texto": "#FFFFFF", "rotulo": "#5A6068"},
+  "foto": {"luz": "golden hour, contraluz quente, sombras frias (teal & orange)", "lente": "50 mm f/1.8, profundidade rasa", "acabamento": "HDR comercial, nitidez alta"},
+  "limites_texto": {"titulo_palavras": 6, "corpo_frases": 2, "corpo_linhas": 3}
+}

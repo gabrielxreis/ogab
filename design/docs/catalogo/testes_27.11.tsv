@@ -1,0 +1,25 @@
+OK	place como smart object	1435ms	LayerKind.SMARTOBJECT
+OK	ler tipo do smart object (AM smartObject)	0ms	pessoa.png
+OK	trocar conteúdo do smart object	487ms	ok
+OK	voltar foto (replace de novo)	255ms	
+OK	redimensionar/mover camada (resize+translate)	87ms	118 px,453 px,982 px,935 px
+OK	selecionar assunto (autoCutout)	10558ms	0 px,0 px,1080 px,1350 px
+OK	máscara a partir da seleção	87ms	
+OK	remover fundo (removeBackground)	2599ms	pessoa
+OK	texto (fonte por PostScript, cor, tamanho)	353ms	Montserrat-Bold
+OK	texto de parágrafo (caixa)	226ms	TextType.PARAGRAPHTEXT
+OK	estilo de camada: sombra + traço (AM layerEffects)	11ms	
+OK	forma: retângulo arredondado (contentLayer)	61ms	LayerKind.SOLIDFILL
+OK	camada de ajuste: matiz/saturação	15ms	LayerKind.HUESATURATION
+FALHA	camada de preenchimento degradê	29ms	Erro: Ocorreu um erro geral no Photoshop. Essa funcionalidade pode não estar disponível nessa versão do Photoshop. - Os parâmetros para o comando “Degradê” não são válidos no momento. (linha 32)
+OK	máscara de corte (clipping)	6ms	
+OK	grupo + mover camada para dentro	77ms	1
+OK	prancheta (artboard)	89ms	
+OK	ler árvore de camadas inteira (AM, rápido)	2ms	11: </Layer group> | Camada 0 | FOTO | pessoa | Texto longo que quebra sozinho dentro da caixa de parágrafo do  | BOTAO | Matiz/Saturação 1 | </Layer group> | TITULO | GRUPO | Prancheta 1
+OK	listar fontes (PostScript)	0ms	1763 ex: AppleColorEmoji,EmojiOneColor,NotoColorEmoji-SVG,ABCOracleTripleUnlicensedTrial-Thin,ABCOracleTripleUnlicensedTrial-ThinItalic
+OK	export PNG (saveAs cópia)	1428ms	ok
+OK	export JPG via Save for Web	479ms	
+OK	salvar PSD em camadas	593ms	
+FALHA	runMenuItem (Selecionar Tudo por ID)	5ms	Erro: Ocorreu um erro geral no Photoshop. Essa funcionalidade pode não estar disponível nessa versão do Photoshop. - O objeto “<desconhecido> (item de menu)” não está disponível no momento. (linha 41)
+OK	filtro: desfoque gaussiano em cópia	325ms	
+OK	histórico: suspendHistory (1 desfazer)	7ms	50

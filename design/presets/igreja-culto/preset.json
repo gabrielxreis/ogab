@@ -1,0 +1,48 @@
+{
+  "nome": "igreja-culto",
+  "descricao": "Flyer/story de culto, congresso de jovens, louvor, avivamento",
+  "aprendido_de": "7 templates PSD profissionais do gênero, 16/10/2026",
+  "formatos": {
+    "feed": [1080, 1350],
+    "retrato": [1440, 1920],
+    "story": [1080, 1920],
+    "story_2x": [2160, 3840]
+  },
+  "variacoes": {
+    "show_gospel": {
+      "arvore": ["TAG", "AJUSTES", "LUZ", "TEXTURA", "PRELETOR", "TITULO", "NOMES", "DATA E HORA", "LOCAL", "DEGRADE", "IMAGEM", "SHAPE", "BACKGROUND"],
+      "fontes": {
+        "titulo_display": {"usado": "Dirtyline36Daysoftype2022-Reg", "alternativa": "BricolageGrotesque-Black"},
+        "titulo_serifa_italica": {"usado": "Thecoffins-Italic", "alternativa": "PlayfairDisplay-Italic"},
+        "script": {"usado": "AlberobelloScript", "alternativa": "GreatVibes-Regular"},
+        "creditos": {"usado": "StretchProRegular", "alternativa": "Unbounded-Regular", "tracking": 40},
+        "corpo": {"usado": "Sora-Medium", "alternativa": "Poppins-Medium"}
+      },
+      "paletas": {
+        "laranja": {"fundo": "#0B0B0B", "destaque": "#FF8000", "destaque_2": "#FE9A68", "creme": "#FFD8AC", "texto": "#FFFFFF"},
+        "roxo": {"fundo": "#1A0F3A", "destaque": "#9B7BFF", "texto": "#DFDBD8", "texto_escuro": "#131431"},
+        "grafite": {"fundo": "#1E1E1E", "destaque": "#FF8000", "texto": "#F3F3F3"}
+      },
+      "acabamento": [
+        {"tipo": "colorLookup", "opacidade": [10, 50]},
+        {"tipo": "curves", "opacidade": 20},
+        {"tipo": "solidColor", "mesclagem": "softLight", "opacidade": 70},
+        {"tipo": "ruido", "mesclagem": "overlay", "opacidade": 50},
+        {"tipo": "grao", "mesclagem": "multiply"}
+      ],
+      "luz_na_pessoa": [
+        {"tipo": "solidColor", "mesclagem": "hardLight", "opacidade": 50, "recorte": true},
+        {"tipo": "luz", "mesclagem": "screen", "opacidade": 59, "recorte": true},
+        {"tipo": "luz", "mesclagem": "overlay", "opacidade": 40, "recorte": true},
+        {"tipo": "sombra", "mesclagem": "multiply", "atras": true}
+      ],
+      "titulo": {"altura_letra_px_feed": 200, "tracking": [-40, -20], "mistura_duas_fontes": true, "letras_destaque": "pontas da palavra"}
+    },
+    "colagem": {
+      "arvore": ["TEXTURA", "IMAGEM", "TEXTO", "DESIGN", "BACKGROUND"],
+      "fontes": {"titulo": "SixCaps", "data": "ClimateCrisis-Regular"},
+      "paleta": {"fundo": "#000000", "papel": "#F7EDD0", "recortes": ["#C8E03A", "#F4A6C6", "#F26A2E", "#1F4D2B"]},
+      "textura": {"mesclagem": "multiply", "opacidade": 50}
+    }
+  }
+}

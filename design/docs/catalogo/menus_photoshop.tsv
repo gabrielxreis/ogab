@@ -1,0 +1,760 @@
+0	Help > Home	1990
+0	Help > Photoshop Help	5956
+0	Help > Hands-on Tutorials	15203
+0	Help > What's New	15204
+0	Help > System Info	15004
+0	Help > GPU Compatibility	15009
+0	Help > Learn more about generative credits	15019
+0	Help > Adobe generative AI user guidelines	15020
+0	Help > Updates	4002
+0	AppleMenu > About Photoshop	1
+0	File > New	10
+0	File > New OpenColorIO	11
+0	File > Open	20
+0	File > Browse in Bridge	1520
+0	File > Open as Smart Object	22
+0	File > Open as OpenColorIO	24
+0	File > Open Recent > Clear Recent File List	2103
+0	File > Close	31
+0	File > Close All	37
+0	File > Close Others	46
+0	File > Close and Go to Bridge	1530
+0	File > Save	30
+0	File > Save As	32
+0	File > Save a Copy	33
+0	File > Revert	34
+0	File > Invite to Edit	5967
+0	File > Share for Review	5966
+0	File > Export > Export As	3443
+0	File > Export > Export Preferences	2332
+0	File > Export > Save for Web	1695
+0	File > Export > Send to Firefly Boards	5968
+0	File > Export > Data Sets as Files	7806
+0	File > Export > Render Video	-629
+0	File > Export > Paths to Illustrator	-630
+0	File > Invite	5959
+0	File > Search Adobe Stock	15201
+0	File > Search Adobe Express Templates	15202
+0	File > Place Embedded	1032
+0	File > Place Linked	3090
+0	File > Package	3092
+0	File > Automate > Batch	1180
+0	File > Automate > PDF Presentation	1696
+0	File > Automate > Create Droplet	1169
+219	File > Automate > Generator Plugins	3098
+0	File > Automate > Crop and Straighten Photos	-607
+0	File > Scripts > Browse	1676
+0	File > Import > Variable Data Sets	7805
+0	File > Import > Video Frames to Layers	6362
+0	File > Import > Images from Device	1502
+0	File > Import > Notes	-457
+0	File > Import from iPhone or iPad	1503
+0	File > File Info	1137
+0	File > Version History	20006
+0	File > Print	2101
+0	File > Print One Copy	177
+0	Edit > Undo	101
+0	Edit > Redo	132
+0	Edit > Toggle Last State	133
+0	Edit > Step Forward	1962
+0	Edit > Step Backward	1961
+0	Edit > Fade	1154
+0	Edit > Cut	103
+0	Edit > Copy	104
+0	Edit > Copy Merged	1107
+0	Edit > Paste	105
+0	Edit > Paste Special > Paste without Formatting	9143
+0	Edit > Paste Special > Paste in Place	1297
+0	Edit > Paste Special > Paste Into	1040
+0	Edit > Paste Special > Paste Outside	5068
+0	Edit > Clear	106
+0	Edit > Search	5957
+0	Edit > Check Spelling	3392
+0	Edit > Find and Replace Text	3393
+0	Edit > Fill	1042
+0	Edit > Stroke	1043
+0	Edit > Content-Aware Fill	1510
+0	Edit > Prompt to Edit	1789
+0	Edit > Generative Fill	1750
+0	Edit > Generate Image	1771
+0	Edit > Reflection Removal	26010
+0	Edit > Content-Aware Scale	2220
+0	Edit > Puppet Warp	2221
+0	Edit > Perspective Warp	17001
+0	Edit > Free Transform	2207
+0	Edit > Transform > Again	2217
+0	Edit > Transform > Scale	2201
+0	Edit > Transform > Rotate	2205
+0	Edit > Transform > Skew	2202
+0	Edit > Transform > Distort	2204
+0	Edit > Transform > Perspective	2203
+0	Edit > Transform > Warp	2219
+0	Edit > Transform > Split Warp Horizontally	2250
+0	Edit > Transform > Split Warp Vertically	2251
+0	Edit > Transform > Split Warp Crosswise	2252
+0	Edit > Transform > Remove Warp Split	2253
+0	Edit > Transform > Convert warp anchor point	2255
+0	Edit > Transform > Toggle Guides	2254
+0	Edit > Transform > Rotate 180°	2208
+0	Edit > Transform > Rotate 90° Clockwise	2209
+0	Edit > Transform > Rotate 90° Counter Clockwise	2210
+0	Edit > Transform > Flip Horizontal	2211
+0	Edit > Transform > Flip Vertical	2212
+0	Edit > Rotate Object	25070
+0	Edit > Auto-Align Layers	1237
+0	Edit > Auto-Blend Layers	1238
+0	Edit > Sky Replacement	2260
+0	Edit > Define Brush Preset	1029
+0	Edit > Define Pattern	1038
+0	Edit > Define Custom Shape	5624
+0	Edit > Purge > Undo	2911
+0	Edit > Purge > Clipboard	2912
+0	Edit > Purge > Histories	2361
+0	Edit > Purge > All	2915
+0	Edit > Purge > Video Cache	2920
+0	Edit > Adobe PDF Presets	1215
+0	Edit > Presets > Preset Manager	1214
+0	Edit > Presets > Migrate Presets	1211
+0	Edit > Remote Connections	1613
+0	Edit > Color Settings	2344
+0	Edit > OpenColorIO Settings	2345
+0	Edit > Assign Profile	1212
+0	Edit > Convert to Profile	1213
+0	Edit > Convert to OpenColorIO	3820
+0	Edit > Keyboard Shortcuts	5980
+0	Edit > Menus	5982
+0	Edit > Toolbar	5983
+0	Edit > Customize Save Dialog File Formats	5984
+0	Image > Mode > Enable NextGen Engine	3902
+0	Image > Mode > Capture NGE Scene	3906
+0	Image > Mode > Add Gaussian Blur Filter	3907
+0	Image > Mode > Bitmap	1006
+0	Image > Mode > Grayscale	1007
+0	Image > Mode > Duotone	1008
+0	Image > Mode > Indexed Color	1009
+0	Image > Mode > RGB Color	1010
+0	Image > Mode > CMYK Color	1011
+0	Image > Mode > Lab Color	1052
+0	Image > Mode > Multichannel	1014
+0	Image > Mode > 8 Bits/Channel	1161
+0	Image > Mode > 16 Bits/Channel	1162
+0	Image > Mode > 32 Bits/Channel	1206
+0	Image > Mode > Color Table	1045
+0	Image > Adjustments > Brightness/Contrast	1803
+0	Image > Adjustments > Levels	1801
+0	Image > Adjustments > Curves	1802
+0	Image > Adjustments > Exposure	3067
+0	Image > Adjustments > Vibrance	1827
+0	Image > Adjustments > Hue/Saturation	1805
+0	Image > Adjustments > Color Balance	1804
+0	Image > Adjustments > Black  White	1824
+0	Image > Adjustments > Photo Filter	3063
+0	Image > Adjustments > Channel Mixer	3056
+0	Image > Adjustments > Color Lookup	3066
+0	Image > Adjustments > OpenColorIO Transform	3099
+0	Image > Adjustments > Invert	1701
+0	Image > Adjustments > Posterize	1704
+0	Image > Adjustments > Threshold	1703
+0	Image > Adjustments > Gradient Map	3062
+0	Image > Adjustments > Selective Color	1807
+0	Image > Adjustments > Shadows/Highlights	3065
+0	Image > Adjustments > HDR Toning	-475
+0	Image > Adjustments > Desaturate	1809
+0	Image > Adjustments > Match Color	1822
+0	Image > Adjustments > Replace Color	1806
+0	Image > Adjustments > Equalize	1702
+0	Image > Auto Tone	1808
+0	Image > Auto Contrast	1810
+0	Image > Auto Color	1817
+0	Image > Image Size	1030
+0	Image > Generative Upscale	1776
+0	Image > Canvas Size	1031
+0	Image > Image Rotation > 180°	2993
+0	Image > Image Rotation > 90° Clockwise	2991
+0	Image > Image Rotation > 90° Counter Clockwise	2992
+0	Image > Image Rotation > Arbitrary	2994
+0	Image > Image Rotation > Flip Canvas Horizontal	2996
+0	Image > Image Rotation > Flip Canvas Vertical	2997
+0	Image > Crop	1044
+0	Image > Trim	1080
+0	Image > Reveal All	1081
+0	Image > Duplicate	1134
+0	Image > Apply Image	1153
+0	Image > Calculations	1900
+0	Image > Variables > Define	7802
+0	Image > Variables > Data Sets	7803
+0	Image > Apply Data Set	7800
+0	Image > Trap	1093
+0	Image > Analysis > Set Measurement Scale > Default	2841
+0	Image > Analysis > Set Measurement Scale > Custom	2842
+0	Image > Analysis > Select Data Points > Custom	2851
+0	Image > Analysis > Record Measurements	2860
+0	Image > Analysis > Ruler Tool	2820
+0	Image > Analysis > Count Tool	7900
+0	Image > Analysis > Place Scale Marker	2830
+0	Layer > New > Layer	1099
+0	Layer > New > Layer from Background	1942
+0	Layer > New > Group	2976
+0	Layer > New > Group from Layers	2956
+0	Layer > New > Artboard	9220
+0	Layer > New > Artboard from Group	9221
+0	Layer > New > Artboard from Layers	9222
+0	Layer > New > Frame from Layers	9252
+0	Layer > New > Convert to Frame	9255
+0	Layer > New > Layer Via Copy	2970
+0	Layer > New > Layer Via Cut	2971
+0	Layer > Copy CSS	3439
+0	Layer > Copy SVG	3438
+0	Layer > Duplicate Group	1135
+0	Layer > Delete > Layer	1100
+0	Layer > Delete > Hidden Layers	2951
+0	Layer > Quick Export As PNG	3446
+0	Layer > Export As	3447
+0	Layer > Rename Group	2983
+0	Layer > Layer Style > Blending Options	1331
+0	Layer > Layer Style > Bevel  Emboss	1305
+0	Layer > Layer Style > Stroke	1313
+0	Layer > Layer Style > Inner Shadow	1302
+0	Layer > Layer Style > Inner Glow	1304
+0	Layer > Layer Style > Satin	1312
+0	Layer > Layer Style > Color Overlay	1335
+0	Layer > Layer Style > Gradient Overlay	1336
+0	Layer > Layer Style > Pattern Overlay	1337
+0	Layer > Layer Style > Outer Glow	1303
+0	Layer > Layer Style > Drop Shadow	1301
+0	Layer > Layer Style > Copy Layer Style	1314
+0	Layer > Layer Style > Paste Layer Style	1315
+0	Layer > Layer Style > Clear Disabled Layer Styles	1348
+0	Layer > Layer Style > Clear Layer Style	1339
+0	Layer > Layer Style > Global Light	1307
+0	Layer > Layer Style > Create Layer	1308
+0	Layer > Layer Style > Hide All Effects	1306
+0	Layer > Layer Style > Scale Effects	1327
+0	Layer > Smart Filter > Disable Smart Filters	2769
+0	Layer > Smart Filter > Delete Filter Mask	5226
+0	Layer > Smart Filter > Disable Filter Mask	3076
+0	Layer > Smart Filter > Clear Smart Filters	2770
+0	Layer > New Fill Layer > Solid Color	6300
+0	Layer > New Fill Layer > Gradient	6301
+0	Layer > New Fill Layer > Pattern	6302
+0	Layer > New Adjustment Layer > Light	6306
+0	Layer > New Adjustment Layer > Color and vibrance	3085
+0	Layer > New Adjustment Layer > Clarity and dehaze	6651
+0	Layer > New Adjustment Layer > Grain	6652
+0	Layer > New Adjustment Layer > Levels	6303
+0	Layer > New Adjustment Layer > Curves	6304
+0	Layer > New Adjustment Layer > Exposure	3083
+0	Layer > New Adjustment Layer > Hue/Saturation	6308
+0	Layer > New Adjustment Layer > Color Balance	6305
+0	Layer > New Adjustment Layer > Black  White	6348
+0	Layer > New Adjustment Layer > Photo Filter	6312
+0	Layer > New Adjustment Layer > Channel Mixer	6310
+0	Layer > New Adjustment Layer > Color Lookup	6337
+0	Layer > New Adjustment Layer > Selective Color	6309
+0	Layer > New Adjustment Layer > OpenColorIO Transform	6650
+0	Layer > New Adjustment Layer > Invert	6313
+0	Layer > New Adjustment Layer > Posterize	6315
+0	Layer > New Adjustment Layer > Threshold	6314
+0	Layer > New Adjustment Layer > Gradient Map	6311
+0	Layer > New Relight Layer	25080
+0	Layer > Harmonize	11600
+0	Layer > Layer Content Options	1103
+0	Layer > Layer Mask > Reveal All	1157
+0	Layer > Layer Mask > Hide All	1156
+0	Layer > Layer Mask > Reveal Selection	1158
+0	Layer > Layer Mask > Hide Selection	1168
+0	Layer > Layer Mask > From Transparency	1292
+0	Layer > Layer Mask > Delete	5059
+0	Layer > Layer Mask > Apply	5095
+0	Layer > Layer Mask > Enable	1159
+0	Layer > Layer Mask > Link	5085
+0	Layer > Layer Mask > Enhance edge	1496
+0	Layer > Vector Mask > Reveal All	1954
+0	Layer > Vector Mask > Hide All	1953
+0	Layer > Vector Mask > Current Path	1955
+0	Layer > Vector Mask > Delete	1956
+0	Layer > Vector Mask > Enable	1959
+0	Layer > Vector Mask > Link	2109
+0	Layer > Create Clipping Mask	2972
+0	Layer > Mask All Objects	22100
+0	Layer > Smart Objects > Convert to Smart Object	2980
+0	Layer > Smart Objects > New Smart Object via Copy	2981
+0	Layer > Smart Objects > Reveal in Finder	3091
+0	Layer > Smart Objects > Update Modified Content	6342
+0	Layer > Smart Objects > Update All Modified Content	6343
+0	Layer > Smart Objects > Edit Contents	6332
+0	Layer > Smart Objects > Reset Transform	6347
+0	Layer > Smart Objects > Relink to File	6340
+0	Layer > Smart Objects > Relink to Library Graphic	6341
+0	Layer > Smart Objects > Replace Contents	6333
+0	Layer > Smart Objects > Export Contents	6334
+0	Layer > Smart Objects > Embed Linked	6345
+0	Layer > Smart Objects > Embed All Linked	6346
+0	Layer > Smart Objects > Convert to Linked	6339
+0	Layer > Smart Objects > Convert to Layers	21000
+0	Layer > Smart Objects > Stack Mode > None	6432
+0	Layer > Smart Objects > Stack Mode > Skewness	-458
+0	Layer > Smart Objects > Stack Mode > Kurtosis	-459
+0	Layer > Smart Objects > Stack Mode > Standard Deviation	-460
+0	Layer > Smart Objects > Stack Mode > Entropy	-461
+0	Layer > Smart Objects > Stack Mode > Range	-462
+0	Layer > Smart Objects > Stack Mode > Maximum	-463
+0	Layer > Smart Objects > Stack Mode > Median	-464
+0	Layer > Smart Objects > Stack Mode > Minimum	-465
+0	Layer > Smart Objects > Stack Mode > Summation	-466
+0	Layer > Smart Objects > Stack Mode > Mean	-467
+0	Layer > Smart Objects > Stack Mode > Variance	-468
+0	Layer > Smart Objects > Rasterize	3549
+0	Layer > Video Layers > New Video Layer from File	6351
+0	Layer > Video Layers > New Blank Video Layer	6352
+0	Layer > Video Layers > Insert Blank Frame	6353
+0	Layer > Video Layers > Duplicate Frame	6354
+0	Layer > Video Layers > Delete Frame	6355
+0	Layer > Video Layers > Replace Footage	6357
+0	Layer > Video Layers > Interpret Footage	6356
+0	Layer > Video Layers > Show Altered Video	6358
+0	Layer > Video Layers > Restore Frame	6360
+0	Layer > Video Layers > Restore All Frames	6361
+0	Layer > Video Layers > Reload Frame	6363
+0	Layer > Video Layers > Rasterize	3555
+0	Layer > Rasterize > Type	3542
+0	Layer > Rasterize > Shape	3541
+0	Layer > Rasterize > Fill Content	3544
+0	Layer > Rasterize > Vector Mask	1957
+0	Layer > Rasterize > Smart Object	3549
+0	Layer > Rasterize > Generative	3561
+0	Layer > Rasterize > Dynamic	3563
+0	Layer > Rasterize > Video	3551
+0	Layer > Rasterize > 3D	3553
+0	Layer > Rasterize > Layer Style	3557
+0	Layer > Rasterize > Layer	3547
+0	Layer > Rasterize > All Layers	3545
+0	Layer > New Layer Based Slice	5217
+0	Layer > Group Layers	2958
+0	Layer > Ungroup Layers	2959
+0	Layer > Hide Group	1114
+0	Layer > Arrange > Bring to Front	2711
+0	Layer > Arrange > Bring Forward	2712
+0	Layer > Arrange > Send Backward	2713
+0	Layer > Arrange > Send to Back	2714
+0	Layer > Arrange > Reverse	2715
+0	Layer > Combine Shapes > Unite Shapes	3409
+0	Layer > Combine Shapes > Subtract Front Shape	3410
+0	Layer > Combine Shapes > Unite Shapes at Overlap	3411
+0	Layer > Combine Shapes > Subtract Shapes at Overlap	3412
+0	Layer > Align Layers to Selection > Top Edges	1231
+0	Layer > Align Layers to Selection > Vertical Centers	1233
+0	Layer > Align Layers to Selection > Bottom Edges	1232
+0	Layer > Align Layers to Selection > Left Edges	1234
+0	Layer > Align Layers to Selection > Horizontal Centers	1236
+0	Layer > Align Layers to Selection > Right Edges	1235
+0	Layer > Distribute > Top Edges	1241
+0	Layer > Distribute > Vertical Centers	1243
+0	Layer > Distribute > Bottom Edges	1242
+0	Layer > Distribute > Left Edges	1245
+0	Layer > Distribute > Horizontal Centers	1247
+0	Layer > Distribute > Right Edges	1246
+0	Layer > Distribute > Horizontally	1249
+0	Layer > Distribute > Vertically	1239
+0	Layer > Lock Group	2957
+0	Layer > Link Layers	2961
+0	Layer > Select Linked Layers	2960
+0	Layer > Merge Layers	1166
+0	Layer > Merge Visible	1139
+0	Layer > Flatten Image	1141
+0	Layer > Matting > Color Decontaminate	1295
+0	Layer > Matting > Defringe	1037
+0	Layer > Matting > Remove Black Matte	2701
+0	Layer > Matting > Remove White Matte	2703
+0	Type > More from Adobe Fonts	1522
+0	Type > Panels > Character Panel	3300
+0	Type > Panels > Paragraph Panel	3350
+0	Type > Panels > Glyphs Panel	9068
+0	Type > Panels > Character Styles Panel	9066
+0	Type > Panels > Paragraph Styles Panel	9067
+0	Type > Anti-Alias > None	3370
+0	Type > Anti-Alias > Sharp	3374
+0	Type > Anti-Alias > Crisp	3371
+0	Type > Anti-Alias > Strong	3372
+0	Type > Anti-Alias > Smooth	3373
+0	Type > Anti-Alias > Mac LCD	3375
+0	Type > Anti-Alias > Mac	3376
+0	Type > Orientation > Horizontal	1223
+0	Type > Orientation > Vertical	1224
+0	Type > OpenType > Standard Ligatures	3309
+0	Type > OpenType > Contextual Alternates	3338
+0	Type > OpenType > Discretionary Ligatures	3339
+0	Type > OpenType > Swash	3334
+0	Type > OpenType > Oldstyle	3310
+0	Type > OpenType > Stylistic Alternates	3340
+0	Type > OpenType > Titling Alternates	3341
+0	Type > OpenType > Ornaments	3342
+0	Type > OpenType > Ordinals	3343
+0	Type > OpenType > Fractions	3344
+0	Type > OpenType > Justification Alternates	9086
+0	Type > OpenType > Japanese 78	3345
+0	Type > OpenType > Japanese Expert	3346
+0	Type > OpenType > Japanese Traditional	3347
+0	Type > OpenType > Proportional Metrics	3327
+0	Type > OpenType > Kana	3348
+0	Type > OpenType > Roman Italics	3349
+0	Type > Create Work Path	1228
+0	Type > Convert to Shape	1229
+0	Type > Rasterize Type Layer	3542
+0	Type > Convert to Paragraph Text	3382
+0	Type > Convert to Dynamic Text > Block	22102
+0	Type > Convert to Dynamic Text > Circle	22112
+0	Type > Convert to Dynamic Text > Arch	22113
+0	Type > Convert to Dynamic Text > Bow	22114
+0	Type > Warp Text	2218
+0	Type > Match Font	9123
+0	Type > Font Preview Size > None	9109
+0	Type > Font Preview Size > Small	9110
+0	Type > Font Preview Size > Medium	9111
+0	Type > Font Preview Size > Large	9112
+0	Type > Font Preview Size > Extra Large	9113
+0	Type > Font Preview Size > Huge	9114
+0	Type > Language Options > Default Features	9100
+0	Type > Language Options > East Asian Features	9101
+0	Type > Language Options > Middle Eastern Features	9102
+0	Type > Language Options > Standard Vertical Roman Alignment	9130
+0	Type > Language Options > Tate-chu-yoko	9131
+0	Type > Language Options > Top-to-Top Leading	9132
+0	Type > Language Options > Bottom-to-Bottom Leading	9133
+0	Type > Language Options > LTR Arabic Digits - 123%	3451
+0	Type > Language Options > RTL Arabic Digits - %123	3459
+0	Type > Language Options > Hindi Digits	3453
+0	Type > Language Options > Farsi Digits	3452
+0	Type > Language Options > Kashidas	9137
+0	Type > Language Options > Default Direction	9138
+0	Type > Language Options > Left-to-Right Character Direction	9139
+0	Type > Language Options > Right-to-Left Character Direction	9140
+0	Type > Update All Text Layers	3390
+0	Type > Manage Missing Fonts	9087
+0	Type > Paste Lorem Ipsum	9119
+0	Type > Paste Placeholder Text	3385
+0	Type > Load Default Type Styles	9121
+0	Type > Save Default Type Styles	9122
+0	Select > All	1017
+0	Select > Deselect	1016
+0	Select > Reselect	1943
+0	Select > Inverse	1018
+0	Select > All Layers	2962
+0	Select > Deselect Layers	2963
+0	Select > Find Layers	2982
+0	Select > Isolate Layers	2986
+0	Select > Color Range	1152
+0	Select > Focus Area	1460
+0	Select > Subject	1461
+0	Select > Sky	1462
+0	Select > Select and Mask	1115
+0	Select > Modify > Border	1035
+0	Select > Modify > Smooth	1108
+0	Select > Modify > Expand	1109
+0	Select > Modify > Contract	1110
+0	Select > Modify > Feather	1036
+0	Select > Grow	1033
+0	Select > Similar	1034
+0	Select > Transform Selection	1971
+0	Select > Edit in Quick Mask Mode	5069
+0	Select > Load Selection	1200
+0	Select > Save Selection	1281
+0	Filter > Last Filter	1019
+0	Filter > Last Filter	23150
+0	Filter > Last Filter	23151
+0	Filter > Last Filter	23152
+0	Filter > Last Filter	23153
+0	Filter > NextGen Filters > Blur (Gaussian)	3911
+0	Filter > NextGen Filters > Light Leaks	3912
+0	Filter > Convert for Smart Filters	6440
+0	Filter > Neural Filters	8820
+0	Filter > Parametric Filters	7789
+0	Filter > Filter Gallery	-476
+0	Filter > Adaptive Wide Angle	-477
+0	Filter > Camera Raw Filter	-478
+0	Filter > AI Denoise	1777
+0	Filter > AI Sharpen	1778
+0	Filter > Lens Correction	-479
+0	Filter > Liquify	-480
+0	Filter > Vanishing Point	-481
+0	Filter > Artistic > Fresco	-483
+0	Filter > Artistic > Watercolor	-484
+0	Filter > Artistic > Poster Edges	-485
+0	Filter > Artistic > Smudge Stick	-486
+0	Filter > Artistic > Palette Knife	-487
+0	Filter > Artistic > Sponge	-488
+0	Filter > Artistic > Film Grain	-489
+0	Filter > Artistic > Colored Pencil	-490
+0	Filter > Artistic > Neon Glow	-491
+0	Filter > Artistic > Rough Pastels	-492
+0	Filter > Artistic > Dry Brush	-493
+0	Filter > Artistic > Plastic Wrap	-494
+0	Filter > Artistic > Cutout	-495
+0	Filter > Artistic > Underpainting	-496
+0	Filter > Artistic > Paint Daubs	-497
+0	Filter > Sketch > Torn Edges	-499
+0	Filter > Sketch > Bas Relief	-500
+0	Filter > Sketch > Graphic Pen	-501
+0	Filter > Sketch > Charcoal	-502
+0	Filter > Sketch > Conté Crayon	-503
+0	Filter > Sketch > Chrome	-504
+0	Filter > Sketch > Stamp	-505
+0	Filter > Sketch > Photocopy	-506
+0	Filter > Sketch > Plaster	-507
+0	Filter > Sketch > Chalk  Charcoal	-508
+0	Filter > Sketch > Halftone Pattern	-509
+0	Filter > Sketch > Note Paper	-510
+0	Filter > Sketch > Water Paper	-511
+0	Filter > Sketch > Reticulation	-512
+0	Filter > Blur > Blur	-514
+0	Filter > Blur > Box Blur	-515
+0	Filter > Blur > Shape Blur	-516
+0	Filter > Blur > Lens Blur	-517
+0	Filter > Blur > Motion Blur	-518
+0	Filter > Blur > Surface Blur	-519
+0	Filter > Blur > Gaussian Blur	-520
+0	Filter > Blur > Smart Blur	-521
+0	Filter > Blur > Blur More	-522
+0	Filter > Blur > Radial Blur	-523
+0	Filter > Blur > Average	-524
+0	Filter > Distort > Diffuse Glow	-526
+0	Filter > Distort > Polar Coordinates	-527
+0	Filter > Distort > Shear	-528
+0	Filter > Distort > Spherize	-529
+0	Filter > Distort > Ocean Ripple	-530
+0	Filter > Distort > Displace	-531
+0	Filter > Distort > Wave	-532
+0	Filter > Distort > Ripple	-533
+0	Filter > Distort > Twirl	-534
+0	Filter > Distort > Pinch	-535
+0	Filter > Distort > Glass	-536
+0	Filter > Distort > ZigZag	-537
+0	Filter > Stylize > Glowing Edges	-539
+0	Filter > Stylize > Diffuse	-540
+0	Filter > Stylize > Emboss	-541
+0	Filter > Stylize > Extrude	-542
+0	Filter > Stylize > Find Edges	-543
+0	Filter > Stylize > Tiles	-544
+0	Filter > Stylize > Oil Paint	-545
+0	Filter > Stylize > Solarize	-546
+0	Filter > Stylize > Trace Contour	-547
+0	Filter > Stylize > Wind	-548
+0	Filter > Blur Gallery > Field Blur	2225
+0	Filter > Blur Gallery > Iris Blur	2224
+0	Filter > Blur Gallery > Tilt-Shift	2226
+0	Filter > Blur Gallery > Path Blur	2227
+0	Filter > Blur Gallery > Spin Blur	2229
+0	Filter > Sharpen > Sharpen Edges	-551
+0	Filter > Sharpen > Sharpen More	-552
+0	Filter > Sharpen > Unsharp Mask	-553
+0	Filter > Sharpen > Sharpen	-554
+0	Filter > Sharpen > Smart Sharpen	-555
+0	Filter > Pixelate > Crystallize	-557
+0	Filter > Pixelate > Facet	-558
+0	Filter > Pixelate > Fragment	-559
+0	Filter > Pixelate > Mezzotint	-560
+0	Filter > Pixelate > Color Halftone	-561
+0	Filter > Pixelate > Mosaic	-562
+0	Filter > Pixelate > Pointillize	-563
+0	Filter > Render > Flame	2231
+0	Filter > Render > Picture Frame	2232
+0	Filter > Render > Tree	2233
+0	Filter > Render > Fibers	-565
+0	Filter > Render > Clouds	-566
+0	Filter > Render > Difference Clouds	-567
+0	Filter > Render > Lens Flare	-568
+0	Filter > Noise > Add Noise	-570
+0	Filter > Noise > Median	-571
+0	Filter > Noise > Dust  Scratches	-572
+0	Filter > Noise > Reduce Noise	-573
+0	Filter > Noise > Despeckle	-574
+0	Filter > Texture > Patchwork	-576
+0	Filter > Texture > Craquelure	-577
+0	Filter > Texture > Grain	-578
+0	Filter > Texture > Mosaic Tiles	-579
+0	Filter > Texture > Texturizer	-580
+0	Filter > Texture > Stained Glass	-581
+0	Filter > Brush Strokes > Accented Edges	-583
+0	Filter > Brush Strokes > Crosshatch	-584
+0	Filter > Brush Strokes > Ink Outlines	-585
+0	Filter > Brush Strokes > Spatter	-586
+0	Filter > Brush Strokes > Sumi-e	-587
+0	Filter > Brush Strokes > Angled Strokes	-588
+0	Filter > Brush Strokes > Sprayed Strokes	-589
+0	Filter > Brush Strokes > Dark Strokes	-590
+0	Filter > Video > NTSC Colors	-592
+0	Filter > Video > De-Interlace	-593
+0	Filter > Other > High Pass	-595
+0	Filter > Other > Offset	-596
+0	Filter > Other > HSB/HSL	-597
+0	Filter > Other > Maximum	-598
+0	Filter > Other > Minimum	-599
+0	Filter > Other > Custom	-600
+0	View > Proof Setup > Custom	2802
+0	View > Proof Setup > Working CMYK	2803
+0	View > Proof Setup > Working Cyan Plate	2804
+0	View > Proof Setup > Working Magenta Plate	2805
+0	View > Proof Setup > Working Yellow Plate	2806
+0	View > Proof Setup > Working Black Plate	2807
+0	View > Proof Setup > Working CMY Plates	2808
+0	View > Proof Setup > Legacy Macintosh RGB (Gamma 1.8)	2809
+0	View > Proof Setup > Internet Standard RGB (sRGB)	2810
+0	View > Proof Setup > Monitor RGB	2811
+0	View > Proof Setup > Color Blindness - Protanopia-type	2815
+0	View > Proof Setup > Color Blindness - Deuteranopia-type	2816
+0	View > Proof Colors	1105
+0	View > Gamut Warning	1106
+0	View > Pixel Aspect Ratio > Custom Pixel Aspect Ratio	1202
+0	View > Pixel Aspect Ratio > Delete Pixel Aspect Ratio	1203
+0	View > Pixel Aspect Ratio > Reset Pixel Aspect Ratios	1204
+0	View > Pixel Aspect Ratio > Square	1205
+0	View > Pixel Aspect Ratio Correction	1112
+0	View > 32-bit Preview Options	6400
+0	View > Zoom In	1004
+0	View > Zoom Out	1005
+0	View > Fit on Screen	1192
+0	View > Fit Layer(s) on Screen	21001
+0	View > Fit Artboard on Screen	1195
+0	View > 100%	1190
+0	View > 200%	1299
+0	View > Print Size	1191
+0	View > Actual Size	1217
+0	View > Flip Horizontal	1284
+0	View > Pattern Preview	1285
+0	View > Screen Mode > Standard Screen Mode	5991
+0	View > Screen Mode > Full Screen Mode With Menu Bar	5992
+0	View > Screen Mode > Full Screen Mode	5993
+0	View > Extras	3500
+0	View > Show > Layer Edges	3512
+0	View > Show > Selection Edges	3501
+0	View > Show > Target Path	3502
+0	View > Show > Grid	3504
+0	View > Show > Guides	3503
+0	View > Show > Canvas Guides	3536
+0	View > Show > Artboard Guides	3533
+0	View > Show > Artboard Names	3535
+0	View > Show > Count	3513
+0	View > Show > Smart Guides	3511
+0	View > Show > Slices	3505
+0	View > Show > Notes	3506
+0	View > Show > Pixel Grid	3514
+0	View > Show > Pattern Preview Tile Bounds	3532
+0	View > Show > Mesh	3517
+0	View > Show > Edit Pins	3585
+0	View > Show > All	3507
+0	View > Show > None	3508
+0	View > Show > Show Extras Options	3510
+0	View > Rulers	1002
+0	View > Snap	3520
+0	View > Snap To > Guides	3521
+0	View > Snap To > Grid	3522
+0	View > Snap To > Layers	3530
+0	View > Snap To > Slices	3523
+0	View > Snap To > Document Bounds	3524
+0	View > Snap To > All	3527
+0	View > Snap To > None	3528
+0	View > Guides > Edit Selected Guides	22003
+0	View > Guides > Lock Guides	2940
+0	View > Guides > Clear Guides	2950
+0	View > Guides > Clear Selected Guides	22004
+0	View > Guides > Clear Selected Artboard Guides	2952
+0	View > Guides > Clear Canvas Guides	2953
+0	View > Guides > New Guide	5613
+0	View > Guides > New Guide Layout	5614
+0	View > Guides > New Guides From Shape	5615
+0	View > Lock Slices	2967
+0	View > Clear Slices	2969
+0	Plugins > Plugins Panel	1429
+0	Plugins > Manage Plugins	1431
+0	Window > Arrange > Tile All Vertically	5933
+0	Window > Arrange > Tile All Horizontally	5934
+0	Window > Arrange > 2-up Horizontal	5935
+0	Window > Arrange > 2-up Vertical	5936
+0	Window > Arrange > 3-up Horizontal	5937
+0	Window > Arrange > 3-up Vertical	5938
+0	Window > Arrange > 3-up Stacked	5939
+0	Window > Arrange > 4-up	5940
+0	Window > Arrange > 6-up	5941
+0	Window > Arrange > Consolidate All to Tabs	5998
+0	Window > Arrange > Cascade	5930
+0	Window > Arrange > Tile	5931
+0	Window > Arrange > Float in Window	5996
+0	Window > Arrange > Float All in Windows	5997
+0	Window > Arrange > Match Zoom	5960
+0	Window > Arrange > Match Location	5962
+0	Window > Arrange > Match Rotation	5963
+0	Window > Arrange > Match All	5964
+0	Window > Arrange > Minimize	5932
+0	Window > Arrange > Bring All to Front	5929
+0	Window > Workspace > Core Tools	-683
+0	Window > Workspace > Essentials (Default)	5634
+0	Window > Workspace > Motion	-684
+0	Window > Workspace > Painting	-685
+0	Window > Workspace > Photography	-686
+0	Window > Workspace > Graphic and Web	-687
+0	Window > Workspace > New Workspace	5115
+0	Window > Workspace > Delete Workspace	5116
+0	Window > Workspace > Keyboard Shortcuts  Menus	5981
+0	Window > Workspace > Lock Workspace	2939
+0	Window > Actions	1170
+0	Window > Adobe Stock	30901
+0	Window > Adjustments	6479
+0	Window > Swatches	1119
+0	Window > Libraries	-20004
+0	Window > Layers	1098
+0	Window > Channels	1021
+0	Window > Character	3300
+0	Window > Comments	20008
+0	Window > Layer Comps	1167
+0	Window > Brush Settings	1025
+0	Window > Content Credentials (Beta)	7785
+0	Window > Color	1046
+0	Window > Gradients	7763
+0	Window > Paths	1065
+0	Window > Styles	3187
+0	Window > Character Styles	9066
+0	Window > Paragraph Styles	9067
+0	Window > Shapes	7772
+0	Window > Glyphs	9068
+0	Window > Histogram	1382
+0	Window > History	1199
+0	Window > Version History	20007
+0	Window > Info	1055
+0	Window > Timeline	1188
+0	Window > Materials	7788
+0	Window > Navigator	1163
+0	Window > Notes	1355
+0	Window > OpenColorIO	2346
+0	Window > Clone Source	1058
+0	Window > Patterns	7767
+0	Window > Paragraph	3350
+0	Window > Brushes	1396
+0	Window > Tool Presets	4210
+0	Window > Properties	6478
+0	Window > Measurement Log	2880
+0	Window > AI Assisted Editor	7933
+0	Window > Application Frame	7930
+0	Window > Options	1111
+0	Window > Tools	1194
+0	Window > Contextual Task Bar	9600
+0	Preferences > General	2311
+0	Preferences > Interface	2323
+0	Preferences > Workspace	2331
+0	Preferences > Notifications	2337
+0	Preferences > Tools	2330
+0	Preferences > History  Content Credentials	2329
+0	Preferences > File Handling	2317
+0	Preferences > Export	2332
+0	Preferences > Performance	2304
+0	Preferences > Image Processing	2335
+0	Preferences > Scratch Disks	2328
+0	Preferences > Cursors	2312
+0	Preferences > Transparency  Gamut	2313
+0	Preferences > Units  Rulers	2314
+0	Preferences > Guides, Grid  Slices	2315
+0	Preferences > Plugins	2316
+0	Preferences > Type	2322
+0	Preferences > Enhanced Controls	2333
+0	Preferences > Technology Previews	2327
+0	Preferences > Product Improvement	2334
+0	Preferences > Camera Raw	2324

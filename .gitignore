@@ -52,3 +52,9 @@ trafego/painel/.aberto
 trafego/painel/.servidor.log
 trafego/painel/.progresso.json
 trafego/painel/.idioma
+# design (ex-/orick): config, venv, catálogo da máquina e o OCR compilado ficam só na máquina
+design/config.json
+design/clientes/
+design/.venv/
+design/docs/catalogo/local/
+design/scripts/swift/ocr

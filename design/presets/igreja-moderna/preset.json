@@ -1,0 +1,31 @@
+{
+  "nome": "igreja-moderna",
+  "descricao": "Post de culto/conferência no estilo editorial das redes de igrejas contemporâneas",
+  "aprendido_de": "9 posts publicados, engenharia reversa visual, 16/10/2026",
+  "formatos": {"feed": [1080, 1350], "story": [1080, 1920], "horizontal": [1536, 1024], "banner": [1920, 1080]},
+  "arquetipos": {
+    "A_moldura_quebrada": {"pessoas": 1, "titulo": "expandido ou serifa alto contraste", "moldura": ["retangulo_degrade", "arco_foto_pb"], "fundo": ["preto_texturizado", "cor_chapada_padrao_geometrico"]},
+    "B_colagem_maximalista": {"pessoas": [2, 4], "titulo": "condensado com letras trocadas", "fundo": ["glitch_azul_roxo", "creme_papel_folha_ouro"], "elementos": ["listras", "estrela", "rabiscos", "letras_gigantes_cortadas"]},
+    "C_palavra_gigante_dois_pregadores": {"pessoas": 2, "titulo": "condensado com glow", "horarios": "pilula_contorno", "fundo": "preto_com_plateia_no_topo"},
+    "D_lineup_piramide": {"pessoas": [5, 20], "composicao": "fileiras escalonadas, principal na frente", "fundo": ["palco_luzes", "degrade_roxo_confete"]},
+    "E_raios_de_cor": {"pessoas": [1, 3], "fundo": "raios em leque multicoloridos + estadio", "titulo": "ultra bold branco com numero pequeno"}
+  },
+  "fontes": {
+    "titulo_expandido": "ArchivoExpanded-ExtraBold",
+    "titulo_condensado": "Anton-Regular",
+    "serifa_contraste": "BodoniModa-Bold",
+    "script_troca": "MrsSaintDelafield-Regular",
+    "mono_servico": {"fonte": "SpaceMono-Regular", "caixa": "alta", "tracking": [100, 200]},
+    "apoio": "Inter-Medium"
+  },
+  "paletas": {
+    "escuro_quente": ["#0A0A0A", "#F07A2A", "#C42E1E", "#FFFFFF"],
+    "matriz_terroso": ["#E8892E", "#F3E3C3", "#2F7FA8", "#B8502C", "#F6EBD9"],
+    "conf_eletrico": ["#2B2BE0", "#7A2BE0", "#E01F1F", "#F2D21B", "#000000", "#FFFFFF"],
+    "creme_ouro": ["#E9E4DA", "#C9A227", "#111111", "#FFFFFF"],
+    "preto_ciano": ["#000000", "#1FA6E0", "#FFFFFF"],
+    "roxo_magenta": ["#5B1FB8", "#C21FB8", "#FF5FA8", "#FFFFFF"]
+  },
+  "assinaturas": ["DMNGO", "WELCOME TO THE NEW", "BEM-VINDO AO NOVO", "PRESENCIAL + ONLINE"],
+  "acabamento": [{"tipo": "textura_papel", "mesclagem": ["multiply", "screen"], "opacidade": [20, 40]}, {"tipo": "grao"}]
+}

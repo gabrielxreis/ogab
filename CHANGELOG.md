@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-7 (03/11/2026)
+- **O Rick virou parte do Gab: agora é só `/ogab` (o /orick foi desativado).** Post, carrossel, story, capa de Reels, miniatura do YouTube, banner, anúncio em imagem, mockup, recorte de foto e a arte animada saem do próprio Gab. Peça normalmente ou use `/ogab design`. Continua igual: antes de montar ele pergunta onde gerar, a IA de imagem é o padrão, gasto de crédito só com o seu ok e fonte que falta ele procura e baixa. Quem tinha o /orick: presets próprios em `~/.claude/skills/orick/presets/` vão para `~/.claude/skills/ogab/design/presets/`; depois a pasta antiga pode ser apagada.
 ## 2026.11.03-6 (03/11/2026)
 - **O Jhon virou parte do Gab: agora é só `/ogab` (o /ojhon foi desativado).** Tudo de anúncio pago fica no próprio Gab: auditoria de conta (Meta, Google, TikTok e outras), CPA e ROAS, plano de verba, criativo e copy de anúncio, ganchos para teste, concorrentes na Biblioteca de Anúncios, pixel e relatório para o cliente. Peça normalmente ou use `/ogab trafego`. O painel da conta ganhou cara nova (preto e branco, vidro, cérebro das campanhas, galeria dos criativos com o vídeo tocando, comparador e versão em inglês). Quem tinha o /ojhon: copie `~/.claude/skills/ojhon/clientes/` para `~/.claude/skills/ogab/trafego/clientes/`.
 ## 2026.11.03-5 (03/11/2026)

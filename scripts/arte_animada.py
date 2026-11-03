@@ -20,8 +20,7 @@ import numpy as np
 from PIL import Image
 
 AQUI = Path(__file__).resolve().parent
-ORICK = next((p for p in (Path.home() / ".claude/skills/orick/scripts", Path.home() / ".claude/skills/oyoshi/scripts") if p.exists()),
-             Path.home() / ".claude/skills/orick/scripts")
+ORICK = AQUI.parent / "design" / "scripts"   # ponte do Photoshop da área de design (o antigo /orick)
 
 # ---------------------------------------------------------------- utilidades
 
@@ -238,7 +237,7 @@ def _tem_photoshop():
 
 
 def _ps_arquivo(caminho, timeout=1800):
-    """Roda um .jsx no Photoshop (usa a ponte da /orick se existir; senão, a mesma chamada por AppleScript)."""
+    """Roda um .jsx no Photoshop (usa a ponte da área de design se existir; senão, a mesma chamada por AppleScript)."""
     if (ORICK / "ps_lib.py").exists():
         sys.path.insert(0, str(ORICK))
         import ps_lib

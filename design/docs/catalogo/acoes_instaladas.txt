@@ -1,0 +1,7 @@
+Ações Padrão (12): Vinheta (seleção) | Canal de Molduras - 50 pixels | Moldura de Madeira - 50 pixels | Projetar Sombra (texto) | Reflexão na Água (texto) | Personalizar RGB em Tons de Cinza | Chumbo Derretido | Tonalização em Sépia (camada) | Cores do Quadrante | Salvar como PDF do Photoshop  | Mapa de Degradê | Configuração da tinta para clonagem do pincel de mistura
+Ajustes básicos (5): Equilíbrio de cores automático | Ajustar tom automaticamente | Aprimorar contraste | Realçar cores | Dar destaque ao objeto
+Objeto e fundo (5): Selecionar objeto | Remove background | Desfocar o fundo | Gera fundo personalizado | Harmonizar a camada atual
+Efeitos criativos (6): Aprimorar claridade | Nitidez | Adicionar vinheta | Adicionar granulação | Preto e branco | Configurar subexposição e superexposição
+Guias (8): Remover tudo | Linhas centrais | Terceiros | Terços (com medianizes) | Grade 4x4 | Grade 4x4 (com medianizes) | Grade 12x12 | Grade 12x12 (com medianizes)
+Redimensionar (6): Redimensionar para o Instagram (paisagem) | Redimensionar para o Instagram (retrato) | Redimensionar para o Instagram (quadrado) | Redimensionar para publicação no Facebook | Redimensionar para publicação no X (Twitter) | Redimensionar para miniatura do YouTube
+Exportar (6): Salvar como PSD | Salvar como PNG | Salvar como JPG | Salvar como TIFF | Salvar como GIF | Salvar como PDF do Photoshop 

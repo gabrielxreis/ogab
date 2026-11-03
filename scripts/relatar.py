@@ -707,7 +707,8 @@ def varrer():
 # ------------------------------------------------------------ invenções (scripts novos e melhorias na skill)
 EXT_INVENCAO = (".py", ".js", ".mjs", ".css", ".html", ".md", ".json", ".sh", ".ps1", ".jsx", ".lua", ".txt")
 FORA_INVENCAO = ("presets/", "biblioteca_motions_local/", "clientes/", "assets/", "biblioteca_sfx/", "config.json",
-                 "relatos/destino.json", "voz_local/modelos/")
+                 "relatos/destino.json", "voz_local/modelos/", "design/config.json", "design/.venv/",
+                 "design/clientes/", "design/docs/catalogo/local/", "design/scripts/swift/ocr")
 MIN_LINHAS_INVENCAO = 6   # menos que isso é ajuste, não invenção
 # pasta de temporário (scripts gerados na hora, com conteúdo de cliente) nunca é invenção (relato de 27/10/2026)
 TEMP_INVENCAO = re.compile(r"(^|/)(_?tmp|_?temp|_?cache)(/|$)|\.parcial$", re.I)
