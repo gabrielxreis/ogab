@@ -58,3 +58,13 @@ design/clientes/
 design/.venv/
 design/docs/catalogo/local/
 design/scripts/swift/ocr
+# comercial (ex-/amariana, a Mariana): dados, chaves e venv ficam só na máquina
+comercial/data/
+comercial/.env
+comercial/.venv/
+comercial/harvey.local.yaml
+comercial/skills/product_knowledge.md
+comercial/skills/competitive_intel.md
+comercial/*.egg-info/
+comercial/.pytest_cache/
+comercial/linkedin_cookies.json

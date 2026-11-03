@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mariana</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="mark">M</div>
+    <div>
+      <h1>Mariana</h1>
+      <div class="tagline">Secretária de audiovisual</div>
+    </div>
+  </div>
+  <div class="header-controls">
+    <div class="harvey-status" id="header-status">
+      <span class="status-dot stopped" id="header-dot"></span>
+      <span id="header-status-text">Verificando…</span>
+    </div>
+    <button class="icon-btn" id="theme-btn" onclick="cycleTheme()"
+            title="Aparência: segue o sistema até você escolher">auto</button>
+    <button class="refresh-btn" onclick="loadCurrentTab()">Atualizar</button>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('today', this)">Hoje<span class="nav-count" id="nav-today"></span></button>
+  <button onclick="showTab('signals', this)">Sinais<span class="nav-count" id="nav-signals"></span></button>
+  <button onclick="showTab('discover', this)">Descobrir</button>
+  <button onclick="showTab('companies', this)">Empresas</button>
+  <button onclick="showTab('prospects', this)">Contatos</button>
+  <button onclick="showTab('campaigns', this)">Campanhas</button>
+  <button onclick="showTab('outbox', this)">Outbox<span class="nav-count" id="nav-outbox"></span></button>
+  <button onclick="showTab('channels', this)">Mensagens<span class="nav-count" id="nav-channels"></span></button>
+  <button onclick="showTab('jobs', this)">Jobs</button>
+  <button onclick="showTab('metrics', this)">Números</button>
+  <button onclick="showTab('conversations', this)">Conversas</button>
+  <button onclick="showTab('activity', this)">Atividade</button>
+  <button onclick="showTab('usage', this)">Uso</button>
+  <button onclick="showTab('settings', this)">Configurações</button>
+  <button onclick="showTab('controls', this)">Controles</button>
+  <button onclick="showTab('help', this)">Ajuda</button>
+</nav>
+
+<main>
+
+<!-- Hoje: o que precisa de você -->
+<div id="today" class="section active">
+  <div class="section-head">
+    <h2>Hoje</h2>
+    <p>O que está esperando por você, e tudo o que a Mariana já montou.</p>
+  </div>
+  <div class="today-grid">
+    <div class="today-main">
+      <div id="today-queue"></div>
+      <div class="rail-block" style="margin-top:34px">
+        <div class="subhead">Atividade recente</div>
+        <div id="today-activity"></div>
+      </div>
+    </div>
+
+    <aside class="today-rail">
+      <div class="rail-block">
+        <div class="subhead">Funil</div>
+        <div id="today-figures"></div>
+      </div>
+      <div class="rail-block" id="today-runs-block">
+        <div class="subhead">Coletas</div>
+        <div id="today-runs"></div>
+      </div>
+      <div id="today-setup"></div>
+    </aside>
+  </div>
+</div>
+
+<!-- Sinais: a confirmação -->
+<div id="signals" class="section">
+  <div class="section-head">
+    <h2>Sinais</h2>
+    <p>A Mariana propõe o que sabe procurar. Você decide o que define um bom
+       cliente &mdash; nada é coletado até você confirmar.</p>
+  </div>
+  <div id="signals-summary"></div>
+  <div id="signals-groups"></div>
+
+  <div class="subhead">Construtor de público</div>
+  <div class="card">
+    <p class="lede">Uma lista de leads é uma consulta, não um arquivo. Escolha os
+      sinais que um bom cliente precisa ter &mdash; e os que desqualificam &mdash; e
+      veja quantas empresas batem agora.</p>
+    <div id="cohort-builder"></div>
+    <div id="cohort-result"></div>
+  </div>
+</div>
+
+<!-- Descobrir: a única etapa que gasta dinheiro -->
+<div id="discover" class="section">
+  <div class="section-head">
+    <h2>Descobrir</h2>
+    <p>Encontre empresas que batem com o seu perfil de cliente. Escolha a fonte,
+       veja quanto custa e rode &mdash; nada é chamado até você apertar o botão.</p>
+  </div>
+  <div id="discover-providers"></div>
+
+  <div class="subhead">Rodar</div>
+  <div class="card">
+    <div class="form-row" style="margin-bottom:14px">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Cidades</label>
+        <input class="form-input" id="disc-cities" placeholder="do seu perfil de cliente, ou escreva outras, uma por linha">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Resultados por busca</label>
+        <input class="form-input" id="disc-limit" type="number" value="100" min="1" max="1000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Profundidade da busca</label>
+        <input class="form-input" id="disc-depth" type="number" value="30" min="10" max="100" step="10">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teto de gasto (US$)</label>
+        <input class="form-input" id="disc-cap" type="number" value="1.00" min="0" step="0.25">
+      </div>
+    </div>
+    <div id="discover-estimate"></div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="estimateDiscovery()">Estimar custo</button>
+      <button class="btn btn-primary" id="disc-run" onclick="runDiscovery()" disabled>
+        Estime primeiro</button>
+      <button class="btn btn-danger" id="disc-stop" onclick="stopDiscovery()" style="display:none">
+        Parar</button>
+    </div>
+  </div>
+  <div id="discover-result"></div>
+</div>
+
+<!-- Empresas -->
+<div id="companies" class="section">
+  <div class="section-head"><h2>Empresas</h2><p>Organizações que a Mariana pesquisou. Clique numa linha para ver os contatos.</p></div>
+  <div id="companies-list"></div>
+</div>
+
+<!-- Contatos -->
+<div id="prospects" class="section">
+  <div class="section-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
+    <div><h2>Contatos</h2><p>Pessoas que a Mariana encontrou e verificou.</p></div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <a class="btn btn-secondary btn-sm" href="/api/export/prospects.csv" download>Exportar entregáveis (CSV)</a>
+      <a class="btn btn-secondary btn-sm" href="/api/export/prospects.csv?all=true" download>Exportar tudo</a>
+    </div>
+  </div>
+  <div id="prospects-table"></div>
+</div>
+
+<!-- Campanhas -->
+<div id="campaigns" class="section">
+  <div class="section-head"><h2>Campanhas</h2><p>Sequências de email que a Mariana escreveu e colocou na fila.</p></div>
+  <div id="campaigns-list"></div>
+</div>
+
+<!-- Mensagens: WhatsApp / LinkedIn / Instagram, enviadas por você -->
+<div id="channels" class="section">
+  <div class="section-head">
+    <h2>Mensagens</h2>
+    <p>WhatsApp (Brasil), LinkedIn (exterior) e Instagram. A Mariana escreve; você
+       aprova, abre e envia da sua conta. Nenhuma conta é automatizada.</p>
+  </div>
+  <div id="channels-list"></div>
+</div>
+
+<!-- Jobs: propostas, fechados, entregues -->
+<div id="jobs" class="section">
+  <div class="section-head">
+    <h2>Jobs</h2>
+    <p>Propostas, trabalhos fechados e entregues. Marque a entrega e a data do próximo
+       evento do cliente: a Mariana pede depoimento e indicação e volta a falar antes do evento.</p>
+  </div>
+  <div id="jobs-list"></div>
+</div>
+
+<!-- Números -->
+<div id="metrics" class="section">
+  <div class="section-head">
+    <h2>Números</h2>
+    <p>Quem responde e quem fecha, por mercado, canal e tipo de cliente.</p>
+  </div>
+  <div id="metrics-list"></div>
+</div>
+
+<!-- Outbox: a mesa de decisões -->
+<div id="outbox" class="section">
+  <div class="section-head" style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
+    <div>
+      <h2>Outbox</h2>
+      <p>Todo email que sai para aqui. Leia um, decida, siga &mdash;
+         <kbd>A</kbd> aprovar, <kbd>R</kbd> recusar, <kbd>J</kbd>/<kbd>K</kbd> navegar.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0" id="outbox-actions"></div>
+  </div>
+  <div id="outbox-banner"></div>
+  <div id="outbox-desk"></div>
+  <div id="outbox-list"></div>
+</div>
+
+<!-- Conversas -->
+<div id="conversations" class="section">
+  <div class="section-head"><h2>Conversas</h2><p>Cada resposta e como a Mariana tratou. Daqui saem a proposta e o "Fechou".</p></div>
+  <div id="conversations-list"></div>
+</div>
+
+<!-- Atividade -->
+<div id="activity" class="section">
+  <div class="section-head"><h2>Atividade</h2><p>O registro de tudo o que os agentes da Mariana fizeram.</p></div>
+  <div id="activity-list"></div>
+</div>
+
+<!-- Uso -->
+<div id="usage" class="section">
+  <div class="section-head"><h2>Uso</h2><p>Uso real do modelo: a cota da sua assinatura (Claude ou Codex), chamadas e tokens por provedor, agente e tarefa. Assinatura não cobra por token, então não há valores em dinheiro aqui.</p></div>
+  <div id="usage-quota" class="card" style="display:none"></div>
+  <div class="stats-grid" id="usage-stats"></div>
+  <div class="card" id="usage-daily" style="display:none"></div>
+  <div id="usage-tables"></div>
+</div>
+
+<!-- Configurações -->
+<div id="settings" class="section">
+  <div class="section-head"><h2>Configurações</h2><p>As credenciais ficam só no seu computador, em <span style="font-family:var(--mono);font-size:12px">.env</span>, e só vão para os próprios serviços.</p></div>
+  <div class="card">
+    <h2>Provedor de email</h2>
+    <p class="lede">Como a Mariana envia e lê as respostas. Provedor ativo: <b id="active-provider">…</b>. Para trocar, mude <span style="font-family:var(--mono);font-size:12px">channels.email.provider</span> no <span style="font-family:var(--mono);font-size:12px">harvey.local.yaml</span> para <span style="font-family:var(--mono);font-size:12px">gmail</span>, <span style="font-family:var(--mono);font-size:12px">microsoft</span> ou <span style="font-family:var(--mono);font-size:12px">smtp</span>.</p>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+      <div style="font-weight:650;margin-bottom:4px">Gmail / Google Workspace <span class="optional-tag">recomendado</span> <span id="gmail-status" class="email-tag"></span></div>
+      <p class="lede" style="margin-top:4px">De preferência numa caixa de um domínio só de prospecção. No Google Cloud Console, ative a Gmail API e a Google Calendar API, crie um cliente OAuth do tipo "App para computador", cole o ID e o segredo, salve e rode <span style="font-family:var(--mono);font-size:12px">mariana gmail auth</span> no terminal.</p>
+      <div class="form-group"><label class="form-label" for="gmail-id">ID do cliente</label>
+        <input type="text" class="form-input" id="gmail-id" placeholder="xxxx.apps.googleusercontent.com" autocomplete="off"></div>
+      <div class="form-group"><label class="form-label" for="gmail-secret">Segredo do cliente</label>
+        <div class="form-row"><div class="form-group" style="margin-bottom:0">
+          <input type="password" class="form-input" id="gmail-secret" placeholder="Cole o segredo do cliente" autocomplete="off"></div>
+          <button class="btn btn-secondary btn-sm" onclick="toggleVisibility('gmail-secret')">Mostrar</button></div></div>
+      <button class="btn btn-primary btn-sm" onclick="saveGmail()">Salvar Gmail</button>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+      <div style="font-weight:650;margin-bottom:4px">Caixa SMTP + IMAP</div>
+      <p class="lede" style="margin-top:4px">Qualquer caixa de verdade (Fastmail, Zoho, senha de app do Workspace). Se o IMAP ficar em branco, usa o mesmo servidor e login do SMTP.</p>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label" for="smtp-host">Servidor SMTP</label>
+          <input type="text" class="form-input" id="smtp-host" placeholder="smtp.exemplo.com" autocomplete="off"></div>
+        <div class="form-group" style="max-width:120px"><label class="form-label" for="smtp-port">Porta</label>
+          <input type="text" class="form-input" id="smtp-port" placeholder="587" autocomplete="off"></div>
+      </div>
+      <div class="form-group"><label class="form-label" for="smtp-user">Usuário</label>
+        <input type="text" class="form-input" id="smtp-user" placeholder="voce@exemplo.com" autocomplete="off"></div>
+      <div class="form-group"><label class="form-label" for="smtp-pass">Senha</label>
+        <div class="form-row"><div class="form-group" style="margin-bottom:0">
+          <input type="password" class="form-input" id="smtp-pass" placeholder="Senha ou senha de app" autocomplete="off"></div>
+          <button class="btn btn-secondary btn-sm" onclick="toggleVisibility('smtp-pass')">Mostrar</button></div></div>
+      <button class="btn btn-primary btn-sm" onclick="saveSmtp()">Salvar SMTP</button>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-weight:650;margin-bottom:4px">Instantly <span class="optional-tag">legado</span></div>
+      <p class="lede" style="margin-top:4px">Pegue a chave da API em <a href="https://app.instantly.ai/app/settings/integrations" target="_blank" rel="noopener">Instantly Settings → Integrations</a> (plano Growth ou acima).</p>
+      <div class="form-group"><div class="form-row"><div class="form-group" style="margin-bottom:0">
+        <input type="password" class="form-input" id="instantly-key" placeholder="Cole a chave da API do Instantly" autocomplete="off"></div>
+        <button class="btn btn-secondary btn-sm" onclick="toggleVisibility('instantly-key')">Mostrar</button>
+        <button class="btn btn-secondary btn-sm" onclick="testInstantly()">Testar</button></div>
+        <div id="instantly-test-result"></div></div>
+      <button class="btn btn-primary btn-sm" onclick="saveInstantly()">Salvar Instantly</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Verificação de email <span class="optional-tag">muito recomendado</span></h2>
+    <p class="lede">Coloque pelo menos uma para os emails encontrados serem verificados. Sem nenhuma, os endereços ficam como <span class="email-tag guess">guess</span> e nunca recebem email. O Reoon tem o melhor plano grátis (600/mês).</p>
+    <div class="form-group"><label class="form-label" for="reoon-key">Chave do Reoon <span id="reoon-status" class="email-tag"></span></label>
+      <div class="form-row"><div class="form-group" style="margin-bottom:0">
+        <input type="password" class="form-input" id="reoon-key" placeholder="600 grátis/mês: reoon.com/email-verifier" autocomplete="off"></div>
+        <button class="btn btn-secondary btn-sm" onclick="toggleVisibility('reoon-key')">Mostrar</button></div></div>
+    <div class="form-group"><label class="form-label" for="zerobounce-key">Chave do ZeroBounce <span id="zerobounce-status" class="email-tag"></span></label>
+      <input type="password" class="form-input" id="zerobounce-key" placeholder="100 grátis/mês: o melhor para domínios do Microsoft 365/Workspace" autocomplete="off"></div>
+    <div class="form-group"><label class="form-label" for="hunter-key">Chave do Hunter <span id="hunter-status" class="email-tag"></span></label>
+      <input type="password" class="form-input" id="hunter-key" placeholder="50 grátis/mês + padrão de email" autocomplete="off"></div>
+    <button class="btn btn-primary btn-sm" onclick="saveVerifiers()">Salvar chaves de verificação</button>
+  </div>
+
+  <div class="card">
+    <h2>Cloudflare <span class="optional-tag">opcional</span></h2>
+    <p class="lede">Para ler sites que dependem de JavaScript no treinamento. ~US$ 5/mês.</p>
+    <div class="form-group">
+      <label class="form-label" for="cf-account-id">Account ID</label>
+      <input type="text" class="form-input" id="cf-account-id" placeholder="Seu Account ID do Cloudflare" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="cf-api-token">API Token</label>
+      <input type="password" class="form-input" id="cf-api-token" placeholder="Seu API Token do Cloudflare" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="saveCloudflare()">Salvar</button>
+  </div>
+</div>
+
+<!-- Controles -->
+<div id="controls" class="section">
+  <div class="section-head"><h2>Controles</h2><p>Ligue e desligue o ciclo da Mariana e veja o que ela está fazendo.</p></div>
+  <div class="control-panel">
+    <div class="card">
+      <h2>Agente</h2>
+      <div class="status-big" id="control-status">
+        <div class="dot stopped" id="control-dot"></div>
+        <span class="label stopped" id="control-label">Parada</span>
+      </div>
+      <div class="status-meta" id="control-meta"></div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btn-start" onclick="startMariana()">Ligar a Mariana</button>
+        <button class="btn btn-danger" id="btn-stop" onclick="stopMariana()" style="display:none">Parar a Mariana</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Registros recentes</h2>
+      <div class="log-viewer" id="log-viewer">Nenhum registro ainda. Ligue a Mariana para ver a atividade.</div>
+      <div class="btn-group">
+        <button class="btn btn-secondary btn-sm" onclick="loadLogs()">Atualizar registros</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ajuda -->
+<div id="help" class="section">
+  <div class="section-head"><h2>Ajuda</h2><p>O que a Mariana é, como funciona e como resolver os problemas mais comuns.</p></div>
+
+  <div class="help-section">
+    <h2>O que é a Mariana?</h2>
+    <p>A Mariana é a sua secretária de IA para fechar trabalhos de audiovisual e edição. Ela encontra quem precisa de vídeo, escreve emails e mensagens de WhatsApp, LinkedIn e Instagram, lê as respostas, leva até a call, monta a proposta, faz o follow-up e, depois que você fecha, cuida da produção e do pós-venda. Você revisa tudo por este painel, e nada sai sem a sua aprovação.</p>
+    <p>Ela roda na sua assinatura do Claude (ou do ChatGPT, pelo Codex), sem custo extra de IA. Tudo fica no seu computador, numa pasta só.</p>
+  </div>
+
+  <div class="help-section">
+    <h2>Primeiros passos</h2>
+    <pre>1. No terminal (ou no Claude Code): mariana onboard
+2. Conecte o email: mariana gmail auth  e  mariana email-check --send-test
+3. Confirme os sinais na aba Sinais e rode a busca na aba Descobrir
+4. Na aba Controles, clique em Ligar a Mariana</pre>
+    <p>A coluna da direita da aba Hoje mostra o que já está pronto e o que falta.</p>
+  </div>
+
+  <div class="help-section">
+    <h2>Onde fica cada coisa</h2>
+    <p>Tudo o que a Mariana precisa fica dentro desta pasta do projeto.</p>
+    <div class="table-card" style="padding:6px 4px">
+    <table class="file-table">
+      <tr><td>.env</td><td>Suas chaves e credenciais (nunca compartilhadas)</td></tr>
+      <tr><td>harvey.local.yaml</td><td>Seus dados, perfil de cliente, canais e comportamento (gerado pelo onboarding)</td></tr>
+      <tr><td>skills/</td><td>Base de conhecimento. Edite para mudar como a Mariana escreve e vende.</td></tr>
+      <tr><td>skills/product_knowledge.md</td><td>O seu dossiê: serviços, preços, portfólio, clientes</td></tr>
+      <tr><td>prompts/</td><td>Os prompts de cada agente. Personalização avançada.</td></tr>
+      <tr><td>data/harvey.db</td><td>Banco de dados com leads, campanhas, conversas e jobs</td></tr>
+      <tr><td>data/propostas/</td><td>As propostas geradas</td></tr>
+      <tr><td>data/harvey.log</td><td>O registro do que a Mariana está fazendo</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <h2>Chaves e conexões</h2>
+
+    <details>
+      <summary>Gmail e Google Agenda (recomendado)</summary>
+      <div class="faq-body">
+        <p>1. Em <a href="https://console.cloud.google.com" target="_blank" rel="noopener">console.cloud.google.com</a>, crie um projeto e ative a Gmail API e a Google Calendar API</p>
+        <p>2. Em Credenciais, crie um ID do cliente OAuth do tipo "App para computador"</p>
+        <p>3. Cole o ID e o segredo na aba Configurações</p>
+        <p>4. No terminal: <code>mariana gmail auth</code> e depois <code>mariana email-check --send-test</code></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>WhatsApp</summary>
+      <div class="faq-body">
+        <p>No modo padrão (link), não precisa de nada: a Mariana escreve e o botão "Abrir no WhatsApp" abre o seu WhatsApp com o texto pronto.</p>
+        <p>O modo API (Cloud API da Meta) envia sozinho, mas só para quem respondeu ou pediu contato. Precisa de <code>WHATSAPP_TOKEN</code> e <code>WHATSAPP_PHONE_NUMBER_ID</code> no .env.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Avisos no celular</summary>
+      <div class="faq-body">
+        <p>Instale o app grátis ntfy, assine um tópico difícil de adivinhar e coloque em <code>NTFY_TOPIC</code> no .env. Teste com <code>mariana aviso-teste</code>.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Cloudflare Browser Rendering (opcional)</summary>
+      <div class="faq-body">
+        <p>Só é usado no treinamento por site, para ler páginas que dependem de JavaScript.</p>
+        <p>1. Crie uma conta no <a href="https://dash.cloudflare.com" target="_blank" rel="noopener">Cloudflare</a> (plano pago do Workers, ~US$ 5/mês)</p>
+        <p>2. Crie um API Token com permissão "Browser Rendering: Edit"</p>
+        <p>3. Coloque o Account ID e o Token na aba Configurações</p>
+        <p>Sem isso, a Mariana usa o leitor próprio, que funciona na maioria dos sites.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="help-section">
+    <h2>Problemas comuns</h2>
+
+    <details>
+      <summary>"command not found: mariana"</summary>
+      <div class="faq-body">Ative o ambiente antes: <code>source .venv/bin/activate</code>, ou use <code>.venv/bin/mariana</code>.</div>
+    </details>
+
+    <details>
+      <summary>O Claude não responde em modo automático</summary>
+      <div class="faq-body">Rode <code>claude login</code> no terminal e confirme que a assinatura está ativa. A Mariana usa a sua assinatura, não uma chave de API separada.</div>
+    </details>
+
+    <details>
+      <summary>O Codex está falhando</summary>
+      <div class="faq-body">Com <code>brain.provider: codex</code>, rode <code>codex login</code> e escolha "Sign in with ChatGPT". A Mariana precisa do Codex CLI 0.159.3 no macOS ou Linux e não renova o seu login: se o registro disser que venceu, use o Codex uma vez ou rode <code>codex login</code>. Enquanto o Codex não puder ser usado, a Mariana pausa sem mexer em nada e volta quando estiver resolvido; <code>mariana status --check</code> confere na hora. Ela nunca troca para o Claude sozinha.</div>
+    </details>
+
+    <details>
+      <summary>Email caindo no spam</summary>
+      <div class="faq-body">Quase sempre é o domínio. Rode <code>mariana email-check</code> e corrija o SPF, DKIM e DMARC. Comece com poucos emails por dia e suba devagar.</div>
+    </details>
+
+    <details>
+      <summary>A Mariana não está achando clientes</summary>
+      <div class="faq-body">Confira se o perfil de cliente (segmentos, cargos e cidades) está realista no seu config, se os sinais foram confirmados na aba Sinais, e veja a aba Atividade para saber o que ela tentou fazer.</div>
+    </details>
+  </div>
+</div>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

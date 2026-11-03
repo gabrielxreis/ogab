@@ -1,8 +1,9 @@
 {
-  "quando": "2026-11-03 17:17",
+  "quando": "2026-11-03 19:03",
   "arquivos": {
-    "SKILL.md": "648d10265ddfcfdbe4a1c389db8771c6c8130541451b01992bf18e9ac7acc74e",
+    "SKILL.md": "4474fa538bf9ba896c737f6f581300b852e90f56ebecadc01a603e5c5ff0e076",
     "docs/PROCESSO.md": "717fa72acb99509624c3f0c5c79f107be940bf7b71e25a91ab0c549a7b800348",
+    "docs/comercial/guia.md": "20a170179ad57515247ffdf6c146c6e9a77b16608b267df21db715754b63f8e5",
     "docs/design/canva.md": "1b61f7319c460c8519b1a15536d704170d443310ed581d0d34fd602c8f48d18f",
     "docs/design/canva_api.md": "8b96b389f211b20514961bef4efed303fa407b1ea87f0a02f3003418c168b074",
     "docs/design/carrossel.md": "e7166f83f0fb63da415706beea320df8d585b670b92f859b80ab02dad1bf5f37",
@@ -16,6 +17,7 @@
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
     "docs/etapas/cliente.md": "39951c123444c16d9303497a7c94f012d2420c8023c7bfa0318c6255bfc45975",
+    "docs/etapas/comercial.md": "330cfa6fedfe5862359f8cffcf3f4ce0f57e1d04481d3615be22fa49e7dab814",
     "docs/etapas/cor.md": "ffc8626c282fce7622299d54afcd46d1f863c00a7892e8f7ac553abf203c5f42",
     "docs/etapas/davinci.md": "163f020a8a4c62f4451f65ad73ee590d60d65128b8a2af7124406e2278412ce3",
     "docs/etapas/davinci_api.md": "aa7106613c4f629c34f436a259d2c090984a612a67f87e4421a50f77a81e9234",
@@ -50,7 +52,7 @@
     "docs/etapas/sfx.md": "dec5e2891adfa1825a707c5bca362d84dc88162d1833ce05e7907d312b428ddb",
     "docs/etapas/so_motion.md": "4b76f8daf25815a412f101bcfe5badb2d6aa999c8984eeb7cc086f47f5afdc5a",
     "docs/etapas/sonorizacao.md": "10b39c9ccb25fb6a581cdd6d3d429815f34b5b72d6a77aa5cf95cc4cb272368d",
-    "docs/etapas/subcomandos.md": "c3e9874e420841778a645e756f3dbd0f63bdbc8fbe5a343ca1e8dec8f26ce38f",
+    "docs/etapas/subcomandos.md": "9f922fc3c0b33ad80ba7aafaae507c79796c9b768cc1413572185452afa68470",
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/trafego.md": "8ebe784fd48f24b34335a5eaca426258eb31c96a559b2605662108d6ae5a3618",

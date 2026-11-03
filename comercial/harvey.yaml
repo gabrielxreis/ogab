@@ -1,0 +1,103 @@
+# Modelo. Rode `mariana onboard` no primeiro uso: ele gera o
+# harvey.local.yaml (fora do git) com os SEUS dados, que tem prioridade.
+persona:
+  name: ""                       # quem assina os emails (você)
+  company: ""                    # sua marca / produtora
+  role: "Filmmaker e editor de vídeo"
+  email: ""                      # email de envio
+  linkedin: ""
+  tone: "direto, caloroso, criativo"
+  language: "pt-BR"              # pt-BR (Brasil) ou en (exterior) quando não der pra saber
+  signature:
+    enabled: true
+    whatsapp: ""                 # DDI + DDD + número, ex.: 5521999998888
+    website: ""
+    instagram: ""
+    portfolio: ""                # showreel / Vimeo / YouTube
+    accent_color: "#111111"
+    photo_url: ""
+    extra_lines: []
+
+product:
+  name: ""
+  description: "Filmagem e edição de vídeo: Reels, eventos, institucionais e anúncios"
+  pricing: "Sob orçamento"
+  key_benefits: []
+  objection_responses: {}
+  offer:
+    primary: ""                  # ex.: "pacote de 8 Reels editados por mês"
+    entry: ""                    # ex.: "um Reel teste a partir do seu material"
+    goal: "book_call"
+    booking_method: "suggest_times"
+    booking_url: ""
+    meeting_duration: "15 minutes"
+    meeting_owner: ""
+
+icp:
+  industries:
+    - "Igrejas"
+    - "Eventos e casamentos"
+    - "Marcas e produtos"
+  company_size: "1-200"
+  titles:
+    - "Owner"
+    - "Founder"
+    - "Marketing"
+    - "Communications Director"
+    - "Pastor"
+  geography:
+    - "Rio de Janeiro, RJ"
+  geo_coordinates:
+    "Rio de Janeiro, RJ": "-22.9068,-43.1729,40"
+  hiring_signals:
+    - "video editor"
+    - "editor de vídeo"
+    - "social media"
+    - "videomaker"
+
+channels:
+  email:
+    enabled: true
+    provider: "gmail"          # gmail (recomendado) | microsoft | smtp | instantly
+    max_daily_sends: 50
+    require_approval: true      # os emails esperam a sua aprovação na Outbox
+    send_to_risky: false        # enviar também a domínios que aceitam tudo (desligado = mais seguro)
+    max_bounce_rate: 0.05       # pausa todos os envios se os bounces passarem disso
+  linkedin:
+    enabled: true                # rascunhos de convite + mensagem p/ clientes de fora
+    max_daily_connections: 20
+    max_daily_messages: 10
+    max_weekly_connections: 80   # o LinkedIn restringe acima de ~100 convites por semana
+    warmup: true                 # comentar num post do lead antes do convite
+    warmup_days: 2
+    withdraw_after_days: 21      # convites pendentes mais velhos que isso: retirar
+  whatsapp:
+    enabled: true
+    mode: "link"                 # link (você envia) | cloud_api (só p/ quem deu opt-in)
+    countries: ["55"]            # WhatsApp só no Brasil; fora vai por email + LinkedIn
+    default_country_code: "55"
+    max_daily_sends: 20
+    require_approval: true
+    template_name: ""
+    template_language: "pt_BR"
+  instagram:
+    enabled: true                # rascunhos de DM quando a empresa linka o Instagram
+
+usage:
+  max_daily_claude_percent: 80
+  heartbeat_interval_minutes: 15
+  quiet_hours:
+    start: "21:00"
+    end: "08:00"
+    timezone: "America/Sao_Paulo"
+
+# Opcional: confere cada destinatário novo no Precleared (precleared.dev)
+# antes do primeiro email frio, pelas regras do Reino Unido (PECR), EUA
+# (CAN-SPAM), Canadá (CASL), Alemanha (UWG) e França. Qualquer resposta que
+# não seja "pode" segura o email, com o motivo na Outbox. Uma checagem por
+# endereço; 10/dia sem chave, 25 com chave grátis (PRECLEARED_API_KEY no .env).
+compliance:
+  precleared:
+    enabled: false
+    sender_country: ""          # GB ou US: onde fica o seu negócio
+    address_source: "unknown"   # de onde vêm os endereços: published | bought | scraped | given | unknown

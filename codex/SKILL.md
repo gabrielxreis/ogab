@@ -1,6 +1,6 @@
 ---
 name: ogab
-description: "Gab, o editor de vídeo com IA (no Codex: $ogab ou /ogab). Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve, Premiere, CapCut ou Final Cut (cortar, montar, legendar, música, takes, lettering, motions, cor, áudio). Leva do roteiro até a timeline pronta, ou até o MP4 sem editor: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes, motions com HyperFrames, legenda com conferência automática. Também cuida do Instagram: legenda do post, carrossel, gancho de Reel, hashtags, semana de conteúdo. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill."
+description: "Gab, o editor de vídeo com IA (no Codex: $ogab ou /ogab). Skill PRINCIPAL para qualquer trabalho de vídeo: criar um vídeo novo (Reels, YouTube Shorts/longo, Meta Ads, anúncio, institucional, vídeo de cliente) OU editar um vídeo/projeto/timeline no DaVinci Resolve, Premiere, CapCut ou Final Cut (cortar, montar, legendar, música, takes, lettering, motions, cor, áudio). Leva do roteiro até a timeline pronta, ou até o MP4 sem editor: roteiro para aprovação, voz por IA, música, efeitos sonoros, takes, motions com HyperFrames, legenda com conferência automática. Também cuida do Instagram: legenda do post, carrossel, gancho de Reel, hashtags, semana de conteúdo. E é o comercial que fecha trabalhos (/ogab comercial, a antiga Mariana): prospecção, mensagens para leads, proposta, follow-up e arrumar o LinkedIn e o Instagram do usuário. Use SEMPRE que o usuário pedir para criar/fazer/editar um vídeo, mexer no DaVinci, reels, anúncio, pauta ou roteiro, mesmo sem citar a skill."
 ---
 
 # Gab, o editor (/ogab) no Codex
@@ -60,7 +60,8 @@ Caminhos `~/.claude/...` citados no mapa são arquivos e continuam valendo no Co
 - **Revisão de olho fresco:** `codex review` no repo de um preset ou no HTML do motion antes de renderizar.
 
 ## Irmãos do Gab
-Mesma regra do carregador do Claude: vídeo, design (`/ogab design`, o antigo /orick) e tráfego (`/ogab trafego`, o
-antigo /ojhon) ficam todos no Gab. No Codex, "chamar" um irmão = ler o SKILL.md dele (tabela acima) e seguir com o pedido e o
+Mesma regra do carregador do Claude: vídeo, design (`/ogab design`, o antigo /orick), tráfego (`/ogab trafego`, o
+antigo /ojhon) e comercial (`/ogab comercial`, a antiga Mariana do /amariana: prospecção, propostas, LinkedIn e
+Instagram do usuário) ficam todos no Gab. No Codex, "chamar" um irmão = ler o SKILL.md dele (tabela acima) e seguir com o pedido e o
 contexto (cliente, pasta do vídeo, o que já foi decidido). Cores, fontes e logo da marca:
 `<pasta_saida>/<Marca>/design/design-<marca>.md` (área de design); criativos vencedores: `~/.claude/skills/ogab/trafego/clientes/<cliente>/trafego.md`.

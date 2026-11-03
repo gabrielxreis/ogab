@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mariana"
+version = "0.6.0"
+description = "Mariana: secretária de IA que fecha trabalhos de audiovisual e edição."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = ["sales", "ai-agent", "cold-email", "prospecting", "autonomous-agent", "claude"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+]
+# Keep in sync with requirements.txt (used by Docker builds).
+dependencies = [
+    "pyyaml>=6.0.1,<7",
+    "python-dotenv>=1.0.1,<2",
+    "httpx>=0.27.0,<1",
+    "playwright>=1.40,<2",
+    "beautifulsoup4>=4.12.3,<5",
+    "dnspython>=2.4.2,<3",
+    "aiosmtplib>=3.0.1,<4",
+    "aiosqlite>=0.19,<1",
+    "pydantic>=2.5,<3",
+    "pytz>=2024.1",
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.34,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9",
+    "pytest-asyncio>=0.23,<1",
+]
+
+[project.urls]
+Homepage = "https://github.com/gabrielxreis/ogab"
+Issues = "https://github.com/gabrielxreis/ogab/issues"
+Changelog = "https://github.com/gabrielxreis/ogab/blob/main/comercial/CHANGELOG.md"
+
+[project.scripts]
+mariana = "harvey.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["harvey*"]
+
+# The dashboard's HTML/CSS/JS are real files served from disk, and its fonts
+# are vendored so a local tool renders correctly with the network off.
+[tool.setuptools.package-data]
+harvey = ["web/*", "web/fonts/*"]
