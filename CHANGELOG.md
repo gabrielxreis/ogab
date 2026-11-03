@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-3 (03/11/2026)
+- **O Gab mentor agora também cuida do seu dinheiro pessoal:** orçamento, dívidas, reserva de emergência, separar conta da empresa e da pessoa, pró-labore, aposentadoria e como funcionam renda fixa, Tesouro, ações, fundos imobiliários, cripto e investimento no exterior. Aprendeu com os 1.070 vídeos do canal Primo Rico (2016 a 2026), além da base do G4 para a empresa. Ele explica e orienta a ordem certa, mostra a data de cada opinião do canal e não indica ativo específico: para montar carteira, ele te diz o que perguntar a um planejador certificado.
 ## 2026.11.03-2 (03/11/2026)
 - **Cortes, legenda e fala limpa em vídeo em inglês:** a legenda do DaVinci sai no idioma do vídeo, o corte de pregação não come mais a última palavra da frase, a fala limpa pega pausa longa mesmo com ronco grave na sala e a legenda importada por caminho relativo não entra mais com duração zero.
 ## 2026.11.03-1 (03/11/2026)
