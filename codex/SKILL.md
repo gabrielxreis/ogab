@@ -38,7 +38,7 @@ Onde o mapa cita uma ferramenta do Claude, use o equivalente abaixo. A regra por
 | No mapa (Claude Code) | No Codex |
 |---|---|
 | `Read` de imagem / `olhar.py` | `view_image` no arquivo; imagem maior que 1024 px: antes `scripts/olhar.py <img>` (python do sistema) e ver a reduzida |
-| ferramenta `Skill` (/orick, /ojhon, hyperframes...) | ler `~/.codex/skills/<nome>/SKILL.md` ou, se não houver, `~/.claude/skills/<nome>/SKILL.md` e seguir |
+| ferramenta `Skill` (/orick, hyperframes...) | ler `~/.codex/skills/<nome>/SKILL.md` ou, se não houver, `~/.claude/skills/<nome>/SKILL.md` e seguir |
 | subagente / ajudantes em paralelo / `Agent` | subagentes do Codex (multi_agent) com o mesmo brief; sem eles, fazer em sequência na ordem do plano |
 | painel Terminal / `run_in_terminal` / link da aba | abrir numa janela própria e avisar que a barra está lá. Mac: `osascript -e 'tell app "Terminal" to do script "<cmd>"'`; Windows: `Start-Process powershell -ArgumentList '-NoExit','-Command','<cmd>'`. Sem isso, `OGAB_SEM_PAINEL=1` e rodar aqui |
 | `SendUserFile` / mostrar print grande | dizer o caminho absoluto e mostrar com `view_image` (imagem) ou `open <arquivo>` no Mac / `Start-Process <arquivo>` no Windows (vídeo, PDF) |
@@ -60,7 +60,7 @@ Caminhos `~/.claude/...` citados no mapa são arquivos e continuam valendo no Co
 - **Revisão de olho fresco:** `codex review` no repo de um preset ou no HTML do motion antes de renderizar.
 
 ## Irmãos do Gab
-Mesma regra do carregador do Claude: design estático vai para o **/orick** (Rick), tráfego e anúncio para o **/ojhon**
-(Jhon), vídeo fica no Gab. No Codex, "chamar" um irmão = ler o SKILL.md dele (tabela acima) e seguir com o pedido e o
+Mesma regra do carregador do Claude: design estático vai para o **/orick** (Rick); vídeo, tráfego e anúncio pago ficam
+no Gab (`/ogab trafego`, o antigo /ojhon não existe mais). No Codex, "chamar" um irmão = ler o SKILL.md dele (tabela acima) e seguir com o pedido e o
 contexto (cliente, pasta do vídeo, o que já foi decidido). Cores, fontes e logo da marca:
-`<pasta_saida>/<Marca>/design/design-<marca>.md` do Rick; criativos vencedores: `~/.claude/skills/ojhon/clientes/<cliente>/trafego.md`.
+`<pasta_saida>/<Marca>/design/design-<marca>.md` do Rick; criativos vencedores: `~/.claude/skills/ogab/trafego/clientes/<cliente>/trafego.md`.

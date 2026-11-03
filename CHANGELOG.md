@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-6 (03/11/2026)
+- **O Jhon virou parte do Gab: agora é só `/ogab` (o /ojhon foi desativado).** Tudo de anúncio pago fica no próprio Gab: auditoria de conta (Meta, Google, TikTok e outras), CPA e ROAS, plano de verba, criativo e copy de anúncio, ganchos para teste, concorrentes na Biblioteca de Anúncios, pixel e relatório para o cliente. Peça normalmente ou use `/ogab trafego`. O painel da conta ganhou cara nova (preto e branco, vidro, cérebro das campanhas, galeria dos criativos com o vídeo tocando, comparador e versão em inglês). Quem tinha o /ojhon: copie `~/.claude/skills/ojhon/clientes/` para `~/.claude/skills/ogab/trafego/clientes/`.
 ## 2026.11.03-5 (03/11/2026)
 - **O Gab monta a sua marca pelo método G4 Business (`/ogab marca`):** para criar ou refazer marca, posicionamento e frases, ele segue sempre o método do G4: a quem a marca serve (e quem decide a compra), posicionamento que amplia o mercado, Primal Branding (história, crenças, ícones, rituais, inimigos, palavras sagradas), os seis gatilhos de marca, cores na regra 60-30-10, tom de voz, manifesto, tagline, bio do Instagram, títulos, CTAs, respostas às objeções e um plano de ação. Tudo num documento da marca que passa a guiar roteiros, legendas, carrosséis e landing pages. Sem promessa de guru e sem prova social inventada.
 ## 2026.11.03-4 (03/11/2026)

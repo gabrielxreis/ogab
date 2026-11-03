@@ -13,7 +13,7 @@ criar: para cada gancho, timeline nova "<base> - gancho <nome>" com o MESMO form
   aninhar (AppendToTimeline com a timeline), o corpo é renderizado UMA vez (renderizar_trecho) e entra como arquivo.
   Depois: legenda em CADA variação pela etapa de legenda (subtitles from audio da timeline da variação: a legenda da
   base aninhada não aparece no render), conferir a emenda gancho > corpo (corte 1 quadro antes da palavra) e
-  exportar cada uma com o nome do gancho. O /ojhon sobe as variações como anúncios do mesmo conjunto (teste A/B).
+  exportar cada uma com o nome do gancho. A área de tráfego (/ogab trafego) sobe as variações como anúncios do mesmo conjunto (teste A/B).
 Regras: gancho de 1,5 a 3 s com ação logo no primeiro quadro (takes-brutos-ritmo); a timeline base não é tocada.
 """
 import os, sys, time

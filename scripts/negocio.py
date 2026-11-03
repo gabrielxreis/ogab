@@ -199,7 +199,7 @@ def painel(empresa):
         r = ltv / cac
         print(f"LTV/CAC: {r:.1f}")
         if r < 3:
-            alertas.append(f"LTV/CAC de {r:.1f} (mínimo saudável 3): passar para o Jhon (/ojhon) com esses números")
+            alertas.append(f"LTV/CAC de {r:.1f} (mínimo saudável 3): levar para o tráfego (/ogab trafego) com esses números")
     serie = [(r["data"], r["faturamento"]) for r in lanc if "faturamento" in r][-8:]
     if len(serie) >= 2:
         mx = max(v for _, v in serie) or 1

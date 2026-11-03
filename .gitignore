@@ -42,3 +42,13 @@ presets/*/exemplo/.work/
 presets/*/exemplo/*.sheet.jpg
 presets/e-se/engine/node_modules
 presets/palito/exemplo/
+# tráfego (ex-/ojhon): dados dos clientes e arquivos do painel ficam só na máquina
+trafego/clientes/*
+!trafego/clientes/_exemplo/
+trafego/config.json
+trafego/.venv/
+trafego/painel/dados.js
+trafego/painel/.aberto
+trafego/painel/.servidor.log
+trafego/painel/.progresso.json
+trafego/painel/.idioma

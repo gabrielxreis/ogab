@@ -1,0 +1,11 @@
+config.json
+clientes/*
+!clientes/_exemplo/
+.DS_Store
+__pycache__/
+.venv/
+painel/dados.js
+painel/.aberto
+painel/.servidor.log
+painel/.progresso.json
+painel/.idioma

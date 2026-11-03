@@ -1,0 +1,21 @@
+{
+ "cliente": {"id": "exemplo", "nome": "Empresa Exemplo", "conta": "Conta de anúncios", "conta_id": "000", "handle": "@empresa", "iniciais": "EX", "plataforma": "Meta Ads"},
+ "atualizado": "2026-01-31", "fonte": "Export do Gerenciador de Anúncios (exemplo)",
+ "periodo": {"rotulo": "Últimos 30 dias", "de": "2026-01-01", "ate": "2026-01-31"},
+ "plataformas": [{"nome": "Meta Ads", "ativo": true}, {"nome": "Google Ads", "ativo": false}],
+ "manchete": "Frase de conclusão do Jhon (exemplo).",
+ "resumo": {"titulo": "Resumo de desempenho", "subtitulo": "Conta Meta Ads.", "comparacao": "janeiro contra dezembro",
+  "kpis": [{"rotulo": "Investimento", "valor": 1000, "anterior": 800, "formato": "brl", "melhor": "neutro"},
+           {"rotulo": "Vendas", "valor": 10, "anterior": 8, "formato": "num", "melhor": "maior"},
+           {"rotulo": "Custo por venda", "valor": 100, "anterior": 100, "formato": "brl0", "melhor": "menor"},
+           {"rotulo": "CPM", "valor": 20, "anterior": 22, "formato": "brl", "melhor": "menor"}]},
+ "serie": {"titulo": "Evolução da conta", "subtitulo": "Impressões e alcance por mês.", "nota": "",
+  "linhas": [{"campo": "impressoes", "rotulo": "Impressões"}, {"campo": "alcance", "rotulo": "Alcance"}],
+  "extra": [{"campo": "gasto", "rotulo": "Investimento", "formato": "brl"}],
+  "pontos": [{"mes": "2025-12", "impressoes": 40000, "alcance": 25000, "gasto": 800}, {"mes": "2026-01", "impressoes": 50000, "alcance": 30000, "gasto": 1000}]},
+ "geo": {"titulo": "Onde a verba foi entregue", "subtitulo": "Por estado.", "nota": "", "pontos": [{"rotulo": "São Paulo", "lat": -23.5, "lon": -46.6, "valor": 0.6}]},
+ "distribuicao": {"titulo": "Investimento por tipo", "subtitulo": "Para onde foi o dinheiro.", "campo": "grupo"},
+ "campanhas": [{"id": "c1", "campanha": "[VENDAS] Exemplo", "grupo": "Venda", "quando": "jan/2026", "resultado_tipo": "Compra no site", "resultados": 10, "custo_por_resultado": 100, "gasto": 1000, "cpm": 20, "cliques_link": 500, "alcance": 30000, "frequencia": 1.6, "orcamento_dia": 33, "parecer": "bom", "porque": "Exemplo"}],
+ "parecer": {"bom": ["Exemplo"], "ruim": ["Exemplo"], "fazer": ["Exemplo"], "lacunas": ["Exemplo"]},
+ "perfil": {"preenchidos": 5, "total": 14, "rotulo": "Perfil de tráfego"}
+}

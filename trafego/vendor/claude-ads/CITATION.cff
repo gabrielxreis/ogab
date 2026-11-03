@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use this software in your work, please cite it using the metadata below."
+type: software
+title: "Claude Ads"
+abstract: >
+  Claude-first, portable paid-media operations across Google, Meta, YouTube,
+  LinkedIn, TikTok, Microsoft, Apple, Amazon, Reddit, Pinterest, Snapchat, and
+  X. Provides source-grounded audits, deterministic findings and evidence coverage, versioned JSON
+  contracts, lifecycle workflows, client reports, and capability-gated account
+  changes for professional operators.
+authors:
+  - given-names: Daniel
+    family-names: Agrici
+    alias: AgriciDaniel
+    website: "https://agricidaniel.com"
+repository-code: "https://github.com/AgriciDaniel/claude-ads"
+url: "https://github.com/AgriciDaniel/claude-ads"
+license: MIT
+version: "2.1.0"
+date-released: "2026-10-16"
+keywords:
+  - paid advertising
+  - google ads
+  - meta ads
+  - amazon ads
+  - apple ads
+  - tiktok ads
+  - linkedin ads
+  - microsoft ads
+  - youtube ads
+  - reddit ads
+  - pinterest ads
+  - snapchat ads
+  - x ads
+  - ppc
+  - advertising audit
+  - retail media
+  - attribution
+  - server-side tracking
+  - agent skills
+  - claude code
+  - codex cli
+  - llm tool
