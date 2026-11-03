@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-10 (03/11/2026)
+- **O Gab agora é por assinatura.** R$ 179,90 por mês ou R$ 1.500 por ano (12x de R$ 125 sem juros), no Pix ou no cartão. Assine com o mesmo email da sua key e ela é liberada na hora, sem trocar nada no computador. Se a assinatura não estiver ativa, o Gab avisa (`LICENCA_SEM_PLANO`) e mostra onde assinar em [ogab.io](https://ogab.io). Cancelou? O acesso vai até o fim do período já pago.
 ## 2026.11.03-9 (03/11/2026)
 - **O Gab tem endereço próprio: [ogab.io](https://ogab.io).** Cadastro, login, sua key e o painel da conta agora ficam lá (ogab.io/cadastro, ogab.io/login). O endereço antigo agrandemissao.com.br/ogab continua funcionando e leva você para o novo.
 ## 2026.11.03-8 (03/11/2026)
