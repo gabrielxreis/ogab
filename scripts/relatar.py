@@ -648,8 +648,16 @@ def _presets_do_usuario():
         rastreados = {l.split("/")[1] for l in out.splitlines() if l.count("/") >= 2}
     except Exception:
         return r   # sem git não dá para saber o que é do usuário
+    try:   # o atualizador grava os arquivos do release sem commit: o que veio nele também é da skill, não do usuário
+        rel = json.load(open(os.path.join(os.path.expanduser("~"), ".claude", "ogab_release_local.json"), encoding="utf-8"))
+        rastreados |= {k.split("/")[1] for k in (rel.get(SKILL) or {}) if k.startswith("presets/") and k.count("/") >= 2}
+    except Exception:
+        pass
     for d in sorted(glob.glob(os.path.join(SKILL, "presets", "*", ""))):
         nome = os.path.basename(os.path.dirname(d))
+        # "_" = kit base (presets/_reels e cópias dele), não é motion: 7 pacotes do _reels chegaram na fila (03/11/2026)
+        if nome.startswith("_"):
+            continue
         if nome not in rastreados and any(a.endswith(CODIGO_HF) for a in _arquivos_hf(d)):
             r.append(os.path.dirname(d))
     for d in sorted(glob.glob(os.path.join(SKILL, "biblioteca_motions_local", "*", "modelo.json"))):
