@@ -137,7 +137,7 @@ def regioes():
     f = NSScreen.screens()[0].frame(); W, H = int(f.size.width), int(f.size.height)
     if (W, H) == (1728, 1117): return
     INSPECTOR = (W - 423, 50, 423, max(300, H - 110))
-    TIMELINE = (160, int(H * 0.483), W - 160, int(H * 0.40))
+    TIMELINE = (160, int(H * 0.30), W - 160, int(H * 0.58))   # tela baixa/ultrawide (2560x1080): a ST1 fica acima de 48% (04/11/2026)
 
 
 def frente():
