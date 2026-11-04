@@ -125,7 +125,7 @@ def main():
         em, raio, passo = float(arg("--em")), float(arg("--raio", 2)), float(arg("--passo", .25))
         n = int(2 * raio / passo) + 1
         tempos = [(round(em - raio + k * passo, 3), "") for k in range(n) if 0 <= em - raio + k * passo < dur]
-    pasta = os.path.join(os.path.expanduser(arg("--pasta", "/tmp/ogab_conferir")), f"conferir_{modo}")
+    pasta = os.path.join(os.path.abspath(os.path.expanduser(arg("--pasta", "/tmp/ogab_conferir"))), f"conferir_{modo}")   # DaVinci não resolve caminho relativo ("render path inaccessible")
     quadros = exportar(p, t, tempos, pasta)
     print(folha(quadros, os.path.join(pasta, "folha.png")))
     print(f"{len(quadros)} de {len(tempos)} quadros ({t.GetName()})")
