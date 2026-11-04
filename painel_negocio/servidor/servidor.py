@@ -24,8 +24,16 @@ os.makedirs(os.path.join(DADOS, "arquivos"), exist_ok=True)
 
 sys.path.insert(0, AQUI)
 import contrato  # noqa: E402
+import email_envio  # noqa: E402
 import extrato  # noqa: E402
+import ia  # noqa: E402
 import ogab  # noqa: E402
+
+# No Windows o mimetypes lê o registro, que às vezes diz text/plain para .js e o navegador recusa o módulo
+for _ext, _tipo in ((".js", "application/javascript"), (".mjs", "application/javascript"), (".css", "text/css"),
+                    (".svg", "image/svg+xml"), (".json", "application/json"), (".webp", "image/webp"),
+                    (".woff2", "font/woff2"), (".wasm", "application/wasm")):
+    mimetypes.add_type(_tipo, _ext)
 
 
 def agora():
@@ -647,21 +655,14 @@ def semear():
 
 # ---------------------------------------------------------------- funções
 
+IA_FUNCOES = ("ai-generate-budget", "ai-generate-proposal", "ai-chat", "parse-bank-statement", "clean-transaction-names")
+
+
 def funcao(nome, corpo, arquivos):
     if nome == "generate-contract":  # sem IA: modelo fixo com os dados do formulário, no formato de stream
         if not corpo or not corpo.get("clientName") or not corpo.get("contractValue"):
             return 400, {"error": "Campos obrigatórios não preenchidos"}
         return 200, contrato.sse(contrato.texto(corpo)), "text/event-stream"
-    if nome == "parse-bank-statement":
-        arq = arquivos.get("file")
-        if not arq:
-            return 400, {"error": "Arquivo não fornecido"}
-        try:
-            return 200, extrato.ler(arq[0], arq[1], (arquivos.get("period_days") or (None, b"all"))[1].decode() or "all")
-        except extrato.Erro as e:
-            return 400, {"error": str(e)}
-    if nome == "clean-transaction-names":
-        return 200, {"transactions": (corpo or {}).get("transactions", [])}
     if nome == "check-subscription":
         a = ogab.assinatura()
         return 200, {"subscribed": True, "plan": "premium", "product_id": "ogab", "subscription_end": a.get("ate")}
@@ -760,6 +761,17 @@ class Pedido(BaseHTTPRequestHandler):
                             BANCO.gravar("profiles", p)
                             BANCO.salvar()
                 return self.enviar(status, r)
+            if caminho == "/api/ogab/email":  # SMTP pode levar segundos: fora da trava do banco
+                if metodo == "GET":
+                    return self.enviar(200, email_envio.status(DADOS))
+                try:
+                    return self.enviar(200, email_envio.configurar(DADOS, self.corpo_json() or {}))
+                except email_envio.Erro as e:
+                    return self.enviar(400, {"error": str(e)})
+            if caminho == "/functions/v1/send-quote-email":
+                return self.enviar(*email_envio.enviar_orcamento(DADOS, self.corpo_json() or {}))
+            if caminho == "/api/ogab/ia" or caminho[14:] in IA_FUNCOES and caminho.startswith("/functions/v1/"):
+                return self.ia_rota(metodo, caminho)  # a IA demora: fora da trava do banco
             with TRAVA:
                 if caminho.startswith("/rest/v1/rpc/"):
                     return self.enviar(200, rpc(caminho[13:], self.corpo_json() or dict(q)))
@@ -791,6 +803,50 @@ class Pedido(BaseHTTPRequestHandler):
             import traceback
             traceback.print_exc()
             return self.enviar(500, {"code": "XX000", "message": str(e), "details": None, "hint": None})
+
+    def ia_rota(self, metodo, caminho):
+        """Ajustes da IA (/api/ogab/ia) e as funções que usam IA. Erro da IA vira mensagem amigável no painel."""
+        try:
+            if caminho == "/api/ogab/ia":
+                if metodo == "GET":
+                    return self.enviar(200, ia.estado())
+                corpo = self.corpo_json() or {}
+                if corpo.get("desligar"):
+                    return self.enviar(200, ia.desligar())
+                return self.enviar(200, ia.salvar(corpo.get("provedor"), corpo.get("chave")))
+            nome = caminho[14:]
+            bruto = self.corpo_bruto()
+            if nome == "parse-bank-statement":
+                arquivos = self.multipart(bruto)
+                arq = arquivos.get("file")
+                if not arq:
+                    return self.enviar(400, {"error": "Arquivo não fornecido"})
+                periodo = (arquivos.get("period_days") or (None, b"all"))[1].decode() or "all"
+                if not arq[0].lower().endswith(".pdf"):
+                    try:
+                        return self.enviar(200, extrato.ler(arq[0], arq[1], periodo))
+                    except extrato.Erro as e:
+                        return self.enviar(400, {"error": str(e)})
+                trans = ia.extrato_pdf(arq[1], periodo)
+                if not trans:
+                    return self.enviar(422, {"error": "Nenhuma transação encontrada no PDF. Tente o extrato em OFX ou CSV."})
+                return self.enviar(200, {"success": True, "transactions": trans, "total": len(trans), "summary": {
+                    "income": sum(t["amount"] for t in trans if t["type"] == "income"),
+                    "expense": sum(t["amount"] for t in trans if t["type"] == "expense")}})
+            corpo = json.loads(bruto) if bruto else {}
+            if nome == "clean-transaction-names":
+                return self.enviar(200, {"transactions": ia.limpar_nomes(corpo.get("transactions", []))})
+            if nome == "ai-generate-budget":
+                return self.enviar(200, ia.orcamento(corpo))
+            if nome == "ai-generate-proposal":
+                with TRAVA:
+                    perfil = dict(BANCO.tabela("profiles").get(UID) or {})
+                return self.enviar(200, ia.proposta(corpo, perfil))
+            if nome == "ai-chat":
+                return self.enviar(200, contrato.sse(ia.chat(corpo)), "text/event-stream")
+            return self.enviar(404, {"error": "função"})
+        except ia.Erro as e:
+            return self.enviar(e.status, {"error": str(e), "ia": True})
 
     def rest(self, metodo, t, q):
         opcoes = ler_consulta(q)

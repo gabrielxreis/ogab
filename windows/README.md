@@ -37,6 +37,7 @@ Instala pelo `winget` o que faltar (ffmpeg, yt-dlp, Node.js LTS, Python 3.12, Gi
 8. **Temporários:** não passar caminho `/tmp/...` do Git Bash para o Python (são pastas diferentes no Windows). Usar a pasta do vídeo ou o scratchpad.
 9. **Transcrição:** igual (DaVinci 21.1+ pela API). Abaixo disso o Whisper local é o `faster-whisper` (CPU; com placa NVIDIA dá para trocar para CUDA).
 10. **Downloads pelo navegador:** iguais (Claude in Chrome); os arquivos caem em `%USERPROFILE%\Downloads`.
+11. **Meu Negócio (`/ogab dashboard`):** `negocio.sh` -> `powershell -NoProfile -ExecutionPolicy Bypass -File ~/.claude/skills/ogab/painel_negocio/scripts/negocio.ps1 <ação>` (abrir, status, parar, resumo, empresa). Os dados ficam em `%USERPROFILE%\.ogab\negocio`; se não ligar, o erro está em `servidor.err.log` dessa pasta.
 
 ## CapCut no Windows (beta)
 

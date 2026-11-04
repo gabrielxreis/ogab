@@ -1,4 +1,10 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-17 (03/11/2026)
+- **Meu Negócio no Windows:** "abre meu negócio" e `/ogab dashboard` agora funcionam também no Windows.
+- **IA no Meu Negócio:** na engrenagem (Ajustes), ligue a IA com a sua chave (a do Gemini é grátis; Claude e ChatGPT também servem) e o painel passa a ler o extrato do banco em PDF, montar orçamento e proposta a partir de um briefing e refinar textos. A chave fica guardada só no seu computador.
+- **Orçamento por e-mail e WhatsApp:** configure o seu e-mail em Ajustes (Gmail com senha de app, Outlook, Hostinger e outros) e envie o orçamento com o PDF anexo direto do painel. Sem configurar, ele abre o seu programa de e-mail com tudo pronto, e também dá para mandar no WhatsApp.
+- **Agenda para o Google, Apple e Outlook:** no Planner, exporte os eventos, as sessões e os prazos do Kanban num arquivo .ics para importar na sua agenda, ou importe a agenda que você já usa.
+- **Mentor de negócios mais esperto:** quando você usa o Meu Negócio, o `/ogab negocio` lê os números dele (entradas, saídas, orçamentos, funil e trabalhos atrasados) e não pergunta de novo o que já está lá.
 ## 2026.11.03-16 (03/11/2026)
 - **Câmera que segue o rosto (Mac):** o Gab trava o enquadramento nos olhos de quem fala, com um planar track feito sozinho no take (bom para entrevista e talking head gravados com a câmera solta).
 - **Volume dos efeitos sonoros de uma vez:** peça "efeitos mais baixos" (ou mais altos) e o Gab ajusta todos os SFX da timeline juntos.

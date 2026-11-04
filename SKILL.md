@@ -54,6 +54,9 @@ Se a skill existir em `~/.claude/skills/<nome>/SKILL.md`, chamar pela ferramenta
   logo_url; NUNCA inventar CPF/CNPJ); o assistente de primeiro acesso mostra preenchido e a pessoa confere. Pergunta de
   assinatura, trabalhos, orçamentos, financeiro ou agenda: `negocio.sh resumo` e responder no chat com os números do JSON,
   sem abrir o navegador. Estratégia do negócio continua no mentor (`/ogab negocio`). Dados só em `~/.ogab/negocio`.
+  No Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File ~/.claude/skills/ogab/painel_negocio/scripts/negocio.ps1
+  <ação>` (mesmas ações; ver `windows/README.md`). IA (extrato em PDF, orçamento e proposta por IA) e e-mail do orçamento
+  se ligam na tela Ajustes do painel (engrenagem), com a chave da própria pessoa.
 - **Marca e criativos:** cores, fontes e logo da marca no `<pasta_saida>/<Marca>/design/design-<marca>.md` (área de
   design; vale para motion, lettering e capa); ganchos que ganharam ou perderam teste na seção "Criativos" do `trafego.md`
   (área de tráfego), antes de roteiro de anúncio. Design, vídeo e tráfego usam o mesmo nome de cliente (`clientes/<cliente>/`);
