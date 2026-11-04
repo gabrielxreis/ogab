@@ -22,7 +22,11 @@ As outras áreas têm as suas (regra do usuário, 03/11/2026: "isso pode acontec
 sempre procura otimizar e processar o mais rápido possível"): ver AREAS abaixo ou `paralelo.py pode <pasta>`.
 Sai 1 com o motivo quando a frente não pode (dependência faltando, já rodou, pasta ou recurso de outra frente).
 """
-import contextlib, fcntl, json, os, shutil, subprocess, sys, time
+import contextlib, json, os, shutil, subprocess, sys, time
+try:
+    import fcntl
+except ImportError:   # Windows
+    fcntl = None
 
 # depende: portões (liberar) e/ou frentes concluídas; pasta: a ÚNICA onde a frente escreve; credito: gasta crédito/geração;
 # recurso: o que só um agente usa por vez (navegador = o Chrome do usuário; o editor nunca é de uma frente)
@@ -76,11 +80,29 @@ def arq(pasta): return os.path.join(pasta, "paralelo.json")
 
 
 @contextlib.contextmanager
+def _travar(lk):
+    """Trava exclusiva do arquivo aberto: fcntl no Mac/Linux, msvcrt no Windows (lá não existe fcntl; relato 03/11/2026)."""
+    if fcntl:
+        fcntl.flock(lk, fcntl.LOCK_EX)
+        yield
+        return
+    import msvcrt
+    while True:
+        try:
+            msvcrt.locking(lk.fileno(), msvcrt.LK_NBLCK, 1); break
+        except OSError:
+            time.sleep(0.05)
+    try:
+        yield
+    finally:
+        lk.seek(0); msvcrt.locking(lk.fileno(), msvcrt.LK_UNLCK, 1)
+
+
+@contextlib.contextmanager
 def estado(pasta, gravar=True):
     """Lê e grava o paralelo.json com trava de arquivo: vários agentes chamando ao mesmo tempo não se atropelam."""
     os.makedirs(pasta, exist_ok=True)
-    with open(os.path.join(pasta, ".paralelo.lock"), "w") as lk:
-        fcntl.flock(lk, fcntl.LOCK_EX)
+    with open(os.path.join(pasta, ".paralelo.lock"), "w") as lk, _travar(lk):
         try:
             st = json.load(open(arq(pasta), encoding="utf-8"))
         except FileNotFoundError:

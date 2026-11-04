@@ -23,7 +23,11 @@ Estado em <pasta>/equipe.json (com trava de arquivo), resumo legível em <pasta>
 
 Sai 1 com o motivo quando algo não pode (portão fechado, frente já rodando, recurso de outra frente).
 """
-import contextlib, csv, fcntl, json, os, shutil, sys, time
+import contextlib, csv, json, os, shutil, sys, time
+try:
+    import fcntl
+except ImportError:   # Windows
+    fcntl = None
 
 # depende: portões que o gerente libera com o ok do usuário; le: o mapa da área no cofre (a frente lê SÓ isto);
 # entrega: o que a frente devolve; recurso: o que só uma frente usa por vez
@@ -52,12 +56,30 @@ def arq(pasta): return os.path.join(pasta, "equipe.json")
 
 
 @contextlib.contextmanager
+def _travar(lk):
+    """Trava exclusiva do arquivo aberto: fcntl no Mac/Linux, msvcrt no Windows (lá não existe fcntl; relato 03/11/2026)."""
+    if fcntl:
+        fcntl.flock(lk, fcntl.LOCK_EX)
+        yield
+        return
+    import msvcrt
+    while True:
+        try:
+            msvcrt.locking(lk.fileno(), msvcrt.LK_NBLCK, 1); break
+        except OSError:
+            time.sleep(0.05)
+    try:
+        yield
+    finally:
+        lk.seek(0); msvcrt.locking(lk.fileno(), msvcrt.LK_UNLCK, 1)
+
+
+@contextlib.contextmanager
 def estado(pasta, gravar=True):
     """Lê e grava o equipe.json com trava: o gerente e várias frentes chamando ao mesmo tempo não se atropelam."""
     if not os.path.isfile(arq(pasta)) and gravar is not None:
         raise SystemExit(f"SEM_EQUIPE: {pasta} não tem equipe.json (rode antes: equipe.py criar)")
-    with open(os.path.join(pasta, ".equipe.lock"), "w") as lk:
-        fcntl.flock(lk, fcntl.LOCK_EX)
+    with open(os.path.join(pasta, ".equipe.lock"), "w") as lk, _travar(lk):
         try:
             st = json.load(open(arq(pasta), encoding="utf-8"))
         except FileNotFoundError:
