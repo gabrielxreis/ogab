@@ -68,6 +68,21 @@ def via_davinci(audio, idioma):
         raise SystemExit("DaVinci fechado ou sem scripting: abra o projeto ou use --motor whisper")
     mp = r.GetProjectManager().GetCurrentProject().GetMediaPool()
     alvo = os.path.basename(audio)
+    # O DaVinci guarda a transcrição pelo CAMINHO: áudio regerado por cima do mesmo arquivo (narracoes/narracao.wav)
+    # voltava com o texto do take antigo (relato 03/11/2026). Transcreve uma cópia com o hash do conteúdo no nome:
+    # o mesmo áudio reaproveita o cache, áudio novo vira clipe novo.
+    import hashlib, shutil
+    h = hashlib.sha1()
+    with open(audio, "rb") as f:
+        for bloco in iter(lambda: f.read(1 << 20), b""):
+            h.update(bloco)
+    base, ext = os.path.splitext(alvo)
+    pasta_hash = os.path.join(os.path.dirname(os.path.abspath(audio)), ".transcrever")
+    os.makedirs(pasta_hash, exist_ok=True)
+    unico = os.path.join(pasta_hash, f"{base}_{h.hexdigest()[:10]}{ext}")
+    if not os.path.exists(unico):
+        shutil.copy2(audio, unico)
+    audio = unico
     caminho = os.path.realpath(os.path.abspath(audio))
 
     def busca(pasta):
