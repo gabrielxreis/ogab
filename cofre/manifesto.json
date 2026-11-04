@@ -1,5 +1,5 @@
 {
-  "quando": "2026-11-03 22:36",
+  "quando": "2026-11-03 23:00",
   "arquivos": {
     "SKILL.md": "900d7a5048734ab46be42946489804eef4d988d661896dc6a8a146d6060215b0",
     "docs/PROCESSO.md": "1d51fc9263c678d86b6d3146b8781523a52bca0e6e954028555c536b3121d115",
@@ -56,7 +56,7 @@
     "docs/etapas/subcomandos.md": "88927b8efaee6f3727b8638719462561fdf29b0f367ea1aa87be262cec9c34c6",
     "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
-    "docs/etapas/trafego.md": "f25917bcf6b569e887c786c31c6a8f8c32514e5232fdd344a5e1fea446449984",
+    "docs/etapas/trafego.md": "f1d902d59d128e12951eaa6c24ed4aaf3704f32cf06168075541c4c483164c8b",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
     "docs/etapas/viral.md": "f9b5709966b37827a1563d0bbd2a9f5471aae0bb556d51578c99c045fec644de",
     "docs/etapas/voz.md": "cf1676057f98c177bc7093fd21512c1632c91c1f79421e27cd5d4eb98b2172b3",
@@ -102,6 +102,8 @@
     "docs/negocios/temas/12_economia_politica_tributos_e_cenario_bra.md": "608cba59676bf874cf11b07a4a22740f14f97cf07b9a348e04723d18e1ca2ce3",
     "docs/negocios/temas/13_mentalidade_carreira_e_rotina_do_empresa.md": "7af9e6f2ea5ed0ae354a17e68acc78016a6f0ff5d414e9cb93f7a44e484d252d",
     "docs/negocios/temas/14_casos_de_empresas.md": "d018ec1efe1c8bb3b0b0a1b4c3c5d9d3790ed46c92b2d1f980a02468348b1996",
-    "docs/negocios/temas/15_numeros_e_benchmarks_citados.md": "b8b43c63ee33fa38ec125f7b600a63772285686753cecd288453e5006ad406cb"
+    "docs/negocios/temas/15_numeros_e_benchmarks_citados.md": "b8b43c63ee33fa38ec125f7b600a63772285686753cecd288453e5006ad406cb",
+    "docs/trafego/subido/BASE_CURSOS.md": "27ff27712ac8f3bb0cc7861977fd17025b36bb2ec82d81b52a217d0dd9815496",
+    "docs/trafego/subido/BASE_LIVES.md": "3ba4f876b92f8cdadf871373a40595fe9581beefaadd8c466dc082d20b325682"
   }
 }
