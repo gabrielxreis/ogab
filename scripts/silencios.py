@@ -18,7 +18,7 @@ da A1 (regra do usuário, 15/10/2026: "tirar os silêncios seria bom entrar no p
 (+5 dB da narração). Rodar logo depois de `colocar_narracao`, antes da legenda e dos takes.
 `--simular` mostra o que sairia sem mexer no DaVinci.
 """
-import argparse, os, sys
+import argparse, math, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -171,7 +171,7 @@ def main():
         print(f"  {x.GetName()}: {dur:.1f} s -> {fica:.1f} s" + (" (sem transcrição: entra inteiro)" if ws is None else f" ({len(ks)} trechos)"))
         vol = x.GetProperty("AudioVolume") if narracao else None
         for c, b in ks:
-            info = {"mediaPoolItem": it, "startFrame": int(round(c * fps)), "endFrame": int(round(b * fps))}
+            info = {"mediaPoolItem": it, "startFrame": int(math.floor(c * fps)), "endFrame": int(math.ceil(b * fps))}   # quadro inteiro para fora: arredondar comia o fim da palavra
             if narracao: info.update({"mediaType": 2, "trackIndex": 1})
             infos.append(info); vols.append(vol)
     print(f"total: {antes:.1f} s -> {depois:.1f} s (saem {antes - depois:.1f} s em {cortes} silêncios)")

@@ -13,7 +13,7 @@ fica como backup "<nome> - bruto").
          (ou use "frase@SEG" para a ocorrência mais perto de SEG).
 --tirar-entre: tira tudo entre dois tempos (retake inteiro).
 """
-import json, re, sys, unicodedata
+import json, math, re, sys, unicodedata
 
 
 def norm(s):
@@ -190,9 +190,28 @@ def montar(plano_json, nome_tl, clipe, fps_fonte=30.0):
         for k in ("timelineResolutionWidth", "timelineResolutionHeight", "timelineFrameRate"):
             t.SetSetting(k, base.GetSetting(k))
     print("formato:", t.GetSetting("timelineResolutionWidth"), "x", t.GetSetting("timelineResolutionHeight"), t.GetSetting("timelineFrameRate"), "fps")
-    infos = [{"mediaPoolItem": item, "startFrame": int(round(a * fps_fonte)),
-              "endFrame": int(round(b * fps_fonte))} for a, b in d["trechos"]]
+    # fps do PRÓPRIO clipe (o padrão 30 numa gravação de 24/25 deslocava cada trecho) e quadro inteiro para fora:
+    # início pelo chão, fim pelo teto (endFrame é exclusivo). Arredondar comia 0,03 a 0,08 s do fim de cada trecho e o
+    # começo da palavra seguinte (relato limpar_fala_corta_palavras, 04/11/2026)
+    try:
+        fps_fonte = float(item.GetClipProperty("FPS") or fps_fonte)
+    except Exception:
+        pass
+    infos, fim_ant = [], -1
+    for a, b in d["trechos"]:
+        ini, fim = max(int(math.floor(a * fps_fonte)), fim_ant), int(math.ceil(b * fps_fonte))
+        if fim > ini:
+            infos.append({"mediaPoolItem": item, "startFrame": ini, "endFrame": fim}); fim_ant = fim
     res = mp.AppendToTimeline(infos)
+    # leitura de volta: cada trecho na timeline tem que ter a duração pedida (tolerância de 1 quadro)
+    for k, (x, info) in enumerate(zip(res or [], infos)):
+        try:
+            pedido = (info["endFrame"] - info["startFrame"]) / fps_fonte
+            veio = x.GetDuration() / float(t.GetSetting("timelineFrameRate"))
+            if pedido - veio > 1.5 / fps_fonte:
+                print(f"AVISO: trecho {k + 1} entrou com {veio:.3f} s (pedido {pedido:.3f} s)")
+        except Exception:
+            pass
     n = len(t.GetItemListInTrack("video", 1) or [])
     fps = float(t.GetSetting("timelineFrameRate"))
     dur = (t.GetEndFrame() - t.GetStartFrame()) / fps
