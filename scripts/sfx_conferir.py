@@ -32,9 +32,12 @@ def python_com_clap():
     se outro python3 já tem, usa ele em vez de baixar ~2 GB)."""
     import shutil
     for py in dict.fromkeys(filter(None, [shutil.which("python3"), "/opt/homebrew/bin/python3", "/usr/local/bin/python3"])):
-        if os.path.realpath(py) == os.path.realpath(sys.executable): continue
-        if subprocess.run([py, "-c", "import torch, transformers"], capture_output=True).returncode == 0:
-            return py
+        if not os.path.isfile(py) or os.path.realpath(py) == os.path.realpath(sys.executable): continue
+        try:   # Windows: os caminhos do Homebrew não existem e o subprocess estourava WinError 2 (relato 03/11/2026)
+            if subprocess.run([py, "-c", "import torch, transformers"], capture_output=True).returncode == 0:
+                return py
+        except OSError:
+            continue
     return None
 
 
