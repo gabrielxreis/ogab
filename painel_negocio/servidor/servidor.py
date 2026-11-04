@@ -767,6 +767,7 @@ class Pedido(BaseHTTPRequestHandler):
                 try:
                     return self.enviar(200, email_envio.configurar(DADOS, self.corpo_json() or {}))
                 except email_envio.Erro as e:
+                    sys.stderr.write(f"[e-mail] {e}\n")  # sem senha: só o motivo do servidor de e-mail
                     return self.enviar(400, {"error": str(e)})
             if caminho == "/functions/v1/send-quote-email":
                 return self.enviar(*email_envio.enviar_orcamento(DADOS, self.corpo_json() or {}))

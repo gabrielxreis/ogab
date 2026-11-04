@@ -1,7 +1,7 @@
 """E-mail do Meu Negócio: manda orçamento (com o PDF anexado) pelo SMTP da própria pessoa (Gmail com senha de app,
 Outlook, Hostinger, iCloud ou qualquer outro). A configuração fica cifrada em DADOS/email.enc com uma chave local
 (DADOS/.chave_email, só leitura do dono); nada disso vai para o git nem sai do computador."""
-import base64, hashlib, hmac, json, os, secrets, smtplib, socket, ssl
+import base64, hashlib, hmac, json, os, re, secrets, smtplib, socket, ssl
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid
 
@@ -96,8 +96,17 @@ def completar(cfg):
         dominio = usuario.split("@", 1)[1].lower()
         host, porta_padrao = PROVEDORES.get(dominio, (f"smtp.{dominio}", 465))
         porta = porta or porta_padrao
-    return {"usuario": usuario, "senha": cfg["senha"].replace(" ", ""), "host": host, "porta": porta or 465,
+    return {"usuario": usuario, "senha": re.sub(r"[\s\u200b-\u200d\u2060\ufeff]", "", cfg["senha"]), "host": host, "porta": porta or 465,
             "nome": (cfg.get("nome") or "").strip()}
+
+
+def _entrar(s, usuario, senha):
+    """Login só por AUTH PLAIN: o smtplib tenta LOGIN depois de um 535 e o Gmail derruba a conexão, escondendo o motivo."""
+    s.ehlo()
+    if "plain" not in s.esmtp_features.get("auth", "").lower():
+        return s.login(usuario, senha)
+    s.user, s.password = usuario, senha
+    s.auth("PLAIN", s.auth_plain)
 
 
 def enviar(cfg, para, assunto, texto, anexos=()):
@@ -114,15 +123,19 @@ def enviar(cfg, para, assunto, texto, anexos=()):
     try:
         if int(cfg["porta"]) == 465:
             with smtplib.SMTP_SSL(cfg["host"], 465, timeout=25, context=contexto) as s:
-                s.login(cfg["usuario"], cfg["senha"])
+                _entrar(s, cfg["usuario"], cfg["senha"])
                 s.send_message(msg)
         else:
             with smtplib.SMTP(cfg["host"], int(cfg["porta"]), timeout=25) as s:
                 s.starttls(context=contexto)
-                s.login(cfg["usuario"], cfg["senha"])
+                _entrar(s, cfg["usuario"], cfg["senha"])
                 s.send_message(msg)
-    except smtplib.SMTPAuthenticationError:
-        raise Erro("O e-mail recusou o login. No Gmail, use uma senha de app (não a senha normal) e confira o e-mail.")
+    except smtplib.SMTPAuthenticationError as e:
+        motivo = (e.smtp_error or b"").decode("utf-8", "replace")
+        if e.smtp_code == 534 or "Application-specific" in motivo:
+            raise Erro("O Gmail pediu uma senha de app: a senha normal da conta não funciona aqui. Crie em myaccount.google.com/apppasswords (precisa da verificação em duas etapas ligada).")
+        raise Erro("O e-mail recusou o login: o e-mail ou a senha de app não conferem. Confira se a senha de app foi criada nesta mesma conta "
+                   f"({cfg['usuario']}) e cole de novo, só as 16 letras. Resposta do servidor: {e.smtp_code} {motivo.splitlines()[0] if motivo else ''}".strip())
     except smtplib.SMTPRecipientsRefused:
         raise Erro(f"O e-mail recusou o destinatário {para}. Confira o endereço.")
     except smtplib.SMTPException as e:  # vem antes do OSError: SMTPException herda dele
