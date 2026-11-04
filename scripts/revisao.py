@@ -187,6 +187,20 @@ def v1_sem_som(t):
     return not o
 
 
+def v1_misto(t):
+    """Estilo clone de IA (03/11/2026): a V1 mistura take com som próprio (clone, áudio do take na A1) e motion sem som
+    (narração na A1) e fecho mudo. A fala se confere pela A1 e só os takes precisam de A1 casada clipe a clipe."""
+    import subprocess
+    com = sem = 0
+    for x in itens(t, "video", 1):
+        arq = (x.GetMediaPoolItem().GetClipProperty("File Path") or "") if x.GetMediaPoolItem() else ""
+        if not arq or not os.path.exists(arq): continue
+        if subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", arq],
+                          capture_output=True, text=True).stdout.strip(): com += 1
+        else: sem += 1
+    return com > 0 and sem > 0
+
+
 def v1_tem_take(t):
     """Algum clipe da V1 é gravação/take com som próprio (o rosto ainda se confere, mesmo com a fala na A1)."""
     import subprocess
@@ -206,7 +220,7 @@ def fala(t):
         import limpar_fala as LF
     except Exception as e:
         ERROS.append(f"FALA: limpar_fala indisponível ({e}), checagem de fala não rodou"); return
-    S, F = t.GetStartFrame(), R.fps_tl(t); its = itens(t, "audio", 1) if v1_sem_som(t) else itens(t, "video", 1)
+    S, F = t.GetStartFrame(), R.fps_tl(t); its = itens(t, "audio", 1) if (v1_sem_som(t) or v1_misto(t)) else itens(t, "video", 1)
     if not its: return
     # Cada pedaço com o arquivo DELE: A1 com várias gravações do gravador (0098, 0099, 0100) lia tudo do primeiro
     # arquivo e dava ~117 SILÊNCIO/FALA falsos nos trechos dos outros (31/10/2026).
@@ -305,6 +319,24 @@ def audio(t):
         if a and v and (a[0].GetStart() < v[0].GetStart() or a[-1].GetEnd() > v[-1].GetEnd()):
             ERROS.append("ÁUDIO x IMAGEM: a narração da A1 passa do começo ou do fim do motion da V1")
         AVISOS.append(f"V1 é motion sem som: fala conferida na A1 ({len(a)} trechos)")
+        return
+    if v1_misto(t):   # clone + motion: take casado com a A1; narração dentro da V1; fecho mudo pode ficar sem A1
+        def _arq(x): return (x.GetMediaPoolItem().GetClipProperty("File Path") or "") if x.GetMediaPoolItem() else ""
+        pa = {(_arq(y), y.GetStart(), y.GetEnd()) for y in a}
+        import subprocess
+        for x in v:
+            arq = _arq(x)
+            if arq and os.path.exists(arq) and subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", arq],
+                                                               capture_output=True, text=True).stdout.strip() and (arq, x.GetStart(), x.GetEnd()) not in pa:
+                # troca de palavra (03/11/2026, "dispurou" -> "disparou" do ElevenLabs): a A1 cobre a imagem inteira, sem vão,
+                # com o áudio do próprio take em volta da emenda
+                cob = sorted((y.GetStart(), y.GetEnd(), _arq(y)) for y in a if y.GetEnd() > x.GetStart() and y.GetStart() < x.GetEnd())
+                ok = bool(cob) and cob[0][0] <= x.GetStart() and cob[-1][1] >= x.GetEnd() and any(c[2] == arq for c in cob) \
+                     and all(c2[0] <= c1[1] for c1, c2 in zip(cob, cob[1:]))
+                if not ok: ERROS.append(f"ÁUDIO x IMAGEM: o take {os.path.basename(arq)} em {x.GetStart()} não tem o próprio áudio casado na A1")
+        if a and v and (a[0].GetStart() < v[0].GetStart() or a[-1].GetEnd() > v[-1].GetEnd()):
+            ERROS.append("ÁUDIO x IMAGEM: a A1 passa do começo ou do fim da V1")
+        AVISOS.append(f"V1 mista (clone + motion): takes casados com a A1, fala conferida na A1 ({len(a)} trechos)")
         return
     if len(v) != len(a) or any(x.GetStart() != y.GetStart() or x.GetEnd() != y.GetEnd() for x, y in zip(v, a)):
         ERROS.append(f"ÁUDIO x IMAGEM: V1 tem {len(v)} clipes e A1 {len(a)} (ou fora de posição); a fala pode estar fora do lugar ou faltando")
