@@ -1,4 +1,9 @@
 # Novidades do Gab (/ogab)
+## 2026.11.03-16 (03/11/2026)
+- **Câmera que segue o rosto (Mac):** o Gab trava o enquadramento nos olhos de quem fala, com um planar track feito sozinho no take (bom para entrevista e talking head gravados com a câmera solta).
+- **Volume dos efeitos sonoros de uma vez:** peça "efeitos mais baixos" (ou mais altos) e o Gab ajusta todos os SFX da timeline juntos.
+- **Gold Design e Silver Design voltam a renderizar**, inclusive no Windows: as texturas agora vêm dentro do pacote.
+- **Windows mais estável:** o Gab em equipe e o trabalho em paralelo, os comandos npx/npm e a conferência de efeitos sonoros não quebram mais no Windows. A transcrição no DaVinci também não devolve mais o texto de uma narração antiga quando o áudio é refeito no mesmo arquivo.
 ## 2026.11.03-15 (03/11/2026)
 - **Meu Negócio: a sua dashboard financeira e executiva.** Peça "abre meu negócio", "abre o crm" ou use `/ogab dashboard` e o Gab abre no seu computador um painel com tudo do seu trabalho: quanto entrou, quanto vai entrar e quanto saiu no mês, CRM com funil de clientes e "quem chamar agora" (WhatsApp em um toque), projetos em Kanban que já nascem com as colunas prontas e podem ser personalizados, planner, orçamentos com PDF e contrato, transações com extrato do banco (OFX ou CSV) e o tempo que falta da sua assinatura do Gab. Na primeira vez você monta a identidade do seu negócio (nome, CPF ou CNPJ, contatos, logo, cor e Pix), que passa a sair nos orçamentos e contratos; o Gab já preenche o que sabe das suas conversas e você só confere. Para mudar depois, toque na bolinha do canto de cima. Também dá para perguntar no chat "quanto falta da minha assinatura?" ou "como está o mês?". Tudo fica só no seu computador.
 ## 2026.11.03-14 (03/11/2026)
