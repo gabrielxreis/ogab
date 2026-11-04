@@ -96,3 +96,20 @@ if os.name == "nt":
         return _run_original(args, *a, **k)
 
     _sp.run = _run
+
+    # Qualquer comando solto sem extensão (npx, npm, hyperframes...) que no Windows é .cmd/.bat: o CreateProcess sem
+    # shell não acha ("WinError 2" no centro.py e no Popen do paralelo, relato 03/11/2026). Troca pelo caminho que o
+    # PATHEXT resolve; vale para run, Popen, call e check_output, que passam todos pelo Popen.
+    import shutil as _sh
+
+    class _PopenCmd(_sp.Popen):
+        def __init__(self, args, *a, **k):
+            if isinstance(args, (list, tuple)) and args and not k.get("shell"):
+                a0 = str(args[0])
+                if not os.path.splitext(a0)[1]:
+                    achado = _sh.which(a0)
+                    if achado and achado.lower().endswith((".cmd", ".bat")):
+                        args = [achado] + list(args[1:])
+            super().__init__(args, *a, **k)
+
+    _sp.Popen = _PopenCmd
