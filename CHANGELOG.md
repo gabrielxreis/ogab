@@ -1,6 +1,8 @@
 # Novidades do Gab (/ogab)
 ## 2026.11.03-19 (03/11/2026)
 - **E-mail do Meu Negócio mais fácil de configurar:** a senha de app colada do Google com espaços agora funciona, e quando o e-mail recusa o login o painel mostra o motivo exato que o servidor deu.
+- **Revisão certa no estilo clone de IA:** vídeo que mistura o clone falando com motions narrados não acusa mais erro falso de áudio fora do lugar, e a troca de uma palavra dentro da fala do clone passa na conferência.
+- **Foto pequena ou borrada vira foto nítida antes de entrar no vídeo:** o Gab agora usa o upscale local e grátis também nas fotos dos takes (Gemini, prints, fotos do cliente), não só no design.
 ## 2026.11.03-18 (03/11/2026)
 - **Gestor de tráfego muito mais experiente.** A área de tráfego do Gab (`/ogab trafego`) ganhou uma base nova, estudada aula por aula em 850 aulas de tráfego pago (cursos completos, tutoriais práticos e mais de 350 lives com especialistas). Agora ele tem playbooks por nicho (clínicas, advocacia, delivery, imobiliário, e-commerce, eventos, política, Google Meu Negócio e dezenas de outros) com estrutura de campanha, divisão de verba, criativo e casos com números, o checklist do que ligar e desligar ao criar campanha no Meta, no Google, no TikTok e no LinkedIn, roteiros de onboarding, cliente oculto, relatório e reunião com o cliente, e uma tabela de preços de gestão. Ele consulta só a parte do seu caso, trata os números como referência e confirma com os dados da sua conta, e nunca recomenda tática que fura as regras das plataformas, dos conselhos profissionais ou da LGPD.
 ## 2026.11.03-17 (03/11/2026)

@@ -1,8 +1,8 @@
 {
-  "quando": "2026-11-03 23:00",
+  "quando": "2026-11-03 23:08",
   "arquivos": {
     "SKILL.md": "900d7a5048734ab46be42946489804eef4d988d661896dc6a8a146d6060215b0",
-    "docs/PROCESSO.md": "1d51fc9263c678d86b6d3146b8781523a52bca0e6e954028555c536b3121d115",
+    "docs/PROCESSO.md": "ea771b87aed69217002c983b88275db03805d34c93da3c7726892956b13c628b",
     "docs/comercial/guia.md": "20a170179ad57515247ffdf6c146c6e9a77b16608b267df21db715754b63f8e5",
     "docs/design/canva.md": "1b61f7319c460c8519b1a15536d704170d443310ed581d0d34fd602c8f48d18f",
     "docs/design/canva_api.md": "8b96b389f211b20514961bef4efed303fa407b1ea87f0a02f3003418c168b074",
@@ -54,7 +54,7 @@
     "docs/etapas/so_motion.md": "4b76f8daf25815a412f101bcfe5badb2d6aa999c8984eeb7cc086f47f5afdc5a",
     "docs/etapas/sonorizacao.md": "10b39c9ccb25fb6a581cdd6d3d429815f34b5b72d6a77aa5cf95cc4cb272368d",
     "docs/etapas/subcomandos.md": "88927b8efaee6f3727b8638719462561fdf29b0f367ea1aa87be262cec9c34c6",
-    "docs/etapas/takes.md": "76633b59e7982e3acfa32b6a01cc1f175c6beef0e467c0febcbead6f6e839684",
+    "docs/etapas/takes.md": "6698752e1c41b6a8035cce317994da23250cfd9bc0f7e9d544e9fb3898aef6e9",
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/trafego.md": "f1d902d59d128e12951eaa6c24ed4aaf3704f32cf06168075541c4c483164c8b",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
