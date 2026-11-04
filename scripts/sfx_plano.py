@@ -1,10 +1,11 @@
 """SFX COMPLETO a partir do plano do motion (regra do usuário, 29/10/2026: "os sfx têm que ser completos sempre").
 Nada de "um whoosh por corte + um som por cena": TODO movimento que o preset anima ganha som, pelo próprio plano.
 
-  python3 sfx_plano.py <preset> <plano.json> <saida plano_sfx.txt> --lib <pasta de sfx> [--ofs 5.38] [--acrescentar]
+  python3 sfx_plano.py <preset> <plano.json> <saida plano_sfx.txt> --lib <pasta de sfx> [--ofs 5.38] [--acrescentar] [--ganho -3]
 
 preset: poster | colagem | mimic | grafico. --ofs: segundo da timeline em que esse motion começa (vídeo em partes).
---acrescentar: soma ao plano_sfx.txt que já existe (outra parte do mesmo vídeo). A saída é o formato do
+--acrescentar: soma ao plano_sfx.txt que já existe (outra parte do mesmo vídeo). --ganho: dB somados
+em todos os sons (ex.: -3 quando o usuário acha os SFX altos). A saída é o formato do
 `resolve_lib.colocar_plano_sfx` ('T.TTs A3 nome -NNdB D.Ds: o que acompanha'); colocar com trilhas=range(3, 13).
 
 O que ganha som (pela linguagem de cada preset):
@@ -47,8 +48,8 @@ SUBST = {"cartao": "papel", "crescer": "whoosh_curto", "blip": "click", "passos"
 
 
 class Plano:
-    def __init__(self, lib, ofs):
-        self.lib, self.ofs, self.ev, self.faltou = lib, ofs, [], set()
+    def __init__(self, lib, ofs, ganho=0):
+        self.lib, self.ofs, self.ganho, self.ev, self.faltou = lib, ofs, ganho, [], set()
 
     def som(self, t, papel_ou_trio, nota, dmax=None):
         nome, db, dur = SONS[papel_ou_trio] if isinstance(papel_ou_trio, str) else papel_ou_trio
@@ -63,7 +64,7 @@ class Plano:
         out, ult = [], {}
         for t, nome, db, dur, nota in sorted(self.ev):
             if t < 0 or t - ult.get(nome, -9) < 0.09: continue   # mesmo som colado no anterior soa como um só
-            ult[nome] = t; out.append(f"{t:.2f}s A3 {nome} {db}dB {dur}s: {nota}")
+            ult[nome] = t; out.append(f"{t:.2f}s A3 {nome} {int(round(db + self.ganho))}dB {dur}s: {nota}")
         return out
 
 
@@ -146,7 +147,8 @@ def main():
     a = sys.argv[1:]
     if len(a) < 3 or "--lib" not in a: raise SystemExit(__doc__)
     preset, plano, saida = a[0], json.load(open(a[1])), a[2]
-    P = Plano(a[a.index("--lib") + 1], float(a[a.index("--ofs") + 1]) if "--ofs" in a else 0.0)
+    P = Plano(a[a.index("--lib") + 1], float(a[a.index("--ofs") + 1]) if "--ofs" in a else 0.0,
+              float(a[a.index("--ganho") + 1]) if "--ganho" in a else 0.0)
     {"poster": poster, "colagem": colagem, "mimic": mimic, "grafico": grafico}[preset](P, plano)
     L = P.linhas()
     antes = open(saida).read().splitlines() if "--acrescentar" in a and os.path.exists(saida) else []
