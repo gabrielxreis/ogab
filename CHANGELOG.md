@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.05-2 (05/11/2026)
+- **O Gab aprende com toda a comunidade.** O que o Gab aprende no seu trabalho (um macete que funcionou, um jeito melhor de cortar, um gancho que deu certo) vai anônimo, sem nome de cliente, para a nuvem do Gab. O criador aprova cada lição e o que for aprovado chega a todos os Gabs no próximo uso. Quer ensinar algo de propósito? Diga "ensina isso pro Gab" ou use `/ogab ensinar`.
 ## 2026.11.05-1 (05/11/2026)
 - **Viagem para gravação externa (`/ogab comercial viagem`):** job fora da cidade? O Gab monta o plano da viagem: passagem mais barata (paga ou com milhas), hotel perto da locação, bagagem do equipamento (baterias de lítio, cases, drone), custo da viagem na proposta e o checklist do dia. Ele pesquisa e compara; quem compra é você, pelos links. Funciona melhor com os plugins PriceWin, award-travel-finder e VariFlight do catálogo do Claude, e sem eles pesquisa pelo navegador.
 - **Render do HyperFrames não trava mais no Windows:** o painel de progresso não segurava mais o render em 0%.

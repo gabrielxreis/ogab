@@ -31,7 +31,9 @@ concorda com esse funcionamento.
 Para corrigir a skill e fazer a biblioteca crescer, o Gab envia ao autor, de forma **anônima**:
 - os **erros da skill** que ele corrigir no seu computador (o que quebrou, a causa e a correção nos arquivos da skill);
 - a **estrutura dos motions novos** que você criar e que sejam bem diferentes dos que já existem;
-- as **invenções na skill**: scripts novos e melhorias feitas nos arquivos do próprio Gab.
+- as **invenções na skill**: scripts novos e melhorias feitas nos arquivos do próprio Gab;
+- as **lições aprendidas** no trabalho (o que funcionou, um macete, um pedido diferente), sem nome de cliente. O autor
+  aprova cada lição antes de ela virar conhecimento de todos os Gabs (o conhecimento da comunidade).
 
 A varredura roda sozinha quando o Gab abre e manda só o que é novo. Antes de sair, tudo passa por anonimização:
 caminhos viram `~/…`, e saem e-mails, chaves, tokens, nomes de clientes e seu nome de usuário.

@@ -1,5 +1,5 @@
 """Passo zero do Gab numa chamada só (economia de tokens, regra do Gabriel 28/10/2026: antes eram 8 comandos e 8 saídas).
-Roda na ordem: atualizar > termos > licença > abrir o cofre > novidades > componentes > comunidade > relatos (fundo).
+Roda na ordem: atualizar > termos > licença > abrir o cofre > novidades > componentes > comunidade > conhecimento > relatos (fundo).
 Imprime SÓ o que pede ação; tudo certo = 3 linhas (CONTEUDO_PRONTO, CONFIG e, se houver, o que mudou no cofre).
 
   python3 inicio.py        # sai 0 = seguir; 1 = PARAR e mostrar a mensagem (termos, key, cofre)
@@ -13,6 +13,7 @@ Linhas que podem sair (o SKILL.md do carregador diz o que fazer com cada uma):
   MUDOU_NO_COFRE: <arquivos>                    desde a última abertura nesta máquina: reler só esses
   NOVIDADES: (bloco)                            primeira coisa da resposta, em lista curta
   COMPONENTES: ... / PERGUNTAR_APRESENTACAO: ... / LEMBRETE: ...   como no SKILL.md do carregador
+  CONHECIMENTO: N lição(ões) nova(s) da comunidade (áreas)   uma linha; a área lê `conhecimento.py ler --area`
 """
 import json, os, subprocess, sys
 
@@ -95,6 +96,8 @@ def main():
     out += [l for l in txt.splitlines() if l.startswith("COMPONENTES")]
     _, txt = rodar("comunidade.py", "abrir", timeout=20)
     out += [l for l in txt.splitlines() if l.startswith(("PERGUNTAR_APRESENTACAO", "LEMBRETE"))]
+    _, txt = rodar("conhecimento.py", "baixar", timeout=20)   # base da comunidade aprovada pelo criador
+    out += [l for l in txt.splitlines() if l.startswith("CONHECIMENTO")]
 
     try:  # relatos anônimos: em segundo plano, sem saída
         subprocess.Popen([sys.executable, os.path.join(AQUI, "relatar.py"), "enviar"], cwd=SKILL,

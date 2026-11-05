@@ -24,8 +24,8 @@ RESUMO = f"""TERMOS DE USO DO GAB (/ogab), versão {VERSAO}
   dos seus clientes (os vídeos são seus). Não pode copiar, revender nem burlar a chave/criptografia.
 - A inteligência do Gab é criptografada e só abre com chave válida. Sem chave válida o Gab para e REMOVE da
   máquina só os arquivos dele (o que é seu: vídeos, projetos, config e clientes, nunca é apagado nem acessado).
-- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, erros corrigidos e a estrutura das suas
-  criações; ao aceitar, essas criações viram da COMUNIDADE do /ogab, sem nome nem autoria. Nunca sai vídeo,
+- Para melhorar a skill, o Gab envia ao autor, de forma ANÔNIMA, erros corrigidos, lições aprendidas no trabalho
+  e a estrutura das suas criações; ao aceitar, essas criações viram da COMUNIDADE do /ogab, sem nome nem autoria. Nunca sai vídeo,
   roteiro, cliente, senha, chave ou dado pessoal.
 - Se apresentar com o nome é opcional. Programas de terceiros têm licenças próprias. Sem garantia.
 Texto completo: {URL}
