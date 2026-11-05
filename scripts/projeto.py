@@ -212,6 +212,7 @@ def main():
         return
     if len(a) >= 2 and a[0] == "checklist": sys.exit(checklist(a[1]))
     if len(a) >= 2 and a[0] == "memoria":
+        if a[1].startswith("-"): print(__doc__); sys.exit(2)   # `memoria --help` criava a pasta "--help" (relato 02/11/2026)
         tipo = a[a.index("--tipo") + 1] if "--tipo" in a else "aprendizado"
         nota = next((x for i, x in enumerate(a[2:], 2) if not x.startswith("--") and a[i - 1] != "--tipo"), None)
         arq = memoria(a[1], nota, tipo); print(open(arq, encoding="utf-8").read()); return

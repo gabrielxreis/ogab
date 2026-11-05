@@ -164,7 +164,9 @@ def rodar(cmd, nome="render", log=None, shell=False):
     with open(log, "w", encoding="utf-8") as lg:
         if not shell and isinstance(cmd, list) and cmd and str(cmd[0]).lower() in ("npx", "npm"):
             cmd = [shutil.which(str(cmd[0])) or cmd[0]] + list(cmd[1:])   # Windows: npx é npx.cmd e o Popen sem shell não acha (o sitecustomize só cobre subprocess.run)
-        pr = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0)
+        # Windows: o npx.cmd (cmd /c) herdando o stdin do painel travava o hyperframes render em 0% (relato 04/11/2026)
+        pr = subprocess.Popen(cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0,
+                              stdin=subprocess.DEVNULL if os.name == "nt" else None)
         buf = b""
         while True:
             ch = pr.stdout.read(256)

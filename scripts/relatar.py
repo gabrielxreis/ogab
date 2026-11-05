@@ -716,7 +716,13 @@ def varrer():
 EXT_INVENCAO = (".py", ".js", ".mjs", ".css", ".html", ".md", ".json", ".sh", ".ps1", ".jsx", ".lua", ".txt")
 FORA_INVENCAO = ("presets/", "biblioteca_motions_local/", "clientes/", "assets/", "biblioteca_sfx/", "config.json",
                  "relatos/destino.json", "voz_local/modelos/", "design/config.json", "design/.venv/",
-                 "design/clientes/", "design/docs/catalogo/local/", "design/scripts/swift/ocr")
+                 "design/clientes/", "design/docs/catalogo/local/", "design/scripts/swift/ocr",
+                 "capcut/estilos_legenda/")
+# arquivos de escolha/estado do usuário que podem cair em qualquer pasta (seletor.py grava ao lado da sugestão)
+NOMES_FORA_INVENCAO = ("escolha_presets.json",)
+# update incompleto (git parado numa versão velha, cache do release vazio) fazia centenas de arquivos OFICIAIS
+# irem como "arquivo novo" (relatos de 30/10 a 04/11/2026: pacotes de 215 a 692 itens). Invenção de verdade é pouca.
+MAX_ARQUIVOS_NOVOS = 40
 MIN_LINHAS_INVENCAO = 6   # menos que isso é ajuste, não invenção
 # pasta de temporário (scripts gerados na hora, com conteúdo de cliente) nunca é invenção (relato de 27/10/2026)
 TEMP_INVENCAO = re.compile(r"(^|/)(_?tmp|_?temp|_?cache)(/|$)|\.parcial$", re.I)
@@ -779,6 +785,7 @@ def _blocos_invencao():
     blocos, release = [], _do_release()
     for rel in sorted(_git("ls-files", "--others", "--exclude-standard").splitlines()):
         if rel.startswith(FORA_INVENCAO) or not rel.endswith(EXT_INVENCAO) or "__pycache__" in rel \
+                or rel.rsplit("/", 1)[-1] in NOMES_FORA_INVENCAO or rel in release \
                 or TEMP_INVENCAO.search(rel) or _oficial(rel, release):
             continue
         f = os.path.join(SKILL, rel)
@@ -817,6 +824,9 @@ def registrar_invencoes(motivo=None):
     partes de LIMITE_PARTE. Não repete o mesmo conteúdo (assinatura = hash). Devolve a lista de arquivos gravados."""
     motivo = motivo if motivo is not None else []
     blocos = _blocos_invencao()
+    novos = sum(r.startswith("arquivo novo: ") for r, _ in blocos)
+    if novos > MAX_ARQUIVOS_NOVOS:
+        motivo.append(f"{novos} arquivos novos: parece update incompleto, não invenção (rodar o doctor)"); return []
     linhas = sum(t.count("\n") for _, t in blocos)
     if not blocos or linhas < MIN_LINHAS_INVENCAO:
         motivo.append("nada novo na skill"); return []
