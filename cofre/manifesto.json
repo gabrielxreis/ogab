@@ -1,8 +1,8 @@
 {
-  "quando": "2026-11-04 11:33",
+  "quando": "2026-11-05 09:05",
   "arquivos": {
-    "SKILL.md": "4f115fd3828bc5d75fd88388219207152cdd46ad9229c0c75e33478861db6f6d",
-    "docs/PROCESSO.md": "2108cf920dc81bf0a59132152bdd4ca04362f1a550f1357fd8a2f501de7143da",
+    "SKILL.md": "1788a90e26fabcb2e12183721be30dad4f2d0f543ab4ba11fba7333c092a1785",
+    "docs/PROCESSO.md": "8dce4090be8937c2bbee8602cf6a272fc754cdd261e30e61251be0e45509f9ed",
     "docs/comercial/guia.md": "20a170179ad57515247ffdf6c146c6e9a77b16608b267df21db715754b63f8e5",
     "docs/design/canva.md": "1b61f7319c460c8519b1a15536d704170d443310ed581d0d34fd602c8f48d18f",
     "docs/design/canva_api.md": "8b96b389f211b20514961bef4efed303fa407b1ea87f0a02f3003418c168b074",
@@ -17,7 +17,7 @@
     "docs/etapas/ajudante.md": "8b929d244730f708dfc6e7e470968d444e8c5ca789a1b277ee770610de11b925",
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
     "docs/etapas/cliente.md": "39951c123444c16d9303497a7c94f012d2420c8023c7bfa0318c6255bfc45975",
-    "docs/etapas/comercial.md": "9e1ecb41cf404cf278d09de46acc906b2a3b2d7c7539e8a9984812d8b6af67e7",
+    "docs/etapas/comercial.md": "5faa170f47eda583d847d4120ba7a4e0b2a789c810b4307157b72d5941f0a873",
     "docs/etapas/cor.md": "ffc8626c282fce7622299d54afcd46d1f863c00a7892e8f7ac553abf203c5f42",
     "docs/etapas/davinci.md": "163f020a8a4c62f4451f65ad73ee590d60d65128b8a2af7124406e2278412ce3",
     "docs/etapas/davinci_api.md": "aa7106613c4f629c34f436a259d2c090984a612a67f87e4421a50f77a81e9234",
@@ -58,6 +58,7 @@
     "docs/etapas/tracking_animacao.md": "8716f4f128c187b9b17c92b050673d2b7adef8a882c8f829226a234c02858575",
     "docs/etapas/trafego.md": "f1d902d59d128e12951eaa6c24ed4aaf3704f32cf06168075541c4c483164c8b",
     "docs/etapas/validacao.md": "efbd47b8e64b0f78c8b36a3243c438f8671e61d233daa340e6fb966d882a9bb9",
+    "docs/etapas/viagem.md": "70e08dae06f600218ba1e8b3ce3bb73c4f5b48e888379fdef795c2f8191b4150",
     "docs/etapas/viral.md": "f9b5709966b37827a1563d0bbd2a9f5471aae0bb556d51578c99c045fec644de",
     "docs/etapas/voz.md": "cf1676057f98c177bc7093fd21512c1632c91c1f79421e27cd5d4eb98b2172b3",
     "docs/etapas/youtube.md": "252fcf6875f9f4945ec4595064f0d3ef91804ed0c237a23c3ad8b99ef01cf71a",
