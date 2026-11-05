@@ -1,7 +1,7 @@
 {
-  "quando": "2026-11-05 09:05",
+  "quando": "2026-11-05 12:37",
   "arquivos": {
-    "SKILL.md": "1788a90e26fabcb2e12183721be30dad4f2d0f543ab4ba11fba7333c092a1785",
+    "SKILL.md": "52ecc067ce925bd025ad1371b3e05ff2bc883fd3741e07153b8950dd832bbdd6",
     "docs/PROCESSO.md": "8dce4090be8937c2bbee8602cf6a272fc754cdd261e30e61251be0e45509f9ed",
     "docs/comercial/guia.md": "20a170179ad57515247ffdf6c146c6e9a77b16608b267df21db715754b63f8e5",
     "docs/design/canva.md": "1b61f7319c460c8519b1a15536d704170d443310ed581d0d34fd602c8f48d18f",
@@ -18,11 +18,12 @@
     "docs/etapas/arte_animada.md": "6d7eec78a8a20281770fc374f318b7404cae88f515eef7e8e01439c836ab1081",
     "docs/etapas/cliente.md": "39951c123444c16d9303497a7c94f012d2420c8023c7bfa0318c6255bfc45975",
     "docs/etapas/comercial.md": "5faa170f47eda583d847d4120ba7a4e0b2a789c810b4307157b72d5941f0a873",
+    "docs/etapas/conhecimento.md": "2408acdcdafe0bf0d9a5ca3de017482497a29b7e8e260051f079de16807ba72e",
     "docs/etapas/cor.md": "ffc8626c282fce7622299d54afcd46d1f863c00a7892e8f7ac553abf203c5f42",
     "docs/etapas/davinci.md": "163f020a8a4c62f4451f65ad73ee590d60d65128b8a2af7124406e2278412ce3",
     "docs/etapas/davinci_api.md": "aa7106613c4f629c34f436a259d2c090984a612a67f87e4421a50f77a81e9234",
     "docs/etapas/design.md": "cf2600d54460c65b74e23206341361b57a6dcef0a9b340c35dd6d70de00661e5",
-    "docs/etapas/dono.md": "ffe18317e12cd401c12cbc7a15639becabd7c96d9c09a8c1dfe9330dc0a3ee6f",
+    "docs/etapas/dono.md": "d0d216f6f5563da4ac0612f64416e328beee88a2a74ba0792bf4a006fc95762a",
     "docs/etapas/economia.md": "f13c1902ce0dcce536f8c3723792d54e2cc0e42d564834a6c771b115d2e73e84",
     "docs/etapas/editor_mrbeast.md": "5b464f1d6e1de627bf5b88513784e8b8582ad60fbee4422e14d2353b059da22c",
     "docs/etapas/editores.md": "3b5b278f61e91199fde6dab8e7f5f8ec8d47ecaaaef49a14ffbc85594f000449",
