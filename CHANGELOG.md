@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.06-1 (06/11/2026)
+- **Atualização que tinha parado volta a funcionar.** Em algumas instalações o Gab baixava uma novidade e depois não atualizava mais aquele arquivo, e foi ficando para trás. Agora ele reconhece as versões antigas dele mesmo, traz tudo para a versão atual e continua sem tocar no que você editou. Se o seu Gab estava parado, ele pede um reparo de uma vez só (`scripts/reparar.py`) e depois volta a se atualizar sozinho.
 ## 2026.11.05-2 (05/11/2026)
 - **O Gab aprende com toda a comunidade.** O que o Gab aprende no seu trabalho (um macete que funcionou, um jeito melhor de cortar, um gancho que deu certo) vai anônimo, sem nome de cliente, para a nuvem do Gab. O criador aprova cada lição e o que for aprovado chega a todos os Gabs no próximo uso. Quer ensinar algo de propósito? Diga "ensina isso pro Gab" ou use `/ogab ensinar`.
 ## 2026.11.05-1 (05/11/2026)

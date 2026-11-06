@@ -94,12 +94,37 @@ SEM_PLANO = ("LICENCA_SEM_PLANO: a assinatura do Gab desta key não está ativa.
              "sozinho. Enquanto isso, NÃO fazer nada do pedido.")
 
 
-def checar():
+def _atualizador():
+    """Versão do atualizar.py desta pasta (o servidor pede o reparo a quem ainda tem o antigo, que congelava)."""
+    try:
+        import re
+        m = re.search(r"^VERSAO_ATUALIZADOR = (\d+)", open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                                         "atualizar.py"), encoding="utf-8").read(), re.M)
+        return int(m.group(1)) if m else 1
+    except Exception:
+        return 1
+
+
+def _reparar():
+    rep = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reparar.py")
+    if os.path.exists(rep):
+        try:
+            subprocess.run([sys.executable, rep, "--calado"], capture_output=True, timeout=900)
+        except Exception:
+            pass
+
+
+def checar(_tentou=False):
     d, m = _ler(), maquina()
     if not d.get("key"):
         print(PENDENTE)
         return 1
-    r = _post("/v1/validar", {"key": d["key"], "maquina": m})
+    if _atualizador() < 2 and not _tentou:   # atualizar.py antigo congelado: conserta sozinho antes de validar
+        _reparar()
+    r = _post("/v1/validar", {"key": d["key"], "maquina": m, "atualizador": _atualizador()})
+    if r and r.get("status") == "reparar" and not _tentou:
+        _reparar()
+        return checar(_tentou=True)
     if r is None:
         ok_em = d.get("validado_em", 0)
         if d.get("maquina") == m and time.time() - ok_em < OFFLINE_DIAS * 86400:

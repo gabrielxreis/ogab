@@ -23,6 +23,7 @@ CACHE = os.path.join(os.path.expanduser("~"), ".claude", "ogab_release_local.jso
 ESCRITOS = os.path.join(os.path.expanduser("~"), ".claude", "ogab_release_escritos.json")   # sha de tudo que o update gravou
 ESTADO_HOOK = os.path.join(os.path.expanduser("~"), ".claude", "ogab_hook_atualizar.json")
 INTERVALO = 60   # s entre duas checagens pelo hook
+VERSAO_ATUALIZADOR = 2   # o licenca.py manda isto ao servidor; abaixo de 2 o servidor pede o reparar.py
 
 
 def _sha(full):
@@ -141,11 +142,23 @@ def sync(calado=False):
     escritos = _escritos()
     baixados = 0
     editados = _editados_local()
+    # arquivo diferente do HEAD que não reconhecemos aqui: o servidor conhece toda versão já publicada (o clone do
+    # usuário só tem o git até o dia em que clonou). Versão nossa antiga = sobrescreve; o resto é edição do usuário.
+    duvida = {}
+    for path, sha in arquivos.items():
+        atual = _sha(os.path.join(SKILL, path))
+        if atual and atual != sha and path in editados and not _nosso(path, antigos, escritos):
+            duvida[path] = atual
+    conhecidos = set()
+    if duvida:
+        rc = licenca._post("/v1/release/conhecidos", {"key": d["key"], "maquina": licenca.maquina(), "shas": duvida})
+        if rc and rc.get("status") == "ok":
+            conhecidos = set(rc.get("conhecidos") or [])
     for path, sha in arquivos.items():
         atual = _sha(os.path.join(SKILL, path))
         if atual == sha:
             continue
-        if path in editados and not _nosso(path, antigos, escritos):
+        if path in editados and path not in conhecidos and not _nosso(path, antigos, escritos):
             continue   # edição do próprio usuário: não sobrescrever
         r = licenca._post("/v1/release/baixar", {"key": d["key"], "maquina": licenca.maquina(), "path": path})
         if r and r.get("b64") is not None:
