@@ -3,6 +3,7 @@
 - **Cor marcada mesmo com motion na trilha principal:** quando um motion fica na V1, o status do vídeo não segura mais a etapa de cor como pendente (o motion não recebe cor de propósito).
 - **Premiere: música e áudio com fade não ficam mais mudos.** Música que começa no meio da faixa (ou qualquer áudio cortado no início) tinha o volume e os fades marcados antes do trecho usado e tocava muda. Agora o volume acompanha o ponto de entrada do clipe.
 - **Premiere 26.5: trecho cortado entra sem apagar o vizinho.** Colocar um áudio ou take a partir do meio do arquivo abria um buraco na música ou cortava o efeito ao lado. Agora o Gab mede como a sua versão do Premiere posiciona o clipe (numa área livre da timeline, que ele limpa em seguida) e coloca direto no lugar certo.
+- **Premiere: take não fica preto depois de reabrir o projeto.** O Gab não arrasta mais clipe de lugar na timeline (no Premiere 26.5 o clipe movido aparecia preto ao reabrir); ele coloca cada um direto no tempo certo.
 ## 2026.11.06-1 (06/11/2026)
 - **Atualização que tinha parado volta a funcionar.** Em algumas instalações o Gab baixava uma novidade e depois não atualizava mais aquele arquivo, e foi ficando para trás. Agora ele reconhece as versões antigas dele mesmo, traz tudo para a versão atual e continua sem tocar no que você editou. Se o seu Gab estava parado, ele pede um reparo de uma vez só (`scripts/reparar.py`) e depois volta a se atualizar sozinho.
 ## 2026.11.05-2 (05/11/2026)

@@ -308,6 +308,8 @@ _JS_COLOCAR = """
     if (c.tempo - desloc < 0) {
       // de > tempo (ex.: 2º trecho da narração sem silêncio, de=5.36 em 5.2): a compensação daria posição negativa e o
       // clipe caía no 0 por cima do 1º (Premiere 26.2, sem subclipe). Coloca depois do fim da trilha e MOVE para o tempo.
+      // Só acontece em versão que soma o in point. Cuidado: take de VÍDEO movido pode renderizar preto depois de reabrir o
+      // projeto (relato 06/11/2026): conferir o quadro com P.quadro depois de salvar e reabrir.
       const tr = au >= 0 ? await s.getAudioTrack(au) : await s.getVideoTrack(v);
       let fimTr = 0; for (const x of tr.getTrackItems(CLIPE, false)) fimTr = Math.max(fimTr, (await x.getEndTime()).seconds);
       const x0 = fimTr + 1;
