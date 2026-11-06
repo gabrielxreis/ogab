@@ -281,10 +281,30 @@ _JS_COLOCAR = """
       const b = c.ate !== null ? tt(c.ate) : await clip(fonte).getOutPoint(P.Constants.MediaType.ANY);
       await tx(p, "Gab: in/out", () => [clip(fonte).createSetInOutPointsAction(a, b)]);
     }
-    // Overwrite do ITEM com in point (sem subclipe) cai em tempo + in (relato 3f81261bd5, 20/10/2026: música com
-    // de=40 entrou em 40 s): compensa a posição; o subclipe (soVideo) já começa no zero e não precisa.
-    // 26.0 já põe no tempo certo: compensar lá cai antes do lugar e sobrescreve o fim do clipe vizinho (24/10/2026)
-    const desloc = (fonte === it && c.de && !c.v260) ? c.de : 0;
+    // Overwrite do ITEM com in point (sem subclipe): cada versão do Premiere põe num lugar. Já foi visto cair em tempo + in
+    // (relato 3f81261bd5, 20/10/2026) e no tempo certo (26.0, 24/10; 26.5.2, 06/11). Compensar às cegas (pos = tempo - de)
+    // no 26.5 gravava em tempo - de e apagava a música/riser vizinho (2 relatos de 06/11/2026). Por isso MEDE: coloca uma
+    // vez numa área livre depois do fim das trilhas, vê o deslocamento, apaga essa sonda e coloca no lugar certo. Sem
+    // createMoveAction no caminho normal (item movido renderiza preto depois de reabrir o projeto, relato 06/11/2026).
+    // O subclipe (soVideo) já começa no zero e não precisa.
+    let desloc = 0;
+    if (fonte === it && c.de) {
+      const trilhas = async () => { const r = [];
+        if (v >= 0) { try { const t = await s.getVideoTrack(v); if (t) r.push(t); } catch (e) {} }
+        if (au >= 0) { try { const t = await s.getAudioTrack(au); if (t) r.push(t); } catch (e) {} }
+        return r; };
+      let fimTr = 0; for (const tr of await trilhas()) for (const x of tr.getTrackItems(CLIPE, false)) fimTr = Math.max(fimTr, (await x.getEndTime()).seconds);
+      const x0 = Math.ceil(fimTr) + 2;
+      await tx(p, "Gab: medir ponto de entrada", () => [ed.createOverwriteItemAction(fonte, tt(x0), v, au)]);
+      const sondas = []; let st0 = null;
+      for (const tr of await trilhas()) for (const x of tr.getTrackItems(CLIPE, false)) {
+        const st = (await x.getStartTime()).seconds;
+        if (st >= x0 - 0.05) { sondas.push(x); if (st0 === null || st < st0) st0 = st; }
+      }
+      if (st0 === null) throw new Error("não achou o clipe de medição do ponto de entrada");
+      desloc = Math.abs(st0 - x0) < 0.05 ? 0 : st0 - x0;   // 0 = esta versão já põe no tempo pedido
+      if (!remover(p, ed, sondas)) throw new Error("não apagou o clipe de medição em " + x0 + " s");
+    }
     if (c.tempo - desloc < 0) {
       // de > tempo (ex.: 2º trecho da narração sem silêncio, de=5.36 em 5.2): a compensação daria posição negativa e o
       // clipe caía no 0 por cima do 1º (Premiere 26.2, sem subclipe). Coloca depois do fim da trilha e MOVE para o tempo.
@@ -309,12 +329,7 @@ _JS_COLOCAR = """
       for (const x of tr.getTrackItems(CLIPE, false)) {
         const st = (await x.getStartTime()).seconds;
         if (Math.abs(st - c.tempo) < 0.05) { caiu = st; break; }
-        if (Math.abs(st - c.tempo - desloc) < 0.05 || Math.abs(st - c.tempo - (c.de || 0)) < 0.05) caiu = st;
-        // Premiere 26.0 não soma o in point (24/10/2026: música com de=15,7 caiu em tempo - de): move para o tempo pedido
-        if (caiu === null && desloc && Math.abs(st - pos) < 0.05) {
-          await tx(p, "Gab: acerta posição", () => [x.createMoveAction(tt(c.tempo - st))]);
-          caiu = (await x.getStartTime()).seconds; break;
-        }
+        if (Math.abs(st - pos) < 0.05 || Math.abs(st - c.tempo - (c.de || 0)) < 0.05) caiu = st;   // fora do lugar: o Python avisa
       }
     } catch (e) {}
     saida.push({ nome: it.name, pedido: c.tempo, caiu });
@@ -349,8 +364,7 @@ def colocar(seq, arquivo, tempo, video=0, audio=0, de=None, ate=None, db=None, f
     de/ate cortam a fonte (s). db/fades ajustam o volume do clipe de áudio colocado."""
     arquivo = _abs(arquivo)
     r = js(_JS_COLOCAR, "colocar", seq=seq, clipes=[dict(arquivo=arquivo, tempo=tempo, video=video, audio=audio,
-                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo), dur=_duracao(arquivo),
-                                                           v260=_versao_ppro().startswith("26.0"))])
+                                                           de=de, ate=ate, bin=_bin_de(arquivo), tem_audio=_tem_audio(arquivo), dur=_duracao(arquivo))])
     for x in (r or []):
         if isinstance(x, dict) and x.get("caiu") is not None and abs(x["caiu"] - tempo) > 0.05:
             raise RuntimeError(f"{x['nome']} entrou em {x['caiu']:.2f} s, não em {tempo:.2f} s (ponto de entrada de={de}): "
