@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.06-3 (06/11/2026)
+- **Reparo da atualização agora é automático.** Se o seu Gab tinha parado de se atualizar, ele se conserta sozinho na próxima vez que você abrir: você não precisa rodar nada nem responder nada.
 ## 2026.11.06-2 (06/11/2026)
 - **Cor marcada mesmo com motion na trilha principal:** quando um motion fica na V1, o status do vídeo não segura mais a etapa de cor como pendente (o motion não recebe cor de propósito).
 - **Premiere: música e áudio com fade não ficam mais mudos.** Música que começa no meio da faixa (ou qualquer áudio cortado no início) tinha o volume e os fades marcados antes do trecho usado e tocava muda. Agora o volume acompanha o ponto de entrada do clipe.

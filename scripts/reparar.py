@@ -14,6 +14,7 @@ import base64, json, os, subprocess, sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 SKILL = os.path.dirname(AQUI)
+os.environ["OGAB_REPARANDO"] = "1"   # a ponte scripts/licenca/ não dispara outro reparo daqui
 sys.path.insert(0, AQUI)
 import licenca  # noqa: E402   (serve até o licenca.py antigo: só usa _ler, _post e maquina)
 
