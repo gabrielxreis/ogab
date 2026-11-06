@@ -1,4 +1,7 @@
 # Novidades do Gab (/ogab)
+## 2026.11.06-4 (06/11/2026)
+- **O que o Gab já aprendeu com você pode ajudar a comunidade.** Na próxima abertura, se você tem memórias de marca com aprendizados (o que funcionou e por quê), o Gab pergunta uma vez se pode mandar esses aprendizados para a comunidade, anônimos e sem nome de cliente. Você responde sim ou não e pronto; o criador aprova antes de chegar aos outros.
+- **Relatos mais limpos:** nome de cliente é trocado só quando é a palavra inteira (um cliente chamado "Media" não estraga mais a palavra "multimedia").
 ## 2026.11.06-3 (06/11/2026)
 - **Reparo da atualização agora é automático.** Se o seu Gab tinha parado de se atualizar, ele se conserta sozinho na próxima vez que você abrir: você não precisa rodar nada nem responder nada.
 ## 2026.11.06-2 (06/11/2026)

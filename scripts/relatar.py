@@ -106,6 +106,10 @@ def _nomes_privados(cfg):
     except Exception:
         pass
     nomes.add(os.path.basename(os.path.expanduser("~")))
+    try:   # marcas achadas pela colheita do conhecimento (fora de clientes/ e da pasta_saida)
+        nomes.update(json.load(open(os.path.expanduser("~/.claude/ogab_relatos/nomes_colheita.json"), encoding="utf-8")))
+    except Exception:
+        pass
     return sorted((n for n in nomes if n and len(n) >= 3), key=len, reverse=True)
 
 
@@ -124,7 +128,8 @@ def anonimizar(txt, nomes):
     t = re.sub(r"\b[A-Za-z0-9_\-]{40,}\b", "<longo>", t)
     t = re.sub(r"(https?://[^\s?#]+)\?[^\s)\"']+", r"\1?<params>", t)
     for n in nomes:
-        t = re.sub(re.escape(n), "<cliente>", t, flags=re.I)
+        t = re.sub(r"(?<!\w)" + re.escape(n) + r"(?!\w)", "<cliente>", t, flags=re.I)   # palavra inteira:
+        # nome de pasta comum ("Media", "Music") não corta "musical"/"multimedia"
     return t
 
 

@@ -14,6 +14,7 @@ Linhas que podem sair (o SKILL.md do carregador diz o que fazer com cada uma):
   NOVIDADES: (bloco)                            primeira coisa da resposta, em lista curta
   COMPONENTES: ... / PERGUNTAR_APRESENTACAO: ... / LEMBRETE: ...   como no SKILL.md do carregador
   CONHECIMENTO: N lição(ões) nova(s) da comunidade (áreas)   uma linha; a área lê `conhecimento.py ler --area`
+  COLHEITA_PERGUNTAR: ...   seguir a linha (pergunta de uma linha; uma vez por máquina)
 """
 import json, os, subprocess, sys
 
@@ -98,6 +99,8 @@ def main():
     out += [l for l in txt.splitlines() if l.startswith(("PERGUNTAR_APRESENTACAO", "LEMBRETE"))]
     _, txt = rodar("conhecimento.py", "baixar", timeout=20)   # base da comunidade aprovada pelo criador
     out += [l for l in txt.splitlines() if l.startswith("CONHECIMENTO")]
+    _, txt = rodar("conhecimento.py", "colher", "--checar", timeout=30)   # 1 vez: o que esta máquina já aprendeu
+    out += [l for l in txt.splitlines() if l.startswith("COLHEITA_PERGUNTAR")]
 
     try:  # relatos anônimos: em segundo plano, sem saída
         subprocess.Popen([sys.executable, os.path.join(AQUI, "relatar.py"), "enviar"], cwd=SKILL,
