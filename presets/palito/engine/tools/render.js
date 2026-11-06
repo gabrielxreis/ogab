@@ -3,13 +3,15 @@
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const fs = require('fs');
+const path = require('path');
+const { pathToFileURL } = require('url');
 (async () => {
   const mode = process.argv[2];
-  const browser = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}), args: ['--allow-file-access-from-files', '--enable-gpu', '--ignore-gpu-blocklist', '--use-angle=metal'] });
+  const browser = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}), args: ['--allow-file-access-from-files', '--enable-gpu', '--ignore-gpu-blocklist', ...(process.platform === 'darwin' ? ['--use-angle=metal'] : [])] });   // metal só existe no Mac (relato Windows 06/11/2026)
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
   page.on('console', m => console.log('[page]', m.text()));
   page.on('pageerror', e => console.log('[err]', e.message));
-  await page.goto('file://' + process.cwd() + '/web/index.html');
+  await page.goto(pathToFileURL(path.join(process.cwd(), 'web', 'index.html')).href);   // file:///C:/... no Windows
   await page.evaluate(async () => { await document.fonts.load('700 40px Poppins'); await document.fonts.load('700 40px Lora'); await document.fonts.load('600 40px Lora'); });
   const total = await page.evaluate(() => window.TOTAL_FRAMES);
   if (mode === 'stills') {

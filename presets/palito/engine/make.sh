@@ -14,6 +14,7 @@ DIR="$(cd "${1:?usage: make.sh <reel-folder> [kokoro|elevenlabs|file]}" && pwd)"
 VOICE="${2:-keep}"
 WORKERS="${WORKERS:-4}"
 PY="$KIT/.venv/bin/python"
+[ -x "$PY" ] || [ ! -f "$KIT/.venv/Scripts/python.exe" ] || PY="$KIT/.venv/Scripts/python.exe"   # Windows (Git Bash)
 [ -x "$PY" ] || { echo "the voice tools aren't set up: run  bash $KIT/setup.sh --voice"; exit 1; }
 export NODE_PATH="$KIT/node_modules"
 NAME="$(basename "$DIR")"
