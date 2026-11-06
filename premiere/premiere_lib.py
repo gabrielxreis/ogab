@@ -375,6 +375,9 @@ def volume(seq, trilha_audio, tempo, db=0.0, fade_in=0.0, fade_out=0.0):
       const cadeia = await alvo.getComponentChain();
       const lin = Math.min(1, Math.pow(10, (args.db - 15) / 20));   // escala do Premiere: 0.1778 = 0 dB, 1.0 = +15 dB (máximo)
       const ini = (await alvo.getStartTime()).seconds, fim = (await alvo.getEndTime()).seconds;
+      // Keyframe conta no tempo da MÍDIA (como no envelope_volume): clipe com ponto de entrada (música com inicio_faixa,
+      // de=...) precisa somar o in point, senão os keyframes caem antes do trecho usado e o clipe fica mudo (relatos 06/11/2026).
+      let inP = 0; try { inP = (await alvo.getInPoint()).seconds || 0; } catch (e) {}
       // Componentes e parâmetros só valem DENTRO do lockedAccess e sem await no meio (senão "script object is no longer valid").
       let ok = false, achou = false;
       p.lockedAccess(() => {
@@ -385,7 +388,7 @@ def volume(seq, trilha_audio, tempo, db=0.0, fade_in=0.0, fade_out=0.0):
         }
         if (!nivel) return;
         achou = true;
-        const k = (t, v) => { const kf = nivel.createKeyframe(v); kf.position = tt(t); return nivel.createAddKeyframeAction(kf); };
+        const k = (t, v) => { const kf = nivel.createKeyframe(v); kf.position = tt(inP + t); return nivel.createAddKeyframeAction(kf); };
         ok = p.executeTransaction((c) => {
           if (args.fade_in || args.fade_out) {
             c.addAction(nivel.createSetTimeVaryingAction(true));
