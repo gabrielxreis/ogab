@@ -1,4 +1,6 @@
 # Novidades do Gab (/ogab)
+## 2026.11.06-2 (06/11/2026)
+- **Cor marcada mesmo com motion na trilha principal:** quando um motion fica na V1, o status do vídeo não segura mais a etapa de cor como pendente (o motion não recebe cor de propósito).
 ## 2026.11.06-1 (06/11/2026)
 - **Atualização que tinha parado volta a funcionar.** Em algumas instalações o Gab baixava uma novidade e depois não atualizava mais aquele arquivo, e foi ficando para trás. Agora ele reconhece as versões antigas dele mesmo, traz tudo para a versão atual e continua sem tocar no que você editou. Se o seu Gab estava parado, ele pede um reparo de uma vez só (`scripts/reparar.py`) e depois volta a se atualizar sozinho.
 ## 2026.11.05-2 (05/11/2026)

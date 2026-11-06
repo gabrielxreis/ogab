@@ -88,7 +88,9 @@ def detectar(nome_tl):
     if any(eh_titulo(x) for k, x in acima): ok.add("letterings")
     if any(eh_motion(k, x) and not eh_titulo(x) for k, x in acima): ok.add("motions")
     try:
-        if v1 and all(x.GetNodeGraph().GetNumNodes() > 1 or x.GetNodeGraph().GetLUT(1) for x in v1): ok.add("cor")   # PowerGrade (nós) ou LUT DO GAB no nó 1
+        # motion na V1 (pasta motions*/ ou .mov) não recebe grade no aplicar_grade: não pode travar a etapa (relato 06/11/2026)
+        v1_cor = [x for x in v1 if x.GetClipEnabled() and "/motions" not in _fp(x).replace("\\", "/") and not _fp(x).lower().endswith(".mov")]
+        if v1 and all(x.GetNodeGraph().GetNumNodes() > 1 or x.GetNodeGraph().GetLUT(1) for x in v1_cor): ok.add("cor")   # PowerGrade (nós) ou LUT DO GAB no nó 1
     except Exception:
         pass
     if t.GetTrackCount("audio") >= 2 and itens("audio", 2): ok.add("musica")
